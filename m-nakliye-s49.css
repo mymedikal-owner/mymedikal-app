@@ -1,0 +1,12 @@
+ 
+.tq-veri-satir { font-size: var(--t-xs); color: var(--soluk); margin: 2px 0 var(--b2); font-variant-numeric: tabular-nums; }
+.ns-cizgi { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-size: var(--t-xs); color: var(--soluk); font-variant-numeric: tabular-nums; }
+.ns-hat { display: inline-block; width: 28px; height: 2px; border-radius: 1px; }
+.ns-nokta { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; box-sizing: border-box; }
+.ns-nokta.bos { background: transparent; border: 2px solid var(--gri); }
+.ns-gecikmis { background: var(--kirmizi-zemin); border: 1px solid var(--kritik); border-radius: var(--r-m); padding: var(--b4); }
+.ns-gecikmis .bolum { margin: 0 0 2px; display: flex; align-items: center; gap: 6px; color: var(--kirmizi); }
+.ns-gecikmis .tq-liste { margin-top: var(--b3); }
+.ns-teslim-yok { font-style: italic; }
+.ns-grup { margin-top: var(--b4); }
+.ns-grup-ad { margin: 0 0 var(--b2); font-size: var(--t-m); display: flex; align-items: center; gap: var(--b2); overflow-wrap: anywhere; }

@@ -1,0 +1,37 @@
+ 
+.tn-kap { position: fixed; inset: 0; z-index: 95; display: flex; justify-content: center; align-items: center; padding: var(--b4); }
+.tn-perde { position: absolute; inset: 0; background: rgba(8, 10, 14, .55); backdrop-filter: blur(2px); animation: gir var(--hiz) both; }
+.tn-kart { position: relative; width: min(520px, 100%); max-height: calc(100dvh - 2 * var(--b4)); overflow-y: auto; background: var(--yuzey); color: var(--yazi); border: 1px solid var(--cizgi); border-radius: var(--r-l); box-shadow: var(--golge-2); padding: var(--b5); display: flex; flex-direction: column; gap: var(--b3); animation: gir var(--hiz) var(--egri) both; }
+.tn-ust { display: flex; align-items: center; justify-content: space-between; gap: var(--b3); }
+.tn-sayac { font-size: var(--t-xs); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--soluk); margin: 0; }
+.tn-noktalar { display: flex; gap: 6px; } .tn-n { width: 8px; height: 8px; border-radius: 50%; background: var(--eksen); } .tn-n.on { background: var(--vurgu); width: 22px; border-radius: var(--r-t); transition: width var(--hiz); }
+.tn-baslik { font-size: var(--t-xl); line-height: 1.25; margin: 0; letter-spacing: -.01em; } .tn-baslik:focus { outline: none; } .tn-baslik:focus-visible { outline: none; }
+.tn-govde { display: flex; flex-direction: column; gap: var(--b3); font-size: var(--t-m); line-height: 1.5; }
+.tn-metin, .tn-not, .tn-govde p { margin: 0; } .tn-not { font-size: var(--t-s); color: var(--soluk); }
+.tn-cipler, .tn-satirlar { list-style: none; margin: 0; padding: 0; }
+.tn-cipler { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+.tn-cip { display: flex; align-items: center; gap: var(--b2); min-height: 44px; padding: 0 var(--b3); background: var(--yuzey2); border: 1px solid var(--cizgi); border-radius: var(--r-m); font-size: var(--t-s); font-weight: 600; min-width: 0; }
+.tn-cip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tn-cip-ik { color: var(--vurgu); display: inline-flex; flex: 0 0 auto; }
+.tn-satirlar { display: flex; flex-direction: column; gap: var(--b3); }
+.tn-satir { display: flex; gap: var(--b3); align-items: flex-start; }
+.tn-satir-ik { flex: 0 0 auto; min-width: 44px; padding: 0 6px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--vurgu-zemin); color: var(--vurgu); border-radius: var(--r-m); }
+.tn-satir > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; } .tn-satir b { font-size: var(--t-m); } .tn-satir span:not(.tn-satir-ik):not(.nokta):not(.etiket) { font-size: var(--t-s); color: var(--yazi2); }
+.tn-satir-ik .etiket { font-size: 9px; padding: 1px 5px; }
+.tn-guvence { display: flex; gap: var(--b2); align-items: flex-start; padding: var(--b3); background: var(--yesil-zemin); color: var(--yazi); border: 1px solid var(--cizgi); border-radius: var(--r-m); font-size: var(--t-s); }
+.tn-guvence svg { flex: 0 0 auto; color: var(--yesil); margin-top: 1px; }
+.tn-alt { display: flex; align-items: center; gap: var(--b2); margin-top: var(--b2); }
+.tn-bosluk { flex: 1 1 auto; }
+.tn-dugme { min-height: 44px; min-width: 44px; padding: 0 var(--b4); border-radius: var(--r-t); border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi); font: inherit; font-size: var(--t-m); font-weight: 600; cursor: pointer; }
+.tn-dugme:hover { background: var(--yuzey2); } .tn-dugme[hidden] { display: none; }
+.tn-dugme:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; }
+.tn-atla { border-color: transparent; background: none; color: var(--soluk); }
+.tn-ileri { background: var(--vurgu); color: var(--vurgu-yazi); border-color: var(--vurgu); padding: 0 var(--b5); } .tn-ileri:hover { background: var(--vurgu); filter: brightness(1.08); }
+body.tanitim-acik { overflow: hidden; }
+@media (max-width: 599px) {
+  .tn-kap { align-items: flex-end; padding: 0; }
+  .tn-kart { width: 100%; max-height: 92dvh; border-radius: var(--r-l) var(--r-l) 0 0; border-bottom: 0; padding: var(--b4) var(--b4) calc(var(--b4) + env(safe-area-inset-bottom)); }
+  .tn-baslik { font-size: var(--t-l); }
+}
+@media (max-width: 359px) { .tn-cipler { grid-template-columns: 1fr; } }
+.zil-tur { display: inline; min-height: 44px; padding: 0; border: 0; background: none; color: var(--vurgu); font: inherit; text-decoration: underline; cursor: pointer; }

@@ -1,0 +1,57 @@
+ 
+.kpi-izgara.ih-kpi { grid-template-columns: 1fr 1fr; gap: var(--b2); }
+.ih-kpi .kpi-ana { padding: var(--b3); }
+.ih-kpi .kpi-baslik { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
+.ih-rozetler { margin: var(--b2) 0; }
+.ih-bilgi { display: inline-block; font-size: var(--t-xs); padding: 3px 10px; border-radius: var(--r-s); background: var(--yesil-zemin); color: var(--yesil); font-weight: 600; }
+.ih-bilgi.kirmizi { background: var(--kirmizi-zemin); color: var(--kirmizi); }
+.ih-filtre { margin-bottom: var(--b3); }
+.ih-liste { display: grid; gap: var(--b3); }
+.ih-kart { background: var(--yuzey); border: 1px solid var(--cizgi); border-left: 4px solid var(--vurgu); border-radius: var(--r-m); overflow: hidden; }
+.ih-kart.dis { border-left-color: var(--tahmin); }
+.ih-kart.acik { border-color: var(--vurgu); }
+.ih-kart-ust { display: flex; flex-direction: column; gap: var(--b2); width: 100%; text-align: left; font: inherit; color: var(--yazi); background: transparent; border: 0; padding: var(--b3) var(--b4); cursor: pointer; min-height: 44px; }
+.ih-kurum { font-weight: 600; overflow-wrap: anywhere; }
+.ih-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b1) var(--b3); font-size: var(--t-s); color: var(--yazi2); }
+.ih-ikn { font-variant-numeric: tabular-nums; }
+.ih-son.acil { color: var(--turuncu); font-weight: 700; }
+.ih-say { color: var(--soluk); }
+.ih-kalemler { border-top: 1px solid var(--cizgi); padding: var(--b3) var(--b4) var(--b4); display: grid; gap: var(--b2); }
+.ih-kalem { display: flex; align-items: flex-start; gap: var(--b2); padding: var(--b2); border-radius: var(--r-s); background: var(--yuzey2); cursor: pointer; min-height: 44px; }
+.ih-kalem.ilgisiz { opacity: .7; }
+.ih-kalem input { margin-top: 3px; width: 20px; height: 20px; flex: none; }
+.ih-kalem-metin { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.ih-kalem-no { font-size: var(--t-xs); color: var(--soluk); }
+.ih-kalem-tanim { overflow-wrap: anywhere; }
+.ih-kalem-miktar { font-size: var(--t-s); color: var(--yazi2); font-variant-numeric: tabular-nums; }
+.ih-rozet-grup { flex: none; font-size: 11px; font-weight: 700; border-radius: var(--r-s); padding: 2px 8px; background: var(--vurgu-zemin); color: var(--vurgu); border: 1px solid var(--vurgu); }
+.ih-eylem { display: flex; flex-wrap: wrap; gap: var(--b2); margin-top: var(--b2); }
+.ih-eylem .dugme { text-decoration: none; justify-content: center; flex: 1 1 140px; }
+.ih-mail-dugme { background: var(--yuzey) !important; color: var(--yazi) !important; border-color: var(--cizgi) !important; }
+.ih-ipucu { margin: 0; font-size: var(--t-xs); color: var(--soluk); }
+.ih-panel { background: var(--yuzey2); border-radius: var(--r-m); padding: var(--b3); display: grid; gap: var(--b3); }
+.ih-panel h4 { margin: 0; font-size: var(--t-m); }
+.ih-fk { display: grid; gap: var(--b1); padding-bottom: var(--b2); border-bottom: 1px solid var(--cizgi); }
+.ih-fk:last-child { border-bottom: 0; padding-bottom: 0; }
+.ih-fk-ad { font-size: var(--t-s); color: var(--yazi2); overflow-wrap: anywhere; }
+.ih-seg-liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--b2); }
+.ih-seg { display: flex; flex-direction: column; gap: 2px; }
+.ih-seg-ad { font-size: var(--t-xs); color: var(--soluk); }
+.ih-seg-fiyat { font-size: var(--t-l); font-variant-numeric: tabular-nums; }
+.ih-seg-alt { font-size: var(--t-xs); color: var(--soluk); }
+.ih-seg.yok .ih-seg-fiyat { font-size: var(--t-s, inherit); color: var(--soluk); font-weight: normal; }
+.ih-tavan { font-size: var(--t-s, inherit); }
+.ih-tavan.yok { color: var(--soluk); }
+.ih-bant { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--b2); }
+.ih-bant-oge { display: flex; flex-direction: column; gap: 2px; }
+.ih-bant-oge small { font-size: var(--t-xs); color: var(--soluk); }
+.ih-bant-oge strong { font-size: var(--t-l); font-variant-numeric: tabular-nums; }
+.ih-alt, .ih-etiket, .ih-maliyet, .ih-yok, .ih-uyari, .ih-onceki { margin: 0; font-size: var(--t-s); }
+.ih-alt, .ih-yok { color: var(--soluk); }
+.ih-etiket { color: var(--yazi2); font-style: italic; }
+.ih-uyari { color: var(--kirmizi); background: var(--kirmizi-zemin); padding: 4px 8px; border-radius: var(--r-s); font-weight: 700; }
+.sekme-sayi { margin-left: 6px; font-size: var(--t-xs); color: var(--soluk); }
+@media (hover: hover) {
+  .ih-kart-ust:hover { background: var(--yuzey2); }
+  .ih-kalem:hover { outline: 1px solid var(--vurgu); }
+}

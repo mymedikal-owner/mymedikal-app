@@ -1,0 +1,40 @@
+ 
+
+ 
+body.nakliyeci .menu, body.nakliyeci #diger-sheet, body.nakliyeci #ara-ac, body.nakliyeci #zil, body.nakliyeci #menu-ac { display: none !important; }
+body.nakliyeci .kabuk { grid-template-columns: minmax(0, 1fr) !important; padding-bottom: 0 !important; }
+body.nakliyeci .icerik { grid-column: 1 !important; grid-row: 2; max-width: 640px; margin: 0 auto; width: 100%; box-sizing: border-box; padding-bottom: calc(var(--b6) + env(safe-area-inset-bottom, 0px)); }
+
+.ny-baslik { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b2) var(--b3); margin: var(--b3) 0 var(--b3); }
+.ny-baslik h2 { margin: 0; font-size: var(--t-xl, 1.4rem); }
+.ny-firma { display: inline-flex; align-items: center; min-height: 32px; padding: 0 var(--b3); border-radius: var(--r-t); background: var(--vurgu-zemin); color: var(--vurgu-sert); font-weight: 600; font-size: var(--t-s); }
+.ny-kart { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m); padding: var(--b4); margin: 0 0 var(--b3); display: flex; flex-direction: column; gap: var(--b2); min-width: 0; }
+.ny-etiket { font-weight: 600; font-size: var(--t-s); margin-top: var(--b2); }
+.ny-girdi { width: 100%; box-sizing: border-box; min-height: 52px; padding: 10px var(--b3); font: inherit; font-size: 1.125rem; color: var(--yazi); background: var(--yuzey); border: 2px solid var(--cizgi); border-radius: var(--r-m); }
+.ny-girdi:focus-visible { outline: 3px solid var(--vurgu); outline-offset: 1px; border-color: var(--vurgu); }
+.ny-not { min-height: 72px; font-size: 1rem; resize: vertical; }
+.ny-ipucu { color: var(--soluk); font-size: var(--t-xs); margin: 0; }
+.ny-dugmeler { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); margin: var(--b2) 0; }
+@media (max-width: 380px) { .ny-dugmeler { grid-template-columns: minmax(0, 1fr); } }
+.ny-buyuk { min-height: 60px; font-size: 1.05rem; justify-content: center; border-radius: var(--r-m); }
+.ny-gonder { width: 100%; min-height: 60px; justify-content: center; font-size: 1.15rem; border-radius: var(--r-m); margin-top: var(--b2); }
+.ny-gonder:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.ny-gizli { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; }
+.ny-secili { display: flex; flex-direction: column; gap: var(--b2); }
+.ny-dosya { display: flex; align-items: center; gap: var(--b3); padding: var(--b2); border: 1px solid var(--cizgi); border-radius: var(--r-m); background: var(--yuzey2); min-width: 0; }
+.ny-kucuk { width: 56px; height: 56px; flex: none; object-fit: cover; border-radius: var(--r-s); background: var(--yuzey); display: inline-flex; align-items: center; justify-content: center; }
+.ny-pdf { color: var(--kirmizi); border: 1px solid var(--cizgi); }
+.ny-dosya-ad { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.ny-dosya-ad small, .ny-satir-ad small { color: var(--soluk); font-size: var(--t-xs); overflow-wrap: anywhere; }
+.ny-kaldir { flex: none; width: 52px; height: 52px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--cizgi); border-radius: var(--r-m); background: var(--yuzey); color: var(--yazi2); cursor: pointer; }
+.ny-mesaj { min-height: 1.4em; font-size: var(--t-s); color: var(--yazi2); }
+.ny-mesaj.tamam { color: var(--yesil); font-weight: 600; }
+.ny-mesaj.hata { color: var(--kirmizi); font-weight: 600; }
+.ny-alt-baslik { margin: 0 0 var(--b2); font-size: var(--t-l); }
+.ny-liste { display: flex; flex-direction: column; }
+.ny-satir { display: flex; align-items: center; justify-content: space-between; gap: var(--b3); padding: var(--b3) 0; border-bottom: 1px solid var(--cizgi); min-width: 0; }
+.ny-satir:last-child { border-bottom: 0; }
+.ny-satir-ad { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.ny-satir-ad b { overflow-wrap: anywhere; }
+.ny-rozet { display: inline-flex; align-items: center; gap: 6px; flex: none; min-height: 32px; padding: 0 var(--b3); border-radius: var(--r-t); font-size: var(--t-s); font-weight: 600; white-space: nowrap; }
+@media (max-width: 420px) { .ny-satir { flex-wrap: wrap; } }

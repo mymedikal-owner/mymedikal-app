@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex">
+<script src="web-koruma.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com https://mymedikal.sharepoint.com; frame-src 'self' https://login.microsoftonline.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>MY Medikal</title>
+<meta name="theme-color" content="#256abf">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="marka/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="marka/ikon-180.png">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="bilesen.css">
+<link rel="stylesheet" href="kabuk.css">
+<link rel="stylesheet" href="m-ana.css">
+<link rel="stylesheet" href="m-makine.css">
+<link rel="stylesheet" href="m-eldiven.css">
+<link rel="stylesheet" href="m-siparis.css">
+<link rel="stylesheet" href="m-dmo.css">
+<link rel="stylesheet" href="m-dmo-nakliyat.css">
+<link rel="stylesheet" href="m-takvim.css">
+<link rel="stylesheet" href="m-yeni.css">
+<link rel="stylesheet" href="m-tanitim.css">
+<link rel="stylesheet" href="m-s41.css">
+<link rel="stylesheet" href="m-s42.css">
+<link rel="stylesheet" href="m-sterilizasyon.css">
+<link rel="stylesheet" href="m-ihale.css">
+<link rel="stylesheet" href="m-nakliye-s49.css">
+<link rel="stylesheet" href="m-makine-ek.css">
+<link rel="stylesheet" href="m-muhasebe-s49.css">
+<link rel="stylesheet" href="giris.css">
+</head>
+<body>
+<div id="acilis" class="acilis" aria-hidden="true"><img class="acilis-acik" src="marka/logo.svg" alt="" width="240"><img class="acilis-koyu" src="marka/logo-koyu.svg" alt="" width="240"></div>
+<div class="kabuk">
+  <header class="ust">
+    <button id="menu-ac" class="ikon-dugme" type="button" aria-label="Menüyü aç / daralt" aria-expanded="false" aria-controls="menu">&#9776;</button>
+    <div class="marka"><img src="marka/logo-isaret.svg" alt="" width="32" height="32"><h1>MY Medikal</h1></div>
+    <button id="ara-ac" class="ara-dugme" type="button" aria-label="Ara (konteyner, sipariş, makine, belge)" aria-haspopup="dialog"><span class="ara-ikon"></span><span class="ara-metin">Ara…</span><kbd>Ctrl K</kbd></button>
+    <div class="ust-sag">
+      <button id="zil" class="ikon-dugme zil" type="button" aria-label="Bildirimler" aria-haspopup="dialog" aria-expanded="false"><span class="zil-ikon"></span><span class="zil-sayi" hidden></span></button>
+      <button id="tema" class="ikon-dugme" type="button" aria-label="Temayı değiştir" title="Açık / koyu tema"><span class="tema-ikon"></span></button>
+    </div>
+  </header>
+  <nav id="menu" class="menu" aria-label="Modüller"></nav>
+  <main id="icerik" class="icerik" tabindex="-1"></main>
+</div>
+<script src="ayar.js"></script>
+<script src="dil.js"></script>
+<script src="veri.js"></script>
+<script src="arama.js"></script>
+<script src="grafik.js"></script>
+<script src="app.js"></script>
+<script src="vendor/msal-browser.min.js"></script>
+<script src="giris.js"></script>
+<script src="bildirim.js"></script>
+<script src="modul-makine-ek.js"></script>
+<script src="modul-fabrika.js"></script>
+<script src="modul-eldiven.js"></script>
+<script src="modul-siparis.js"></script>
+<script src="modul-dmo.js"></script>
+<script src="modul-dmo-nakliyat.js"></script>
+<script src="modul-takvim.js"></script>
+<script src="modul-nakliye.js"></script>
+<script src="modul-nakliye-yukle.js"></script>
+<script src="modul-sterilizasyon.js"></script>
+<script src="modul-ihale.js"></script>
+<script src="modul-kalite-yukle.js"></script>
+<script src="modul-yonetim.js"></script>
+<script src="modul-ana.js"></script>
+<script src="modul-yeni.js"></script>
+<script src="modul-muhasebe.js"></script>
+<script src="modul-mali.js"></script>
+<script src="modul-stok.js"></script>
+<script src="modul-musteri.js"></script>
+<script src="modul-sikayet.js"></script>
+<script src="ozet.js"></script>
+<script src="kabuk-ek.js"></script>
+<script src="modul-tanitim.js"></script>
+<script src="yukleme-kontrol.js"></script>
+<script src="acilis.js"></script>
+</body>
+</html>

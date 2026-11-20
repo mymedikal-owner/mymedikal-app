@@ -1,0 +1,22 @@
+ 
+.ms-arama { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m); padding: var(--b2) var(--b3); margin-bottom: var(--b3); }
+.ms-arama-ust { display: flex; align-items: center; gap: var(--b2); color: var(--soluk); }
+.ms-arama-giris { flex: 1 1 auto; min-width: 0; min-height: 40px; border: 0; background: transparent; font: inherit; font-size: var(--t-s); color: var(--yazi); outline: none; }
+.ms-arama-giris:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; border-radius: var(--r-s); }
+.ms-arama-sonuc { display: grid; gap: var(--b1); margin-top: var(--b2); }
+.ms-arama-sonuc:empty { display: none; }
+.ms-arama-satir { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px var(--b2); align-items: center; text-align: left; min-height: 44px; padding: var(--b2); background: var(--yuzey2); border: 1px solid var(--cizgi); border-radius: var(--r-s); color: inherit; font: inherit; cursor: pointer; }
+.ms-arama-satir b { overflow-wrap: anywhere; font-size: var(--t-s); }
+.ms-arama-satir small { grid-column: 2; color: var(--soluk); font-size: var(--t-xs); overflow-wrap: anywhere; }
+.ms-kapanis { display: flex; height: 18px; border-radius: var(--r-t); overflow: hidden; background: var(--gri-zemin); margin-bottom: var(--b2); }
+.ms-kapanis i { display: block; height: 100%; }
+.ms-sec { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--b2); }
+.ms-adim { display: inline-flex; align-items: center; gap: var(--b2); }
+.ms-adim-ad { min-width: 96px; text-align: center; font-size: var(--t-m); font-variant-numeric: tabular-nums; }
+.ms-adim .mini-dugme { min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; }
+.ms-adim .mini-dugme[disabled] { opacity: .4; cursor: default; }
+.ms-fk { display: grid; gap: var(--b1); }
+.ms-delta { display: grid; gap: 2px; padding: 0 var(--b2); font-size: var(--t-xs); }
+.ms-alt-baslik { margin: 0 0 var(--b2); font-size: var(--t-s); }
+.ms-tumu { margin-top: var(--b2); min-height: 44px; }
+@media (max-width: 420px) { .ms-sec { justify-content: center; } }

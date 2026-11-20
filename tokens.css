@@ -1,0 +1,56 @@
+
+
+
+:root {
+  color-scheme: light;
+   
+  --zemin: #f4f4f1; --yuzey: #fcfcfb; --yuzey2: #f0efec; --yuzey3: #e8e7e2; --cizgi: #e1e0d9; --eksen: #c3c2b7; --izgara: #e1e0d9;
+  --yazi: #0b0b0b; --yazi2: #52514e; --soluk: #62615c; --soluk2: #898781;
+   
+  --vurgu: #256abf; --vurgu-yazi: #ffffff; --vurgu-zemin: #e6effb; --vurgu-sert: #184f95;
+   
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
+   
+  --sk1: #cde2fb; --sk2: #9ec5f4; --sk3: #6da7ec; --sk4: #3987e5; --sk5: #256abf; --sk6: #184f95; --sk7: #0d366b;
+   
+  --iyi: #0ca30c; --uyari: #fab219; --ciddi: #ec835a; --kritik: #d03b3b;
+   
+  --yesil: #006300; --sari: #7a5200; --turuncu: #b3470f; --kirmizi: #c02f2f; --gri: #898781;
+  --yesil-zemin: #e2f3e2; --sari-zemin: #fff3d1; --sari-yazi: #4d3300; --kirmizi-zemin: #fbe7e7; --gri-zemin: #eceae4; --turuncu-zemin: #fdeadf;
+  --tahmin: #6250d6; --tahmin-zemin: #ecebfb;
+   
+  --b1: 4px; --b2: 8px; --b3: 12px; --b4: 16px; --b5: 24px; --b6: 32px; --b7: 48px;
+  --t-xs: 11.5px; --t-s: 13px; --t-m: 15px; --t-l: 17px; --t-xl: 20px; --t-2xl: 26px; --t-3xl: 34px;
+  --r-s: 8px; --r-m: 12px; --r-l: 16px; --r-t: 999px;
+  --golge-1: 0 1px 2px rgba(11,11,11,.06), 0 1px 1px rgba(11,11,11,.04);
+  --golge-2: 0 8px 28px rgba(11,11,11,.14), 0 2px 6px rgba(11,11,11,.08);
+  --hiz: 160ms; --egri: cubic-bezier(.2, .7, .2, 1);
+  --alt-yukseklik: 60px; --ust-yukseklik: 56px;
+  --yazi-aile: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="acik"]) { color-scheme: dark;
+    --zemin: #0d0d0d; --yuzey: #1a1a19; --yuzey2: #232321; --yuzey3: #2c2c2a; --cizgi: #2c2c2a; --eksen: #383835; --izgara: #2c2c2a;
+    --yazi: #f0efec; --yazi2: #c3c2b7; --soluk: #a8a79e; --soluk2: #898781;
+    --vurgu: #5598e7; --vurgu-yazi: #06141f; --vurgu-zemin: #15283d; --vurgu-sert: #86b6ef;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --sk1: #0d366b; --sk2: #104281; --sk3: #184f95; --sk4: #1c5cab; --sk5: #3987e5; --sk6: #6da7ec; --sk7: #9ec5f4;
+    --yesil: #3fc13f; --sari: #fab219; --turuncu: #f09a74; --kirmizi: #f08585; --gri: #898781;
+    --yesil-zemin: #12301a; --sari-zemin: #3a2f0c; --sari-yazi: #ffe3a0; --kirmizi-zemin: #3a1a1a; --gri-zemin: #262624; --turuncu-zemin: #3a2314;
+    --tahmin: #9085e9; --tahmin-zemin: #1f1c3a;
+    --golge-1: 0 1px 2px rgba(0,0,0,.4); --golge-2: 0 10px 32px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
+  }
+}
+:root[data-tema="koyu"] { color-scheme: dark;
+  --zemin: #0d0d0d; --yuzey: #1a1a19; --yuzey2: #232321; --yuzey3: #2c2c2a; --cizgi: #2c2c2a; --eksen: #383835; --izgara: #2c2c2a;
+  --yazi: #f0efec; --yazi2: #c3c2b7; --soluk: #a8a79e; --soluk2: #898781;
+  --vurgu: #5598e7; --vurgu-yazi: #06141f; --vurgu-zemin: #15283d; --vurgu-sert: #86b6ef;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+  --sk1: #0d366b; --sk2: #104281; --sk3: #184f95; --sk4: #1c5cab; --sk5: #3987e5; --sk6: #6da7ec; --sk7: #9ec5f4;
+  --yesil: #3fc13f; --sari: #fab219; --turuncu: #f09a74; --kirmizi: #f08585; --gri: #898781;
+  --yesil-zemin: #12301a; --sari-zemin: #3a2f0c; --sari-yazi: #ffe3a0; --kirmizi-zemin: #3a1a1a; --gri-zemin: #262624; --turuncu-zemin: #3a2314;
+  --tahmin: #9085e9; --tahmin-zemin: #1f1c3a;
+  --golge-1: 0 1px 2px rgba(0,0,0,.4); --golge-2: 0 10px 32px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
+}
+:root[data-tema="acik"] { color-scheme: light; }
+@media (prefers-reduced-motion: reduce) { :root { --hiz: 0ms; } *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }

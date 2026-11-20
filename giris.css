@@ -1,0 +1,6 @@
+ 
+.giris-dugme { font: inherit; font-size: 12px; line-height: 1; padding: 8px 10px; min-height: 36px; max-width: 150px; border-radius: 999px; border: 1px solid var(--cizgi, rgba(128,128,128,.35)); background: transparent; color: inherit; cursor: pointer; }
+.giris-dugme .giris-metin { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.giris-dugme.giris-yok { opacity: .7; }
+.giris-dugme:disabled { cursor: default; }
+@media (max-width: 560px) { .giris-dugme { max-width: 88px; padding: 5px 4px; font-size: 9.5px; letter-spacing: -.1px; line-height: 1.15; } .giris-dugme .giris-metin { white-space: normal; overflow-wrap: anywhere; max-height: 2.4em; } }

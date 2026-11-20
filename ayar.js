@@ -79,6 +79,16 @@ window.MM_AYAR = {
   girisUpn: '',          
   
   
+  rolGruplari: {
+    yonetim: ['45c58d2c-cdd9-4ddb-a08d-5a0c6d71982f'],   
+    finans: ['2db77edc-f848-478c-b40b-c36ba47dd665'],    
+    muhasebe: ['d8af0072-3f43-4aef-8573-f421731dd012'],  
+    fabrika: ['3a22fb3b-80a1-48c3-a2e2-8eae9ea65115']    
+  },
+  rolAdlari: { calisan: 'Çalışan', yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' },
+  surum: '54',           
+  
+  
   acikModuller: ['ana', 'makineler', 'eldiven', 'siparis', 'kalite', 'nakliye', 'muhasebe', 'finans', 'dmo', 'dmo-nakliyat', 'stok', 'sikayet', 'sterilizasyon', 'ihale', 'kalite-yukle', 'asistan'],
   eskiDk: 15            
 };

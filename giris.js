@@ -40,9 +40,12 @@
     var talep = (hesap && hesap.idTokenClaims) || {};
     var upn = String(talep.preferred_username || (hesap && hesap.username) || '').trim().toLowerCase();
     var roller = Array.isArray(talep.roles) ? talep.roles.map(function (r) { return String(r).toLowerCase(); }) : [];
-    var rol = 'calisan';
-    for (var i = 0; i < ROL_SIRASI.length; i++) { if (roller.indexOf(ROL_SIRASI[i]) >= 0) { rol = ROL_SIRASI[i]; break; } }
     var gruplar = Array.isArray(talep.groups) ? talep.groups.map(function (g) { return String(g).trim().toLowerCase(); }) : [];   
+    var rol = 'calisan', rg = A.rolGruplari || {};
+    for (var i = 0; i < ROL_SIRASI.length; i++) {   
+      var ad = ROL_SIRASI[i], listeli = Array.isArray(rg[ad]) ? rg[ad] : [];
+      if (roller.indexOf(ad) >= 0 || listeli.some(function (g) { return gruplar.indexOf(String(g).trim().toLowerCase()) >= 0; })) { rol = ad; break; }
+    }
     A.girisUpn = upn; A.girisRol = rol; A.girisGruplar = gruplar;
     A.girisOid = String(talep.oid || '').trim().toLowerCase();   
     var iss = String(talep.iss || ''), tid = String(talep.tid || ''), ev = String(A.tenantId || '').trim().toLowerCase();
@@ -61,6 +64,8 @@
   var sistem = native && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios' && window.Capacitor.Plugins && window.Capacitor.Plugins.MMGiris;
   var SSO_KEY = 'mm_sso_deneme', SSO_ARALIK = 10 * 60 * 1000, bekleyen = null, bekleyenZorla = null, bant = null;
   var hazir = null;
+  var webSessizHak = false;   
+  var IZ_KEY = 'mm_web_giris_izi';   
   var geciciler = [];   
 
   
@@ -171,7 +176,7 @@
   var sonBitis = 0;   
   function basari(r) {
     if (r.bit) sonBitis = r.bit;
-    geciciler.length = 0; V.tokenDurumu = ''; bantGizle();
+    geciciler.length = 0; V.tokenDurumu = ''; bantGizle(); webSessizHak = false;
     if (r.agdan) yetkiTazele();
     return r.t;
   }
@@ -191,6 +196,12 @@
     V.tokenDurumu = 'kimlik';
     var simdi = Date.now(), son = 0;
     try { son = parseInt(localStorage.getItem(SSO_KEY) || '0', 10) || 0; } catch (e) {   }
+    if (!native && !sistem && webSessizHak && simdi - son > SSO_ARALIK) {   
+      webSessizHak = false;
+      try { localStorage.setItem(SSO_KEY, String(simdi)); } catch (e) {   }
+      try { pca.acquireTokenRedirect({ scopes: KAPSAM, account: hesap, prompt: 'none', responseMode: 'query' }); } catch (e) { bantGoster(kodKisa(e)); }
+      return null;
+    }
     if (sistem && sistemIzni && simdi - son > SSO_ARALIK) {
       try { localStorage.setItem(SSO_KEY, String(simdi)); } catch (e) {   }
       sistemYonlendir.yenile = true;
@@ -215,9 +226,10 @@
     if (!bekleyen) { var pb = bekleyen = sinirliToken(tokenAl(true)).then(function (t) { if (bekleyen === pb) bekleyen = null; return t; }); }
     return bekleyen;
   };
-  function onIsit() {   
+  function onIsit(oneGelme) {   
     if (!pca) { if (kopruHata) baslat(); return; }
     if (!pca.getActiveAccount()) return;
+    if (oneGelme === true && !native) webSessizHak = true;
     var kotu = !!V.tokenDurumu, dolacak = !!sonBitis && sonBitis - Date.now() < 10 * 60 * 1000;
     if (kotu || dolacak) {   
       V.tokenSaglayici(true).then(function (t) { if (t && MM.menuYenile) MM.menuYenile(); });
@@ -225,7 +237,7 @@
     }
     V.tokenSaglayici();
   }
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) onIsit(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) onIsit(true); });
   setInterval(function () { if (!document.hidden) onIsit(); }, 20 * 60 * 1000);
   try {
     var capApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
@@ -236,7 +248,7 @@
   
   function yerelTemizle() {
     try { sessionStorage.clear(); } catch (e) {   }
-    try { localStorage.removeItem(SSO_KEY); localStorage.removeItem('mm_siparis_son_aramalar'); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('mm-dmo-fiyat-') === 0) localStorage.removeItem(k); }); } catch (e) {   }
+    try { localStorage.removeItem(SSO_KEY); localStorage.removeItem(IZ_KEY); localStorage.removeItem('mm_siparis_son_aramalar'); localStorage.removeItem('mm-okunan'); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('mm-dmo-fiyat-') === 0) localStorage.removeItem(k); }); } catch (e) {   }
     var isler = [];
     try { if (window.caches) isler.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {   }
     try { if (window.indexedDB) isler.push(new Promise(function (c) { var r = indexedDB.deleteDatabase('mm-nakliye-yukle'); r.onsuccess = r.onerror = r.onblocked = function () { c(); }; })); } catch (e) {   }
@@ -274,6 +286,7 @@
   async function girisSonrasi(hesap) {
     pca.setActiveAccount(hesap);
     hesapAyarla(hesap);
+    if (!native) { try { localStorage.setItem(IZ_KEY, '1'); } catch (e) {   } }   
     try { await MM.bayrakYenile(); } catch (e) {   }
     if (MM.menuYenile) MM.menuYenile();
   }
@@ -293,18 +306,35 @@
         kopruHata = false;
         var p = new window.msal.PublicClientApplication({
           auth: { clientId: String(A.clientId).trim(), authority: 'https://login.microsoftonline.com/' + String(A.tenantId).trim(), redirectUri: yonlendirme, postLogoutRedirectUri: yonlendirme, navigateToLoginRequestUrl: false },
-          cache: { cacheLocation: native ? 'localStorage' : 'sessionStorage' }
+          cache: { cacheLocation: 'localStorage' }   
         });
         await p.initialize();
         pca = p; hazirCoz();   
-        var sonuc = await pca.handleRedirectPromise();
+        var sonuc = null;
+        try { sonuc = await pca.handleRedirectPromise(); }
+        catch (re) {   
+          if (native || !/[?&]error=(login_required|interaction_required|consent_required|account_selection_required)/.test(location.search)) throw re;
+          sonuc = null;
+        }
         if (/[?&](code|state|error)=/.test(location.search) && history.replaceState) {   
           var q = new URLSearchParams(location.search); ['code', 'state', 'session_state', 'client_info', 'error', 'error_description', 'iss'].forEach(function (k) { q.delete(k); });
           history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash);
         }
         var hesap = (sonuc && sonuc.account) || pca.getActiveAccount() || pca.getAllAccounts()[0] || null;
         dugme.disabled = false;
-        if (!hesap) { cikisAyarla(); return; }
+        if (!hesap) {
+          cikisAyarla();
+          var izVar = false, sonDeneme = 0;
+          if (!native) { try { izVar = localStorage.getItem(IZ_KEY) === '1'; sonDeneme = parseInt(localStorage.getItem(SSO_KEY) || '0', 10) || 0; } catch (e) {   } }
+          if (izVar && Date.now() - sonDeneme > SSO_ARALIK) {   
+            try { localStorage.setItem(SSO_KEY, String(Date.now())); } catch (e) {   }
+            durum('Giriş yenileniyor…', 'Giriş yenileniyor', true);
+            try { pca.loginRedirect({ scopes: KAPSAM, prompt: 'none', responseMode: 'query' }); } catch (e) { cikisAyarla(); }
+          }
+          return;
+        }
+        if (sonuc && sonuc.account) { try { localStorage.removeItem(SSO_KEY); } catch (e) {   } }
+        if (!native) webSessizHak = true;   
         await girisSonrasi(hesap);
         V.tokenSaglayici();   
       } catch (e) {
@@ -317,8 +347,9 @@
   }
   
 
-  if (!native) {
-    var BOSTA_MS = 30 * 60 * 1000, sonHareket = Date.now(), bostaCikiyor = false;
+  var BOSTA_MS = 0;   
+  if (!native && BOSTA_MS > 0) {
+    var sonHareket = Date.now(), bostaCikiyor = false;
     var bostaCikis = function () {
       if (bostaCikiyor) return; bostaCikiyor = true;
       var hesap = pca && pca.getActiveAccount && pca.getActiveAccount();

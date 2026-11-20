@@ -140,9 +140,9 @@
 
    
   var panel = null, bildirim = [], okunanlar = {};
-  try { okunanlar = JSON.parse(localStorage.getItem('mm-okunan') || '{}'); } catch (e) { okunanlar = {}; }
+  try { okunanlar = window.MM_DEPO ? JSON.parse(window.MM_DEPO.getItem('mm-okunan') || '{}') : {}; } catch (e) { okunanlar = {}; }
   function anahtar(b) { return b.id + '|' + b.baslik; }
-  function okunduYaz() { try { localStorage.setItem('mm-okunan', JSON.stringify(okunanlar)); } catch (e) { } }
+  function okunduYaz() { try { if (window.MM_DEPO) window.MM_DEPO.setItem('mm-okunan', JSON.stringify(okunanlar)); } catch (e) { } }
   function sayiGuncelle() {
     var n = bildirim.filter(function (b) { return b.sev === 'kritik' && !okunanlar[anahtar(b)]; }).length, e = zil.querySelector('.zil-sayi');    
     e.hidden = !n; e.textContent = n > 99 ? '99+' : String(n); zil.setAttribute('aria-label', 'Bildirimler' + (n ? ' — ' + n + ' kritik okunmamış' : ''));

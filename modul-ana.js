@@ -6,7 +6,7 @@
   'use strict';
   var BOLUM_AD = { kal: 'Kalite', sip: 'Sipariş', fab: 'Fabrika', isg: 'İSG', eld: 'Eldiven', dmo: 'DMO' };
   var MM = window.MM, gr = MM.gr, h = MM.h, sayi = MM.sayi;
-  var ROL_AD = { yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', calisan: 'Çalışan', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' };
+  var ROL_AD = (window.MM_AYAR && window.MM_AYAR.rolAdlari) || { yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', calisan: 'Çalışan', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' };
 
   function trParcalar() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hour12: false }).formatToParts(new Date()).reduce(function (a, p) { a[p.type] = p.value; return a; }, {}); }
   function bugunIso() { var p = trParcalar(); return p.year + '-' + p.month + '-' + p.day; }

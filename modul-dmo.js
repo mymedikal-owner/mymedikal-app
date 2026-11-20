@@ -580,13 +580,13 @@
 
     function yerelKey(i) { return 'mm-dmo-fiyat-' + i.firma + '-' + i.ikn; }
     function fiyatPaneli(i) {
-      var kayit = null; try { kayit = JSON.parse((window.MM_DEPO || localStorage).getItem(yerelKey(i)) || 'null'); } catch (e) { }
+      var kayit = null; try { if (window.MM_DEPO) kayit = JSON.parse(window.MM_DEPO.getItem(yerelKey(i)) || 'null'); } catch (e) { }
       var giris = h('input', { type: 'text', inputmode: 'decimal', sinif: 'dm-girdi', id: 'dm-fiyat', placeholder: 'Birim fiyat (TL)', autocomplete: 'off', value: kayit && kayit.fiyat ? kayit.fiyat : '' });
       var not = h('input', { type: 'text', sinif: 'dm-girdi', id: 'dm-not', placeholder: 'Not (isteğe bağlı)', autocomplete: 'off', value: kayit && kayit.not ? kayit.not : '' });
       var durum = h('p', { sinif: 'kucuk soluk', role: 'status', metin: kayit ? 'Yerel taslak kayıtlı: ' + kayit.zaman : 'Henüz taslak yok.' });
       var kaydet = h('button', { type: 'button', sinif: 'dugme', onclick: function () {
         var z = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date());
-        try { (window.MM_DEPO || localStorage).setItem(yerelKey(i), JSON.stringify({ fiyat: giris.value.trim(), not: not.value.trim(), zaman: z + ' (TR)' })); durum.textContent = 'Yerel taslak kaydedildi: ' + z + ' (TR) — yalnız bu cihazda.'; } catch (e) { durum.textContent = 'Kaydedilemedi (tarayıcı depolaması kapalı).'; } } }, ['Taslağı kaydet (yerel)']);
+        try { if (!window.MM_DEPO) throw new Error('depo yok'); window.MM_DEPO.setItem(yerelKey(i), JSON.stringify({ fiyat: giris.value.trim(), not: not.value.trim(), zaman: z + ' (TR)' })); durum.textContent = 'Yerel taslak kaydedildi: ' + z + ' (TR) — yalnız bu cihazda.'; } catch (e) { durum.textContent = 'Kaydedilemedi (tarayıcı depolaması kapalı).'; } } }, ['Taslağı kaydet (yerel)']);
       var gonder = h('button', { type: 'button', sinif: 'dugme ikincil', disabled: true, 'aria-disabled': 'true', title: 'Portal şu an salt okuma; gönderim ayrı yetki' }, ['Portala gönder']);
       return G.kart({ baslik: 'Fiyat girişi (taslak)', govde: h('div', { sinif: 'dm-fiyat' }, [
         h('label', { sinif: 'dm-etiket', for: 'dm-fiyat', metin: 'Birim fiyat' }), giris, h('label', { sinif: 'dm-etiket', for: 'dm-not', metin: 'Not' }), not,

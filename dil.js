@@ -52,6 +52,7 @@
     'Düşük (bilgi)': 'Low (information)', 'Orta (hat izlensin)': 'Medium (monitor the line)', 'Yüksek (durdurma / ayırma gerekli)': 'High (stop / segregate)',
     'Düşük': 'Low', 'Orta': 'Medium', 'Yüksek': 'High', 'Bu ekran için yetkiniz yok': 'You do not have access to this screen', 'Yükleme şu an kapalı': 'Upload is closed right now', 'Lütfen daha sonra tekrar deneyin.': 'Please try again later.',
     'Ana sayfa': 'Home', 'Makineler': 'Machines', 'Eldiven': 'Gloves', 'Siparişler': 'Orders', 'DMO': 'DMO', 'Stok': 'Stock', 'Kalite': 'Quality', 'İSG': 'OHS', 'Nakliye': 'Logistics',
+    'Sürüm': 'Version', 'Rol: ': 'Role: ', 'Oturumunuzun yenilenmesi gerekiyor — alttaki kırmızı “Oturumu yenile” düğmesine dokunun': 'Your session needs to be renewed — tap the red “Renew session” button below',
     'İK': 'HR', 'Onaylar': 'Approvals', 'Asistan': 'Assistant', 'Yönetim': 'Management', 'Finans': 'Finance', 'Muhasebe': 'Accounting', 'Diğer': 'More', 'Yakında': 'Coming soon',
     'Diğer modüller': 'More sections', 'Yakında gelecek modüller': 'Sections coming soon', 'Modüller': 'Sections', 'Modül': 'Section', 'Eylem': 'Action', 'Eylemler': 'Actions',
     'Menüyü aç / daralt': 'Open / collapse menu', 'Bildirimler': 'Notifications', 'Temayı değiştir': 'Change theme', 'Açık / koyu tema': 'Light / dark theme',

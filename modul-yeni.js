@@ -130,7 +130,7 @@
     }
     var sohbet = gr.kart({ baslik: 'Sohbet', alt: 'Cevaplar kaynak göstererek verilir', govde: sohbetGovde });
     var kaynakKart = gr.kart({ baslik: 'Erişebildiğin kaynaklar', alt: 'Cevaplar yalnız yetkinizin açtığı kaynaklardan verilir', govde: h('div', { sinif: 'cip-sira' }, erisilen.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), k[1]]); })) });
-    kabuk(kok, { canli: true, ad: 'Asistan', alt: 'Şirket içi yapay zekâ asistanı', govde: h('div', { sinif: 'yigin' }, [kaynakKart, sohbet]), });
+    kabuk(kok, { canli: true, ad: 'Asistan', alt: 'Şirket içi yapay zekâ asistanı', govde: h('div', { sinif: 'yigin' }, [h('p', { sinif: 'rol-satir' }, ['Rol: ', h('b', { metin: ((window.MM_AYAR.rolAdlari || {})[rol]) || rol })]), kaynakKart, sohbet]), });
   };
 
    

@@ -5,7 +5,7 @@
   'use strict';
   var MM = window.MM, gr = MM.gr, h = gr.h;
   var SURUM = 1;
-  var ROL_AD = { yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', calisan: 'Çalışan', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' };
+  var ROL_AD = (window.MM_AYAR && window.MM_AYAR.rolAdlari) || { yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', calisan: 'Çalışan', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' };
   var kapAcik = null, bellekGoruldu = false;
 
   function rol() { return MM.rol(); }

@@ -61,6 +61,7 @@
     if (typeof MMVeri.tokenSaglayici !== 'function') throw hata('giris_gerekli', 'Giriş henüz açık değil');
     var token = await MMVeri.tokenSaglayici();
     if (!token) {
+      if (MMVeri.tokenDurumu === 'kimlik') throw hata('ag', 'Oturum yenilenemedi (kimlik)');   
       if (MMVeri.tokenDurumu === 'gecici') throw hata('ag', 'Oturum yenilenemedi (bağlantı), tekrar deneyin');   
       throw hata('giris_gerekli', 'Giriş yapın');
     }
@@ -557,7 +558,8 @@
         clearTimeout(tz);
         var iyi = SON_IYI[anahtar];
         if (iyi && e && (e.kod === 'ag' || e.kod === 'giris_gerekli')) { eskiNotu(iyi.alindi); return { veri: iyi.veri, kaynak: m, alindi: iyi.alindi, eski: true }; }   
-        if (e && e.kod === 'ag' && /zaman aşımı|Oturum yenilenemedi/.test(String(e.ayrinti || ''))) e.message = 'Bağlantı yenileniyor, birkaç saniye sonra yeniden deneyin';
+        if (e && e.kod === 'ag' && /Oturum yenilenemedi \(kimlik\)/.test(String(e.ayrinti || ''))) e.message = 'Oturumunuzun yenilenmesi gerekiyor — alttaki kırmızı “Oturumu yenile” düğmesine dokunun';
+        else if (e && e.kod === 'ag' && /zaman aşımı|Oturum yenilenemedi/.test(String(e.ayrinti || ''))) e.message = 'Bağlantı yenileniyor, birkaç saniye sonra yeniden deneyin';
         throw e;
       }
     }

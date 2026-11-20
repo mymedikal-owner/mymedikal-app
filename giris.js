@@ -313,7 +313,8 @@
         var sonuc = null;
         try { sonuc = await pca.handleRedirectPromise(); }
         catch (re) {   
-          if (native || !/[?&]error=(login_required|interaction_required|consent_required|account_selection_required)/.test(location.search)) throw re;
+          var sessizKod = String((re && (re.errorCode || re.error)) || '');   
+          if (native || !/^(login_required|interaction_required|consent_required|account_selection_required)$/.test(sessizKod)) throw re;
           sonuc = null;
         }
         if (/[?&](code|state|error)=/.test(location.search) && history.replaceState) {   

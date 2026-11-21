@@ -733,11 +733,16 @@
       var kartlar = fl.map(function (x) {
         var okundu = x.okundu !== false;
         var ic = [h('strong', { sinif: 'dm-oge-ad', metin: x.ad || 'Firma' })];
-        if (!okundu) ic.push(h('span', { sinif: 'dm-yok', metin: 'portalda okunamadı' }));
+        var kismi = x.kismi === true, veriVar = okundu || (kismi && x.kalem != null);   
+        if (kismi) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'kısmi: bir firma okunamadı' }));
+        if (!veriVar) ic.push(h('span', { sinif: 'dm-yok', metin: 'portalda okunamadı' }));
         else {
           ic.push(h('span', {}, ['Kalem ', h('strong', { metin: anAdetMetin(x.kalem) })]), h('span', {}, ['Adet ', h('strong', { metin: anAdetFirma(x) })]));
-          if (x.kismi === true) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'kısmi: bir firma okunamadı' }));
           if (fg) ic.push(h('span', {}, ['Tutar (KDV hariç) ', h('strong', { metin: fiy[x.ad] ? tl(fiy[x.ad].tutar_tl) : 'veri yok' })]));
+          if (!sonuc && x.bizde_olmayan_kalem != null) {   
+            var bo = x.bizde_olmayan_adet != null ? say(x.bizde_olmayan_adet) : anAdetFirma({ adet: null, adet_birim: x.bizde_olmayan_adet_birim });
+            ic.push(h('span', { sinif: 'soluk kucuk', metin: 'bizde olmayan: ' + say(x.bizde_olmayan_kalem) + ' kalem / ' + bo + ' adet; firma adı sonuç açıklanınca' }));
+          }
         }
         if (!sonuc) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'değerlendirme aşaması, kesin değil' }));
         return h('div', { sinif: 'dm-oge' }, ic);

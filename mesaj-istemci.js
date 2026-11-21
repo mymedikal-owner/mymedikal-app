@@ -15,6 +15,7 @@
 
   function hata(kod, ek) { var e = new Error(kod); e.kod = kod; if (ek) for (var k in ek) e[k] = ek[k]; return e; }
   function oidGecerli(o) { return typeof o === 'string' && /^[0-9a-fA-F-]{8,40}$/.test(o); }
+  function yerelUygulama() { var c = typeof window !== 'undefined' ? window.Capacitor : null; return !!(c && c.isNativePlatform && c.isNativePlatform()); }
   function s(v) { return typeof v === 'string' ? v : (typeof v === 'number' ? String(v) : ''); }
   function adTemizle(ad) { return String(ad || 'dosya').replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 100) || 'dosya'; }
 
@@ -100,7 +101,7 @@
   function hazirla(o) {
     o = o || {};
     var apiUrl = typeof o.apiUrl === 'string' ? o.apiUrl.trim().replace(/\/+$/, '') : '';
-    var kapali = !apiUrl;
+    var kapali = !apiUrl || (typeof window !== 'undefined' && !yerelUygulama());   
     var tasiyici = o.tasiyici || varsayilanTasiyici(apiUrl);
     var blobTasiyici = o.blobTasiyici || varsayilanBlobTasiyici;
     var bekle = o.bekle || function (sn) { return new Promise(function (ok) { setTimeout(ok, sn * 1000); }); };

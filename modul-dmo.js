@@ -704,7 +704,7 @@
 
      
     var AN_GRUP = [['eldiven', 'Eldiven'], ['spanc', 'Spanç'], ['diger', 'Diğer']];   
-    var AN_ALT = { eldiven: { muayene: 'Muayene', cerrahi: 'Cerrahi' }, spanc: { spanc: 'Spanç', batin: 'Gaz kompres / batın', gazli_bez: 'Gazlı bez' }, diger: {} };
+    var AN_ALT = { eldiven: { muayene: 'Muayene', cerrahi: 'Cerrahi' }, spanc: { spanc: 'Spanç', gaz_kompres_batin: 'Gaz kompres / batın', gazli_bez: 'Gazlı bez' }, diger: {} };
     var anVeri = null, anHata = null, anYukleniyor = false, anGrup = 'eldiven';
     async function anlikYukle() {   
       var r = null, d = null, f = null;
@@ -715,34 +715,53 @@
       return { d: d, f: f, fm: fm };
     }
     function anAdetMetin(n) { return n == null ? 'okunamadı' : say(n); }
+    function anAdetFirma(x) {   
+      if (x.adet != null) return say(x.adet);
+      var ab = x.adet_birim && typeof x.adet_birim === 'object' ? Object.keys(x.adet_birim) : [];
+      return ab.length ? ab.map(function (k) { return say(x.adet_birim[k]) + ' ' + k; }).join(' + ') : 'okunamadı';
+    }
+    function anBizim(ad) { return ad === 'MY' || ad === 'DAY' || ad === 'MY+DAY'; }
     function anSatirlar(v) {   
       var d = v.d || {}, ar = (d.satirlar || []).filter(function (x) { return x && typeof x === 'object'; });
-      if (d.asama !== 'sonuc') ar = ar.filter(function (x) { return x.firma === 'MY' || x.firma === 'DAY' || x.firma === 'MY+DAY'; });   
-      return ar;
+      return ar.filter(function (x) { return anBizim(x.firma); });   
     }
     function anFirmaKartlari(v) {   
-      var d = v.d || {}, sonuc = d.asama === 'sonuc', fg = fiyatGor(), fl = (d.firmalar || []).filter(function (x) { return x && typeof x === 'object'; });
-      if (!sonuc) fl = fl.filter(function (x) { return x.ad === 'MY' || x.ad === 'DAY' || x.ad === 'MY+DAY'; });
+      var d = v.d || {}, sonuc = d.asama === 'sonuc', fg = fiyatGor();
+      var fl = (d.firmalar || []).filter(function (x) { return x && typeof x === 'object' && anBizim(x.ad); });
       var fiy = {}; if (fg && v.f) (v.f.firmalar || []).forEach(function (x) { if (x && x.ad) fiy[x.ad] = x; });
+      var rfy = {}; if (fg && v.f) (v.f.rakipler_fiyat || []).forEach(function (x) { if (x && x.ad) rfy[x.ad] = x; });
       var kartlar = fl.map(function (x) {
-        var okundu = x.okundu !== false, bizim = x.ad === 'MY' || x.ad === 'DAY' || x.ad === 'MY+DAY';
+        var okundu = x.okundu !== false;
         var ic = [h('strong', { sinif: 'dm-oge-ad', metin: x.ad || 'Firma' })];
         if (!okundu) ic.push(h('span', { sinif: 'dm-yok', metin: 'portalda okunamadı' }));
         else {
-          ic.push(h('span', {}, ['Kalem ', h('strong', { metin: anAdetMetin(x.kalem) })]), h('span', {}, ['Adet ', h('strong', { metin: anAdetMetin(x.adet) })]));
-          if (bizim && fg) ic.push(h('span', {}, ['Tutar (KDV hariç) ', h('strong', { metin: fiy[x.ad] ? tl(fiy[x.ad].tutar_tl) : 'veri yok' })]));
-          if (!bizim) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'fiyat portalda yok' }));
+          ic.push(h('span', {}, ['Kalem ', h('strong', { metin: anAdetMetin(x.kalem) })]), h('span', {}, ['Adet ', h('strong', { metin: anAdetFirma(x) })]));
+          if (x.kismi === true) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'kısmi: bir firma okunamadı' }));
+          if (fg) ic.push(h('span', {}, ['Tutar (KDV hariç) ', h('strong', { metin: fiy[x.ad] ? tl(fiy[x.ad].tutar_tl) : 'veri yok' })]));
         }
-        if (bizim && !sonuc) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'değerlendirme aşaması, kesin değil' }));
+        if (!sonuc) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'değerlendirme aşaması, kesin değil' }));
         return h('div', { sinif: 'dm-oge' }, ic);
       });
-      return kartlar.length ? h('div', { sinif: 'dm-oge-izgara' }, kartlar) : null;
+      var rak = sonuc ? (d.rakipler || []).filter(function (x) { return x && typeof x === 'object' && x.ad; }).map(function (x) {
+        var ic = [h('strong', { sinif: 'dm-oge-ad', metin: x.ad }), h('span', {}, ['Kalem ', h('strong', { metin: anAdetMetin(x.kalem) })]), h('span', {}, ['Adet ', h('strong', { metin: anAdetFirma(x) })])];
+        if (x.hastane != null) ic.push(h('span', {}, ['Hastane ', h('strong', { metin: say(x.hastane) })]));
+        if (fg) {   
+          var rf = rfy[x.ad];
+          if (rf && rf.belgeli_satir > 0) ic.push(h('span', { sinif: 'soluk kucuk', metin: 'belgeli: ' + tl(rf.belgeli_tutar_tl) + ' (' + say(rf.toplam_satir) + ' satırın ' + say(rf.belgeli_satir) + '’i)' }));
+          else ic.push(h('span', { sinif: 'soluk kucuk', metin: 'fiyat portalda yok' }));
+        }
+        return h('div', { sinif: 'dm-oge' }, ic);
+      }) : [];
+      var cikti = h('div', {});
+      if (kartlar.length) cikti.appendChild(h('div', { sinif: 'dm-oge-izgara' }, kartlar));
+      if (rak.length) { cikti.appendChild(h('p', { sinif: 'dm-aciklama', metin: 'Diğer firmalar' })); cikti.appendChild(h('div', { sinif: 'dm-oge-izgara' }, rak)); }
+      return cikti.childNodes.length ? cikti : null;
     }
     function anAltBolum(satirlar, grup, kod) {
       var ad = (AN_ALT[grup] || {})[kod] || (kod === 'diger' ? 'Diğer' : 'Diğer'), fg = fiyatGor(), v = anVeri;
       var kol = [{ ad: 'Firma', k: 'firma' }, { ad: 'Ürün', k: 'urun' }, { ad: 'Adet', k: 'adet', csv: function (s) { return s.adet == null ? '' : s.adet; }, ciz: function (s) { return anAdetMetin(s.adet); } }, { ad: 'Birim', k: 'birim' }];
       var rows = satirlar;
-      if (fg) { kol.push({ ad: 'Birim fiyat (TL)', k: 'bf', csv: function (s) { var f = v.fm[s.satir_id]; return f && f.birim_fiyat_tl != null ? f.birim_fiyat_tl : ''; }, ciz: function (s) { var f = v.fm[s.satir_id]; return f ? tl(f.birim_fiyat_tl) : 'veri yok'; } }); }
+      if (fg) { kol.push({ ad: 'Birim fiyat (TL)', k: 'bf', csv: function (s) { var f = v.fm[s.satir_id]; return f && f.birim_fiyat_tl != null ? f.birim_fiyat_tl : ''; }, ciz: function (s) { var f = v.fm[s.satir_id]; return f ? (f.birim_fiyat_tl == null && f.fiyat_cesit > 1 ? 'birden çok fiyat' : tl(f.birim_fiyat_tl)) : 'veri yok'; } }); }
       return G.veriTablo({ ad: ad, filtre: ({ eldiven: 'Eldiven', spanc: 'Spanç' })[grup] || 'Diğer', kolonlar: kol, satirlar: rows, bos: 'Bu grupta satır yok' });
     }
     function anlikEkrani() {
@@ -753,8 +772,8 @@
       if (!d || typeof d !== 'object' || (d.ihale_var === false) || (!(d.satirlar || []).length && !(d.firmalar || []).length)) { govde.appendChild(G.bos({ baslik: 'Bugün ihale yok / veri yok', metin: 'Anlık sonuç dosyası bulunamadı ya da bugün için sonuç yok.' })); return; }
       if (d.ornek === true) govde.appendChild(h('div', { sinif: 'bant ornek', role: 'alert', metin: 'ÖRNEK VERİ' }));
       var okuma = d.portal_okuma_zamani;
-      if (okuma) govde.appendChild(h('div', { sinif: 'tazelik dm-taze' }, [h('span', { sinif: 'nokta yesil', 'aria-hidden': 'true' }), h('strong', { metin: 'Portal okuma saati: ' + zamanTR(okuma) })]));
-      govde.appendChild(h('p', { sinif: 'dm-aciklama', metin: d.asama === 'sonuc' ? 'Sonuç açıklandı.' : 'Değerlendirme aşaması: sonuçlar kesin değildir; yalnız MY ve DAY gösterilir.' }));
+      if (okuma) govde.appendChild(h('div', { sinif: 'tazelik dm-taze' }, [h('span', { sinif: 'nokta yesil', 'aria-hidden': 'true' }), h('strong', { metin: 'Portal okuma: ' + zamanTR(okuma) })]));
+      govde.appendChild(h('p', { sinif: 'dm-aciklama', metin: d.asama === 'sonuc' ? 'Sonuç açıklandı; diğer firmalar için yalnız kalem ve adet gösterilir.' : 'Değerlendirme aşaması: sonuçlar kesin değildir; yalnız MY ve DAY gösterilir.' }));
       var fk = anFirmaKartlari(anVeri); if (fk) govde.appendChild(fk);
       var tum = anSatirlar(anVeri);
       govde.appendChild(G.cipler(AN_GRUP.map(function (g) { return [g[0], g[1], tum.filter(function (x) { return x.grup === g[0]; }).length]; }), anGrup, function (id) { anGrup = id; ciz(); }, 'Ürün grubu'));

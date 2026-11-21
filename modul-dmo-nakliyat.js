@@ -179,7 +179,7 @@
         { ad: 'Hastane', k: 'hastane', ciz: function (r) { return r.hastane || '—'; } },
         { ad: 'Ürün', k: 'urun_adi', ciz: function (r) { return r.urun_adi || '—'; } },
         { ad: 'Adet', k: 'miktar', sag: true, ciz: function (r) { return say(r.miktar); } },
-        { ad: 'YK no', k: 'yk_no', ciz: function (r) { return r.yk_no || '—'; } },
+        { ad: 'Sipariş no', k: 'siparis_no', ciz: function (r) { return r.siparis_no || '—'; } },
         { ad: 'Durum', k: 'durum', ciz: function (r) { var s = SD_ROZET[sdKova(r.durum)]; return s ? sdRozet(s[2], s[0], s[1]) : (r.durum || '—'); }, csv: function (r) { return r.durum; } },
         { ad: 'Teslim durumu', k: 'teslim_durumu', ciz: function (r) { return r.teslim_durumu && !sdBasla(r) ? (SD_TESLIM[r.teslim_durumu] || r.teslim_durumu) : '—'; } },
         { ad: 'Kontrol', k: 'kontrol', ciz: function (r) { var c = sdKontrol(r); return c[1] ? sdRozet(c[0], c[1][0], c[1][1]) : c[0]; }, csv: function (r) { return sdKontrol(r)[0]; } },
@@ -187,7 +187,6 @@
         { ad: 'İKN', k: 'ikn', ciz: function (r) { return r.ikn || '—'; } },
         { ad: 'İl', k: 'il', ciz: function (r) { return r.il || '—'; } },
         { ad: 'Ürün grubu', k: 'urun_grubu', ciz: function (r) { return GRUP_AD[r.urun_grubu] || r.urun_grubu || '—'; } },
-        { ad: 'Sipariş no', k: 'siparis_no', ciz: function (r) { return r.siparis_no || '—'; } },
         { ad: 'Miktar', k: 'miktar', sag: true, ciz: function (r) { return say(r.miktar); } },
         { ad: 'Sevk edilen', k: 'sevk_edilen_adet', sag: true, ciz: function (r) { return say(r.sevk_edilen_adet); } },
         { ad: 'Teslim adet', k: 'teslim_adet', sag: true, ciz: function (r) { return say(r.teslim_adet); } },
@@ -201,7 +200,7 @@
         var q = MM.aramaNorm ? MM.aramaNorm(sd.ara || '') : String(sd.ara || '').toLowerCase();
         var s = tum.filter(function (r) {
           if (sd.gec && !sdGecik(r)) return false; if (sd.durum && sdKova(r.durum) !== sd.durum) return false; if (sd.teslim && (sdBasla(r) || r.teslim_durumu !== sd.teslim)) return false;
-          if (!q) return true; var t = [r.hastane, r.ikn, r.siparis_no, r.il, r.irsaliye_no, r.malzeme, r.urun_adi, r.yk_no].join(' '); return (MM.aramaNorm ? MM.aramaNorm(t) : t.toLowerCase()).indexOf(q) >= 0;
+          if (!q) return true; var t = [r.hastane, r.ikn, r.siparis_no, r.il, r.irsaliye_no, r.malzeme, r.urun_adi].join(' '); return (MM.aramaNorm ? MM.aramaNorm(t) : t.toLowerCase()).indexOf(q) >= 0;
         });
         var f = ['Firma: ' + (firma === 'TOPLAM' ? 'tümü' : firma), 'İl: ' + (ilSec ? ilSec : 'tümü'), 'Durum: ' + (sd.durum ? SD_ROZET[sd.durum][2] : 'tümü'), 'Teslim durumu: ' + (sd.teslim ? (SD_TESLIM[sd.teslim] || sd.teslim) : 'tümü')]; if (sd.ara) f.push('Arama: ' + sd.ara);
         alan.appendChild(G.veriTablo({ ad: 'Sevk durumu', filtre: f.join(' · '), kolonlar: kol, satirlar: s, sayfa: 50, bos: 'Bu süzgeçte kayıt yok.' }));

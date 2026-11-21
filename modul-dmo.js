@@ -706,6 +706,7 @@
     function ciz() {
       ustKap.textContent = ''; govde.textContent = '';
       ustKap.appendChild(G.sayfaBasi({ baslik: 'DMO', alt: 'İhale, sipariş ve ceza takibi', kirinti: [['DMO']] }));
+      var gc = G.gecis([['dmo-nakliyat', 'DMO Nakliyat']]); if (gc) ustKap.appendChild(gc);
       if (hata && !yuk) { govde.appendChild(G.bos({ tur: hata.kod === 'ayar_bekleniyor' || hata.kod === 'giris_gerekli' ? 'bekle' : 'hata', baslik: 'DMO verisi alınamadı', metin: hata.message, eylem: { ad: 'Yeniden dene', fn: yenile } })); return; }
       if (!yuk) { govde.appendChild(G.iskelet('kart', 4)); return; }
       ustKap.appendChild(bantlar(yuk.v['dmo-ozet']));

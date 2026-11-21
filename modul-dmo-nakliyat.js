@@ -61,8 +61,9 @@
   }
 
   MM.moduller['dmo-nakliyat'] = function (kok) {
-    var yuk = null, hata = null, canli = true, firma = 'TOPLAM', sira = 'cikti', ilSec = '', uyz = 'turuncu';
+    var yuk = null, hata = null, canli = true, firma = 'TOPLAM', sira = 'cikti', ilSec = '', uyz = 'turuncu', sd = { durum: '', teslim: '', ara: '' };
     kok.appendChild(G.sayfaBasi({ baslik: 'DMO Nakliyat', alt: 'İhale bazında çıktı, teslim ve DMO onayı', kirinti: [['DMO Nakliyat']] }));
+    var gc = G.gecis([['dmo', 'DMO', 'geri'], ['nakliye', 'Nakliye', 'geri']]); if (gc) kok.appendChild(gc);
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
 
@@ -153,6 +154,54 @@
       return h('div', { sinif: 'dn-ihale-kap' }, [d, det]);
     }
 
+     
+    var SD_TESLIM = { teslim_tam: 'Teslim edildi', teslim_kismi: 'Kısmen teslim', kanit_yok: 'Kanıt yok' };
+    function sdKova(d) { d = String(d || ''); return /^sevk edildi/i.test(d) ? 'sevk' : /kısm/i.test(d) ? 'kismi' : /başlanmad/i.test(d) ? 'bas' : 'diger'; }
+    var SD_ROZET = { sevk: ['var(--yesil)', 'var(--yesil-zemin)', 'Sevk edildi'], kismi: ['var(--sari)', 'var(--sari-zemin)', 'Kısmi'], bas: ['var(--soluk)', 'var(--yuzey3)', 'Başlanmadı'] };
+    function sdRozet(ad, yazi, zemin) { return h('span', { sinif: 'tq-rozet', style: 'color:' + yazi + ';background:' + zemin, metin: ad }); }
+    function sdBasla(r) { return r.sevk_edilen_adet === 0 || sdKova(r.durum) === 'bas'; }    
+    function sdKontrol(r) { if (sdBasla(r)) return ['—', null]; var k = r.kontrol; if (k == null || k === '') return ['—', null]; if (k === 'tamam') return ['Tamam', ['var(--yesil)', 'var(--yesil-zemin)']]; if (k === 'kanit_yok') return ['Teslim kanıtı yok', ['var(--soluk)', 'var(--yuzey3)']]; return ['Uyuşmazlık', ['var(--ciddi)', 'var(--sari-zemin)']]; }
+    function sevkDurumu(v) {
+      var sv = v.sevk_satirlari; if (!sv || !Array.isArray(sv.satirlar)) return null;
+      var kap = h('div', { sinif: 'ust-bosluk' }), tum = sv.satirlar.filter(function (x) { return firmaEsles(x) && ilEsles(x); });
+      kap.appendChild(h('h3', { sinif: 'bolum', metin: 'Sevk durumu (' + tum.length + ')' }));
+      if (sv.kaynak_yok) kap.appendChild(h('div', { sinif: 'bant sari kucuk-bant', role: 'status', metin: 'Planlama dosyası henüz bağlı değil; durum sevk tarihinden belirlenir. İrsaliye, lokasyon ve koli bilgisi dosya bağlanınca gelecek.' }));
+      var sayD = { sevk: 0, kismi: 0, bas: 0 }, tv = {}; tum.forEach(function (x) { var k = sdKova(x.durum); if (sayD[k] != null) sayD[k]++; if (x.teslim_durumu && !sdBasla(x)) tv[x.teslim_durumu] = (tv[x.teslim_durumu] || 0) + 1; });
+      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.cipler([['', 'Tüm durumlar', tum.length], ['sevk', 'Sevk edildi', sayD.sevk], ['kismi', 'Kısmi', sayD.kismi], ['bas', 'Başlanmadı', sayD.bas]], sd.durum, function (d) { sd.durum = d; ciz(); }, 'Sevk durumu süzgeci')]));
+      var tcip = [['', 'Tüm teslim durumları']].concat(Object.keys(tv).sort().map(function (k) { return [k, SD_TESLIM[k] || k.replace(/_/g, ' '), tv[k]]; }));
+      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.cipler(tcip, sd.teslim, function (d) { sd.teslim = d; ciz(); }, 'Teslim durumu süzgeci')]));
+      var alan = h('div', { sinif: 'ust-bosluk' });
+      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [h('input', { type: 'search', sinif: 'sv-ara', 'aria-label': 'Ara', placeholder: 'Ara: hastane, İKN, sipariş, il…', value: sd.ara || '', oninput: function (e) { sd.ara = e.target.value; yaz(); } })])); kap.appendChild(alan);
+      var kol = [
+        { ad: 'Hastane', k: 'hastane', ciz: function (r) { return r.hastane || '—'; } },
+        { ad: 'Durum', k: 'durum', ciz: function (r) { var s = SD_ROZET[sdKova(r.durum)]; return s ? sdRozet(s[2], s[0], s[1]) : (r.durum || '—'); }, csv: function (r) { return r.durum; } },
+        { ad: 'Teslim durumu', k: 'teslim_durumu', ciz: function (r) { return r.teslim_durumu && !sdBasla(r) ? (SD_TESLIM[r.teslim_durumu] || r.teslim_durumu) : '—'; } },
+        { ad: 'Kontrol', k: 'kontrol', ciz: function (r) { var c = sdKontrol(r); return c[1] ? sdRozet(c[0], c[1][0], c[1][1]) : c[0]; }, csv: function (r) { return sdKontrol(r)[0]; } },
+        { ad: 'Firma', k: 'firma', ciz: function (r) { return r.firma || '—'; } },
+        { ad: 'İKN', k: 'ikn', ciz: function (r) { return r.ikn || '—'; } },
+        { ad: 'İl', k: 'il', ciz: function (r) { return r.il || '—'; } },
+        { ad: 'Ürün grubu', k: 'urun_grubu', ciz: function (r) { return GRUP_AD[r.urun_grubu] || r.urun_grubu || '—'; } },
+        { ad: 'Sipariş no', k: 'siparis_no', ciz: function (r) { return r.siparis_no || '—'; } },
+        { ad: 'Miktar', k: 'miktar', sag: true, ciz: function (r) { return say(r.miktar); } },
+        { ad: 'Sevk edilen', k: 'sevk_edilen_adet', sag: true, ciz: function (r) { return say(r.sevk_edilen_adet); } },
+        { ad: 'Teslim adet', k: 'teslim_adet', sag: true, ciz: function (r) { return say(r.teslim_adet); } },
+        { ad: 'Teslim kanıtı yok (adet)', k: 'kanit_yok_adet', sag: true, ciz: function (r) { return sdBasla(r) ? '—' : say(r.kanit_yok_adet); } },
+        { ad: 'Son irsaliye', k: 'son_irsaliye_tarihi', ciz: function (r) { return tarihTR(r.son_irsaliye_tarihi); } },
+        { ad: 'Son teslim', k: 'son_teslim', ciz: function (r) { return tarihTR(r.son_teslim); } },
+        { ad: 'İrsaliye no', k: 'irsaliye_no', ciz: function (r) { return r.irsaliye_no || '—'; } },
+        { ad: 'Koli', k: 'koli', sag: true, ciz: function (r) { return say(r.koli); } }];
+      function yaz() {
+        alan.textContent = '';
+        var q = MM.aramaNorm ? MM.aramaNorm(sd.ara || '') : String(sd.ara || '').toLowerCase();
+        var s = tum.filter(function (r) {
+          if (sd.durum && sdKova(r.durum) !== sd.durum) return false; if (sd.teslim && (sdBasla(r) || r.teslim_durumu !== sd.teslim)) return false;
+          if (!q) return true; var t = [r.hastane, r.ikn, r.siparis_no, r.il, r.irsaliye_no, r.malzeme].join(' '); return (MM.aramaNorm ? MM.aramaNorm(t) : t.toLowerCase()).indexOf(q) >= 0;
+        });
+        var f = ['Firma: ' + (firma === 'TOPLAM' ? 'tümü' : firma), 'İl: ' + (ilSec ? ilSec : 'tümü'), 'Durum: ' + (sd.durum ? SD_ROZET[sd.durum][2] : 'tümü'), 'Teslim durumu: ' + (sd.teslim ? (SD_TESLIM[sd.teslim] || sd.teslim) : 'tümü')]; if (sd.ara) f.push('Arama: ' + sd.ara);
+        alan.appendChild(G.veriTablo({ ad: 'Sevk durumu', filtre: f.join(' · '), kolonlar: kol, satirlar: s, sayfa: 50, bos: 'Bu süzgeçte kayıt yok.' }));
+      }
+      yaz(); return kap;
+    }
     function ilEsles(x) { return !ilSec || buyuk(x.il) === ilSec; }
     function firmaEsles(x) { return firma === 'TOPLAM' || x.firma === firma; }
     function ilHarita(v) {
@@ -292,6 +341,8 @@
             h('div', { sinif: 'dm-sp-alt kucuk' }, [h('span', { metin: 'Sipariş ' + (x.siparis_no || '—') }), h('span', { metin: 'İKN ' + (x.ikn || '—') }), ay ? h('span', { metin: ay }) : null])]);
         }, { n: 10, sinif: 'dn-liste' }) : G.bos({ baslik: 'Uyuşmazlık yok' }));
       }
+
+      var sdk = sevkDurumu(v); if (sdk) govde.appendChild(sdk);
 
       var be = v.belge_eksik || {}, bl = (be.liste || []).filter(function (x) { return firmaEsles(x) && ilEsles(x); }).slice(0, 50);
       govde.appendChild(h('h3', { sinif: 'bolum', metin: 'Teslim belgesi eksiği (' + say(be.sayi) + ')' }));

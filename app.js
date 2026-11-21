@@ -58,6 +58,9 @@
   }
 
   window.MM = Object.assign(window.MM || {}, { h: h, svg: svg, sayi: sayi, saat: saat, yasMetin: yasMetin, yasDk: yasDk, tazelikSatiri: tazelikSatiri, moduller: {} });
+   
+  window.MM.mesaj = Object.assign(window.MM.mesaj || {}, { hesap: function () { var a = window.MM_AYAR || {}; return { oid: String(a.girisOid || ''), ad: String(a.girisAd || '') }; } });
+  function mesajAcik() { var m = (window.MM_AYAR || {}).mesaj || {}; return !!(String(m.url || '').trim() && String(m.apiKapsam || '').trim()); }   
 
    
   var IKON = {
@@ -68,6 +71,7 @@
     ik: 'M16 11a3 3 0 100-6 3 3 0 000 6zM8 12a3 3 0 100-6 3 3 0 000 6zM2 20c0-3 3-5 6-5s6 2 6 5M14 15c3 0 8 1 8 5',
     onay: 'M5 12l4.5 4.5L19 7',
     asistan: 'M4 5h16v11H9l-5 4zM8 10h8',
+    mesaj: 'M4 5h16v11H9l-5 4zM8 9h8M8 12h5',
     siparis: 'M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10',
     finans: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6',
     muhasebe: 'M5 4h12a2 2 0 012 2v14H7a2 2 0 01-2-2zM5 18a2 2 0 012-2h12M9 8h6M9 12h6',
@@ -104,6 +108,7 @@
     { id: 'ik', ad: 'İK', aktif: true, onizleme: true },
     { id: 'onay', ad: 'Onaylar', aktif: true, onizleme: true },
     { id: 'asistan', ad: 'Asistan', aktif: true },   
+    { id: 'mesaj', ad: 'Mesaj', aktif: true, mesaj: true },   
     { id: 'yonetim', ad: 'Yönetim', aktif: true },
     { id: 'finans', ad: 'Finans', aktif: true },
     { id: 'muhasebe', ad: 'Muhasebe', aktif: true }
@@ -165,6 +170,7 @@
     var ym = yonetimMi();   
     MODULLER = MODULLER_TUM.filter(function (m) {
       if (m.nakliyeci || m.erisimYok) return false;
+      if (m.mesaj && !mesajAcik()) return false;   
       var r = (window.MM_AYAR.roller || {})[m.id];
       if (KAPALI.indexOf(m.id) >= 0 && m.id !== 'ana') return false;   
       if (ym && ACIK && VARSAYILAN_ACIK && VARSAYILAN_ACIK.indexOf(m.id) >= 0 && !modAcik(m.id)) return false;   

@@ -51,6 +51,7 @@
     'Hammadde uygunsuzluğu': 'Raw material nonconformity', 'Makine ayarı / duruş kaynaklı': 'Machine setting / stoppage related',
     'Düşük (bilgi)': 'Low (information)', 'Orta (hat izlensin)': 'Medium (monitor the line)', 'Yüksek (durdurma / ayırma gerekli)': 'High (stop / segregate)',
     'Düşük': 'Low', 'Orta': 'Medium', 'Yüksek': 'High', 'Bu ekran için yetkiniz yok': 'You do not have access to this screen', 'Yükleme şu an kapalı': 'Upload is closed right now', 'Lütfen daha sonra tekrar deneyin.': 'Please try again later.',
+    'DMO Nakliyat →': 'DMO Freight →', '← DMO': '← DMO', '← Nakliye': '← Logistics', 'Bölüm geçişi': 'Section links',
     'Ana sayfa': 'Home', 'Makineler': 'Machines', 'Eldiven': 'Gloves', 'Siparişler': 'Orders', 'DMO': 'DMO', 'Stok': 'Stock', 'Kalite': 'Quality', 'İSG': 'OHS', 'Nakliye': 'Logistics',
     'Sürüm': 'Version', 'Rol: ': 'Role: ', 'Oturumunuzun yenilenmesi gerekiyor — alttaki kırmızı “Oturumu yenile” düğmesine dokunun': 'Your session needs to be renewed — tap the red “Renew session” button below',
     'İK': 'HR', 'Onaylar': 'Approvals', 'Asistan': 'Assistant', 'Yönetim': 'Management', 'Finans': 'Finance', 'Muhasebe': 'Accounting', 'Diğer': 'More', 'Yakında': 'Coming soon',
@@ -330,6 +331,19 @@
     ['filtresinde görülür', 'is visible in the filter'], ['Tüm müşteriler / hastaneler', 'All customers / hospitals'], ['yalnız genel ve DMO teslimatları; tutar gösterilmez', 'general and DMO deliveries only; no amounts shown'], ['Örnek veri (gerçek değil)', 'Sample data (not real)'], ['Durum filtresi', 'Status filter'],
     ['Şirket filtresi', 'Company filter'], ['Müşteri / hastane filtresi', 'Customer / hospital filter'],
      
+    ['Gri = teslim edilmedi DEĞİL, kanıt yok: bu teslimatlar için taşıyıcı portalında kayıt bulunamadı ya da taşıyıcı listesi tam değil. Boş sıfır değildir.', 'Grey = NOT “undelivered”, no evidence: no record was found in the carrier portal for these deliveries, or the carrier list is incomplete. Empty is not zero.'],
+    ['Teslim edilmedi DEĞİL, kanıt yok', 'NOT undelivered, no evidence'], ['Portal gönderi sayıları şirket bazında ayrılmaz; aşağıda bu şirketin teslimat kayıtları var.', 'Portal shipment counts are not split by company; this company’s delivery records are below.'],
+    ['Taşıyıcı portallarından teslim verisi henüz gelmedi.', 'Delivery data from the carrier portals has not arrived yet.'], ['Kargo teslim verisi yok', 'No cargo delivery data'], ['Veri eski/eksik', 'Data stale/incomplete'],
+    ['Eksik taşıyıcı: ', 'Missing carrier: '], [' — oranlar eksik olabilir', ' — rates may be incomplete'], ['son başarılı okuma zamanı yok', 'no last successful read time'], ['son başarılı okuma ', 'last successful read '], ['Son başarılı okuma ', 'Last successful read '], ['Son okuma zamanı yok', 'No last read time'],
+    ['Bu taşıyıcının bilgileri eksik geliyor; oranlar eksik olabilir.', 'This carrier’s data arrives incomplete; rates may be incomplete.'], [' bilgisi eksik)', ' data incomplete)'],
+    ['Teslim oranı', 'Delivery rate'], ['Koli teslim oranı', 'Parcel delivery rate'], ['Uzun yolda', 'Long in transit'], ['14 gün üstü: ', 'Over 14 days: '], [' gönderi teslim', ' shipments delivered'], [' bağlı teslimat', ' linked deliveries'],
+    ['şirket bazında koli verisi yok', 'no parcel data per company'], ['şirket bazında uzun yolda verisi yok', 'no long-in-transit data per company'], ['taşıyıcıda, teslim edilmedi', 'with the carrier, not delivered'],
+    ['Teslim durumu filtresi', 'Delivery status filter'], ['Tüm teslim durumları', 'All delivery statuses'], ['Yolda / bekliyor', 'In transit / waiting'], ['Kanıt yok', 'No evidence'], ['Ekran bölümü', 'Screen section'], ['Sevkiyat', 'Shipments'], ['Kargo teslim', 'Cargo delivery'],
+    ['Portal gönderileri (', 'Portal shipments ('], [' gönderi)', ' shipments)'], ['Teslimat kayıtları (', 'Delivery records ('], ['Bağlı teslimat yok', 'No linked deliveries'], ['Portalda yok', 'Not in portal'], ['Taşıyıcı bilgisi yok', 'No carrier data'], ['Teslim durumu', 'Delivery status'],
+    ['Çıkış → teslim', 'Dispatch → delivery'], [' · medyan ', ' · median '],
+    ['Son 30 gün: kargo çıkışı ve teslim', 'Last 30 days: cargo dispatch and delivery'], ['Taşıyıcı portalı, gönderi adedi/gün', 'Carrier portal, shipments per day'], [' · şirket ayrımı yok, tüm gönderiler', ' · no company split, all shipments'],
+    ['İl bazında ortalama teslim süresi', 'Average delivery time by province'], ['İl bazında teslim günü', 'Delivery days by province'], ['Portalda hâlâ teslim görünmeyen; en uzun bekleyen üstte', 'Still not shown as delivered in the portal; longest waiting first'], ['Liste verisi yok', 'No list data'],
+     
     ['e-Belge, aktarım, kapanış, mutabakat (yalnız muhasebe rolü)', 'e-Document, transfer, closing, reconciliation (accounting role only)'], ['Mali tablolar, e-Belge, aktarım, kapanış', 'Financial statements, e-Document, transfer, closing'], ['değerleme farkı düşülmüş', 'valuation difference deducted'], ['son dışa aktarım', 'last export'], ['Aktarılmayan', 'Not transferred'], ['tamamı kural gereği bekliyor', 'all waiting by rule'], ['GİB engeli', 'GİB block'],
     ['kontrolü', 'check'], ['gönderilebilir', 'ready to send'], ['Düzeltme', 'Correction'], ['cevap geldi', 'reply received'], ['Aktarım bekliyor', 'Awaiting transfer'], ['Aktarıldı', 'Transferred'], ['Aktarım', 'Transfer'], ['Kapanış', 'Closing'], ['Fatura türü', 'Invoice type'],
     ['İptal', 'Cancelled'], ['İade iptali', 'Return cancellation'], ['İade faturası', 'Return invoice'], ['Genel / grup içi satış', 'General / intra-group sale'], ['DMO tevkifatlı', 'DMO withholding'], ['GİB öncesi kontrol kararı', 'Pre-GİB check decision'], ['Gönderilebilir', 'Ready to send'], ['Gönderilemez', 'Not ready to send'],
@@ -407,6 +421,21 @@
     if (!PARCA_L.some(function (x) { return x[0] === p[0]; })) PARCA_L.push(p);
   });
    
+  [['Planlama dosyası henüz bağlı değil; durum sevk tarihinden belirlenir.', 'The planning file is not connected yet; status is taken from the dispatch date.'], [' Koli ve ayrıntılı tür bilgisi dosya bağlanınca gelecek.', ' Cargo-box counts and detailed type information will appear once the file is connected.'], [' İrsaliye, lokasyon ve koli bilgisi dosya bağlanınca gelecek.', ' Waybill, location and box information will appear once the file is connected.'],
+    ['Bugün için planlanmış sevkiyat yok; “Tümü” sekmesine bakın.', 'No shipments are planned for today; see the “All” tab.'], ['Bu süzgeçte kayıt yok.', 'No records for this filter.'], ['Bu dönemde sevkiyat kaydı yok.', 'No shipments in this period.'],
+    ['Ara: kurum, ürün, sipariş, irsaliye…', 'Search: institution, product, order, waybill…'], ['Ara: hastane, İKN, sipariş, il…', 'Search: hospital, tender no., order, province…'], ['Lojistik listesi yok', 'No logistics list'], ['Sevkiyat planı verisi henüz gelmedi.', 'Shipment plan data has not arrived yet.'], ['Günlük rapor yok', 'No daily report'], ['Günlük sevkiyat verisi henüz gelmedi.', 'Daily shipment data has not arrived yet.'],
+    ['Liste kesik: ilk ', 'List truncated: first '], [' satır gösteriliyor.', ' rows shown.'], [' gönderi gösteriliyor, toplam ', ' shipments shown, total '], ['Sevkiyat özeti', 'Shipment summary'], ['Aylık sevkiyat', 'Monthly shipments'], ['Her ay çıkışı yapılan teslimat, satır ve miktar', 'Deliveries, lines and quantity dispatched each month'],
+    ['Son 30 gün sevkiyat', 'Last 30 days shipments'], ['Günlük çıkışı yapılan teslimat sayısı · günlük ortalama koli ', 'Deliveries dispatched per day · daily average boxes '], ['En çok sevk edilen 10 ürün', 'Top 10 shipped products'], ['Sevk satırı sayısına göre; miktar kendi biriminde', 'By number of shipment lines; quantity in its own unit'], [' · son 60 günde ', ' · in the last 60 days '], [' ürün çeşidi', ' product types'], [' satır · ', ' lines · '], [' satır', ' lines'],
+    ['Teslimat listesi', 'Delivery list'], ['Teslim alan kurum', 'Receiving institution'], ['Plan tarihi', 'Planned date'], ['Sevk tarihi', 'Dispatch date'], ['Sevk edildi', 'Dispatched'], ['Planlandı', 'Planned'], ['Tüm durumlar', 'All statuses'], ['Tarih seç', 'Pick a date'], ['Rapor dönemi', 'Report period'], ['Tek gün', 'Single day'], ['Tarih aralığı', 'Date range'], ['Başlangıç ', 'Start '], ['Bitiş ', 'End '],
+    ['Günlük rapor', 'Daily report'], ['Lojistik', 'Logistics'], ['Sipariş no', 'Order no.'], ['İrsaliye no', 'Waybill no.'], ['İrsaliye', 'Waybill'], ['Teslim noktası', 'Delivery point'], ['Teslim noktası', 'Delivery point'], ['farklı kurum', 'distinct institutions'], ['farklı irsaliye', 'distinct waybills'], ['sevk satırı', 'shipment lines'], ['toplam miktar', 'total quantity'], ['toplam koli', 'total boxes'], ['koli bilgisi yok', 'no box information'], ['Lokasyon', 'Location'], ['Açıklama', 'Note'],
+    ['Teslimat', 'Deliveries'], [' · koli ', ' · boxes '], ['Ürün kodu', 'Product code'], ['Sevk satırı', 'Shipment lines'], ['Ürün çeşidi', 'Product types'], ['Excel\'e aktar', 'Export to Excel'], ['Sevk durumu süzgeci', 'Dispatch status filter'], ['Teslim durumu süzgeci', 'Delivery status filter'], ['Sevk durumu', 'Dispatch status'], ['Başlanmadı', 'Not started'], ['Kısmi', 'Partial'], ['Teslim edildi', 'Delivered'], ['Kısmen teslim', 'Partially delivered'], ['Teslim kanıtı yok', 'No delivery evidence'], ['Uyuşmazlık', 'Mismatch'], ['Tamam', 'OK'], ['Hastane', 'Hospital'], ['Teslim durumu', 'Delivery status'], ['Kontrol', 'Check'], ['Ürün grubu', 'Product group'], ['Sevk edilen', 'Dispatched qty'], ['Teslim adet', 'Delivered qty'], ['Son irsaliye', 'Last waybill'], ['Son teslim', 'Last delivery'],
+    [' (kısmi ay)', ' (partial month)'], ['Planlandı · gecikmiş', 'Planned · overdue'],
+    ['Uzun yolda (', 'Long in transit ('], ['+ gün)', '+ days)'], ['ort. ', 'avg. '], ['(tahmini)', '(estimated)'], ['Kargo çıkış ', 'Cargo dispatch '], ['İli bilinmeyen gönderi yok.', 'No shipments with an unknown province.'], ['İli bilinmeyen ', 'Unknown province: '], [' gönderi bu grafiğe girmez.', ' shipments are not in this chart.'], ['En çok gönderi giden 12 il', 'Top 12 provinces by shipments'], [' kayıtta teslim tarihi çıkıştan önce görünüyor; süre ortalamasına alınmadı.', ' records show a delivery date before dispatch; excluded from the duration average.'],
+    ['Ocak', 'January'], ['Şubat', 'February'], ['Mart', 'March'], ['Nisan', 'April'], ['Mayıs', 'May'], ['Haziran', 'June'], ['Temmuz', 'July'], ['Ağustos', 'August'], ['Eylül', 'September'], ['Ekim', 'October'], ['Kasım', 'November'], ['Aralık', 'December']
+  ].forEach(function (p) {
+    if (!PARCA_L.some(function (x) { return x[0] === p[0]; })) PARCA_L.push(p);
+  });
+   
   [[' sipariş · en uzun ', ' orders · longest '], ['İlk teslimat siparişten ', 'First delivery after order: '], [' gün sonra', ' days'], ['İlk fatura ilk tesliminden ', 'First invoice after first delivery: '], [' açık sipariş', ' open orders'], ['Süresi geçti ', 'Expired '], [' · 7 günde ', ' · within 7 days ']].forEach(function (p) {
     if (!PARCA_L.some(function (x) { return x[0] === p[0]; })) PARCA_L.push(p);
   });
@@ -438,6 +467,22 @@
    [/Trend: Son (\d+) tam gün/g, 'Trend: last $1 full days'], [/Analiz \(huni, gecikme, son (\d+) gün\)/g, 'Analysis (funnel, delay, last $1 days)'], [/(\S+) tarihinde açıldı/g, 'opened on $1'], [/kaynak dosya (\d+) gün önceki tarihli/g, 'source file dated $1 days earlier'],
    [/(\S+) itibarıyla, milyon/g, 'As of $1, million'], [/(\S+ – \S+) arasında oluşturulan belgeler; tutar yok/g, 'Documents created between $1; no amounts'], [/(\d\d:\d\d)’den bugün şimdiye/g, 'from $1 today until now'], [/Nakliye firması ve teslim kanıtı SAP.de tutulmuyor; /g, 'The carrier and proof of delivery are not kept in SAP; '],
    [/Şirket içi \(MY→DAY\)/g, 'Internal (MY→DAY)'], [/(\d+) kaynağın/g, '$1 sources’']]));
+   
+  var TAM_MESAJ = {
+    'Asistan': 'Assistant', 'Yeni sohbet': 'New chat', 'Yenile': 'Refresh', 'Geri': 'Back', 'Başlat': 'Start', 'Anladım': 'Got it', 'Kişi ara': 'Search people', 'Grup adı': 'Group name',
+    'Kişi seçin': 'Select people', 'Sohbet yok': 'No chats', 'Mesaj yok': 'No messages', 'Mesaj': 'Message', 'Gönder': 'Send', 'Kartı gönder': 'Send card', 'Siz': 'You', 'Okundu': 'Read',
+    'Gönderildi': 'Sent', 'Biri': 'Someone', 'yazıyor…': 'is typing…', 'Sesli ara': 'Voice call', 'Görüntülü ara': 'Video call', 'Aranıyor': 'Calling', 'Arama sürüyor': 'Call in progress',
+    'sizi arıyor': 'is calling you', 'görüntülü': 'video', 'Sesli mesaj': 'Voice message', 'Dosya': 'File', 'Paylaşılan kart': 'Shared card', 'Dosya / fotoğraf': 'File / photo', 'Katıl': 'Join',
+    'Sohbet': 'Chat', 'Kişi bulunamadı': 'No people found', 'Yükleniyor': 'Loading', 'Mesaj kapalı': 'Messaging is off',
+    'Mesaj girişi alınamadı': 'Could not sign in to messaging', 'Giriş geçersiz': 'Sign-in is not valid', 'Bu sohbete erişiminiz yok': 'You do not have access to this chat', 'Bulunamadı': 'Not found',
+    'Geçersiz istek': 'Invalid request', 'Çok sık istek; biraz sonra deneyin': 'Too many requests; please try again shortly', 'Bağlantı yok': 'No connection', 'Sunucu hatası': 'Server error',
+    'Mesaj boş': 'Message is empty', 'Mesaj çok uzun': 'Message is too long', 'Bu dosya türü gönderilemez': 'This file type cannot be sent', 'Dosya 25 MB\'tan büyük olamaz': 'File cannot be larger than 25 MB',
+    'Fotoğraf işlenemedi': 'Photo could not be processed', 'Dosya yüklenemedi': 'File could not be uploaded', 'Grup adı yazın': 'Enter a group name', 'Arama bu cihazda yok': 'Calling is not available on this device',
+    'Arama başlatılamadı': 'Could not start the call', 'Alınamadı': 'Could not be retrieved',
+    'Bu sohbetler şirketin Microsoft bulut hesabında (Batı Avrupa) 12 ay saklanır. Uçtan uca şifreli değildir; şirket yönetimi gerektiğinde erişebilir. Aramalar kaydedilmez. Şifre, kimlik numarası, sağlık bilgisi yazmayınız. Buraya yazılan \'onay\' ya da \'gönder\' hiçbir işlemi başlatmaz.':
+      'These chats are kept for 12 months in the company\'s Microsoft cloud account (West Europe). They are not end-to-end encrypted; company management can access them when required. Calls are not recorded. Do not write passwords, ID numbers or health information. Writing \'approve\' or \'send\' here does not start any action.'
+  };
+  Object.keys(TAM_MESAJ).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_MESAJ[k]; });
   var onbellek = {};
   function cevir(m) {
     if (!EN || m == null) return m;

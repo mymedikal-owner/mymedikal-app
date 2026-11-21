@@ -1,4 +1,15 @@
  
+ 
+.veri-tablo-ust { display: flex; align-items: center; justify-content: space-between; gap: var(--b2); margin-bottom: var(--b2); flex-wrap: wrap; }
+.veri-tablo-ad { font-size: var(--t-s); min-width: 0; overflow-wrap: anywhere; }
+.excel-dugme { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; white-space: nowrap; }
+.kart2-eylem .excel-dugme { margin-left: 0; }
+.veri-tablo { min-width: 0; max-width: 100%; }
+.sv-ara { width: 100%; max-width: 420px; box-sizing: border-box; min-height: 40px; padding: 6px 12px; border: 1px solid var(--cizgi); border-radius: var(--r-s); background: var(--yuzey); color: inherit; font: inherit; }
+.sv-tarih { display: flex; flex-wrap: wrap; gap: var(--b3); font-size: var(--t-s); }
+.sv-tarih label { display: inline-flex; align-items: center; gap: 6px; }
+.sv-tarih input { min-height: 40px; padding: 4px 8px; border: 1px solid var(--cizgi); border-radius: var(--r-s); background: var(--yuzey); color: inherit; font: inherit; max-width: 100%; }
+.sv-ay { margin: 0; }
 .tq-veri-satir { font-size: var(--t-xs); color: var(--soluk); margin: 2px 0 var(--b2); font-variant-numeric: tabular-nums; }
 .ns-cizgi { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-size: var(--t-xs); color: var(--soluk); font-variant-numeric: tabular-nums; }
 .ns-hat { display: inline-block; width: 28px; height: 2px; border-radius: 1px; }
@@ -8,5 +19,17 @@
 .ns-gecikmis .bolum { margin: 0 0 2px; display: flex; align-items: center; gap: 6px; color: var(--kirmizi); }
 .ns-gecikmis .tq-liste { margin-top: var(--b3); }
 .ns-teslim-yok { font-style: italic; }
+ 
+.kt-not { display: block; margin-top: 4px; font-size: var(--t-xs); color: var(--soluk); overflow-wrap: anywhere; }
+.kt-yigin-iz { display: flex; height: 12px; border-radius: var(--r-t); background: var(--yuzey3); overflow: hidden; }
+.kt-yigin-iz i { display: block; height: 100%; min-width: 2px; }
+.kt-yigin-iz.gri { height: 8px; opacity: .85; }
+.kt-yigin { margin-bottom: var(--b2); }
+.kt-tas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--b3); }
+.kt-gun { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px var(--b2); font-size: var(--t-s); }
+.kt-gun span { color: var(--soluk); } .kt-gun strong { font-variant-numeric: tabular-nums; }
+.kt-uy-sat { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--b2); padding: var(--b2) 0; border-top: 1px solid var(--cizgi); font-size: var(--t-s); }
+.kt-uy-no { overflow-wrap: anywhere; } .kt-uy-gun { font-weight: 600; color: var(--kirmizi); font-variant-numeric: tabular-nums; text-align: right; }
+.kt-uy-alt { grid-column: 1 / -1; font-size: var(--t-xs); color: var(--soluk); overflow-wrap: anywhere; }
 .ns-grup { margin-top: var(--b4); }
 .ns-grup-ad { margin: 0 0 var(--b2); font-size: var(--t-m); display: flex; align-items: center; gap: var(--b2); overflow-wrap: anywhere; }

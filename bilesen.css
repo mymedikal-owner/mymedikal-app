@@ -22,6 +22,8 @@
 .kirinti { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: var(--t-s); color: var(--soluk); margin-bottom: 4px; }
 .kirinti a { color: var(--soluk); text-decoration: none; padding: 6px 0; } .kirinti a:hover { color: var(--vurgu); text-decoration: underline; }
 .kirinti [aria-current] { color: var(--yazi2); font-weight: 600; overflow-wrap: anywhere; } .kirinti-ayrac { color: var(--eksen); }
+.modul-gecis { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 var(--b3); }
+.modul-gecis-bag { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; text-decoration: none; font-weight: 600; color: var(--vurgu); background: var(--vurgu-zemin); border: 1px solid var(--vurgu); border-radius: var(--r-m); max-width: 100%; }
 .baslik-satir h2 { font-size: var(--t-xl); letter-spacing: -.01em; }
 
  

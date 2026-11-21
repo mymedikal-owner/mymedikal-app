@@ -363,6 +363,48 @@
     k.appendChild(b); return k;
   }
 
+   
+  function gecis(liste) {   
+    var gor = (window.MM && window.MM.modulListe) || [], k = h('nav', { sinif: 'modul-gecis', 'aria-label': 'Bölüm geçişi' });
+    liste.forEach(function (p) { if (gor.some(function (m) { return m.id === p[0]; })) k.appendChild(h('a', { href: '#' + p[0], sinif: 'mini-dugme modul-gecis-bag', metin: p[2] === 'geri' ? '← ' + p[1] : p[1] + ' →' })); });
+    return k.firstChild ? k : null;
+  }
+
+   
+   
+  function csvHucre(v) {
+    var t = v == null || v === '' ? '—' : String(v).replace(/\r?\n/g, ' ');
+    if (/^[=+@]/.test(t) || /^-[^\d.,\s]/.test(t)) t = "'" + t;
+    return /[;"]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+  }
+  function trZaman() { try { return new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date()).replace(',', ''); } catch (e) { return ''; } }
+  function dosyaAdi(ad) { return String(ad).toLocaleLowerCase('tr').replace(/[ç]/g, 'c').replace(/[ğ]/g, 'g').replace(/[ı]/g, 'i').replace(/[ö]/g, 'o').replace(/[ş]/g, 's').replace(/[ü]/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function csvMetin(r) {
+    var T = (window.MM && MM.t) || function (x) { return x; };
+    var sat = [['Rapor', r.ad], ['Süzgeç', r.filtre || 'Yok'], ['Oluşturma', trZaman()], [], r.kolonlar.map(function (c) { return c.ad; })].concat(r.satirlar);
+    return '﻿' + sat.map(function (s) { return s.map(csvHucre).join(';'); }).join('\r\n') + '\r\n';
+  }
+  function iosMu() { return /iPad|iPhone|iPod/.test(navigator.userAgent || '') || (/Macintosh/.test(navigator.userAgent || '') && navigator.maxTouchPoints > 1) || !!window.Capacitor; }
+  function paylasabilir() { try { return !!(navigator.share && navigator.canShare && navigator.canShare({ files: [new File(['a'], 'a.csv', { type: 'text/csv' })] })); } catch (e) { return false; } }
+   
+  function excelDugme(getir) {
+    if (iosMu() && !paylasabilir()) return null;
+    return h('button', { type: 'button', sinif: 'mini-dugme excel-dugme', 'aria-label': "Excel'e aktar", onclick: function () {
+      var r = getir(), kol = r.kolonlar, rows = r.satirlar.map(function (s) { return kol.map(function (c) { var v = c.csv ? c.csv(s) : (c.ciz ? c.ciz(s) : s[c.k]); return v && typeof v === 'object' ? (v.textContent || '') : v; }); });
+      var metin = csvMetin({ ad: r.ad, filtre: r.filtre, kolonlar: kol, satirlar: rows }), ad = dosyaAdi(r.ad) + '.csv';
+      var blob = new Blob([metin], { type: 'text/csv;charset=utf-8' });
+      if (iosMu()) { try { navigator.share({ files: [new File([blob], ad, { type: 'text/csv' })], title: r.ad }); } catch (e) {   } return; }
+      var u = URL.createObjectURL(blob), a = h('a', { href: u, download: ad }); document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    } }, [ikon('indir', 16), "Excel'e aktar"]);
+  }
+   
+  function veriTablo(o) {
+    var kap = h('div', { sinif: 'veri-tablo' }), dg = excelDugme(function () { return { ad: o.ad, filtre: o.filtre, kolonlar: o.kolonlar, satirlar: o.satirlar }; });
+    kap.appendChild(h('div', { sinif: 'veri-tablo-ust' }, [h('strong', { sinif: 'veri-tablo-ad', metin: o.ad + ' (' + say(o.satirlar.length) + ')' }), dg]));
+    kap.appendChild(tablo({ kolonlar: o.kolonlar, satirlar: o.satirlar, sayfa: o.sayfa || 50, bos: o.bos }));
+    return kap;
+  }
+
   window.MM = window.MM || {};
-  window.MM.gr = { h: h, s: s, say: say, kisa: kisa, ikon: ikon, ipucu: ipucu, spark: spark, delta: delta, kpi: kpi, kart: kart, duzTablo: duzTablo, cubuk: cubuk, cizgi: cizgi, yatay: yatay, pareto: pareto, lejant: lejant, iskelet: iskelet, bos: bos, tablo: tablo, cipler: cipler, sekmeler: sekmeler, sayfali: sayfali, sayfaBasi: sayfaBasi, IK: IK };
+  window.MM.gr = { excelDugme: excelDugme, veriTablo: veriTablo, h: h, s: s, say: say, kisa: kisa, ikon: ikon, ipucu: ipucu, spark: spark, delta: delta, kpi: kpi, kart: kart, duzTablo: duzTablo, cubuk: cubuk, cizgi: cizgi, yatay: yatay, pareto: pareto, lejant: lejant, iskelet: iskelet, bos: bos, tablo: tablo, cipler: cipler, sekmeler: sekmeler, sayfali: sayfali, sayfaBasi: sayfaBasi, gecis: gecis, IK: IK };
 })();

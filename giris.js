@@ -48,6 +48,7 @@
     }
     A.girisUpn = upn; A.girisRol = rol; A.girisGruplar = gruplar;
     A.girisOid = String(talep.oid || '').trim().toLowerCase();   
+    A.girisAd = String(talep.name || '').trim().slice(0, 80);   
     var iss = String(talep.iss || ''), tid = String(talep.tid || ''), ev = String(A.tenantId || '').trim().toLowerCase();
     var eposta = String(talep.email || '').trim().toLowerCase(), ALANLAR = (Array.isArray(A.sirketAlanlari) && A.sirketAlanlari.length ? A.sirketAlanlari : ['mymedikal.com.tr']).map(function (d) { return String(d).trim().toLowerCase(); }), EV_ALAN = { test: function (s) { return ALANLAR.some(function (d) { return s.length > d.length + 1 && s.slice(-(d.length + 1)) === '@' + d; }); } };
     A.girisMisafir = talep.acct === 1 || /#ext#/.test(upn) || !EV_ALAN.test(upn) || (!!eposta && !EV_ALAN.test(eposta)) ||   
@@ -56,7 +57,7 @@
     dugme.classList.add('giris-acik');
   }
   function cikisAyarla() {
-    A.girisUpn = ''; A.girisOid = ''; A.girisRol = ''; A.girisGruplar = []; A.girisMisafir = false; dugme.classList.remove('giris-acik');
+    A.girisUpn = ''; A.girisOid = ''; A.girisAd = ''; A.girisRol = ''; A.girisGruplar = []; A.girisMisafir = false; dugme.classList.remove('giris-acik');
     durum('Giriş', 'Giriş yap', false);
   }
 
@@ -243,7 +244,23 @@
     var capApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
     if (capApp && capApp.addListener) capApp.addListener('appStateChange', function (d) { if (d && d.isActive) onIsit(); });
   } catch (e) {   }
-  window.MMGirisSinama = { tokenAl: tokenAl };   
+  
+
+  async function kapsamliTokenAl(kapsamlar) {
+    var kap = (Array.isArray(kapsamlar) ? kapsamlar : [kapsamlar]).map(function (k) { return String(k || '').trim(); }).filter(Boolean);
+    if (!kap.length) throw new Error('kapsam');
+    if (!pca && hazir) await hazir;
+    var hesap = pca && pca.getActiveAccount();
+    if (!hesap) throw new Error('giris_yok');
+    var istek = { scopes: kap, account: hesap };
+    if (sistem && window.msal.CacheLookupPolicy) istek.cacheLookupPolicy = window.msal.CacheLookupPolicy.AccessTokenAndRefreshToken;
+    var s = await Promise.race([pca.acquireTokenSilent(istek), zamanAsimi(sessizSinir())]);
+    if (!s || !s.accessToken) throw new Error('belirtec_yok');
+    return s.accessToken;
+  }
+  MM.mesaj = Object.assign(MM.mesaj || {}, { belirtecAl: kapsamliTokenAl });
+  MM.tokenAl = kapsamliTokenAl;
+  window.MMGirisSinama = { tokenAl: tokenAl, kapsamliTokenAl: kapsamliTokenAl };   
 
   
   function yerelTemizle() {
@@ -260,6 +277,7 @@
     if (hesap) {
       
       bantGizle(); geciciler.length = 0; V.tokenDurumu = '';
+      try { if (MM.mesaj && MM.mesaj.cikis) MM.mesaj.cikis(); } catch (e) {   }   
       try { localStorage.removeItem(SSO_KEY); } catch (e) {   }
       if (sistem) {
         
@@ -355,6 +373,7 @@
       if (bostaCikiyor) return; bostaCikiyor = true;
       var hesap = pca && pca.getActiveAccount && pca.getActiveAccount();
       bantGizle(); geciciler.length = 0; V.tokenDurumu = '';
+      try { if (MM.mesaj && MM.mesaj.cikis) MM.mesaj.cikis(); } catch (e) {   }
       var temizle = yerelTemizle;
       A.girisUpn = ''; A.girisOid = ''; A.girisRol = ''; A.girisGruplar = []; A.girisMisafir = false;
       Promise.resolve().then(function () { return hesap ? pca.logoutRedirect({ account: hesap, onRedirectNavigate: function () { return false; } }) : null; })   

@@ -1,7 +1,7 @@
  
 .tn-kap { position: fixed; inset: 0; z-index: 95; display: flex; justify-content: center; align-items: center; padding: var(--b4); }
 .tn-perde { position: absolute; inset: 0; background: rgba(8, 10, 14, .55); backdrop-filter: blur(2px); animation: gir var(--hiz) both; }
-.tn-kart { position: relative; width: min(520px, 100%); max-height: calc(100dvh - 2 * var(--b4)); overflow-y: auto; background: var(--yuzey); color: var(--yazi); border: 1px solid var(--cizgi); border-radius: var(--r-l); box-shadow: var(--golge-2); padding: var(--b5); display: flex; flex-direction: column; gap: var(--b3); animation: gir var(--hiz) var(--egri) both; }
+.tn-kart { position: relative; width: min(520px, 100%); max-height: calc(100vh - 2 * var(--b4)); max-height: calc(100dvh - 2 * var(--b4)); overflow-y: auto; background: var(--yuzey); color: var(--yazi); border: 1px solid var(--cizgi); border-radius: var(--r-l); box-shadow: var(--golge-2); padding: var(--b5); display: flex; flex-direction: column; gap: var(--b3); animation: gir var(--hiz) var(--egri) both; }
 .tn-ust { display: flex; align-items: center; justify-content: space-between; gap: var(--b3); }
 .tn-sayac { font-size: var(--t-xs); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--soluk); margin: 0; }
 .tn-noktalar { display: flex; gap: 6px; } .tn-n { width: 8px; height: 8px; border-radius: 50%; background: var(--eksen); } .tn-n.on { background: var(--vurgu); width: 22px; border-radius: var(--r-t); transition: width var(--hiz); }
@@ -30,7 +30,7 @@
 body.tanitim-acik { overflow: hidden; }
 @media (max-width: 599px) {
   .tn-kap { align-items: flex-end; padding: 0; }
-  .tn-kart { width: 100%; max-height: 92dvh; border-radius: var(--r-l) var(--r-l) 0 0; border-bottom: 0; padding: var(--b4) var(--b4) calc(var(--b4) + env(safe-area-inset-bottom)); }
+  .tn-kart { width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: var(--r-l) var(--r-l) 0 0; border-bottom: 0; padding: var(--b4) var(--b4) calc(var(--b4) + env(safe-area-inset-bottom)); }
   .tn-baslik { font-size: var(--t-l); }
 }
 @media (max-width: 359px) { .tn-cipler { grid-template-columns: 1fr; } }

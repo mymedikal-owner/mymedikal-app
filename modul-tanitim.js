@@ -36,7 +36,8 @@
     return { baslik: 'Hoş geldiniz', govde: [
       h('p', { sinif: 'tn-metin' }, ['Bu uygulama MY Medikal verisini tek yerde gösterir. Rolünüz: ', h('b', { metin: ROL_AD[r] || r }), '. Menünüzde şunlar var:']),
       h('ul', { sinif: 'tn-cipler', 'aria-label': 'Menünüzdeki modüller' }, liste.map(modulCip)),
-      y.length ? h('p', { sinif: 'tn-not', metin: 'Yakında: ' + y.map(function (m) { return m.ad; }).join(', ') + ' (önizleme).' }) : null
+      y.length ? h('p', { sinif: 'tn-not', metin: 'Yakında: ' + y.map(function (m) { return m.ad; }).join(', ') + ' (önizleme).' }) : null,
+      MM.yukle ? MM.yukle.dugme() : null   
     ] };
   }
   function adim2() {

@@ -289,7 +289,8 @@
     var a = A(), sonuc = {};
     if (!a.driveId || modAl() !== 'graph') return sonuc;
     var token = await sohbetJetonu();
-    var adaylar = (a.acikModuller || []).filter(function (m) { return m !== 'asistan' && m !== 'ana' && m !== 'kalite-yukle' && /^[A-Za-z0-9._-]{1,64}$/.test(m) && ozelErisim(m); });
+    var adaylar = (a.acikModuller || []).filter(function (m) { return m !== 'asistan' && m !== 'ana' && m !== 'kalite-yukle' && /^[A-Za-z0-9._-]{1,64}$/.test(m) && ozelErisim(m); })
+      .map(function (m) { return m === 'siparis' ? 'siparisler' : m; });   
     await Promise.all(adaylar.map(async function (k) {
       try {
         var yol = [a.onedriveKok, k, '_sohbet-anahtar.txt'].filter(Boolean).map(encodeURIComponent).join('/');

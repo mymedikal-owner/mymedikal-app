@@ -241,7 +241,7 @@
       var zt = zamanTR(v.asof);
       ust.appendChild(h('div', { sinif: 'tazelik' }, [h('span', { sinif: 'nokta ' + (eski ? 'sari' : 'yesil'), 'aria-hidden': 'true' }), h('span', { metin: MM.yasMetin(dk) + ' güncellendi' + (zt ? ' (' + zt + ')' : '') })]));
       govde.appendChild(G.cipler([['TOPLAM', 'Tümü'], ['MY', 'MY'], ['DAY', 'DAY']], firma, function (d) { firma = d; ciz(); }, 'Şirket'));
-      if (firma === 'DAY' && v.okn_durum === 'kaynak_bekleniyor' && v.planlama_durum === 'veri_bekleniyor') govde.appendChild(h('p', { sinif: 'dm-yok dm-bekle', metin: 'Kargo teslim bilgisi bekleniyor' }));
+      if (firma === 'DAY' && v.okn_durum === 'kaynak_bekleniyor' && (v.planlama_durum === 'veri_bekleniyor' || v.planlama_durum === 'karsilastirma_yok')) govde.appendChild(h('p', { sinif: 'dm-yok dm-bekle', metin: 'Kargo teslim bilgisi bekleniyor' }));
       if (!oz) { govde.appendChild(G.bos({ baslik: 'Kayıt yok', metin: 'Bu seçimde nakliyat kaydı yok.' })); return; }
 
        

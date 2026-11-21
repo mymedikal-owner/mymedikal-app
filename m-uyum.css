@@ -1,0 +1,14 @@
+
+
+ 
+@media (max-width: 339px) { .marka h1 { display: none; } .ust { gap: 4px; padding-left: 6px; padding-right: 6px; } .ust-sag { gap: 2px; margin-left: auto; } .ara-dugme { margin-left: 0; } .menu > .menu-oge { flex: 1 1 0; } }
+@media (max-width: 599px) { .menu > .menu-oge { height: auto; min-height: var(--alt-yukseklik); padding-top: 4px; padding-bottom: 4px; box-sizing: border-box; } .menu > .menu-oge .ad { line-height: 1.25; } }
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .ust { background: var(--yuzey); }
+  .kpi.d-kritik, .hz-lim.asim { border-color: var(--kritik); }
+  .kpi.d-uyari { border-color: var(--uyari); }
+  .eld-harita .su, .eld-harita .su-ic { fill: var(--vurgu-zemin); }
+  .eld-harita .kara { fill: var(--yuzey2); }
+  .eld-risk-satir, .eld-bas-band { background: var(--yuzey2); }
+  .gb-yolda, .gb-serbest { fill: var(--vurgu-zemin); }
+}

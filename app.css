@@ -178,6 +178,9 @@ table.tablo { border-collapse: collapse; width: 100%; font-size: 13px; font-vari
 .menu-diger.secili { color: var(--vurgu); font-weight: 600; }
 .diger-sheet { position: fixed; right: 8px; bottom: calc(var(--alt-yukseklik) + env(safe-area-inset-bottom) + 6px); z-index: 7; background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 12px; padding: 6px; display: grid; gap: 2px; min-width: 180px; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
 .diger-sheet[hidden] { display: none; }
+.mm-yukle { padding: 6px 10px; } .mm-yukle[hidden] { display: none; }
+.mm-yukle-dugme { width: 100%; min-height: 44px; padding: 0 14px; border-radius: var(--r-t, 8px); border: 1px solid var(--vurgu, #1c355e); background: var(--vurgu, #1c355e); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.mm-yukle-not { margin: 0; font-size: 13px; color: var(--yazi2, #444); }
 .diger-surum { padding: 6px 10px 2px; font-size: 11px; color: var(--soluk, #8a8f98); text-align: right; }
 .rol-satir { margin: 0 0 8px; font-size: 13px; color: var(--soluk, #8a8f98); }
 .diger-sheet.kayar::after { content: ''; position: sticky; bottom: -6px; display: block; height: 22px; margin: 0 -6px -6px; background: linear-gradient(to bottom, transparent, var(--yuzey) 80%); pointer-events: none; }    

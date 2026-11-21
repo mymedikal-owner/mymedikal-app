@@ -219,6 +219,7 @@
     menu.appendChild(o);
     var k = menuOge(m, false); k.classList.remove('onizleme'); k.setAttribute('role', 'menuitem'); k.addEventListener('click', function () { sheet.hidden = true; }); sheet.appendChild(k);
   });
+  if (window.MM.yukle) sheet.appendChild(window.MM.yukle.dugme());   
   sheet.appendChild(h('div', { sinif: 'diger-surum', role: 'presentation', metin: 'Sürüm ' + (window.MM_AYAR.surum || '') }));   
   if (MODULLER.length > ILK || MODULLER.length) { menu.appendChild(digerDugme); document.body.appendChild(sheet); }
   }

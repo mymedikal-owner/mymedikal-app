@@ -166,6 +166,7 @@ dd{margin:0;min-width:0;overflow-wrap:anywhere}
 }
 @media (pointer:coarse){ #stage canvas,.gm{touch-action:pan-y} }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}.seg{flex-wrap:wrap}.seg button{flex:1 1 30%;min-width:0}.ocard{background:var(--panel-solid);border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:8px}.ocard .gstats{grid-template-columns:repeat(5,1fr)}@media (max-width:400px){.ocard .gstats{grid-template-columns:repeat(3,1fr)}}
+@supports not (background:color-mix(in srgb,red 50%,blue)){.alert{background:var(--panel-solid,#fff);border-color:var(--late)}.row:hover{background:var(--panel-solid,#eee)}.row[aria-current="true"]{background:var(--panel-solid,#eee)}.lots td{border-bottom-color:var(--line)}.legs li.now::before{box-shadow:0 0 0 3px var(--line)}}
 </style>
 
 <div id="app">

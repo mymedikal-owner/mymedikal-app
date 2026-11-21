@@ -56,7 +56,8 @@
   if (!window.msal || !window.msal.PublicClientApplication || !http) { durum('Giriş kullanılamıyor', 'Giriş bu ortamda kullanılamıyor', true); dugme.disabled = true; return; }
 
   
-  var yonlendirme = native ? location.origin : location.origin + location.pathname.replace(/[^\/]*$/, '');
+  var androidSistem = native && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android' && !!(window.Capacitor.Plugins && window.Capacitor.Plugins.MMGiris);   
+  var yonlendirme = androidSistem ? 'capacitor://localhost' : native ? location.origin : location.origin + location.pathname.replace(/[^\/]*$/, '');
   var pca = null;
 
   function hesapAyarla(hesap) {
@@ -87,7 +88,8 @@
   }
 
   
-  var sistem = native && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios' && window.Capacitor.Plugins && window.Capacitor.Plugins.MMGiris;
+  
+  var sistem = native && window.Capacitor.getPlatform && (window.Capacitor.getPlatform() === 'ios' || window.Capacitor.getPlatform() === 'android') && window.Capacitor.Plugins && window.Capacitor.Plugins.MMGiris;
   var SSO_KEY = 'mm_sso_deneme', SSO_ARALIK = 10 * 60 * 1000, bekleyen = null, bekleyenZorla = null, bant = null;
   var hazir = null;
   var webSessizHak = false;   
@@ -403,7 +405,7 @@
       Promise.resolve().then(function () { return hesap ? pca.logoutRedirect({ account: hesap, onRedirectNavigate: function () { return false; } }) : null; })   
         .catch(function (e) { console.warn('bosta-cikis', kodKisa(e)); })
         .then(temizle)
-        .then(function () { location.replace(yonlendirme); });
+        .then(function () { location.replace(androidSistem ? location.origin : yonlendirme); });
     };
     var hareket = function () { if (!document.hidden) sonHareket = Date.now(); };
     ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(function (o) { window.addEventListener(o, hareket, { passive: true, capture: true }); });

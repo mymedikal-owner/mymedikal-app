@@ -96,13 +96,14 @@
       var m = h('div', { sinif: 'mesaj ' + kimden }, [h('div', { sinif: 'balon' }, [h('p', { metin: metin }), kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: 'Kaynaklar:' })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), KLASOR_AD[k] || k]); }))) : null])]);
       akis.appendChild(m); akis.scrollTop = akis.scrollHeight;
     }
-    var sohbetGovde;
-    if (!sohbetDurum.acik) {
-      
-      sohbetGovde = h('div', { sinif: 'sohbet' }, [
-        h('p', { metin: 'Asistan yazma özelliği kurulunca bu ekrandan soru sorabileceksiniz. Şimdilik sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.' }),
-        h('a', { sinif: 'dugme', href: mailHref(''), hidden: !mailHref(''), metin: 'Soruyu mail ile ilet' })]);
-    } else {
+    var sohbetGovde = h('div', { sinif: 'sohbet' });
+    function mailGorunum(metin) {
+      sohbetGovde.textContent = '';
+      sohbetGovde.appendChild(h('p', { metin: metin }));
+      sohbetGovde.appendChild(h('a', { sinif: 'dugme', href: mailHref(''), hidden: !mailHref(''), metin: 'Soruyu mail ile ilet' }));
+    }
+    function acikGorunum() {
+      sohbetGovde.textContent = '';
       var bekliyor = false, giriKutu = h('input', { type: 'text', maxlength: '1000', placeholder: 'Sorunuzu yazın…', 'aria-label': 'Sorunuz', autocomplete: 'off' });
       var gonderDugme = h('button', { type: 'submit', sinif: 'dugme', 'aria-label': 'Gönder' }, [gr.ikon('gonder', 18)]);
       var yoklaSayac = 0;
@@ -113,7 +114,7 @@
           try { c = await window.MMVeri.sohbetCevap(id); } catch (e) { c = null; }
           if (c) { mesaj('asistan', c.cevap, c.klasorler); akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; return; }
           gecen += bekle;
-          if (gecen >= 300000) { mesaj('asistan', 'Cevap hazır olunca bu ekranda görünür.'); bekliyor = false; gonderDugme.disabled = false; return; }
+          if (gecen >= 300000) { mesaj('asistan', 'Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.'); akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; return; }
           yokla(id, soru, gecen, Math.min(15000, bekle + 2500));
         }, bekle);
       }
@@ -126,7 +127,16 @@
         try { var s = await window.MMVeri.sohbetSor(soru); yokla(s.id, soru, 0, 5000); }
         catch (err) { mesaj('asistan', 'Soru iletilemedi (' + (err && err.message ? err.message : 'hata') + '). Sorunuzu mail ile iletebilirsiniz.'); akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; }
       } }, [giriKutu, gonderDugme]);
-      sohbetGovde = h('div', { sinif: 'sohbet' }, [akis, giris, h('p', { sinif: 'soluk kucuk', metin: 'Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.' })]);
+      [akis, giris, h('p', { sinif: 'soluk kucuk', metin: 'Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.' })].forEach(function (x) { sohbetGovde.appendChild(x); });
+    }
+    if (!sohbetDurum.acik) {
+      
+      mailGorunum('Asistan yazma özelliği kurulunca bu ekrandan soru sorabileceksiniz. Şimdilik sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.');
+    } else {
+      
+      sohbetGovde.appendChild(h('p', { sinif: 'soluk kucuk', metin: 'Asistan hazırlanıyor…' }));
+      var kapiMail = function () { mailGorunum('Asistan şu an yanıt vermiyor. Sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.'); };
+      window.MMVeri.sohbetKapi().then(function (k) { if (k && k.acik) acikGorunum(); else kapiMail(); }, kapiMail);
     }
     var sohbet = gr.kart({ baslik: 'Sohbet', alt: 'Cevaplar kaynak göstererek verilir', govde: sohbetGovde });
     var kaynakKart = gr.kart({ baslik: 'Erişebildiğin kaynaklar', alt: 'Cevaplar yalnız yetkinizin açtığı kaynaklardan verilir', govde: h('div', { sinif: 'cip-sira' }, erisilen.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), k[1]]); })) });

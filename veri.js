@@ -323,6 +323,29 @@
     if (!sohbetOid()) return { acik: false, neden: 'giris' };
     return { acik: true, neden: '' };
   }
+  var SOHBET_KLASORLERI = ['dmo', 'dmo-fiyat-gor', 'dmo-maliyet', 'eldiven', 'fabrika', 'finans', 'ihale', 'isg', 'kalite', 'muhasebe', 'nakliye', 'saha', 'sikayet', 'siparisler', 'siparisler-yonetim', 'sterilizasyon', 'stok'];
+  
+  var nabizOnbellek = { t: 0, acik: false };
+  async function sohbetKapi() {
+    var ac = sohbetAcik();
+    if (!ac.acik) return ac;
+    if (Date.now() - nabizOnbellek.t < 60000) return nabizOnbellek.acik ? { acik: true, neden: '' } : { acik: false, neden: 'nabiz' };
+    var acik = false, hedef = String(A().sohbetDriveId || '').trim();
+    try {
+      var token = await sohbetJetonu(), yol = sohbetOid() + '/nabiz.json';
+      var bilgi = await jsonGetir('https://graph.microsoft.com/v1.0/drives/' + encodeURIComponent(hedef) + '/root:/' + yol.split('/').map(encodeURIComponent).join('/'), { headers: { Authorization: 'Bearer ' + token }, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
+      var indir = bilgi && bilgi['@microsoft.graph.downloadUrl'];
+      if (indir) {
+        var r = await fetch(indir, { cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
+        if (r.ok) {
+          var j = await r.json(), z = Date.parse(j && j.zaman);
+          if (isFinite(z)) { var fark = Date.now() - z; acik = fark <= 15 * 60000 && fark >= -5 * 60000; }
+        }
+      }
+    } catch (e) { acik = false; }
+    nabizOnbellek = { t: Date.now(), acik: acik };
+    return acik ? { acik: true, neden: '' } : { acik: false, neden: 'nabiz' };
+  }
   async function sohbetJetonu() {
     if (typeof MMVeri.tokenSaglayici !== 'function') throw hata('giris_gerekli', 'Giriş yok');
     var t = await MMVeri.tokenSaglayici();
@@ -334,8 +357,8 @@
     var a = A(), sonuc = {};
     if (!a.driveId || modAl() !== 'graph') return sonuc;
     var token = await sohbetJetonu();
-    var adaylar = (a.acikModuller || []).filter(function (m) { return m !== 'asistan' && m !== 'ana' && m !== 'kalite-yukle' && /^[A-Za-z0-9._-]{1,64}$/.test(m) && ozelErisim(m); })
-      .map(function (m) { return m === 'siparis' ? 'siparisler' : m; });   
+    
+    var adaylar = SOHBET_KLASORLERI.filter(function (k) { return ozelErisim(k); });
     await Promise.all(adaylar.map(async function (k) {
       try {
         var yol = [a.onedriveKok, k, '_sohbet-anahtar.txt'].filter(Boolean).map(encodeURIComponent).join('/');
@@ -353,8 +376,8 @@
   function sekizHex() { var b = new Uint8Array(4); (window.crypto || {}).getRandomValues(b); var s = ''; for (var i = 0; i < 4; i++) s += (b[i] < 16 ? '0' : '') + b[i].toString(16); return s; }
   
   async function sohbetSor(soru) {
-    var ac = sohbetAcik(), hedef = String(A().sohbetDriveId || '').trim();
-    if (!ac.acik) throw hata('ayar_bekleniyor', 'Sohbet kapalı');
+    var hedef = String(A().sohbetDriveId || '').trim(), ac = await sohbetKapi();
+    if (!ac.acik) throw hata('ayar_bekleniyor', 'Sohbet şu an kapalı');
     soru = String(soru || '').trim().slice(0, 1000);
     if (!soru) throw hata('bicim', 'Soru boş');
     var token = await sohbetJetonu(), anahtarlar = await sohbetAnahtarlari();
@@ -586,6 +609,7 @@
     yukle: yukle,
     yuklemeAcik: yuklemeAcik,
     sohbetAcik: sohbetAcik,
+    sohbetKapi: sohbetKapi,
     sohbetSor: sohbetSor,
     sohbetCevap: sohbetCevap,
     yuklemeIsle: yuklemeIsle,

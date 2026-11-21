@@ -268,6 +268,7 @@
    
   Object.assign(TAM, {
     'Uygulamayı yükle': 'Install the app', 'Uygulamayı yüklemek için: Menü → Ana ekrana ekle': 'To install the app: Menu → Add to Home screen',
+    'Demo': 'Demo', 'Örnek verilerle gezin': 'Explore with sample data', 'Demodan çık': 'Exit demo', 'ÖRNEK VERİ / SAMPLE DATA': 'SAMPLE DATA',    
     'Giriş': 'Sign in', 'Giriş yap': 'Sign in', 'Fatura verisi yok': 'No invoice data', 'Kesilen faturalar': 'Issued invoices', 'Mahsup bekleyen tahsilat: ': 'Collections pending offset: ', 'Mahsup bekleyen: ': 'Pending offset: ', 'Geçmiş kotalar: ': 'Past quotas: ', 'Aşım': 'Over limit', 'Son 90 günde olumsuz muayene görünmüyor.': 'No negative inspections in the last 90 days.', 'Teslimat durumu bilinmiyor.': 'Delivery status unknown.', 'Teslimat belgesi yok.': 'No delivery document.', 'Fatura var ama teslimat kaydı yok.': 'Invoice exists but no delivery record.', 'Faturalanmadı.': 'Not invoiced.', 'Sipariş → irsaliye → fatura': 'Order → delivery note → invoice', 'Borç, teminat ve ödeme takvimi': 'Debt, collateral and payment schedule', 'Diğer': 'More',
     'Çalışıyor': 'Running', 'Güncel': 'Up to date', 'Açık': 'Open', 'Geciken': 'Late', 'Tamamlanan': 'Completed', 'Tümü': 'All', 'Özet': 'Summary', 'İhaleler': 'Tenders',
     'Şirket': 'Company', 'Kaynak': 'Source', 'Yaş': 'Age', 'Veri durumu': 'Data status', 'Durum': 'Status', 'Adet': 'Quantity', 'Banka': 'Bank', 'Borç': 'Debt', 'Depo': 'Warehouse',

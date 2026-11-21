@@ -4,3 +4,11 @@
 .giris-dugme.giris-yok { opacity: .7; }
 .giris-dugme:disabled { cursor: default; }
 @media (max-width: 560px) { .giris-dugme { max-width: 88px; padding: 5px 4px; font-size: 9.5px; letter-spacing: -.1px; line-height: 1.15; } .giris-dugme .giris-metin { white-space: normal; overflow-wrap: anywhere; max-height: 2.4em; } }
+ 
+.demo-dugme { font-weight: 600; border-color: var(--vurgu, #256abf); color: var(--vurgu, #256abf); }
+.giris-yigin { display: flex; align-items: center; gap: 4px; }
+@media (max-width: 560px) { .giris-yigin { flex-direction: column; align-items: stretch; gap: 2px; } .giris-yigin .giris-dugme { min-height: 24px; max-width: 64px; padding: 4px 4px; } body.demo-kip .giris-yigin .demo-dugme { max-width: 54px; } }
+#demo-serit { position: fixed; top: 0; left: 0; right: 0; z-index: 100000; box-sizing: border-box; height: calc(24px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 8px 0; display: flex; align-items: center; justify-content: center; background: #fcd34d; color: #1f2937; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-align: center; border-bottom: 1px solid #b45309; pointer-events: none; }
+body.demo-kip { --demo-serit: calc(24px + env(safe-area-inset-top)); padding-top: var(--demo-serit); }
+body.demo-kip .ust { top: var(--demo-serit); padding-top: 0; }
+@media (min-width: 600px) { body.demo-kip .menu { top: calc(var(--ust-yukseklik) + 1px + var(--demo-serit)); height: calc(100vh - var(--ust-yukseklik) - 1px - var(--demo-serit)); } }

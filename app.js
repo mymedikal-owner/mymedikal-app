@@ -117,6 +117,7 @@
     
     
     
+    if (window.MMVeri && window.MMVeri.demo()) return 'yonetim';   
     if (window.MMVeri && window.MMVeri.mod() === 'graph') return window.MM_AYAR.girisRol || 'calisan';
     var q = new URLSearchParams(location.search).get('rol');
     return q || window.MM_AYAR.rol || 'yonetim';
@@ -153,6 +154,7 @@
   window.MM.acikHazir = bayrakOku();
   window.MM.bayrakYenile = bayrakOku;   
   
+  var DEMO_KAPALI = ['kalite-yukle', 'nakliye-yukle', 'asistan', 'mesaj', 'ik', 'onay', 'yonetim'];
   function yonetimMi() {
     if (window.MMVeri && window.MMVeri.mod() === 'graph') return !!window.MMVeri.ozelErisim('yonetim') && !!(window.MM_AYAR.ozelErisim || {}).yonetim;
     return rolAl() === 'yonetim';
@@ -170,6 +172,7 @@
     var ym = yonetimMi();   
     MODULLER = MODULLER_TUM.filter(function (m) {
       if (m.nakliyeci || m.erisimYok) return false;
+      if (window.MMVeri && window.MMVeri.demo() && DEMO_KAPALI.indexOf(m.id) >= 0) return false;   
       if (m.mesaj && !mesajAcik()) return false;   
       var r = (window.MM_AYAR.roller || {})[m.id];
       if (KAPALI.indexOf(m.id) >= 0 && m.id !== 'ana') return false;   

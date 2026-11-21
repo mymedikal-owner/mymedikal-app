@@ -13,6 +13,7 @@
 
   MM.moduller.sikayet = function (kok) {
     var yuk = null, hata = null, canli = true, st = { sec: null, filtre: 'dikkat' };
+    var SAHA = !!(window.MMVeri && window.MMVeri.sahaKip && window.MMVeri.sahaKip());   
     kok.appendChild(G.sayfaBasi({ baslik: 'Şikâyetler', alt: 'Hastane şikâyetleri ve teslimat sorunları', kirinti: [['Şikâyetler']] }));
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
@@ -55,9 +56,9 @@
     }
     function genel(v) {
       var f = document.createDocumentFragment(), o = v.ozet || {}, H = (v.hastaneler || []).slice().sort(function (a, b) { return (b.dikkat_skoru || 0) - (a.dikkat_skoru || 0); });
-      f.appendChild(h('div', { sinif: 'ml-kpi-izgara' }, [kutu('Son 12 ay olay', G.say(o.olay_12ay), null), kutu('Açık olay', G.say(o.acik_olay), null), kutu('Hastane sayısı', G.say(o.hastane_sayisi), null), kutu('Ceza kesintisi (toplam, MY+DAY)', tl(o.ceza_toplam_tl), null)]));
+      f.appendChild(h('div', { sinif: 'ml-kpi-izgara' }, [kutu('Son 12 ay olay', G.say(o.olay_12ay), null), kutu('Açık olay', G.say(o.acik_olay), null), kutu('Hastane sayısı', G.say(o.hastane_sayisi), null), SAHA ? null : kutu('Ceza kesintisi (toplam, MY+DAY)', tl(o.ceza_toplam_tl), null)]));
       var dik = H.filter(function (x) { return x.dikkat_seviye !== 'izle'; }), liste = st.filtre === 'dikkat' ? dik : H;
-      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Dikkat listesi', alt: 'Hastaneler dikkat skoruna göre; seviye olay sayısı, açık kayıt ve ceza kesintisiyle belirlenir',
+      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Dikkat listesi', alt: SAHA ? 'Hastaneler dikkat skoruna göre; seviye olay sayısı ve açık kayıtla belirlenir' : 'Hastaneler dikkat skoruna göre; seviye olay sayısı, açık kayıt ve ceza kesintisiyle belirlenir',
         govde: h('div', null, [G.cipler([['dikkat', 'Dikkat gerektirenler', dik.length], ['tum', 'Tüm hastaneler', H.length]], st.filtre, function (k) { st.filtre = k; ciz(); }, 'Liste'),
           liste.length ? G.sayfali(liste, hastaneSatir, { n: 12 }) : G.bos({ baslik: 'Dikkat gerektiren hastane yok', metin: 'Tüm hastaneler izleme seviyesinde.' })]) })]));
       var tur = topla(H, 'tur_dagilimi_12ay'), u10 = v.urun_ilk10 || [];
@@ -79,7 +80,7 @@
       if (st.sec) { var x = v.hastaneler.filter(function (k) { return k.id === st.sec; })[0]; if (x) { govde.appendChild(kartCiz(v, x)); return; } st.sec = null; }
       govde.appendChild(genel(v));
     }
-    function yenile() { hata = null; yuk = null; ciz(); window.MMVeri.oku('sikayet', 'sikayet', 'siparisler-yonetim').then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
+    function yenile() { hata = null; yuk = null; ciz(); (SAHA ? window.MMVeri.oku('saha', 'sikayet') : window.MMVeri.oku('sikayet', 'sikayet', 'siparisler-yonetim')).then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
     yenile();
     return function () { canli = false; };
   };

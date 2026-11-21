@@ -762,7 +762,7 @@
       kodlar.forEach(function (k) { var s = gs.filter(function (x) { return x.alt_grup === k; }); if (s.length) govde.appendChild(anAltBolum(s, anGrup, k)); });
       var diger = gs.filter(function (x) { return kodlar.indexOf(x.alt_grup) < 0; }); if (diger.length) govde.appendChild(anAltBolum(diger, anGrup, 'diger'));
       if (!gs.length) govde.appendChild(G.bos({ baslik: 'Bu grupta satır yok' }));
-      govde.appendChild(h('div', { sinif: 'bk-dugme-kap' }, [h('button', { type: 'button', sinif: 'dugme', disabled: 'disabled', title: 'Yakında', metin: 'Gönder (yakında)' })]));
+      if (!window.MMVeri.demo()) govde.appendChild(h('div', { sinif: 'bk-dugme-kap' }, [h('button', { type: 'button', sinif: 'dugme', disabled: 'disabled', title: 'Yakında', metin: 'Gönder (yakında)' })]));   
     }
     function anlikBaslat() {
       if (anVeri || anYukleniyor || anHata) return;

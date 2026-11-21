@@ -54,7 +54,7 @@
 .dm-buyuk-metin { margin: 0; font-size: var(--t-xl); font-weight: 650; font-variant-numeric: tabular-nums; }
 .dm-aciklama { margin: var(--b2) 0; font-size: var(--t-s); color: var(--yazi); }
 .dm-oge-izgara { display: grid; gap: var(--b2) var(--b4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
-.dm-oge { display: flex; justify-content: space-between; gap: var(--b2); border-bottom: 1px solid var(--cizgi); padding: 6px 0; font-size: var(--t-s); } .dm-oge-ad { color: var(--soluk); } .dm-oge-deger { font-variant-numeric: tabular-nums; text-align: right; }
+.dm-oge { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--b2); border-bottom: 1px solid var(--cizgi); padding: 6px 0; font-size: var(--t-s); } .dm-oge-ad { color: var(--soluk); } .dm-oge-deger { font-variant-numeric: tabular-nums; text-align: right; }
 .dm-oge.kritik .dm-oge-deger { color: var(--turuncu); }
 .dm-detay-kart + .dm-detay-kart, .kart2 + .kart2 { margin-top: var(--b3); }
 

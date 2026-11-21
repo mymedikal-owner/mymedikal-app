@@ -20,7 +20,35 @@
     return e;
   }
 
+  
+
+  var DEMO = false;
+  function demoIso(ms) {
+    var p = {}; new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(ms)).forEach(function (x) { p[x.type] = x.value; });
+    return p.year + '-' + p.month + '-' + p.day + 'T' + p.hour + ':' + p.minute + ':' + p.second + '+03:00';
+  }
+  var DEMO_ZAMAN = ['asof', 'uretim', 'uretim_zamani', 'zaman', 'sap_veri_zamani', 'sap_senk', 'guncellendi', 'veri_tarihi', 'uretildi', 'portal_okuma_zamani', 'veri_zamani'];
+  var DEMO_ISARET = '2026-01-15T10:00:00+03:00';   
+  function demoTazele(v) {   
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
+    var simdi = demoIso(Date.now() - 120000);
+    DEMO_ZAMAN.forEach(function (k) { if (typeof v[k] === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v[k])) v[k] = simdi; });
+    if (typeof v.bugun === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v.bugun)) v.bugun = simdi.slice(0, 10);
+    if (typeof v.html === 'string') v.html = v.html.split(DEMO_ISARET).join(simdi);
+    return v;
+  }
+  var demoDizinSozu = null;
+  function demoDizin() {
+    if (!demoDizinSozu) demoDizinSozu = fetch('demo/dizin.json', { cache: 'no-cache', credentials: 'omit' }).then(function (r) { return r.ok ? r.json() : { dosyalar: [] }; }).catch(function () { return { dosyalar: [] }; });
+    return demoDizinSozu;
+  }
+  function demoTemizle() {   
+    try { localStorage.removeItem('mm-okunan'); localStorage.removeItem('mm_siparis_son_aramalar'); Object.keys(localStorage).forEach(function (k) { if (k.indexOf('mm-dmo-fiyat-') === 0) localStorage.removeItem(k); }); } catch (e) {   }
+    try { sessionStorage.clear(); } catch (e) {   }
+  }
+
   function modAl() {
+    if (DEMO) return 'yerel';   
     
     if (A().mod === 'graph') return 'graph';
     var q = new URLSearchParams(location.search).get('mod');
@@ -52,6 +80,11 @@
   }
 
   async function yerelOku(modul, dosya) {
+    if (DEMO) {   
+      var dz = await demoDizin();
+      if ((dz.dosyalar || []).indexOf(modul + '/' + dosya) < 0) throw hata('bulunamadi', 'Veri şu an yok');
+      return demoTazele(await jsonGetir('demo/' + modul + '/' + dosya + '.json', { cache: 'no-cache', credentials: 'omit' }));
+    }
     return jsonGetir('ornek/' + modul + '/' + dosya + '.json', { cache: 'no-cache' });   
   }
 
@@ -102,6 +135,14 @@
 
   
   
+  function sahaKip() {
+    if (DEMO) return false;
+    if (modAl() === 'graph') return ozelErisim('saha') && !ozelErisim('siparisler-yonetim');
+    try { return new URLSearchParams(location.search).get('saha') === '1'; } catch (e) { return false; }
+  }
+
+  
+  
   function bolumGorur(modul, rol) {
     var ozel = (A().ozelErisim || {})[modul];
     if (ozel && modAl() === 'graph') return ozelErisim(modul);
@@ -111,6 +152,7 @@
 
    
   async function gorselUrl(klasor, ad) {
+    if (DEMO) throw hata('bulunamadi', 'Demo kipinde görsel yok');
     if (kisitli() || !ozelErisim(klasor)) throw hata('giris_gerekli', 'Bu görsel için erişiminiz yok');   
     if (modAl() !== 'graph') return 'ornek/' + encodeURIComponent(klasor) + '/' + encodeURIComponent(ad);
     var a = A();
@@ -142,6 +184,7 @@
 
   function firmaSlug(s) { return String(s || '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 40); }
   function nakliyeci() {
+    if (DEMO) return null;
     var a = A(), tanim = a.nakliyeciGruplar || {};
     if (modAl() === 'graph') {   
       var g = a.girisGruplar; if (!Array.isArray(g) || !g.length) return null;
@@ -253,6 +296,7 @@
   
   
   async function cihazBelirteciYaz(upnOzet, govde, hedefSurucu) {
+    if (DEMO) return 'ayar';
     var hedef = String(hedefSurucu || '').trim(), ozet = String(upnOzet || '');
     if (!hedef || !/^[0-9a-f]{16}$/.test(ozet)) return 'ayar';
     var yol = 'bildirim/cihazlar/' + ozet + '.json';
@@ -273,6 +317,7 @@
   
   function sohbetOid() { var o = String(A().girisOid || '').trim().toLowerCase(); return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(o) ? o : ''; }
   function sohbetAcik() {
+    if (DEMO) return { acik: false, neden: 'kapali' };
     if (!String(A().sohbetDriveId || '').trim()) return { acik: false, neden: 'kapali' };
     if (modAl() !== 'graph') return { acik: false, neden: 'kapali' };
     if (!sohbetOid()) return { acik: false, neden: 'giris' };
@@ -424,19 +469,23 @@
 
 
   var KALITE_AZAMI = 6;
-  function kaliteGrup() { return String(A().kaliteYukleGrup || '').trim().toLowerCase(); }
+  function kaliteGruplar() {   
+    var k = A().kaliteYukleGrup, d = Array.isArray(k) ? k : [k];
+    return d.map(function (x) { return String(x || '').trim().toLowerCase(); }).filter(Boolean);
+  }
+  function kaliteUye() { var gr = A().girisGruplar; return Array.isArray(gr) && kaliteGruplar().some(function (g) { return gr.indexOf(g) >= 0; }); }
   function kaliteAcik() {
+    if (DEMO) return { acik: false, neden: 'kapali' };
     if (modAl() !== 'graph') return { acik: true, neden: '' };   
-    var g = kaliteGrup(); if (!g) return { acik: false, neden: 'grup-yok' };
-    var gr = A().girisGruplar;
-    if (!Array.isArray(gr) || gr.indexOf(g) < 0) return { acik: false, neden: 'yetki' };
+    if (!kaliteGruplar().length) return { acik: false, neden: 'grup-yok' };
+    if (!kaliteUye()) return { acik: false, neden: 'yetki' };
     if (!String(A().yuklemeDriveId || '').trim()) return { acik: false, neden: 'kapali' };
     return { acik: true, neden: '' };
   }
   function kaliteGorur(yonetim) {   
     if (modAl() !== 'graph') return true;
-    var g = kaliteGrup(); if (!g) return !!yonetim;
-    return Array.isArray(A().girisGruplar) && A().girisGruplar.indexOf(g) >= 0;
+    if (!kaliteGruplar().length) return !!yonetim;
+    return kaliteUye();
   }
   function trParca(d) {
     var p = {}; new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d).forEach(function (x) { p[x.type] = x.value; });
@@ -522,6 +571,9 @@
   }
 
   var MMVeri = {
+    demo: function () { return DEMO; },
+    demoAc: function () { DEMO = true; },
+    demoKapat: function () { DEMO = false; demoTemizle(); },
     kaliteAcik: kaliteAcik,
     kaliteGorur: kaliteGorur,
     kaliteKaydet: kaliteKaydet,
@@ -544,6 +596,7 @@
     tokenSaglayici: null,
     mod: modAl,
     ozelErisim: ozelErisim,
+    sahaKip: sahaKip,
     bolumGorur: bolumGorur,
     async oku(modul, dosya, graphModul) {
       var m = modAl();

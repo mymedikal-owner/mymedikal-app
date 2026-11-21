@@ -19,11 +19,34 @@
   var tema = document.getElementById('tema'), sag = tema && tema.parentNode;
   if (!sag || V.mod() !== 'graph') return;   
 
+  
+
+  var demoDugme = null, demoYigin = null;
+  if (A.demo === true && typeof V.demoAc === 'function') {
+    demoDugme = document.createElement('button'); demoDugme.id = 'demo-ac'; demoDugme.type = 'button'; demoDugme.className = 'giris-dugme demo-dugme';
+    var demoEtiket = document.createElement('span'); demoEtiket.className = 'giris-metin'; demoEtiket.textContent = MM.t('Demo'); demoDugme.appendChild(demoEtiket);
+    demoDugme.title = MM.t('Örnek verilerle gezin'); demoDugme.setAttribute('aria-label', MM.t('Örnek verilerle gezin'));
+    demoYigin = document.createElement('div'); demoYigin.className = 'giris-yigin'; demoYigin.appendChild(demoDugme);   
+    sag.insertBefore(demoYigin, tema);
+    demoDugme.addEventListener('click', function () {
+      if (V.demo()) { V.demoKapat(); location.replace(location.pathname); return; }
+      V.demoAc(); A.rol = 'yonetim';
+      var s = document.createElement('div'); s.id = 'demo-serit'; s.setAttribute('role', 'status');
+      s.textContent = MM.t('ÖRNEK VERİ / SAMPLE DATA');
+      document.body.appendChild(s); document.body.classList.add('demo-kip');
+      var g = document.getElementById('giris'); if (g) g.hidden = true;
+      demoEtiket.textContent = MM.t('Demodan çık'); demoDugme.title = MM.t('Demodan çık'); demoDugme.setAttribute('aria-label', MM.t('Demodan çık'));
+      window.addEventListener('pagehide', function () { if (V.demo()) V.demoKapat(); });
+      var yenile = function () { if (MM.menuYenile) MM.menuYenile(); };
+      if (MM.bayrakYenile) Promise.resolve(MM.bayrakYenile()).catch(function () {   }).then(yenile); else yenile();
+    });
+  }
+
   var dugme = document.createElement('button');
   dugme.id = 'giris'; dugme.type = 'button'; dugme.className = 'giris-dugme';
   var etiket = document.createElement('span'); etiket.className = 'giris-metin';
   dugme.appendChild(etiket);
-  sag.insertBefore(dugme, tema);
+  if (demoYigin) demoYigin.appendChild(dugme); else sag.insertBefore(dugme, tema);
   function durum(metin, baslik, bos) { etiket.textContent = metin; dugme.title = baslik || metin; dugme.setAttribute('aria-label', baslik || metin); dugme.classList.toggle('giris-yok', !!bos); }
 
   var native = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
@@ -55,8 +78,10 @@
  (!!tid && !!ev && tid.toLowerCase() !== ev) || (!!iss && !!ev && iss.toLowerCase().indexOf(ev) < 0);   
     durum(upn ? upn.split('@')[0] : 'Giriş yapıldı', (upn || 'Hesap') + ' — çıkış için dokunun', false);
     dugme.classList.add('giris-acik');
+    if (demoDugme && !V.demo()) demoDugme.hidden = true;   
   }
   function cikisAyarla() {
+    if (demoDugme) demoDugme.hidden = false;
     A.girisUpn = ''; A.girisOid = ''; A.girisAd = ''; A.girisRol = ''; A.girisGruplar = []; A.girisMisafir = false; dugme.classList.remove('giris-acik');
     durum('Giriş', 'Giriş yap', false);
   }

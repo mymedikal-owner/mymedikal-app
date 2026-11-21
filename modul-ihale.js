@@ -33,6 +33,7 @@
   MM.moduller.ihale = function (kok) {
     var yuk = null, hata = null, canli = true;
     var bantDmo = null, maliyet = null;
+    var SAHA = !!(window.MMVeri && window.MMVeri.sahaKip && window.MMVeri.sahaKip());   
     var durum = { sekme: 'dmo', ilgiliYalniz: true, grup: 'hepsi', acik: null, fiyat: {} };
     var secili = {};   
 
@@ -40,8 +41,8 @@
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
 
-    function dmoFiyatGor() { return window.MMVeri.ozelErisim('dmo-fiyat-gor'); }
-    function maliyetGor() { return window.MMVeri.ozelErisim('dmo-maliyet'); }
+    function dmoFiyatGor() { return !SAHA && window.MMVeri.ozelErisim('dmo-fiyat-gor'); }
+    function maliyetGor() { return !SAHA && window.MMVeri.ozelErisim('dmo-maliyet'); }
 
     function bantKayit(ih, k) {   
       if (ih.bolum === 'dmo') {
@@ -145,7 +146,7 @@
       var mail;
       liste.forEach(function (k) {
         var satir = h('label', { sinif: 'ih-kalem' + (ilgili(k) ? '' : ' ilgisiz') });
-        var kutu = h('input', { type: 'checkbox', 'aria-label': 'Kalem ' + k.no + ' seç' });
+        var kutu = h('input', { type: 'checkbox', 'aria-label': 'Kalem ' + k.no + ' seç', hidden: SAHA });
         kutu.checked = !!s[k.no];
         kutu.addEventListener('change', function () { if (kutu.checked) s[k.no] = true; else delete s[k.no]; if (mail) mail.setAttribute('href', mailHref(ih)); if (durum.fiyat[ih.id]) cizFiyat(); });
         var miktar = k.miktar != null && isFinite(k.miktar) ? sayiYaz(k.miktar) + (k.birim ? ' ' + String(k.birim).toLowerCase() : '') : 'miktar yok';
@@ -155,12 +156,14 @@
         kap.appendChild(satir);
       });
       var eylem = h('div', { sinif: 'ih-eylem' });
-      var fiyatVar = ih.bolum !== 'dmo' || dmoFiyatGor();
+      var fiyatVar = !SAHA && (ih.bolum !== 'dmo' || dmoFiyatGor());
       if (fiyatVar) eylem.appendChild(h('button', { type: 'button', sinif: 'dugme ih-fiyat-dugme', 'aria-expanded': durum.fiyat[ih.id] ? 'true' : 'false', onclick: function () { durum.fiyat[ih.id] = !durum.fiyat[ih.id]; ciz(); } }, ['Fiyat önerisi']));
-      mail = h('a', { sinif: 'dugme ih-mail-dugme', href: mailHref(ih), hidden: !mailHref(ih), metin: 'Mail at' });
-      eylem.appendChild(mail);
-      kap.appendChild(eylem);
-      kap.appendChild(h('p', { sinif: 'ih-ipucu', metin: 'Asistan önerili tabloyu kontrol edip size mail eder' }));
+      if (!SAHA) {
+        mail = h('a', { sinif: 'dugme ih-mail-dugme', href: mailHref(ih), hidden: !mailHref(ih), metin: 'Mail at' });
+        eylem.appendChild(mail);
+        kap.appendChild(eylem);
+        kap.appendChild(h('p', { sinif: 'ih-ipucu', metin: 'Asistan önerili tabloyu kontrol edip size mail eder' }));
+      }
       if (fiyatVar && durum.fiyat[ih.id]) { var fp = fiyatPaneli(ih); fp.setAttribute('data-fiyat', '1'); kap.appendChild(fp); }
       return kap;
     }
@@ -225,7 +228,7 @@
     function yenile() {
       hata = null; yuk = null; bantDmo = null; maliyet = null; ciz();
       if (!window.MMVeri.ozelErisim('ihale')) return;   
-      window.MMVeri.oku('ihale', 'acik-ihaleler').then(function (r) {
+      (SAHA ? window.MMVeri.oku('saha', 'acik-ihaleler') : window.MMVeri.oku('ihale', 'acik-ihaleler')).then(function (r) {
         yuk = r; hata = null;
         var js = [];
         if (dmoFiyatGor()) js.push(window.MMVeri.oku('ihale', 'ihale-dmo-bant', 'dmo-fiyat-gor').then(function (x) { bantDmo = x.veri || null; }, function () { bantDmo = null; }));

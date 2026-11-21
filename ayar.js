@@ -87,7 +87,7 @@ window.MM_AYAR = {
   },
   rolAdlari: { calisan: 'Çalışan', yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' },
   mesaj: { url: '', apiKapsam: '' },   
-  surum: '58',         
+  surum: '59',         
   
   
   acikModuller: ['ana', 'makineler', 'eldiven', 'siparis', 'kalite', 'nakliye', 'muhasebe', 'finans', 'dmo', 'dmo-nakliyat', 'stok', 'sikayet', 'sterilizasyon', 'ihale', 'kalite-yukle', 'asistan', 'mesaj'],

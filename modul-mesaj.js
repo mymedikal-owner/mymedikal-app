@@ -4,7 +4,7 @@
 
 (function () {
   'use strict';
-  var BILGI = 'Bu sohbetler şirketin Microsoft bulut hesabında (Batı Avrupa) 12 ay saklanır. Uçtan uca şifreli değildir; şirket yönetimi gerektiğinde erişebilir. Aramalar kaydedilmez. Şifre, kimlik numarası, sağlık bilgisi yazmayınız. Buraya yazılan \'onay\' ya da \'gönder\' hiçbir işlemi başlatmaz.';
+  var BILGI = 'Bu sohbetler şirketin Microsoft bulut hesabında (Avrupa Birliği içinde) 12 ay saklanır. Uçtan uca şifreli değildir; şirket yönetimi gerektiğinde erişebilir. Aramalar kaydedilmez. Şifre, kimlik numarası, sağlık bilgisi yazmayınız. Buraya yazılan \'onay\' ya da \'gönder\' hiçbir işlemi başlatmaz.';
   var KABUL = 'image/jpeg,image/png,image/heic,application/pdf,.xlsx,.docx,audio/mp4,audio/webm,audio/aac';
 
   function kisileriSuz(v) {

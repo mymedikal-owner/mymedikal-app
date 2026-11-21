@@ -5,7 +5,7 @@
   var MM = window.MM, h = MM.h, G = MM.gr, S = MM.s41, EN = window.MM_LOC === 'en-GB', ESKI_DK = 36 * 60, ILK = 40, ADIM = 80;
 
   function degerYetkisi() {
-    if (window.MMVeri.mod() === 'graph') return !!window.MMVeri.ozelErisim('siparisler-yonetim');   
+    if (window.MMVeri.mod() === 'graph') return !!window.MMVeri.ozelErisim('dmo-maliyet');   
     return ['yonetim', 'finans', 'muhasebe'].indexOf(MM.rol()) >= 0;
   }
   function sayiYaz(n, br) { if (n == null || !isFinite(n) || n < 0) return '—'; return G.say(n, n % 1 && n < 100 ? 2 : 0) + (br ? ' ' + br : ''); }
@@ -130,7 +130,7 @@
     function yenile() {
       hata = null; yuk = null; degerVeri = null; ciz();
       window.MMVeri.oku('stok', 'stok').then(function (r) { yuk = r; hata = null; })
-        .then(function () { return degerYetkisi() ? window.MMVeri.oku('stok', 'stok-deger', 'siparisler-yonetim').then(function (d) { degerVeri = d && d.veri; }).catch(function () { degerVeri = null; }) : null; })   
+        .then(function () { return degerYetkisi() ? window.MMVeri.oku('stok', 'stok-deger', 'dmo-maliyet').then(function (d) { degerVeri = d && d.veri; }).catch(function () { degerVeri = null; }) : null; })   
         .catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); });
     }
     yenile();

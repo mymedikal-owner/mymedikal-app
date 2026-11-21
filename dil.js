@@ -480,8 +480,8 @@
     'Mesaj boş': 'Message is empty', 'Mesaj çok uzun': 'Message is too long', 'Bu dosya türü gönderilemez': 'This file type cannot be sent', 'Dosya 25 MB\'tan büyük olamaz': 'File cannot be larger than 25 MB',
     'Fotoğraf işlenemedi': 'Photo could not be processed', 'Dosya yüklenemedi': 'File could not be uploaded', 'Grup adı yazın': 'Enter a group name', 'Arama bu cihazda yok': 'Calling is not available on this device',
     'Arama başlatılamadı': 'Could not start the call', 'Alınamadı': 'Could not be retrieved',
-    'Bu sohbetler şirketin Microsoft bulut hesabında (Batı Avrupa) 12 ay saklanır. Uçtan uca şifreli değildir; şirket yönetimi gerektiğinde erişebilir. Aramalar kaydedilmez. Şifre, kimlik numarası, sağlık bilgisi yazmayınız. Buraya yazılan \'onay\' ya da \'gönder\' hiçbir işlemi başlatmaz.':
-      'These chats are kept for 12 months in the company\'s Microsoft cloud account (West Europe). They are not end-to-end encrypted; company management can access them when required. Calls are not recorded. Do not write passwords, ID numbers or health information. Writing \'approve\' or \'send\' here does not start any action.'
+    'Bu sohbetler şirketin Microsoft bulut hesabında (Avrupa Birliği içinde) 12 ay saklanır. Uçtan uca şifreli değildir; şirket yönetimi gerektiğinde erişebilir. Aramalar kaydedilmez. Şifre, kimlik numarası, sağlık bilgisi yazmayınız. Buraya yazılan \'onay\' ya da \'gönder\' hiçbir işlemi başlatmaz.':
+      'These chats are kept for 12 months in the company\'s Microsoft cloud account (within the European Union). They are not end-to-end encrypted; company management can access them when required. Calls are not recorded. Do not write passwords, ID numbers or health information. Writing \'approve\' or \'send\' here does not start any action.'
   };
   Object.keys(TAM_MESAJ).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_MESAJ[k]; });
   var onbellek = {};

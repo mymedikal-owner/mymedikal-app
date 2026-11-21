@@ -205,7 +205,7 @@
       null
     ]);
   }
-  var YAKINDA_ILK = -1;
+  var YAKINDA_ILK = -1, BAR = {};
   var yakindaAcik = false, yakindaDugme = null;
   var digerDugme = h('button', { type: 'button', sinif: 'menu-oge menu-diger', 'aria-haspopup': 'true', 'aria-controls': 'diger-sheet', 'aria-expanded': 'false' }, [ikon('diger'), h('span', { sinif: 'ad', metin: 'Diğer' })]);
   function kayarIpucu() { sheet.classList.toggle('kayar', sheet.scrollHeight > sheet.clientHeight + 4 && sheet.scrollTop + sheet.clientHeight < sheet.scrollHeight - 4); }   
@@ -216,8 +216,13 @@
   menu.textContent = ''; sheet.textContent = ''; sheet.hidden = true; if (sheet.parentNode) sheet.parentNode.removeChild(sheet);
   YAKINDA_ILK = -1; yakindaDugme = null; yakindaAcik = false;
   
+  
+  BAR = {};
+  var mesajVar = MODULLER.some(function (m) { return m.id === 'mesaj'; });
+  MODULLER.filter(function (m) { return m.id !== 'mesaj'; }).slice(0, mesajVar ? ILK - 1 : ILK).forEach(function (m) { BAR[m.id] = true; });
+  if (mesajVar) BAR.mesaj = true;
   MODULLER.forEach(function (m, i) {
-    var barda = i < ILK;
+    var barda = !!BAR[m.id];
     var o = menuOge(m, !barda); o.classList.remove('onizleme');
     menu.appendChild(o);
     var k = menuOge(m, false); k.classList.remove('onizleme'); k.setAttribute('role', 'menuitem'); k.addEventListener('click', function () { sheet.hidden = true; }); sheet.appendChild(k);
@@ -225,6 +230,7 @@
   if (window.MM.yukle) sheet.appendChild(window.MM.yukle.dugme());   
   sheet.appendChild(h('div', { sinif: 'diger-surum', role: 'presentation', metin: 'Sürüm ' + (window.MM_AYAR.surum || '') }));   
   if (MODULLER.length > ILK || MODULLER.length) { menu.appendChild(digerDugme); document.body.appendChild(sheet); }
+  if (window.MM.mesaj) { if (window.MM.mesaj.arkaBaslat) window.MM.mesaj.arkaBaslat(); if (window.MM.mesaj.rozetUygula) window.MM.mesaj.rozetUygula(); }   
   }
   menuKur(); kurulu = true;
   window.MM.menuYenile = function () {   
@@ -248,7 +254,7 @@
       a.classList.toggle('secili', on);
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
-    var ekstraSecili = MODULLER.some(function (x, i) { return x.id === m.id && i >= ILK; });
+    var ekstraSecili = MODULLER.some(function (x) { return x.id === m.id && !BAR[x.id]; });
     digerDugme.classList.toggle('secili', ekstraSecili);
     sheet.hidden = true;
     if (aktifTemizle) { aktifTemizle(); aktifTemizle = null; }

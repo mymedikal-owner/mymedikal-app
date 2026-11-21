@@ -284,7 +284,6 @@
     return s.accessToken;
   }
   MM.mesaj = Object.assign(MM.mesaj || {}, { belirtecAl: kapsamliTokenAl });
-  MM.tokenAl = kapsamliTokenAl;
   window.MMGirisSinama = { tokenAl: tokenAl, kapsamliTokenAl: kapsamliTokenAl };   
 
   
@@ -400,7 +399,7 @@
       bantGizle(); geciciler.length = 0; V.tokenDurumu = '';
       try { if (MM.mesaj && MM.mesaj.cikis) MM.mesaj.cikis(); } catch (e) {   }
       var temizle = yerelTemizle;
-      A.girisUpn = ''; A.girisOid = ''; A.girisRol = ''; A.girisGruplar = []; A.girisMisafir = false;
+      A.girisUpn = ''; A.girisOid = ''; A.girisAd = ''; A.girisRol = ''; A.girisGruplar = []; A.girisMisafir = false;
       Promise.resolve().then(function () { return hesap ? pca.logoutRedirect({ account: hesap, onRedirectNavigate: function () { return false; } }) : null; })   
         .catch(function (e) { console.warn('bosta-cikis', kodKisa(e)); })
         .then(temizle)

@@ -149,9 +149,21 @@
     asKok.appendChild(sohbetGovde);
     kok.appendChild(asKok);
     document.body.classList.add('ms-tam');
-    function asVv() { if (window.visualViewport) asKok.style.setProperty('--ms-vh', Math.round(window.visualViewport.height) + 'px'); }
-    asVv(); if (window.visualViewport) window.visualViewport.addEventListener('resize', asVv);
-    return function () { document.body.classList.remove('ms-tam'); if (window.visualViewport) window.visualViewport.removeEventListener('resize', asVv); };
+    function asVv() {
+      var v = window.visualViewport; if (!v) return;
+      var ml = asKok.querySelector('.sohbet-akis');
+      var enAlt = !!ml && (ml.scrollHeight - ml.scrollTop - ml.clientHeight < 40);
+      asKok.style.setProperty('--ms-vh', Math.round(v.height) + 'px');
+      asKok.style.setProperty('--ms-ust', Math.round(v.offsetTop) + 'px');
+      document.body.classList.toggle('ms-klavye', v.height < window.innerHeight - 80);
+      if (ml && enAlt) ml.scrollTop = ml.scrollHeight;
+    }
+    asVv(); if (window.visualViewport) { window.visualViewport.addEventListener('resize', asVv); window.visualViewport.addEventListener('scroll', asVv); }
+    return function () {
+      document.body.classList.remove('ms-tam'); document.body.classList.remove('ms-klavye');
+      asKok.style.removeProperty('--ms-vh'); asKok.style.removeProperty('--ms-ust');
+      if (window.visualViewport) { window.visualViewport.removeEventListener('resize', asVv); window.visualViewport.removeEventListener('scroll', asVv); }
+    };
   };
 
    

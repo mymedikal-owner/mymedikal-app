@@ -278,11 +278,20 @@
       kap.className = 'ms-kok ' + s;
       var tam = s !== 'ms-ekran-liste';   
       document.body.classList.toggle('ms-tam', tam);
-      if (!tam) kap.style.removeProperty('--ms-vh');
-      else if (window.visualViewport) kap.style.setProperty('--ms-vh', Math.round(window.visualViewport.height) + 'px');
+      if (!tam) vvTemizle(); else vvDegisti();
     }
-    function vvDegisti() { if (canli && document.body.classList.contains('ms-tam') && window.visualViewport) kap.style.setProperty('--ms-vh', Math.round(window.visualViewport.height) + 'px'); }
-    if (window.visualViewport) window.visualViewport.addEventListener('resize', vvDegisti);
+    function vvTemizle() { kap.style.removeProperty('--ms-vh'); kap.style.removeProperty('--ms-ust'); document.body.classList.remove('ms-klavye'); }
+    function vvDegisti() {   
+      var v = window.visualViewport;
+      if (!canli || !v || !document.body.classList.contains('ms-tam')) return;
+      var ml = kap.querySelector('.ms-mesajlar');
+      var enAlt = !!ml && (ml.scrollHeight - ml.scrollTop - ml.clientHeight < 40);
+      kap.style.setProperty('--ms-vh', Math.round(v.height) + 'px');
+      kap.style.setProperty('--ms-ust', Math.round(v.offsetTop) + 'px');
+      document.body.classList.toggle('ms-klavye', v.height < window.innerHeight - 80);
+      if (ml && enAlt) ml.scrollTop = ml.scrollHeight;
+    }
+    if (window.visualViewport) { window.visualViewport.addEventListener('resize', vvDegisti); window.visualViewport.addEventListener('scroll', vvDegisti); }
     var filtre = { q: '', cip: 'tum' };
     function sohbetBul(id) { return D.sohbetler.filter(function (c) { return c.id === id; })[0]; }
 
@@ -313,7 +322,7 @@
      
     function onizOnek(s) {   
       var g = s.son && s.son.gonderen; if (!g) return '';
-      if (g === benOid) return s.tur === 'grup' ? T('Siz') + ': ' : '✓✓ ';
+      if (g === benOid) return s.tur === 'grup' ? T('Siz') + ': ' : '';
       return s.tur === 'grup' ? ((s.son.gonderenAd || kisiAdiOid(g) || T('Biri')) + ': ') : '';
     }
     function tercihYaz(s, alan, deger, sonra) {   
@@ -904,7 +913,8 @@
     if (D.kisiler === null) kisiYukle().then(null, function () {   });
     return function () {
       canli = false; cozucu.forEach(function (f) { f(); }); abonelik.forEach(function (f) { f(); });
-      document.body.classList.remove('ms-tam'); if (window.visualViewport) window.visualViewport.removeEventListener('resize', vvDegisti);
+      document.body.classList.remove('ms-tam'); document.body.classList.remove('ms-klavye'); kap.style.removeProperty('--ms-vh'); kap.style.removeProperty('--ms-ust');
+      if (window.visualViewport) { window.visualViewport.removeEventListener('resize', vvDegisti); window.visualViewport.removeEventListener('scroll', vvDegisti); }
       D.acikId = ''; D.ac = null; var ix = D.dinleyen.indexOf(durumDegisti); if (ix >= 0) D.dinleyen.splice(ix, 1);   
     };
   };

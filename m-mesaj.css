@@ -96,11 +96,15 @@
 body.ms-tam .ust, body.ms-tam .menu { display: none; }
 body.ms-tam .kabuk { padding-bottom: 0; }
 body.ms-tam .icerik { padding: 0; }
+body.ms-tam .icerik::after { display: none; }
+html:has(.ms-ekran-sohbet), body:has(.ms-ekran-sohbet) { overflow: hidden; overscroll-behavior: none; }
+body.ms-tam .kabuk { min-height: 0; }
 .ms-ekran-kisi, .ms-ekran-bilgi { padding: calc(8px + env(safe-area-inset-top)) 14px calc(8px + env(safe-area-inset-bottom)); min-height: 100dvh; }
+.ms-ekran-bilgi { box-sizing: border-box; height: 100dvh; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .ms-ekran-liste { padding-top: 0; }
 
  
-.ms-ekran-sohbet { gap: 0; padding: 0; height: var(--ms-vh, 100dvh); max-width: 640px; }
+.ms-ekran-sohbet { gap: 0; padding: 0; position: fixed; left: 0; right: 0; top: var(--ms-ust, 0px); height: var(--ms-vh, 100dvh); max-width: 640px; margin: 0 auto; z-index: 5; background: var(--ms-sohbet-zemin, inherit); }
 .ms-sohbet-ust { flex: none; padding: calc(6px + env(safe-area-inset-top)) 8px 6px 4px; background: var(--yuzey, #fff); border-bottom: 1px solid var(--ms-ince); }
 .ms-baslik-pill { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; padding: 2px 4px; border: 0; background: transparent; color: inherit; text-align: left; }
 .ms-baslik-kutu { display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1 1 auto; }
@@ -176,6 +180,7 @@ body.ms-tam .icerik { padding: 0; }
 
  
 .ms-alt { flex: none; display: flex; align-items: flex-end; gap: 6px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: var(--ms-sohbet-zemin); min-width: 0; }
+body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .ms-yaz-kap { flex: 1 1 auto; min-width: 0; display: flex; border-radius: 22px; background: var(--ms-karsi-zemin); }
 .ms-yaz { flex: 1 1 auto; min-width: 0; width: 100%; box-sizing: border-box; padding: 10px 14px; font-size: 16px; line-height: 1.3; border: 0; outline: 0; border-radius: 22px; background: transparent; color: var(--ms-karsi-yazi); resize: none; font-family: inherit; }
 .ms-gonder { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--ms-yesil); display: inline-flex; align-items: center; justify-content: center; }

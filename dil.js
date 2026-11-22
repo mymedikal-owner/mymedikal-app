@@ -475,7 +475,7 @@
   var TAM_MESAJ = {
     'Asistan': 'Assistant', 'Yeni sohbet': 'New chat', 'Yenile': 'Refresh', 'Geri': 'Back', 'Başlat': 'Start', 'Anladım': 'Got it', 'Kişi ara': 'Search people', 'Grup adı': 'Group name',
     'Kişi seçin': 'Select people', 'Sohbet yok': 'No chats', 'Mesaj yok': 'No messages', 'Mesaj': 'Message', 'Gönder': 'Send', 'Kartı gönder': 'Send card', 'Siz': 'You', 'Okundu': 'Read',
-    'Gönderildi': 'Sent', 'Biri': 'Someone', 'yazıyor…': 'is typing…', 'Sesli ara': 'Voice call', 'Görüntülü ara': 'Video call', 'Aranıyor': 'Calling', 'Arama sürüyor': 'Call in progress',
+    'Gönderildi': 'Sent', 'Gönderiliyor': 'Sending', 'Gönderilemedi': 'Not sent', 'Ulaştı': 'Delivered', 'Okundu': 'Read', 'Yeniden dene': 'Try again', 'Mesajın ulaştığı ve okunduğu bilgisi sohbet üyelerine gösterilir.': 'Whether a message was delivered and read is shown to the members of the chat.', 'Biri': 'Someone', 'yazıyor…': 'is typing…', 'Sesli ara': 'Voice call', 'Görüntülü ara': 'Video call', 'Aranıyor': 'Calling', 'Arama sürüyor': 'Call in progress',
     'sizi arıyor': 'is calling you', 'görüntülü': 'video', 'Sesli mesaj': 'Voice message', 'Dosya': 'File', 'Paylaşılan kart': 'Shared card', 'Dosya / fotoğraf': 'File / photo', 'Katıl': 'Join',
     'Sohbet': 'Chat', 'Kişi bulunamadı': 'No people found', 'Yükleniyor': 'Loading', 'Mesaj kapalı': 'Messaging is off',
     'Mesaj girişi alınamadı': 'Could not sign in to messaging', 'Giriş geçersiz': 'Sign-in is not valid', 'Bu sohbete erişiminiz yok': 'You do not have access to this chat', 'Bulunamadı': 'Not found',
@@ -484,6 +484,9 @@
     'Fotoğraf işlenemedi': 'Photo could not be processed', 'Dosya yüklenemedi': 'File could not be uploaded', 'Grup adı yazın': 'Enter a group name', 'Arama bu cihazda yok': 'Calling is not available on this device',
     'Arama başlatılamadı': 'Could not start the call', 'Alınamadı': 'Could not be retrieved',
     'Mesajlar': 'Messages', 'Sohbetler': 'Chats', 'Ara': 'Search', 'Tümü': 'All', 'Okunmamış': 'Unread', 'okunmamış': 'unread', 'Favoriler': 'Favorites', 'Gruplar': 'Groups', 'Arşivlenmiş': 'Archived',
+    'Asistan şu an yanıt vermiyor. Sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.': 'The assistant is not responding right now. Send your question by email; the answer follows your own access rights.',
+    'Asistan hazırlanıyor…': 'The assistant is getting ready…', 'Soru iletilemedi': 'The question could not be sent', 'hata': 'error', 'Sorunuz': 'Your question', 'Gönder': 'Send',
+    'Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.': 'The answer is taking long. You can ask again or send it as a request.', 'Erişebildiğin bölümler:': 'Sections you can access:',
     'Şirket içi yapay zekâ asistanı': 'In-company AI assistant', 'Henüz sohbet yok. Başlatmak için + düğmesine dokunun.': 'No chats yet. Tap + to start one.', 'Arşivde sohbet yok': 'No archived chats', 'Sonuç yok': 'No results',
     'Sohbetler şirket hesabında saklanır.': 'Chats are stored in the company account.', 'Gizle': 'Hide', 'Ayrıntı': 'Details', 'Açılıyor': 'Opening', 'Kişi listesi yenileniyor…': 'Refreshing the people list…',
     'Kişi listesi alınamadı': 'Could not load the people list', 'Yeni grup': 'New group', 'Henüz kimse yok — app\'i açan iş arkadaşların burada görünecek': 'No one yet — colleagues who open the app will appear here',

@@ -85,59 +85,106 @@
   };
 
    
-  MM.moduller.asistan = function (kok) {
+  
+
+  var AS = MM.asistanDurum = MM.asistanDurum || { gecmis: [], bekleyen: false, ui: null };
+  function Tt(k) { return MM.t ? MM.t(k) : k; }
+  var AS_KLASOR_AD = {};
+  function asBalon(o) {
+    var kaynaklar = o.klasorler;
+    var m = h('div', { sinif: 'mesaj ' + o.k }, [h('div', { sinif: 'balon' }, [h('p', { metin: o.metin }), kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: Tt('Dayandığı bilgiler:') })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), AS_KLASOR_AD[k] || k]); }))) : null])]);
+    return m;
+  }
+  function asMailHref(govde) { var p = window.MM.talimatPosta || ''; if (!p) return ''; return 'mailto:' + p + '?subject=' + encodeURIComponent('[Talimat] App asistan sorusu') + (govde ? '&body=' + encodeURIComponent(govde) : ''); }
+  function asEylemSatiri(o) {   
+    var ic = [];
+    if (o.hata) { var yd = h('button', { type: 'button', sinif: 'dugme ikincil', metin: Tt('Yeniden dene') }); yd.addEventListener('click', function () { asGonder(o.soru, true); }); ic.push(yd); }
+    ic.push(h('a', { sinif: 'dugme ikincil', href: asMailHref(o.soru), hidden: !asMailHref(o.soru), metin: Tt('İş olarak ilet') }));
+    return h('div', { sinif: 'kaynak-satir' }, ic);
+  }
+  function asUiGuncelle() {
+    var u = AS.ui; if (!u || !u.akis.isConnected) return;
+    if (u.yaziyor && u.yaziyor.parentNode) u.yaziyor.parentNode.removeChild(u.yaziyor);
+    if (AS.bekleyen) { u.yaziyor = h('div', { sinif: 'mesaj asistan yaziyor', role: 'status' }, [h('div', { sinif: 'balon' }, [h('p', { sinif: 'soluk', metin: Tt('yazıyor…') })])]); u.akis.appendChild(u.yaziyor); }
+    if (u.dugme) u.dugme.disabled = AS.bekleyen;
+    u.akis.scrollTop = u.akis.scrollHeight;
+  }
+  function asEkle(o) {
+    o.ts = Date.now(); AS.gecmis.push(o); if (AS.gecmis.length > 40) AS.gecmis.shift();
+    var u = AS.ui;
+    if (u && u.akis.isConnected) { u.akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') u.akis.appendChild(asEylemSatiri(o)); }
+    asUiGuncelle();
+  }
+  function asBitir(o) { AS.bekleyen = false; asEkle(o); if (typeof MM.asistanDegisti === 'function') { try { MM.asistanDegisti(); } catch (e) {   } } }
+  function asYokla(id, soru, gecen, bekle) {
+    setTimeout(async function () {
+      var c = null;
+      try { c = await window.MMVeri.sohbetCevap(id); } catch (e) { c = null; }
+      if (c) { MM.asistanSon = { metin: String(c.cevap || ''), ts: Date.now() }; asBitir({ k: 'asistan', metin: String(c.cevap || ''), klasorler: c.klasorler, soru: soru }); return; }
+      gecen += bekle;
+      if (gecen >= 300000) { asBitir({ k: 'asistan', metin: Tt('Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.'), soru: soru, hata: true }); return; }
+      asYokla(id, soru, gecen, Math.min(15000, bekle + 2500));
+    }, bekle);
+  }
+  async function asGonder(soru, tekrar) {
+    soru = String(soru || '').trim().slice(0, 1000);
+    if (!soru || AS.bekleyen) return false;
+    AS.bekleyen = true;
+    if (!tekrar) asEkle({ k: 'kullanici', metin: soru }); else asUiGuncelle();
+    try { var s = await window.MMVeri.sohbetSor(soru); asYokla(s.id, soru, 0, 5000); }
+    catch (err) { asBitir({ k: 'asistan', metin: Tt('Soru iletilemedi') + ' (' + (err && err.message ? err.message : Tt('hata')) + ').', soru: soru, hata: true }); }
+    return true;
+  }
+  MM.asistanSohbet = function () {
     var rol = MM.rol(), roller = (window.MM_AYAR.roller || {}), KAYNAK = [['eldiven', 'Eldiven haritası'], ['siparis', 'Siparişler'], ['makineler', 'Makineler'], ['kalite', 'Kalite belgeleri'], ['isg', 'İSG takvimi'], ['stok', 'Stok'], ['ik', 'İK (yalnız kendi kaydın)'], ['finans', 'Finans'], ['muhasebe', 'Muhasebe']];
     var erisilen = KAYNAK.filter(function (k) { return MM.acik(k[0]) && window.MMVeri.ozelErisim(k[0]) && ((roller[k[0]] || []).indexOf(rol) >= 0 || (window.MMVeri.mod() === 'graph' && !!(window.MM_AYAR.ozelErisim || {})[k[0]])); });
     var sohbetDurum = window.MMVeri.sohbetAcik ? window.MMVeri.sohbetAcik() : { acik: false, neden: 'kapali' };
-    var KLASOR_AD = {}; KAYNAK.forEach(function (k) { KLASOR_AD[k[0]] = k[1]; });
-    function mailHref(govde) { var p = window.MM.talimatPosta || ''; if (!p) return ''; return 'mailto:' + p + '?subject=' + encodeURIComponent('[Talimat] App asistan sorusu') + (govde ? '&body=' + encodeURIComponent(govde) : ''); }
+    KAYNAK.forEach(function (k) { AS_KLASOR_AD[k[0]] = k[1]; });
     var akis = h('div', { sinif: 'sohbet-akis', 'aria-live': 'polite' });
-    function mesaj(kimden, metin, kaynaklar) {
-      var m = h('div', { sinif: 'mesaj ' + kimden }, [h('div', { sinif: 'balon' }, [h('p', { metin: metin }), kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: 'Dayandığı bilgiler:' })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), KLASOR_AD[k] || k]); }))) : null])]);
-      akis.appendChild(m); akis.scrollTop = akis.scrollHeight;
-    }
+    var ui = { akis: akis, dugme: null, yaziyor: null };
+    AS.ui = ui;
     var sohbetGovde = h('div', { sinif: 'sohbet' });
-    function mailGorunum(metin) {
+    function mailGorunum(metin, yeniden) {
       sohbetGovde.textContent = '';
-      sohbetGovde.appendChild(h('p', { metin: metin }));
-      sohbetGovde.appendChild(h('a', { sinif: 'dugme', href: mailHref(''), hidden: !mailHref(''), metin: 'Soruyu mail ile ilet' }));
+      sohbetGovde.appendChild(h('p', { metin: Tt(metin) }));
+      if (yeniden) { var yd = h('button', { type: 'button', sinif: 'dugme ikincil', metin: Tt('Yeniden dene') }); yd.addEventListener('click', function () { kapiAc(true); }); sohbetGovde.appendChild(yd); }
+      sohbetGovde.appendChild(h('a', { sinif: 'dugme', href: asMailHref(''), hidden: !asMailHref(''), metin: Tt('Soruyu mail ile ilet') }));
     }
     function acikGorunum() {
       sohbetGovde.textContent = '';
-      var bekliyor = false, giriKutu = h('input', { type: 'text', maxlength: '1000', placeholder: 'Sorunuzu yazın…', 'aria-label': 'Sorunuz', autocomplete: 'off' });
-      var gonderDugme = h('button', { type: 'submit', sinif: 'dugme', 'aria-label': 'Gönder' }, [gr.ikon('gonder', 18)]);
-      var yoklaSayac = 0;
-      function mesajIlet(soru) { return h('a', { sinif: 'dugme ikincil', href: mailHref(soru), hidden: !mailHref(soru), metin: 'İş olarak ilet' }); }
-      function yokla(id, soru, gecen, bekle) {
-        setTimeout(async function () {
-          var c = null;
-          try { c = await window.MMVeri.sohbetCevap(id); } catch (e) { c = null; }
-          if (c) { mesaj('asistan', c.cevap, c.klasorler); MM.asistanSon = { metin: String(c.cevap || ''), ts: Date.now() }; akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; return; }
-          gecen += bekle;
-          if (gecen >= 300000) { mesaj('asistan', 'Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.'); akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; return; }
-          yokla(id, soru, gecen, Math.min(15000, bekle + 2500));
-        }, bekle);
-      }
-      var giris = h('form', { sinif: 'sohbet-giris', onsubmit: async function (e) {
+      var giriKutu = h('input', { type: 'text', maxlength: '1000', placeholder: Tt('Sorunuzu yazın…'), 'aria-label': Tt('Sorunuz'), autocomplete: 'off' });
+      var gonderDugme = h('button', { type: 'submit', sinif: 'dugme', 'aria-label': Tt('Gönder') }, [gr.ikon('gonder', 18)]);
+      ui.dugme = gonderDugme;
+      var giris = h('form', { sinif: 'sohbet-giris', onsubmit: function (e) {
         e.preventDefault();
         var soru = giriKutu.value.trim().slice(0, 1000);
-        if (!soru || bekliyor) return;
-        bekliyor = true; gonderDugme.disabled = true; giriKutu.value = '';
-        mesaj('kullanici', soru);
-        try { var s = await window.MMVeri.sohbetSor(soru); yokla(s.id, soru, 0, 5000); }
-        catch (err) { mesaj('asistan', 'Soru iletilemedi (' + (err && err.message ? err.message : 'hata') + '). Sorunuzu mail ile iletebilirsiniz.'); akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; }
+        if (!soru || AS.bekleyen) return;
+        giriKutu.value = '';
+        asGonder(soru, false);
       } }, [giriKutu, gonderDugme]);
-      [akis, giris, h('p', { sinif: 'soluk kucuk', metin: 'Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.' })].forEach(function (x) { sohbetGovde.appendChild(x); });
+      [akis, giris, h('p', { sinif: 'soluk kucuk', metin: Tt('Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.') })].forEach(function (x) { sohbetGovde.appendChild(x); });
+      AS.gecmis.forEach(function (o) { akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') akis.appendChild(asEylemSatiri(o)); });   
+      asUiGuncelle();
+    }
+    function kapiAc(zorla) {
+      sohbetGovde.textContent = '';
+      sohbetGovde.appendChild(h('p', { sinif: 'soluk kucuk', metin: Tt('Asistan hazırlanıyor…') }));
+      var kapiMail = function () { mailGorunum('Asistan şu an yanıt vermiyor. Sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.', true); };
+      window.MMVeri.sohbetKapi(zorla === true).then(function (k) { if (k && k.acik) acikGorunum(); else kapiMail(); }, kapiMail);
     }
     if (!sohbetDurum.acik) {
       
       mailGorunum('Asistan yazma özelliği kurulunca bu ekrandan soru sorabileceksiniz. Şimdilik sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.');
     } else {
       
-      sohbetGovde.appendChild(h('p', { sinif: 'soluk kucuk', metin: 'Asistan hazırlanıyor…' }));
-      var kapiMail = function () { mailGorunum('Asistan şu an yanıt vermiyor. Sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.'); };
-      window.MMVeri.sohbetKapi().then(function (k) { if (k && k.acik) acikGorunum(); else kapiMail(); }, kapiMail);
+      kapiAc();
     }
+    var kaynakSatiri = erisilen.length ? h('p', { sinif: 'asistan-kaynak soluk kucuk', metin: Tt('Erişebildiğin bölümler:') + ' ' + erisilen.map(function (k) { return Tt(k[1]); }).join(', ') }) : null;
+    return { govde: sohbetGovde, kaynak: kaynakSatiri };
+  };
+
+  MM.moduller.asistan = function (kok) {
+    var as = MM.asistanSohbet(), sohbetGovde = as.govde;
      
     var geriHedef = (MM.acik && MM.acik('mesaj')) ? '#mesaj' : '#ana';
     var geri = h('button', { sinif: 'ms-yd ms-yd-ust', type: 'button', 'aria-label': 'Geri' }, [MM.svg('svg', { viewBox: '0 0 24 24', width: 22, height: 22, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.9, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' }, [MM.svg('path', { d: 'M15 5l-7 7 7 7' })])]);
@@ -145,7 +192,7 @@
     var asAv = h('span', { sinif: 'ms-av ms-av-ust ms-av-asistan', 'aria-hidden': 'true' }, [MM.svg('svg', { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', stroke: '#5b4bd5', 'stroke-width': 1.9, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, [MM.svg('path', { d: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6' })])]);
     var ustCubuk = h('div', { sinif: 'ms-ust-cubuk ms-sohbet-ust' }, [geri, h('span', { sinif: 'ms-baslik-pill' }, [asAv, h('span', { sinif: 'ms-baslik-kutu' }, [h('strong', { sinif: 'ms-baslik', metin: 'Asistan' }), h('span', { sinif: 'ms-alt-yazi', metin: 'Şirket içi yapay zekâ asistanı' })])])]);
     var asKok = h('div', { sinif: 'ms-kok ms-ekran-sohbet asistan-ms' }, [ustCubuk]);
-    if (erisilen.length) asKok.appendChild(h('p', { sinif: 'asistan-kaynak soluk kucuk', metin: 'Erişebildiğin bölümler: ' + erisilen.map(function (k) { return k[1]; }).join(', ') }));
+    if (as.kaynak) asKok.appendChild(as.kaynak);
     asKok.appendChild(sohbetGovde);
     kok.appendChild(asKok);
     document.body.classList.add('ms-tam');

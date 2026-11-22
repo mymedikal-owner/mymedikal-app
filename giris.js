@@ -303,11 +303,12 @@
     if (hesap) {
       
       bantGizle(); geciciler.length = 0; V.tokenDurumu = '';
-      try { if (MM.mesaj && MM.mesaj.cikis) MM.mesaj.cikis(); } catch (e) {   }   
+      var mesajCikis = Promise.resolve();   
+      try { if (MM.mesaj && MM.mesaj.cikis) mesajCikis = Promise.race([Promise.resolve(MM.mesaj.cikis()).then(null, function () {   }), new Promise(function (c) { setTimeout(c, 1500); })]); } catch (e) {   }
       try { localStorage.removeItem(SSO_KEY); } catch (e) {   }
       if (sistem) {
         
-        var cikisSozu = Promise.resolve().then(function () { return pca.logoutRedirect({ account: hesap, onRedirectNavigate: function () { return false; } }); });
+        var cikisSozu = mesajCikis.then(function () { return pca.logoutRedirect({ account: hesap, onRedirectNavigate: function () { return false; } }); });
         saklikAnahtar = '';
         cikisAyarla();
         cikisSozu.catch(function (e) { console.warn('cikis', kodKisa(e)); })
@@ -318,7 +319,7 @@
       else {
         
         var yonlen = function () { pca.logoutRedirect({ account: hesap, postLogoutRedirectUri: yonlendirme }); };
-        if (native) yonlen(); else yerelTemizle().then(yonlen, yonlen);
+        mesajCikis.then(function () { if (native) yonlen(); else yerelTemizle().then(yonlen, yonlen); });
       }
     } else {
       var istek = { scopes: KAPSAM, responseMode: 'query' };   

@@ -20,6 +20,13 @@
   function sonYazim() { try { return +localStorage.getItem(ANAHTAR) || 0; } catch (e) { return 0; } }
   function sonYazimKaydet() { try { localStorage.setItem(ANAHTAR, String(Date.now())); } catch (e) {   } }
 
+   
+  var izinSozu = null;
+  window.MMBildirimIzin = function () {
+    if (!izinSozu) { izinSozu = Promise.resolve(P.izinIste()); setTimeout(function () { izinSozu = null; }, 20000); }
+    return izinSozu;
+  };
+
   async function ozet(metin) {
     var d = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(metin))), s = '';
     for (var i = 0; i < 8; i++) s += (d[i] < 16 ? '0' : '') + d[i].toString(16);   
@@ -41,7 +48,7 @@
     if (Date.now() - sonYazim() < ARALIK) { bitti = true; return; }
     yapiliyor = true;
     try {
-      var s = await P.izinIste();
+      var s = await window.MMBildirimIzin();
       if (!s || s.durum !== 'var' || !s.belirtec) { if (s && s.durum === 'red') bitti = true; return; }
       var sonuc = await dosyayaYaz(upn, s.belirtec);
       if (sonuc === 'tamam') { sonYazimKaydet(); bitti = true; }
@@ -50,11 +57,18 @@
     finally { yapiliyor = false; }
   }
 
-  function rotayaGit(rota) { if (rota === 'fabrika') location.hash = '#fabrika'; }
+   
+  function rotayaGit(rota, sohbet) {
+    if (rota === 'fabrika') { location.hash = '#fabrika'; return; }
+    if (rota !== 'mesaj') return;
+    var M = window.MM && window.MM.mesaj;
+    if (typeof sohbet === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(sohbet) && M && typeof M.sohbeteGit === 'function') M.sohbeteGit(sohbet);
+    else location.hash = '#mesaj';
+  }
 
-  try { P.addListener('bildirimAcildi', function (o) { rotayaGit(o && o.rota); }); } catch (e) {   }
+  try { P.addListener('bildirimAcildi', function (o) { rotayaGit(o && o.rota, o && o.sohbet); }); } catch (e) {   }
   setTimeout(function () {
-    try { P.bekleyenRota().then(function (o) { if (o && o.rota) rotayaGit(o.rota); }).catch(function () {   }); } catch (e) {   }
+    try { P.bekleyenRota().then(function (o) { if (o && o.rota) rotayaGit(o.rota, o.sohbet); }).catch(function () {   }); } catch (e) {   }
   }, 1500);
 
   

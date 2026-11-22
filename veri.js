@@ -326,10 +326,10 @@
   var SOHBET_KLASORLERI = ['dmo', 'dmo-fiyat-gor', 'dmo-maliyet', 'eldiven', 'fabrika', 'finans', 'ihale', 'isg', 'kalite', 'muhasebe', 'nakliye', 'saha', 'sikayet', 'siparisler', 'siparisler-yonetim', 'sterilizasyon', 'stok'];
   
   var nabizOnbellek = { t: 0, acik: false };
-  async function sohbetKapi() {
+  async function sohbetKapi(zorla) {
     var ac = sohbetAcik();
     if (!ac.acik) return ac;
-    if (Date.now() - nabizOnbellek.t < 60000) return nabizOnbellek.acik ? { acik: true, neden: '' } : { acik: false, neden: 'nabiz' };
+    if (zorla !== true && Date.now() - nabizOnbellek.t < 60000) return nabizOnbellek.acik ? { acik: true, neden: '' } : { acik: false, neden: 'nabiz' };
     var acik = false, hedef = String(A().sohbetDriveId || '').trim();
     try {
       var token = await sohbetJetonu(), yol = sohbetOid() + '/nabiz.json';

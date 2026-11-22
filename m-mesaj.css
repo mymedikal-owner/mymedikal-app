@@ -1,5 +1,5 @@
  
-:root { --ms-yesil: #128c4a; --ms-yesil-acik: #d8f5e3; --ms-ben-zemin: #dcf8c6; --ms-ben-yazi: #111b21; --ms-karsi-zemin: #ffffff; --ms-karsi-yazi: #111b21; --ms-sohbet-zemin: #efeae2; --ms-nokta: rgba(120, 100, 70, .10); --ms-saat: #667781; --ms-tik-okundu: #1c7ed6; --ms-gun-zemin: #ffffffd9; --ms-gun-yazi: #54656f; --ms-arama-zemin: #f0f2f5; --ms-cip-zemin: #f0f2f5; --ms-cip-yazi: #54656f; --ms-cip-sec-zemin: #d8f5e3; --ms-cip-sec-yazi: #0b6b38; --ms-ince: #e9edef; }
+:root { --ms-yesil: #128c4a; --ms-yesil-acik: #d8f5e3; --ms-ben-zemin: #dcf8c6; --ms-ben-yazi: #111b21; --ms-karsi-zemin: #ffffff; --ms-karsi-yazi: #111b21; --ms-sohbet-zemin: #efeae2; --ms-nokta: rgba(120, 100, 70, .10); --ms-saat: #667781; --ms-tik-okundu: #53bdeb; --ms-gun-zemin: #ffffffd9; --ms-gun-yazi: #54656f; --ms-arama-zemin: #f0f2f5; --ms-cip-zemin: #f0f2f5; --ms-cip-yazi: #54656f; --ms-cip-sec-zemin: #d8f5e3; --ms-cip-sec-yazi: #0b6b38; --ms-ince: #e9edef; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="acik"]) { --ms-yesil: #1fa855; --ms-yesil-acik: #103529; --ms-ben-zemin: #005c4b; --ms-ben-yazi: #e9edef; --ms-karsi-zemin: #202c33; --ms-karsi-yazi: #e9edef; --ms-sohbet-zemin: #0b141a; --ms-nokta: rgba(255, 255, 255, .04); --ms-saat: #aebac1; --ms-tik-okundu: #53bdeb; --ms-gun-zemin: #182229d9; --ms-gun-yazi: #aebac1; --ms-arama-zemin: #202c33; --ms-cip-zemin: #202c33; --ms-cip-yazi: #aebac1; --ms-cip-sec-zemin: #103529; --ms-cip-sec-yazi: #5ee091; --ms-ince: #2a3942; }
 }
@@ -175,8 +175,15 @@ body.ms-tam .kabuk { min-height: 0; }
 .ms-link { overflow-wrap: anywhere; color: inherit; text-decoration: underline; }
 .ms-kart { min-height: 40px; max-width: 100%; padding: 8px 12px; font-size: 15px; text-align: left; border: 1px solid var(--ms-yesil); border-radius: 8px; background: transparent; color: inherit; overflow-wrap: anywhere; }
 .ms-meta { display: flex; justify-content: flex-end; align-items: center; gap: 4px; margin-top: 1px; font-size: 11px; color: var(--ms-saat); }
-.ms-tik { font-size: 12px; letter-spacing: -2px; }
-.ms-tik-okundu { color: var(--ms-tik-okundu); }
+.ms-tik { display: inline-flex; align-items: center; color: #8696a0; line-height: 0; }    
+.ms-tik svg { width: 16px; height: 16px; }
+.ms-tik-okundu { color: var(--ms-tik-okundu, #53bdeb); }
+.ms-tik-hata { color: #e53935; }
+.ms-tik-bekliyor { color: #8696a0; }
+.ms-tekrar { align-self: flex-end; margin-top: 2px; padding: 2px 10px; border: 0; border-radius: 12px; background: transparent; color: #e53935; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.ms-yerel-hata .ms-metin { opacity: .85; }
+.ms-ozet-tikli .ms-tik { vertical-align: -3px; margin-right: 4px; }
+.ms-ozet-tikli .ms-tik svg { width: 15px; height: 15px; }
 
  
 .ms-alt { flex: none; display: flex; align-items: flex-end; gap: 6px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: var(--ms-sohbet-zemin); min-width: 0; }

@@ -116,7 +116,9 @@
     'geç': 'late', 'kapalı': 'closed', 'canlı': 'live', 'Metre (vardiya)': 'Metres (shift)', 'Atkı': 'Weft', 'Salon': 'Hall', 'Ürün kodu': 'Product code', 'Duruş süresi': 'Downtime duration', 'Duruş başlangıcı': 'Downtime start',
     'Çalışma / duruş': 'Run / stop', 'Durum değişimleri': 'Status changes', 'kısa pencere': 'short window', 'Fabrika görünümleri': 'Factory views', 'Canlı fabrika durumu': 'Live factory status', ' (kapalı)': ' (closed)',
     'Son 7 gün': 'Last 7 days', 'Son 30 gün': 'Last 30 days', 'Kayıt yok.': 'No records.', 'Açık düzeltmeler': 'Open corrections',
-    'Hafta': 'Week', 'Ay': 'Month', 'Hesap': 'Account', 'Dil / Language': 'Dil / Language'
+    'Hafta': 'Week', 'Ay': 'Month', 'Hesap': 'Account', 'Dil / Language': 'Dil / Language',
+     
+    'Canlı': 'Live', '{n} hatta veri gecikmeli': 'Data delayed on {n} line(s)', 'Veri gecikmeli (son: {t})': 'Data delayed (last: {t})', 'Veri gecikmeli': 'Data delayed'
   };
    
   var TAM41 = {

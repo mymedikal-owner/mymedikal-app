@@ -112,7 +112,7 @@
         setTimeout(async function () {
           var c = null;
           try { c = await window.MMVeri.sohbetCevap(id); } catch (e) { c = null; }
-          if (c) { mesaj('asistan', c.cevap, c.klasorler); akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; return; }
+          if (c) { mesaj('asistan', c.cevap, c.klasorler); MM.asistanSon = { metin: String(c.cevap || ''), ts: Date.now() }; akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; return; }
           gecen += bekle;
           if (gecen >= 300000) { mesaj('asistan', 'Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.'); akis.appendChild(h('div', { sinif: 'kaynak-satir' }, [mesajIlet(soru)])); bekliyor = false; gonderDugme.disabled = false; return; }
           yokla(id, soru, gecen, Math.min(15000, bekle + 2500));
@@ -138,9 +138,20 @@
       var kapiMail = function () { mailGorunum('Asistan şu an yanıt vermiyor. Sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.'); };
       window.MMVeri.sohbetKapi().then(function (k) { if (k && k.acik) acikGorunum(); else kapiMail(); }, kapiMail);
     }
-    var sohbet = gr.kart({ baslik: 'Sohbet', alt: 'Cevaplar kaynak göstererek verilir', govde: sohbetGovde });
-    var kaynakKart = gr.kart({ baslik: 'Erişebildiğin kaynaklar', alt: 'Cevaplar yalnız yetkinizin açtığı kaynaklardan verilir', govde: h('div', { sinif: 'cip-sira' }, erisilen.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), k[1]]); })) });
-    kabuk(kok, { canli: true, ad: 'Asistan', alt: 'Şirket içi yapay zekâ asistanı', govde: h('div', { sinif: 'yigin' }, [h('p', { sinif: 'rol-satir' }, ['Rol: ', h('b', { metin: ((window.MM_AYAR.rolAdlari || {})[rol]) || rol })]), kaynakKart, sohbet]), });
+     
+    var geriHedef = (MM.acik && MM.acik('mesaj')) ? '#mesaj' : '#ana';
+    var geri = h('button', { sinif: 'ms-yd ms-yd-ust', type: 'button', 'aria-label': 'Geri' }, [MM.svg('svg', { viewBox: '0 0 24 24', width: 22, height: 22, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.9, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' }, [MM.svg('path', { d: 'M15 5l-7 7 7 7' })])]);
+    geri.addEventListener('click', function () { location.hash = geriHedef; });
+    var asAv = h('span', { sinif: 'ms-av ms-av-ust ms-av-asistan', 'aria-hidden': 'true' }, [MM.svg('svg', { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', stroke: '#5b4bd5', 'stroke-width': 1.9, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, [MM.svg('path', { d: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6' })])]);
+    var ustCubuk = h('div', { sinif: 'ms-ust-cubuk ms-sohbet-ust' }, [geri, h('span', { sinif: 'ms-baslik-pill' }, [asAv, h('span', { sinif: 'ms-baslik-kutu' }, [h('strong', { sinif: 'ms-baslik', metin: 'Asistan' }), h('span', { sinif: 'ms-alt-yazi', metin: 'Şirket içi yapay zekâ asistanı' })])])]);
+    var asKok = h('div', { sinif: 'ms-kok ms-ekran-sohbet asistan-ms' }, [ustCubuk]);
+    if (erisilen.length) asKok.appendChild(h('p', { sinif: 'asistan-kaynak soluk kucuk', metin: 'Erişebildiğin kaynaklar: ' + erisilen.map(function (k) { return k[1]; }).join(', ') }));
+    asKok.appendChild(sohbetGovde);
+    kok.appendChild(asKok);
+    document.body.classList.add('ms-tam');
+    function asVv() { if (window.visualViewport) asKok.style.setProperty('--ms-vh', Math.round(window.visualViewport.height) + 'px'); }
+    asVv(); if (window.visualViewport) window.visualViewport.addEventListener('resize', asVv);
+    return function () { document.body.classList.remove('ms-tam'); if (window.visualViewport) window.visualViewport.removeEventListener('resize', asVv); };
   };
 
    

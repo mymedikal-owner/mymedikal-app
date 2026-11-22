@@ -72,6 +72,7 @@
     onay: 'M5 12l4.5 4.5L19 7',
     asistan: 'M4 5h16v11H9l-5 4zM8 10h8',
     mesaj: 'M4 5h16v11H9l-5 4zM8 9h8M8 12h5',
+    gizlilik: 'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4',
     siparis: 'M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10',
     finans: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6',
     muhasebe: 'M5 4h12a2 2 0 012 2v14H7a2 2 0 01-2-2zM5 18a2 2 0 012-2h12M9 8h6M9 12h6',
@@ -108,10 +109,11 @@
     { id: 'ik', ad: 'İK', aktif: true, onizleme: true },
     { id: 'onay', ad: 'Onaylar', aktif: true, onizleme: true },
     { id: 'asistan', ad: 'Asistan', aktif: true },   
-    { id: 'mesaj', ad: 'Mesaj', aktif: true, mesaj: true },   
+    { id: 'mesaj', ad: 'Mesajlar', aktif: true, mesaj: true },   
     { id: 'yonetim', ad: 'Yönetim', aktif: true },
     { id: 'finans', ad: 'Finans', aktif: true },
-    { id: 'muhasebe', ad: 'Muhasebe', aktif: true }
+    { id: 'muhasebe', ad: 'Muhasebe', aktif: true },
+    { id: 'gizlilik', ad: 'Gizlilik', aktif: true, gizlilik: true }   
   ];
   function rolAl() {
     
@@ -129,7 +131,7 @@
   function acikListe(l) { return Array.isArray(l) ? l.filter(function (x) { return typeof x === 'string'; }) : null; }
   ACIK = acikListe(window.MM_AYAR.acikModuller);
   var VARSAYILAN_ACIK = ACIK ? ACIK.slice() : null;   
-  function modAcik(id) { return id === 'ana' || id === 'nakliye-yukle' || id === 'erisim-yok' || !ACIK || ACIK.indexOf(id) >= 0; }
+  function modAcik(id) { return id === 'ana' || id === 'nakliye-yukle' || id === 'erisim-yok' || id === 'gizlilik' || !ACIK || ACIK.indexOf(id) >= 0; }
   var onizQ = new URLSearchParams(location.search).get('moduller');
   var ONIZ = (onizQ && window.MMVeri && window.MMVeri.mod() === 'yerel') ? onizQ.split(',').map(function (s) { return s.trim(); }).filter(Boolean) : null;   
   if (ONIZ) ACIK = ONIZ;
@@ -173,7 +175,8 @@
     MODULLER = MODULLER_TUM.filter(function (m) {
       if (m.nakliyeci || m.erisimYok) return false;
       if (window.MMVeri && window.MMVeri.demo() && DEMO_KAPALI.indexOf(m.id) >= 0) return false;   
-      if (m.mesaj && !mesajAcik()) return false;   
+      if ((m.mesaj || m.gizlilik) && !mesajAcik()) return false;   
+      if (m.gizlilik) return true;   
       var r = (window.MM_AYAR.roller || {})[m.id];
       if (KAPALI.indexOf(m.id) >= 0 && m.id !== 'ana') return false;   
       if (ym && ACIK && VARSAYILAN_ACIK && VARSAYILAN_ACIK.indexOf(m.id) >= 0 && !modAcik(m.id)) return false;   

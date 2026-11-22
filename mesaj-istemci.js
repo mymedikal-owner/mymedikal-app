@@ -11,7 +11,7 @@
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'audio/mp4', 'audio/webm', 'audio/aac'];
   var TURLER = ['metin', 'kart', 'dosya', 'ses'];
-  var OLAYLAR = ['mesaj', 'okundu', 'yaziyor', 'arama'];
+  var OLAYLAR = ['mesaj', 'okundu', 'yaziyor', 'arama', 'sohbet'];
 
   function hata(kod, ek) { var e = new Error(kod); e.kod = kod; if (ek) for (var k in ek) e[k] = ek[k]; return e; }
   function oidGecerli(o) { return typeof o === 'string' && /^[0-9a-fA-F-]{8,40}$/.test(o); }
@@ -53,12 +53,17 @@
   }
   function sohbetCevir(c) {
     if (!c || typeof c !== 'object') return null;
-    var son = c.son && typeof c.son === 'object' ? { ts: c.son.ts, gonderen: s(c.son.gonderen), ozet: s(c.son.ozet) } : null;
-    return { id: s(c.id), tur: c.tur === 'grup' ? 'grup' : 'bire', ad: s(c.ad), uyeler: Array.isArray(c.uyeler) ? c.uyeler.filter(function (x) { return typeof x === 'string'; }) : [], son: son, okunmamis: Number(c.okunmamis) || 0 };
+    var son = c.son && typeof c.son === 'object' ? { ts: c.son.ts, gonderen: s(c.son.gonderen), ozet: s(c.son.ozet), metin: typeof c.son.metin === 'string' ? c.son.metin : '', gonderenAd: s(c.son.gonderenAd) } : null;
+    var grup = c.tur === 'grup';
+    var r = { id: s(c.id), tur: grup ? 'grup' : 'bire', ad: s(c.ad), uyeler: Array.isArray(c.uyeler) ? c.uyeler.filter(function (x) { return typeof x === 'string'; }) : [], son: son, okunmamis: Number(c.okunmamis) || 0 };
+    if (grup && Array.isArray(c.yoneticiler)) r.yoneticiler = c.yoneticiler.filter(function (x) { return typeof x === 'string'; });   
+    if (grup && typeof c.aciklama === 'string') r.aciklama = c.aciklama;
+    if (c.tercih && typeof c.tercih === 'object') { r.tercih = {}; ['arsiv', 'favori', 'sessiz', 'sabit'].forEach(function (k) { if (typeof c.tercih[k] === 'boolean') r.tercih[k] = c.tercih[k]; }); }
+    return r;
   }
   function liste(v, f) { return (Array.isArray(v) ? v : []).map(f).filter(Boolean); }
 
-  function durumKodu(d) { return d === 401 ? 'kimlik' : d === 403 ? 'uye' : d === 404 ? 'yok' : d === 400 ? 'gecersiz' : d === 429 ? '429' : 'sunucu'; }
+  function durumKodu(d) { return d === 401 ? 'kimlik' : d === 403 ? 'uye' : d === 404 ? 'yok' : d === 400 ? 'gecersiz' : d === 429 ? '429' : d === 503 ? 'mesgul' : 'sunucu'; }
 
    
   function varsayilanTasiyici(apiUrl) {
@@ -106,7 +111,7 @@
     var blobTasiyici = o.blobTasiyici || varsayilanBlobTasiyici;
     var bekle = o.bekle || function (sn) { return new Promise(function (ok) { setTimeout(ok, sn * 1000); }); };
     var simdi = o.simdi || Date.now;
-    var dinleyici = { mesaj: [], okundu: [], yaziyor: [], arama: [] };
+    var dinleyici = { mesaj: [], okundu: [], yaziyor: [], arama: [], sohbet: [] };
     var sonYaziyor = {};
 
     function cagri(yontem, yol, govde, denendi) {
@@ -123,6 +128,7 @@
           if (denendi || sn > MAKS_BEKLE_SN) throw hata('429', { bekleSn: sn });   
           return Promise.resolve(bekle(sn)).then(function () { return cagri(yontem, yol, govde, true); });
         }
+        if (r && r.durum === 503 && !denendi) return Promise.resolve(bekle(1)).then(function () { return cagri(yontem, yol, govde, true); });   
         if (!r || r.durum < 200 || r.durum >= 300) throw hata(durumKodu(r && r.durum), { durum: r && r.durum });
         return r.json;
       });
@@ -140,6 +146,7 @@
       if (d.olay === 'mesaj') { var m = mesajCevir(d.mesaj); if (m) yay('mesaj', m); }
       else if (d.olay === 'okundu') yay('okundu', { sohbet: s(d.sohbet), oid: s(d.oid), sonId: s(d.sonId) });
       else if (d.olay === 'yaziyor') yay('yaziyor', { sohbet: s(d.sohbet), oid: s(d.oid) });
+      else if (d.olay === 'sohbet') yay('sohbet', { sohbet: s(d.sohbet), islem: s(d.islem) });   
       else yay('arama', { sohbet: s(d.sohbet), groupId: s(d.groupId), arayan: s(d.arayan || d.gonderen), video: d.video === true });
     }
     function yenidenDene() {
@@ -196,6 +203,23 @@
         if (!a) return Promise.reject(hata('ad'));
         return cagri('POST', '/sohbetler', { tur: 'grup', uyeler: l, ad: a.slice(0, 80) }).then(sohbetCevir);
       },
+       
+      tercih: function (sohbetId, t) { return cagri('POST', '/sohbetler/' + sid(sohbetId) + '/tercih', t || {}); },
+      uyeEkle: function (sohbetId, uyeler) {
+        var l = Array.isArray(uyeler) ? uyeler : [];
+        if (!l.length || !l.every(oidGecerli)) return Promise.reject(hata('uye'));
+        return cagri('POST', '/sohbetler/' + sid(sohbetId) + '/uyeler', { uyeler: l }).then(sohbetCevir);
+      },
+      uyeCikar: function (sohbetId, oid) {
+        if (!oidGecerli(oid)) return Promise.reject(hata('uye'));
+        return cagri('DELETE', '/sohbetler/' + sid(sohbetId) + '/uyeler/' + sid(oid)).then(function () { return true; });
+      },
+      grupBilgi: function (sohbetId, b) { return cagri('POST', '/sohbetler/' + sid(sohbetId) + '/bilgi', b || {}).then(sohbetCevir); },
+      yonetici: function (sohbetId, oid, yonetici) {
+        if (!oidGecerli(oid)) return Promise.reject(hata('uye'));
+        return cagri('POST', '/sohbetler/' + sid(sohbetId) + '/yonetici', { oid: oid, yonetici: yonetici === true }).then(sohbetCevir);
+      },
+      medya: function (sohbetId, once) { return cagri('GET', '/sohbetler/' + sid(sohbetId) + '/medya' + (once ? '?once=' + encodeURIComponent(String(once)) : '')).then(function (v) { return liste(v, mesajCevir); }); },
       mesajlar: function (sohbetId, sayfa) {
         var q = '';
         if (sayfa && sayfa.once != null) q += (q ? '&' : '?') + 'once=' + encodeURIComponent(String(sayfa.once));

@@ -128,6 +128,9 @@ body.ms-tam .icerik { padding: 0; }
 .ms-bilgi-etiket { display: flex; align-items: center; justify-content: space-between; }
 .ms-medya-izgara { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
 .ms-medya-kare { aspect-ratio: 1 / 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 6px; border: 0; background: var(--ms-arama-zemin); color: var(--ms-saat); }
+.ms-medya-kare { position: relative; overflow: hidden; }
+.ms-medya-resimli { padding: 0; }
+.ms-medya-resim { position: absolute; top: 0; left: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
 .ms-medya-ad { max-width: 100%; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ms-ara, .ms-ara-girdi { margin: 0; }
 .ms-ara-girdi { height: 36px; }

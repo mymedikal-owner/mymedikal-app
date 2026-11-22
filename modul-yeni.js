@@ -93,7 +93,7 @@
     function mailHref(govde) { var p = window.MM.talimatPosta || ''; if (!p) return ''; return 'mailto:' + p + '?subject=' + encodeURIComponent('[Talimat] App asistan sorusu') + (govde ? '&body=' + encodeURIComponent(govde) : ''); }
     var akis = h('div', { sinif: 'sohbet-akis', 'aria-live': 'polite' });
     function mesaj(kimden, metin, kaynaklar) {
-      var m = h('div', { sinif: 'mesaj ' + kimden }, [h('div', { sinif: 'balon' }, [h('p', { metin: metin }), kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: 'Kaynaklar:' })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), KLASOR_AD[k] || k]); }))) : null])]);
+      var m = h('div', { sinif: 'mesaj ' + kimden }, [h('div', { sinif: 'balon' }, [h('p', { metin: metin }), kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: 'Dayandığı bilgiler:' })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), KLASOR_AD[k] || k]); }))) : null])]);
       akis.appendChild(m); akis.scrollTop = akis.scrollHeight;
     }
     var sohbetGovde = h('div', { sinif: 'sohbet' });
@@ -145,7 +145,7 @@
     var asAv = h('span', { sinif: 'ms-av ms-av-ust ms-av-asistan', 'aria-hidden': 'true' }, [MM.svg('svg', { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', stroke: '#5b4bd5', 'stroke-width': 1.9, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, [MM.svg('path', { d: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6' })])]);
     var ustCubuk = h('div', { sinif: 'ms-ust-cubuk ms-sohbet-ust' }, [geri, h('span', { sinif: 'ms-baslik-pill' }, [asAv, h('span', { sinif: 'ms-baslik-kutu' }, [h('strong', { sinif: 'ms-baslik', metin: 'Asistan' }), h('span', { sinif: 'ms-alt-yazi', metin: 'Şirket içi yapay zekâ asistanı' })])])]);
     var asKok = h('div', { sinif: 'ms-kok ms-ekran-sohbet asistan-ms' }, [ustCubuk]);
-    if (erisilen.length) asKok.appendChild(h('p', { sinif: 'asistan-kaynak soluk kucuk', metin: 'Erişebildiğin kaynaklar: ' + erisilen.map(function (k) { return k[1]; }).join(', ') }));
+    if (erisilen.length) asKok.appendChild(h('p', { sinif: 'asistan-kaynak soluk kucuk', metin: 'Erişebildiğin bölümler: ' + erisilen.map(function (k) { return k[1]; }).join(', ') }));
     asKok.appendChild(sohbetGovde);
     kok.appendChild(asKok);
     document.body.classList.add('ms-tam');

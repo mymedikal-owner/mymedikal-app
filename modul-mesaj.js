@@ -323,7 +323,10 @@
     }
     function okunduSay(s) {   
       s.okunmamis = 0; bildir(); if (canli && gorunum === 'liste') { cipGuncelle(); listeIc(); }
-      i.mesajlar(s.id, { adet: 1 }).then(function (l) { var m = l && l[l.length - 1]; if (m) return i.okundu(s.id, m.id); }).then(null, function () {   });
+      i.mesajlar(s.id, { adet: 1 }).then(function (l) {   
+        var m = null; (l || []).forEach(function (x) { if (x && x.id && (!m || epoch(x.ts) > epoch(m.ts))) m = x; });
+        if (m) return i.okundu(s.id, m.id);
+      }).then(null, function () {   });
     }
     function eylemMenusu(s) {   
       var kok2 = h('div', { sinif: 'ms-sheet-kok' }), t = s.tercih || {};
@@ -690,9 +693,21 @@
           return;
         }
         if (!medyaListe.length) { ic.appendChild(h('p', { sinif: 'veri-yok ms-bos', metin: T('Medya yok') })); return; }
-        var izgara = h('div', { sinif: 'ms-medya-izgara' });
+        var izgara = h('div', { sinif: 'ms-medya-izgara' }), kucukSay = 0;
         medyaListe.forEach(function (m) {
           var b = h('button', { sinif: 'ms-medya-kare', type: 'button', 'aria-label': m.dosya.ad }, [ikon('dosyaIk', 26), h('span', { sinif: 'ms-medya-ad', metin: m.dosya.ad })]);
+          if (/^image\/(jpeg|png|gif|webp)$/i.test(m.dosya.mime || '') && kucukSay < 12) {   
+            kucukSay++;
+            i.dosyaIndir(s.id, m.dosya.blob).then(function (u) {
+              if (!canli || !/^https:\/\//.test(u)) return;
+              var im = document.createElement('img');
+              im.className = 'ms-medya-resim'; im.alt = m.dosya.ad; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer';
+              im.addEventListener('load', function () { Array.prototype.slice.call(b.childNodes).forEach(function (c) { if (c !== im) b.removeChild(c); }); b.classList.add('ms-medya-resimli'); });
+              im.addEventListener('error', function () { if (im.parentNode) im.parentNode.removeChild(im); });   
+              b.appendChild(im);   
+              im.src = u;
+            }, function () {   });
+          }
           b.addEventListener('click', function () { i.dosyaIndir(s.id, m.dosya.blob).then(function (u) { window.open(u, '_blank', 'noopener'); }, function (e) { yaz(hataYaz(e)); }); });
           izgara.appendChild(b);
         });

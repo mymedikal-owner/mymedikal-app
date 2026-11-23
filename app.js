@@ -250,7 +250,25 @@
   function yolParcalari() { return (location.hash || '#ana').slice(1).split('?')[0].split('/').filter(Boolean).map(function (x) { try { return decodeURIComponent(x); } catch (e) { return x; } }); }
   window.MM.yol = function () { return yolParcalari().slice(1); };   
   var aktifTemizle = null;
+   
+  function toplantiAdresi(hash) {
+    var m = /^#toplanti\/([A-Za-z0-9_-]{22})$/.exec(String(hash || ''));
+    return m ? 'meet/index.html#toplanti/' + m[1] : '';
+  }
+  function toplantiYonlendir() {
+    var adres = toplantiAdresi(location.hash);
+    if (!adres) return false;
+    var M = window.MM.mesaj;
+    if (M && M.kabukMu && M.kabukMu() && M.meetCerceveAc) {   
+      try { history.replaceState(null, '', location.pathname + location.search + '#ana'); } catch (e) { }
+      M.meetCerceveAc(adres);
+      return false;
+    }
+    location.replace(adres);   
+    return true;
+  }
   function git() {
+    if (toplantiYonlendir()) return;
     var id = yolParcalari()[0] || 'ana';
     var m = MODULLER.filter(function (x) { return x.id === id; })[0];
     if (!m) { m = MODULLER[0]; if (id !== m.id && history.replaceState) { try { history.replaceState(null, '', location.pathname + location.search + '#' + m.id); } catch (e) { } } }   

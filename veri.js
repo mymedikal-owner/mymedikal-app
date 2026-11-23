@@ -375,7 +375,7 @@
   }
   function sekizHex() { var b = new Uint8Array(4); (window.crypto || {}).getRandomValues(b); var s = ''; for (var i = 0; i < 4; i++) s += (b[i] < 16 ? '0' : '') + b[i].toString(16); return s; }
   
-  async function sohbetSor(soru) {
+  async function sohbetSor(soru, grup) {
     var hedef = String(A().sohbetDriveId || '').trim(), ac = await sohbetKapi();
     if (!ac.acik) throw hata('ayar_bekleniyor', 'Sohbet şu an kapalı');
     soru = String(soru || '').trim().slice(0, 1000);
@@ -384,7 +384,9 @@
     var id = sekizHex(), d = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; };
     var zaman = d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate()) + 'T' + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds());
     var yol = sohbetOid() + '/soru-' + zaman + '-' + id + '.json';
-    var govde = JSON.stringify({ id: id, zaman: d.toISOString(), soru: soru, anahtarlar: anahtarlar, surum: 1 });
+    var kayit = { id: id, zaman: d.toISOString(), soru: soru, anahtarlar: anahtarlar, surum: 1 };
+    if (grup && typeof grup.sohbet === 'string' && typeof grup.mid === 'string' && grup.sohbet && grup.mid) kayit.grup = { sohbet: grup.sohbet, mid: grup.mid };   
+    var govde = JSON.stringify(kayit);
     var adres = 'https://graph.microsoft.com/v1.0/drives/' + encodeURIComponent(hedef) + '/root:/' + yol.split('/').map(encodeURIComponent).join('/') + ':/content?@microsoft.graph.conflictBehavior=fail';
     var ham = window.CapacitorWebFetch || window.fetch, r;
     try { r = await ham.call(window, adres, { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: govde, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' }); }
@@ -405,7 +407,7 @@
     if (!indir) return null;
     var r = await fetch(indir, { cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
     if (!r.ok) return null;
-    try { var j = await r.json(); return (j && typeof j.cevap === 'string') ? { cevap: j.cevap, sonuc: String(j.sonuc || ''), klasorler: Array.isArray(j.klasorler) ? j.klasorler.map(String) : [] } : null; } catch (e) { return null; }
+    try { var j = await r.json(); return (j && typeof j.cevap === 'string') ? { cevap: j.cevap, sonuc: String(j.sonuc || ''), klasorler: Array.isArray(j.klasorler) ? j.klasorler.map(String) : [], imza: typeof j.imza === 'string' ? j.imza : '', kapsamDisi: j.kapsam_disi === true || String(j.sonuc || '') === 'kapsam_disi' } : null; } catch (e) { return null; }
   }
    
 

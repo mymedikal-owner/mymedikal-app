@@ -80,6 +80,8 @@
       else r.yanit = { id: s(y.id), gonderen: s(y.gonderen), tur: TURLER.indexOf(y.tur) >= 0 ? y.tur : 'metin', metin: typeof y.metin === 'string' ? y.metin : '' };
     }
     if (m.asistan === true || r.gonderen === 'asistan') r.asistan = true;   
+    if (m.kapsam_disi === true) { r.kapsamDisi = true; delete r.asistan; }    
+    if (m.asistanSoru === true) r.asistanSoru = true;                       
     var tp = tepkiSuz(m.tepkiler); if (tp) r.tepkiler = tp;
     if (typeof m.duzenlendi === 'number' || (typeof m.duzenlendi === 'string' && m.duzenlendi)) r.duzenlendi = m.duzenlendi;
     if (m.iletildi === true) { r.iletildi = true; r.iletimSayisi = Number(m.iletimSayisi) > 0 ? Number(m.iletimSayisi) : 1; }
@@ -240,7 +242,7 @@
           if (bl.length > 20) return hata('gecersiz');
           if (bl.length) gv.bahsedilen = bl;
         }
-        if (g.asistan === true) gv.asistan = true;   
+        if (g.asistan === true) { if (t.length > 1000) return hata('uzun'); gv.asistan = true; }   
         return gv;
       }
       if (tur === 'kart') { var k = kartSuz(g.kart); return k ? { tur: 'kart', kart: k } : hata('gecersiz'); }
@@ -251,7 +253,37 @@
 
     var api = {
       acik: function () { return !kapali; },
-      kisiler: function () { return cagri('GET', '/kisiler').then(function (v) { return liste(v, function (k) { return k && k.oid && k.ad ? { oid: s(k.oid), ad: s(k.ad) } : null; }); }); },
+      kisiler: function () { return cagri('GET', '/kisiler').then(function (v) { return liste(v, function (k) { return k && k.oid && k.ad ? { oid: s(k.oid), ad: s(k.ad), kurulu: k.kurulu === true } : null; }); }); },
+       
+      kisiBilgi: function (oid) {
+        if (!oidGecerli(oid)) return Promise.reject(hata('uye'));
+        return cagri('GET', '/kisiler/' + sid(oid) + '/bilgi').then(function (v) {
+          if (!v || typeof v !== 'object') throw hata('gecersiz');
+          var gr = Array.isArray(v.ortakGruplar) ? v.ortakGruplar.map(function (g) { return g && g.id ? { id: s(g.id), ad: s(g.ad), uyeSayisi: Number(g.uyeSayisi) || 0 } : null; }).filter(Boolean) : [];
+          return { oid: s(v.oid) || oid, ad: s(v.ad), unvan: typeof v.unvan === 'string' && v.unvan ? v.unvan : null, kurulu: v.kurulu === true, ortakGruplar: gr, ortakMedyaSayisi: Number(v.ortakMedyaSayisi) || 0, birebirSohbet: typeof v.birebirSohbet === 'string' && v.birebirSohbet ? v.birebirSohbet : null, sessiz: v.sessiz == null ? null : v.sessiz };
+        });
+      },
+      ara: function (q) {
+        var t = String(q == null ? '' : q).trim();
+        if (t.length < 2 || t.length > 64) return Promise.reject(hata('gecersiz'));
+        return cagri('GET', '/ara?q=' + encodeURIComponent(t)).then(function (v) {
+          v = v && typeof v === 'object' ? v : {};
+          return {
+            kisiler: liste(v.kisiler, function (k) { return k && k.oid ? { oid: s(k.oid), ad: s(k.ad), kurulu: k.kurulu === true } : null; }),
+            sohbetler: liste(v.sohbetler, sohbetCevir),
+            mesajlar: liste(v.mesajlar, mesajCevir)
+          };
+        });
+      },
+       
+      asistanCevapYaz: function (sohbetId, g) {
+        g = g || {};
+        var t = typeof g.metin === 'string' ? g.metin : '';   
+        if (!t || t.length > 4000 || !g.soruId || !g.imza) return Promise.reject(hata('gecersiz'));
+        var b = { tur: 'asistan', soruId: String(g.soruId), metin: t, imza: String(g.imza) };
+        if (typeof g.istemciId === 'string' && ISTEMCI_ID.test(g.istemciId)) b.istemciId = g.istemciId;
+        return cagri('POST', '/sohbetler/' + sid(sohbetId) + '/mesajlar', b).then(mesajCevir);
+      },
       sohbetleriListele: function () { return cagri('GET', '/sohbetler').then(function (v) { return liste(v, sohbetCevir); }); },
       sohbetAc: function (uyeler, ad) {
         var l = Array.isArray(uyeler) ? uyeler : [];

@@ -46,7 +46,12 @@
   function katilSonucu(v) {
     if (!v || typeof v.sonuc !== 'string') throw hata('gecersiz');
     var o = { sonuc: v.sonuc };
-    if (v.sonuc === 'katildi') { o.groupId = s(v.groupId); if (typeof v.kod === 'string') o.kod = v.kod; }
+    if (v.sonuc === 'katildi') {
+      o.groupId = s(v.groupId); if (typeof v.kod === 'string') o.kod = v.kod;
+      if (typeof v.acsToken === 'string') o.acsToken = v.acsToken;     
+      if (typeof v.acsUserId === 'string') o.acsUserId = v.acsUserId;
+      if (typeof v.bitis === 'string') o.bitis = v.bitis;
+    }
     return o;
   }
   function sid(x) { return encodeURIComponent(String(x)); }
@@ -97,13 +102,28 @@
         var bas = new Date(o.baslangic).getTime();
         if (isNaN(bas)) throw hata('gecersiz');
         var dk = Math.max(1, Math.min(480, parseInt(o.sure, 10) || 60));
-        govde.baslangic = new Date(bas).toISOString();
+        govde.baslangic = new Date(bas).toISOString();      
         govde.bitis = new Date(bas + dk * 60000).toISOString();
+      }
+      if (Array.isArray(o.davetliler) && o.davetliler.length) {
+        var dv = [];
+        o.davetliler.forEach(function (x) { if (typeof x === 'string' && x && dv.indexOf(x) < 0) dv.push(x); });
+        if (dv.length > 200) throw hata('gecersiz');
+        if (dv.length) govde.davetliler = dv;
       }
       var v = await cagri('POST', '/toplanti', govde);
       if (!v || typeof v.kod !== 'string') throw hata('gecersiz');
-      return { kod: v.kod, kisaKod: s(v.kisaKod), link: s(v.link), durum: s(v.durum) };
+      return { kod: v.kod, kisaKod: s(v.kisaKod), link: s(v.link), durum: s(v.durum), baslangic: s(v.baslangic) };
     },
+     
+    toplantiIcs: async function (kod) {
+      if (typeof kod !== 'string' || !kod) throw hata('gecersiz');
+      var v = await cagri('GET', '/toplanti/' + sid(kod) + '/ics');
+      if (!v || typeof v.ics !== 'string') throw hata('gecersiz');
+      return v.ics;
+    },
+     
+    odaBaglantisi: function (kod) { return new URL('./', location.href).href + '#toplanti/' + sid(kod); },
      
     toplantiKatil: async function (kod) {
       if (typeof kod !== 'string' || !kod) throw hata('gecersiz');

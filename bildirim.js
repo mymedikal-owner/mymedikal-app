@@ -62,17 +62,18 @@
   }
 
    
-  function rotayaGit(rota, sohbet) {
+  function rotayaGit(rota, sohbet, toplanti) {
     if (rota === 'fabrika') { location.hash = '#fabrika'; return; }
     if (rota !== 'mesaj') return;
     var M = window.MM && window.MM.mesaj;
-    if (typeof sohbet === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(sohbet) && M && typeof M.sohbeteGit === 'function') M.sohbeteGit(sohbet);
+    var mid = toplanti && typeof toplanti.mid === 'string' && /^[0-9]{14}-[A-Za-z0-9-]{1,64}$/.test(toplanti.mid) ? toplanti.mid : '';   
+    if (typeof sohbet === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(sohbet) && M && typeof M.sohbeteGit === 'function') M.sohbeteGit(sohbet, mid);
     else location.hash = '#mesaj';
   }
 
-  try { P.addListener('bildirimAcildi', function (o) { rotayaGit(o && o.rota, o && o.sohbet); }); } catch (e) { kodYaz('dinleyici'); }
+  try { P.addListener('bildirimAcildi', function (o) { rotayaGit(o && o.rota, o && o.sohbet, o && o.toplanti); }); } catch (e) { kodYaz('dinleyici'); }
   setTimeout(function () {
-    try { P.bekleyenRota().then(function (o) { if (o && o.rota) rotayaGit(o.rota, o.sohbet); }).catch(function () { kodYaz('rota_bekleyen'); }); } catch (e) { kodYaz('rota_bekleyen'); }
+    try { P.bekleyenRota().then(function (o) { if (o && o.rota) rotayaGit(o.rota, o.sohbet, o.toplanti); }).catch(function () { kodYaz('rota_bekleyen'); }); } catch (e) { kodYaz('rota_bekleyen'); }
   }, 1500);
 
   

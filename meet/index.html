@@ -54,6 +54,45 @@
           <p class="kucuk">Bu bağlantıyı paylaşın. Toplantıya yalnızca bağlantıyı bilen kişiler katılabilir.</p>
           <div class="baglanti"><input id="l-yeni-link" type="text" readonly aria-label="Oluşturulan bağlantı"><button id="l-yeni-kopyala" type="button">Kopyala</button><button id="l-yeni-katil" type="button" class="birincil">Katıl</button></div>
         </div>
+        <form id="p-form" class="plan-kutu" autocomplete="off" hidden aria-labelledby="p-baslik-b">
+          <h2 id="p-baslik-b">Toplantı planla</h2>
+          <label class="plan-etiket" for="p-baslik">Başlık</label>
+          <input id="p-baslik" class="plan-girdi" type="text" maxlength="120" placeholder="Toplantı başlığı">
+          <div class="plan-satir">
+            <div class="plan-sutun">
+              <label class="plan-etiket" for="p-zaman">Başlangıç (isteğe bağlı)</label>
+              <input id="p-zaman" class="plan-girdi" type="datetime-local">
+            </div>
+            <div class="plan-sutun">
+              <label class="plan-etiket" for="p-sure">Süre</label>
+              <select id="p-sure" class="plan-girdi">
+                <option value="15">15 dakika</option><option value="30">30 dakika</option><option value="45">45 dakika</option>
+                <option value="60" selected>60 dakika</option><option value="90">90 dakika</option><option value="120">120 dakika</option>
+              </select>
+            </div>
+          </div>
+          <label class="plan-etiket" for="p-ara">Davetliler <span id="p-secili" class="kucuk"></span></label>
+          <input id="p-ara" class="plan-girdi" type="search" placeholder="Kişi ara" aria-label="Davetli ara">
+          <ul id="p-kisiler" class="plan-liste"></ul>
+          <p id="p-hata" class="lobi-hata" role="alert" hidden></p>
+          <div class="plan-dugmeler">
+            <button id="p-planla" type="submit" class="birincil">Planla</button>
+            <button id="p-simdi" type="button">Şimdi başlat</button>
+            <button id="p-iptal" type="button" class="metin-dugme">Vazgeç</button>
+          </div>
+        </form>
+        <div id="p-sonuc" class="lobi-baglanti-kutu" hidden>
+          <h2 class="plan-sonuc-baslik">Toplantı hazır</h2>
+          <p class="kucuk">Toplantı kodu</p>
+          <p id="p-kisakod" class="plan-kod"></p>
+          <div class="baglanti"><input id="p-link" type="text" readonly aria-label="Toplantı bağlantısı"><button id="p-kopyala" type="button">Bağlantıyı kopyala</button></div>
+          <div class="plan-dugmeler">
+            <button id="p-ics" type="button" hidden>.ics indir</button>
+            <button id="p-katil" type="button" class="birincil">Katıl</button>
+            <button id="p-kapat" type="button" class="metin-dugme">Kapat</button>
+          </div>
+          <p id="p-sonuc-hata" class="lobi-hata" role="alert" hidden></p>
+        </div>
       </div>
       <div class="lobi-sag">
         <section id="l-yaklasan" class="lobi-bolum" aria-labelledby="l-yaklasan-b" hidden>

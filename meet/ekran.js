@@ -14,6 +14,8 @@
   var uyeler = new Map();                                     
   var gorunum = 'otomatik', sabit = '', konusan = '', yanAcik = '', elAcik = false, ekranAcik = false, bagliOldu = false;   
   var lobiGirisi = false, lobiAtla = false, yeniLink = '', lobiSira = 0;
+  var odaKod = '', odaBilgi = null, onBilgi = null, planSon = null, planSecili = new Set(), planKisiler = [];   
+  var KOD_RE = /^[A-Za-z0-9_-]{22}$/, KISA_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/, ODA_LINK_RE = /#toplanti\/([A-Za-z0-9_-]{22})\s*$/;
   var taklitN = (function () { var m = /[?&]n=(\d+)/.exec(location.search); return m ? Math.max(0, Math.min(12, parseInt(m[1], 10))) : 2; })();
   var lobiBos = /[?&]bos=1(&|$)/.test(location.search);
   var saatZ = null, mesajZ = null, sohbetListe = null, adlar = {};
@@ -430,7 +432,7 @@
       await sag.baglan({ groupId: bilgi.groupId, acsToken: bilgi.acsToken, acsUserId: bilgi.acsUserId, ad: ad, kameraAcik: oz.kam, mikrofonAcik: oz.mik });
     } catch (e) { T('hata_kodu', e && e.kod); mesaj(hataMetni(e)); durumYaz('Hata'); try { await sag.temizle(); } catch (e2) {   } panel('panel-onizleme'); throw e; }
     grupId = bilgi.groupId; T('katildi');
-    var link = window.MeetApi && window.MeetApi.baglantiOlustur ? window.MeetApi.baglantiOlustur(sohbetId, bilgi.groupId) : '';
+    var link = odaKod ? window.MeetApi.odaBaglantisi(odaKod) : (window.MeetApi && window.MeetApi.baglantiOlustur ? window.MeetApi.baglantiOlustur(sohbetId, bilgi.groupId) : '');
     $('baglanti').value = link;
     sohbetBaslat();
   }
@@ -530,6 +532,7 @@
 
   function hashOku() {
     var h = (location.hash || '').replace(/^#/, ''), s = '', g = '', vv = '';
+    if (h.indexOf('toplanti/') === 0) { var kd = h.slice(9); return { s: '', g: '', v: '', t: KOD_RE.test(kd) ? kd : '!' }; }
     h.split('&').forEach(function (p) {
       var i = p.indexOf('='); if (i < 0) return;
       var k = p.slice(0, i), v = p.slice(i + 1);
@@ -578,11 +581,15 @@
       ad = window.MeetKimlik.ad();
     }
     var h = hashOku();
+    odaKod = '';
+    if (h.t) { lobiAtla = false; await odaAc(h.t); return; }   
     
 
     lobiGirisi = !h.s;
     if (lobiGirisi && !lobiAtla) { lobiGoster(); durumYaz('hazir'); return; }
     lobiAtla = false;
+    
+
     oz.kam = h.v !== '0';
     if (h.s && h.g) {
       sohbetId = h.s; grupId = h.g;
@@ -601,39 +608,197 @@
   function lobiKapatMenu() { $('l-yeni-menu').hidden = true; $('l-yeni').setAttribute('aria-expanded', 'false'); }
   function lobiGoster() {
     if (sag) { try { sag.temizle(); } catch (e0) {   } sag = null; }
+    odaKod = ''; odaBilgi = null; onBilgi = null;
     mesaj(''); lobiHata(''); lobiKapatMenu(); $('l-yeni-baglanti').hidden = true; $('l-kod').value = ''; $('l-kod-katil').disabled = true;
     $('l-baglanti').hidden = !taklit;                       
-    $('l-planla').hidden = !taklit;                         
+    $('l-planla').hidden = false;                           
+    planKapat(); $('p-sonuc').hidden = true; planSon = null;
     $('l-kod').placeholder = 'Kod ya da bağlantı girin';   
+    lobiVeriYenile(true);
+    panel('panel-lobi');
+  }
+  function lobiKatilHook(g) { if (taklit) lobiKatil({ s: 't1', g: g }); else lobiOdaKatil(g, false); }   
+  function lobiVeriYenile(gizle) {
     var sira = ++lobiSira;
-    var katilHook = function (g) { if (taklit) lobiKatil({ s: 't1', g: g }); else lobiOdaKatil(g, false); };   
-    window.MeetLobi.ciz({ yaklasan: null, kisiler: null }, katilHook);   
+    if (gizle) window.MeetLobi.ciz({ yaklasan: null, kisiler: null }, lobiKatilHook);   
     Promise.resolve(window.MeetLobi.veriAl(taklit, lobiBos)).then(function (v) {
       if (sira !== lobiSira || $('panel-lobi').hidden) return;   
-      window.MeetLobi.ciz(v, katilHook);
+      window.MeetLobi.ciz(v, lobiKatilHook);
     }).catch(function () {   });
-    panel('panel-lobi');
+  }
+
+   
+  function odaHataMetni(e) {
+    var k = e && e.kod;
+    return k === 'erken' ? 'Toplantı başlangıcından 10 dakika önce açılır.'
+      : k === 'yok' ? 'Toplantı bulunamadı ya da bitti.'
+      : k === 'uye-degil' ? 'Bu toplantıya katılamazsınız.'
+      : k === 'kapali' ? 'Toplantılar şu anda kapalı.'
+      : k === 'cok-istek' ? 'Çok fazla deneme yaptınız. Biraz bekleyip yeniden deneyin.'
+      : hataMetni(e);
+  }
+   
+  function odaSonuc(r) {
+    if (!r) return { mesaj: 'Toplantıya katılınamadı.' };
+    if (r.sonuc === 'bekleme') return { mesaj: 'Toplantı sahibinin onayı bekleniyor.' };
+    if (r.sonuc === 'acilmadi') return { mesaj: 'Toplantı henüz başlamadı. Düzenleyen katılınca girebilirsiniz.' };
+    if (r.sonuc === 'katildi') {
+      if (r.acsToken && r.groupId) return { bilgi: { groupId: r.groupId, acsToken: r.acsToken, acsUserId: r.acsUserId, bitis: r.bitis }, kod: r.kod };
+      return { mesaj: 'Toplantıya kabul edildiniz. Ses ve görüntü bağlantısı bu sürümde henüz bağlanmadı.' };
+    }
+    return { mesaj: 'Toplantıya katılınamadı.' };
+  }
+  async function odaKatilIste(kod, kisa) {
+    var r;
+    try {
+      if (taklit) r = { sonuc: 'katildi', groupId: 'taklit-' + kod.slice(0, 8), acsToken: 'taklit', kod: kod };
+      else r = kisa ? await window.MeetApi.kodlaKatil(kod) : await window.MeetApi.toplantiKatil(kod);
+    } catch (e) { return { mesaj: odaHataMetni(e) }; }
+    return odaSonuc(r);
   }
    
   async function lobiOdaKatil(kod, kisa) {
     if (mesgul) return;
     mesgul = true; lobiHata('');
     try {
-      var r = kisa ? await window.MeetApi.kodlaKatil(kod) : await window.MeetApi.toplantiKatil(kod);
-      if (r.sonuc === 'bekleme') lobiHata('Toplantı sahibinin onayı bekleniyor.');
-      else if (r.sonuc === 'acilmadi') lobiHata('Toplantı henüz açılmadı. Toplantı sahibi katıldığında yeniden deneyin.');
-      else if (r.sonuc === 'katildi') lobiHata('Toplantıya kabul edildiniz. Ses ve görüntü bağlantısı bu sürümde henüz bağlanmadı.');
-      else lobiHata('Toplantıya katılınamadı.');
-    } catch (e) {
-      var k = e && e.kod;
-      lobiHata(k === 'yok' ? 'Bu kodla açık bir toplantı bulunamadı.'
-        : k === 'erken' ? 'Toplantı henüz başlamadı. Başlangıçtan 10 dakika önce katılabilirsiniz.'
-        : k === 'kapali' ? 'Toplantılar şu anda kapalı.'
-        : k === 'uye-degil' ? 'Bu toplantıya katılma izniniz yok.'
-        : k === 'cok-istek' ? 'Çok fazla deneme yaptınız. Biraz bekleyip yeniden deneyin.'
-        : hataMetni(e));
+      var kk = taklit && kisa ? ('T' + kod + 'xxxxxxxxxxxxxxxxxxxxxx').slice(0, 22) : kod;
+      var s = await odaKatilIste(kk, kisa && !taklit);
+      var hedef = taklit ? kk : (s.kod || (kisa ? '' : kod));
+      if (s.bilgi && KOD_RE.test(hedef)) {
+        onBilgi = { kod: hedef, bilgi: s.bilgi };
+        var nh = '#toplanti/' + hedef;
+        if (location.hash === nh) { ac().catch(function (e) { mesaj(hataMetni(e)); }); } else location.hash = nh;   
+      } else lobiHata(s.bilgi ? 'Toplantıya katılınamadı.' : s.mesaj);
+    } finally { mesgul = false; }
+  }
+  async function odaAc(t) {
+    lobiGirisi = false; sohbetId = ''; grupId = ''; oz.kam = true; toplantiAdi = 'Toplantı'; odaBilgi = null;
+    if (!KOD_RE.test(t)) { onBilgi = null; yokGoster('Toplantı bulunamadı', 'Bu adres geçerli bir toplantıya ait değil.', true); durumYaz('hata'); return; }
+    odaKod = t;
+    var s;
+    if (onBilgi && onBilgi.kod === t) { s = { bilgi: onBilgi.bilgi }; onBilgi = null; }
+    else { onBilgi = null; s = await odaKatilIste(t, false); }
+    if (!s.bilgi) { odaKod = ''; yokGoster('Toplantıya katılınamadı', s.mesaj, true); durumYaz('hata'); return; }
+    odaBilgi = s.bilgi;
+    $('b-katil').onclick = odaGir;
+    await onizlemeGoster('katil'); durumYaz('hazir');
+  }
+  async function odaGir() {
+    if (mesgul || !odaKod) return;
+    mesgul = true; $('b-katil').disabled = true; mesaj('');
+    try {
+      var b = odaBilgi; odaBilgi = null;
+      if (!b) {   
+        var s = await odaKatilIste(odaKod, false);
+        if (!s.bilgi) { mesaj(s.mesaj); $('b-katil').disabled = false; mesgul = false; return; }
+        b = s.bilgi;
+      }
+      await cagriyaGir(b);
+    } catch (e) { if ($('sahne').hidden) mesaj(hataMetni(e)); }
+    $('b-katil').disabled = false; mesgul = false;
+  }
+
+   
+  var KISA_ALF = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', B64U = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
+  function rastgele(alfabe, n) {
+    var a = new Uint8Array(n), o = '';
+    try { crypto.getRandomValues(a); } catch (e) { for (var i = 0; i < n; i++) a[i] = Math.floor(Math.random() * 256); }
+    for (var j = 0; j < n; j++) o += alfabe.charAt(a[j] % alfabe.length);
+    return o;
+  }
+  function kisaGoster(k) { var t = String(k || '').toUpperCase().replace(/[\s-]/g, ''); return t.length === 8 ? t.slice(0, 4) + '-' + t.slice(4) : t; }
+  function planHata(m) { var e = $('p-hata'); e.textContent = m || ''; e.hidden = !m; }
+  function planKapat() { $('p-form').hidden = true; planHata(''); }
+  function planSeciliYaz() { $('p-secili').textContent = planSecili.size ? '(' + planSecili.size + ' seçili)' : ''; }
+  function planKisiCiz() {
+    var ul = $('p-kisiler'); ul.textContent = '';
+    var ara = ($('p-ara').value || '').trim().toLocaleLowerCase('tr'), n = 0;
+    planKisiler.forEach(function (k) {
+      if (ara && (k.ad || '').toLocaleLowerCase('tr').indexOf(ara) < 0) return;
+      n++;
+      var li = document.createElement('li'), lb = document.createElement('label'), cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.checked = planSecili.has(k.oid);
+      cb.addEventListener('change', function () {
+        if (cb.checked) { if (planSecili.size >= 200) { cb.checked = false; planHata('En çok 200 davetli seçebilirsiniz.'); return; } planSecili.add(k.oid); }
+        else planSecili.delete(k.oid);
+        planHata(''); planSeciliYaz();
+      });
+      var sp = document.createElement('span'); sp.textContent = k.ad || 'Kişi';
+      lb.appendChild(cb); lb.appendChild(sp); li.appendChild(lb); ul.appendChild(li);
+    });
+    if (!n) { var l0 = document.createElement('li'); l0.className = 'lobi-bos'; l0.textContent = planKisiler.length ? 'Eşleşen kişi yok.' : 'Kişi listesi alınamadı.'; ul.appendChild(l0); }
+  }
+  async function planAc() {
+    $('p-sonuc').hidden = true; planSon = null; planSecili = new Set(); planSeciliYaz();
+    $('p-baslik').value = ''; $('p-zaman').value = ''; $('p-sure').value = '60'; $('p-ara').value = ''; planHata('');
+    var d = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; };
+    $('p-zaman').min = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+    $('p-form').hidden = false; planKisiler = []; planKisiCiz();
+    try { $('p-baslik').focus(); } catch (e) {   }
+    try {
+      planKisiler = taklit ? [1, 2, 3, 4].map(function (i) { return { oid: 'c' + i, ad: 'Katılımcı ' + i }; })
+        : (await window.MeetApi.kisiler()).filter(function (k) { return k && typeof k.oid === 'string'; }).map(function (k) { return { oid: k.oid, ad: typeof k.ad === 'string' ? k.ad : '' }; });
+    } catch (e2) { planKisiler = []; }
+    if (!$('p-form').hidden) planKisiCiz();
+  }
+  function planHataMetni(e) { return e && e.kod === 'gecersiz' ? 'Toplantı bilgileri geçersiz. Başlık, zaman ve davetlileri kontrol edin.' : odaHataMetni(e); }
+  function taklitOda() { return { kod: rastgele(B64U, 22), kisaKod: kisaGoster(rastgele(KISA_ALF, 8)), durum: 'bekliyor' }; }
+  async function planGonder(simdi) {
+    if (mesgul) return;
+    var baslik = $('p-baslik').value.trim();
+    if (!baslik) { planHata('Toplantı başlığı yazın.'); return; }
+    var o = { baslik: baslik, davetliler: Array.from(planSecili) }, ms = 0, sure = parseInt($('p-sure').value, 10) || 60;
+    if (!simdi) {
+      var v = $('p-zaman').value;
+      if (!v) { planHata('Planlamak için başlangıç tarih ve saatini seçin; hemen başlatmak için "Şimdi başlat" düğmesini kullanın.'); return; }
+      ms = new Date(v).getTime();
+      if (isNaN(ms)) { planHata('Başlangıç zamanı geçersiz.'); return; }
+      if (ms < Date.now()) { planHata('Başlangıç zamanı geçmişte olamaz.'); return; }
+      o.baslangic = ms; o.sure = sure;
     }
+    if (o.davetliler.length > 200) { planHata('En çok 200 davetli seçebilirsiniz.'); return; }
+    mesgul = true; planHata(''); ['p-planla', 'p-simdi'].forEach(function (i) { $(i).disabled = true; });
+    var basari = null;
+    try {
+      var r = taklit ? taklitOda() : await window.MeetApi.toplantiOlustur(o);
+      basari = { kod: r.kod, kisaKod: kisaGoster(r.kisaKod), link: window.MeetApi.odaBaglantisi(r.kod), planli: !simdi, baslik: baslik, ms: ms, sure: sure };
+    } catch (e) { planHata(planHataMetni(e)); }
+    ['p-planla', 'p-simdi'].forEach(function (i) { $(i).disabled = false; });
     mesgul = false;
+    if (!basari) return;
+    if (simdi) { planKapat(); lobiOdaKatil(basari.kod, false); return; }   
+    planSon = basari; planKapat();
+    $('p-kisakod').textContent = basari.kisaKod; $('p-link').value = basari.link; $('p-ics').hidden = !basari.planli; $('p-sonuc-hata').hidden = true;
+    $('p-sonuc').hidden = false; lobiVeriYenile(false);
+  }
+  function taklitIcs(p) {
+    var f = function (ms) { return new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z'); };
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Mumu Meet//TR', 'BEGIN:VEVENT', 'UID:taklit-' + rastgele(KISA_ALF, 8) + '@toplanti.taklit',
+      'DTSTART:' + f(p.ms), 'DTEND:' + f(p.ms + p.sure * 60000), 'SUMMARY:' + p.baslik, 'URL:' + p.link, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n') + '\r\n';
+  }
+  async function icsIndir() {
+    if (!planSon) return;
+    var h = $('p-sonuc-hata'); h.hidden = true;
+    try {
+      var ics = taklit ? taklitIcs(planSon) : await window.MeetApi.toplantiIcs(planSon.kod);
+      var url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+      var a = document.createElement('a'); a.href = url; a.download = 'toplanti.ics'; a.hidden = true;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    } catch (e) { h.textContent = '.ics alınamadı: ' + planHataMetni(e); h.hidden = false; }
+  }
+  function planDugmeleri() {
+    $('p-form').addEventListener('submit', function (e) { e.preventDefault(); planGonder(false); });
+    $('p-simdi').addEventListener('click', function () { planGonder(true); });
+    $('p-iptal').addEventListener('click', planKapat);
+    $('p-ara').addEventListener('input', planKisiCiz);
+    $('p-kapat').addEventListener('click', function () { $('p-sonuc').hidden = true; planSon = null; });
+    $('p-katil').addEventListener('click', function () { if (planSon) lobiOdaKatil(planSon.kod, false); });
+    $('p-ics').addEventListener('click', icsIndir);
+    $('p-kopyala').addEventListener('click', async function () {
+      var h = $('p-sonuc-hata'); h.hidden = true;
+      try { await navigator.clipboard.writeText($('p-link').value); tost2('Bağlantı kopyalandı.'); } catch (e) { $('p-link').select(); h.textContent = 'Kopyalanamadı; bağlantıyı seçip elle kopyalayın.'; h.hidden = false; }
+    });
   }
   function lobiKatil(r) {
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {   }
@@ -642,11 +807,13 @@
   function lobiKodGonder() {
     var t = $('l-kod').value.trim(); if (!t) return;
     var r = window.MeetLobi.cozumle(t);
-    if (!r && taklit && /^[A-Za-z0-9-]{3,64}$/.test(t)) r = { s: 't1', g: 'taklit-' + t };   
-    if (!r && !taklit) {
+    if (!r) {
+      var om = ODA_LINK_RE.exec(t), ok = om ? om[1] : (KOD_RE.test(t) ? t : '');
+      if (ok) { lobiOdaKatil(ok, false); return; }                       
       var kk = t.toUpperCase().replace(/[\s-]/g, '');
-      if (/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(kk)) { lobiOdaKatil(kk, true); return; }   
+      if (KISA_RE.test(kk)) { lobiOdaKatil(kk, true); return; }          
     }
+    if (!r && taklit && /^[A-Za-z0-9-]{3,64}$/.test(t)) r = { s: 't1', g: 'taklit-' + t };   
     if (!r) { lobiHata('Geçerli bir toplantı bağlantısı girin. Bağlantıyı toplantıyı başlatan kişiden alabilirsiniz.'); return; }
     lobiHata(''); lobiKatil(r);
   }
@@ -673,7 +840,8 @@
       try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {   }
       if (sag) { try { sag.temizle(); } catch (e0) {   } } sag = null; katilimciYaz(0); lobiAtla = false; lobiGirisi = true; lobiGoster();
     });
-    $('l-planla').addEventListener('click', function () { lobiKapatMenu(); tost2('Toplantı planlama yakında.'); });
+    $('l-planla').addEventListener('click', function () { lobiKapatMenu(); planAc(); });
+    planDugmeleri();
      
     ['yok-baglanti', 'b-ana', 'b-app'].forEach(function (id) {
       $(id).addEventListener('click', function (e) {

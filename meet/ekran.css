@@ -252,6 +252,26 @@ body.koyu .bant { top:50%; transform:translate(-50%,-50%); }
 .menu-cizgi { border:0; border-top:1px solid var(--s-yuzey2); margin:4px 0; width:100%; }
 .menu { max-height:min(70vh,520px); overflow-y:auto; }
 
+ 
+.plan-kutu { margin-top:18px; max-width:560px; padding:14px; border:1px solid var(--cizgi); border-radius:12px; background:var(--yuzey); }
+.plan-kutu h2, .plan-sonuc-baslik { font-size:16px; font-weight:500; margin:0 0 8px; }
+.plan-etiket { display:block; margin:10px 0 4px; font-size:14px; color:var(--soluk); }
+.plan-girdi { width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--cizgi); border-radius:8px; padding:8px; min-height:44px; min-width:0; }
+.plan-satir { display:flex; gap:12px; flex-wrap:wrap; }
+.plan-sutun { flex:1 1 180px; min-width:0; }
+.plan-liste { list-style:none; margin:8px 0 0; padding:0; max-height:180px; overflow:auto; border:1px solid var(--cizgi); border-radius:8px; }
+.plan-liste li { border-top:1px solid var(--cizgi); }
+.plan-liste li:first-child { border-top:0; }
+.plan-liste label { display:flex; align-items:center; gap:10px; min-height:44px; padding:0 10px; cursor:pointer; }
+.plan-liste input { width:20px; height:20px; flex:none; }
+.plan-dugmeler { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+.plan-dugmeler button { min-height:44px; }
+.plan-kod { margin:2px 0 12px; font-size:28px; font-weight:600; letter-spacing:.08em; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.plan-kutu[hidden], #p-sonuc[hidden] { display:none; }
+#p-sonuc .baglanti { flex-wrap:wrap; }
+#p-sonuc .baglanti input { flex:1 1 200px; min-height:44px; }
+#p-sonuc .baglanti button { min-height:44px; }
+
 @media (max-width: 900px) {
   .lobi { grid-template-columns:minmax(0,1fr); gap:24px; align-content:start; align-items:start; }
 }

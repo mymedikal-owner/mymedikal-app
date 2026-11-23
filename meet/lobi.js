@@ -2,7 +2,6 @@
 
 
 
-
 (function () {
   'use strict';
 
@@ -24,8 +23,20 @@
   function saatMetni(ms) { try { return new Date(ms).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
 
    
+  
+
+  async function gercekVeri() {
+    var api = window.MeetApi;
+    var r = await Promise.all([
+      api.yaklasanToplantilar().then(function (l) { return { l: l, kapali: false }; }, function (e) { return { l: null, kapali: !!(e && e.kod === 'kapali') }; }),
+      api.cevrimiciKisiler().then(function (c) { return c && c.acik ? c.kisiler : null; }, function () { return null; })
+    ]);
+    return { yaklasan: r[0].l, kisiler: r[1], toplantiKapali: r[0].kapali };
+  }
+
+   
   function veriAl(taklit, bos) {
-    if (!taklit) return { yaklasan: null, kisiler: null };
+    if (!taklit) return gercekVeri().catch(function () { return { yaklasan: null, kisiler: null, toplantiKapali: false }; });
     if (bos) return { yaklasan: [], kisiler: [] };
     var simdi = Date.now(), sa = 3600000;
     return {

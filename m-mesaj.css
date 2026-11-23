@@ -143,12 +143,26 @@ body.ms-tam .kabuk { min-height: 0; }
 .asistan-ms { background: var(--ms-sohbet-zemin); }
 .asistan-ms .ms-sohbet-ust { gap: 4px; }
  
+ 
 @media (max-width: 599px) {
-  .asistan-sayfa.ms-ekran-sohbet { top: calc(var(--ust-yukseklik) + env(safe-area-inset-top)); bottom: calc(var(--alt-yukseklik) + env(safe-area-inset-bottom)); height: auto; }
-  .asistan-sayfa .ms-sohbet-ust { padding-top: 6px; }
-  body.ms-klavye .asistan-sayfa.ms-ekran-sohbet { top: var(--ms-ust, 0px); bottom: auto; height: var(--ms-vh, 100dvh); z-index: 7; }
-  body.ms-klavye .asistan-sayfa .ms-sohbet-ust { padding-top: calc(6px + env(safe-area-inset-top)); }
+  .asistan-sayfa.ms-ekran-sohbet { top: var(--ms-ust, 0px); bottom: auto; height: var(--ms-vh, 100dvh); z-index: 7; display: flex; flex-direction: column; }
+  .asistan-sayfa .ms-sohbet-ust { padding-top: calc(6px + env(safe-area-inset-top)); }
+  body:has(.asistan-sayfa) .ust, body:has(.asistan-sayfa) .menu { visibility: hidden; }    
 }
+html:has(.asistan-ms), body:has(.asistan-ms) { background: var(--ms-sohbet-zemin); }
+.asistan-ms { display: flex; flex-direction: column; min-height: 0; overflow: hidden; box-sizing: border-box; }
+.asistan-ms .sohbet-giris { padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
+body.ms-klavye .asistan-ms .sohbet-giris { padding-bottom: 6px; }
+ 
+.ms-toplanti { display: flex; align-items: center; gap: 10px; min-width: 200px; padding: 8px 10px; border-radius: 10px; background: var(--ms-yesil-acik); color: var(--ms-karsi-yazi); }
+.ms-top-simge { font-size: 22px; line-height: 1; }
+.ms-top-ad { flex: 1 1 auto; min-width: 0; font-weight: 600; font-size: 14.5px; overflow-wrap: anywhere; }
+.ms-top-katil { flex: none; min-height: 36px; padding: 0 16px; border: 0; border-radius: 18px; background: var(--ms-yesil); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+ 
+.ana-talk-kart { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; box-sizing: border-box; margin: 0 0 12px; padding: 12px 14px; border: 1px solid var(--ms-ince); border-radius: 12px; background: var(--yuzey, #fff); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ana-talk-kart[hidden] { display: none; }
+.ana-talk-kart strong { font-weight: 600; }
+.ana-talk-sayi { min-width: 22px; height: 22px; padding: 0 7px; box-sizing: border-box; border-radius: 11px; background: #d93025; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
 @media (min-width: 600px) {
   .asistan-sayfa.ms-ekran-sohbet { position: relative; top: auto; left: auto; right: auto; height: calc(100dvh - var(--ust-yukseklik) - 48px); z-index: auto; }
 }

@@ -208,13 +208,17 @@
       var v = window.visualViewport; if (!v) return;
       var ml = asKok.querySelector('.sohbet-akis');
       var enAlt = !!ml && (ml.scrollHeight - ml.scrollTop - ml.clientHeight < 40);
-      asKok.style.setProperty('--ms-vh', Math.round(v.height) + 'px');
-      asKok.style.setProperty('--ms-ust', Math.round(v.offsetTop) + 'px');
-      document.body.classList.toggle('ms-klavye', v.height < window.innerHeight - 80);
+      var klavye = v.height > 120 && v.height < window.innerHeight - 80;   
+      if (klavye) { asKok.style.setProperty('--ms-vh', Math.round(v.height) + 'px'); asKok.style.setProperty('--ms-ust', Math.round(v.offsetTop) + 'px'); }
+      else { asKok.style.removeProperty('--ms-vh'); asKok.style.removeProperty('--ms-ust'); }
+      document.body.classList.toggle('ms-klavye', klavye);
       if (ml && enAlt) ml.scrollTop = ml.scrollHeight;
     }
+    function asVvGec() { asVv(); setTimeout(asVv, 120); setTimeout(asVv, 450); }   
     asVv(); if (window.visualViewport) { window.visualViewport.addEventListener('resize', asVv); window.visualViewport.addEventListener('scroll', asVv); }
+    document.addEventListener('focusin', asVvGec); document.addEventListener('focusout', asVvGec);
     return function () {
+      document.removeEventListener('focusin', asVvGec); document.removeEventListener('focusout', asVvGec);
       document.body.classList.remove('ms-tam'); document.body.classList.remove('ms-klavye');
       asKok.style.removeProperty('--ms-vh'); asKok.style.removeProperty('--ms-ust');
       if (window.visualViewport) { window.visualViewport.removeEventListener('resize', asVv); window.visualViewport.removeEventListener('scroll', asVv); }
@@ -686,7 +690,7 @@
     }
     [konuS, gunI, saatS, sureS].forEach(function (el) { el.addEventListener('change', guncelle); el.addEventListener('input', guncelle); });
     function alan(ad, el) { return h('label', { sinif: 'alan' }, [h('span', { metin: ad }), el]); }
-    kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'MY Medikal Meet ile toplantı', kirinti: [['Toplantı']] }));
+    kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'Mumu Meet ile toplantı', kirinti: [['Toplantı']] }));
      
     
 
@@ -698,7 +702,7 @@
     function meetIcAc() {
       if (meetCerceve) return;
       meetDugme.style.display = 'none';
-      meetCerceve = h('iframe', { title: 'MY Medikal Meet', src: 'meet/index.html', allow: 'camera; microphone; autoplay; display-capture' });
+      meetCerceve = h('iframe', { title: 'Mumu Meet', src: 'meet/index.html', allow: 'camera; microphone; autoplay; display-capture' });
       meetCerceve.setAttribute('style', 'width:100%;height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:460px;border:0;border-radius:12px;background:#0b1424');
       meetAlan.appendChild(meetCerceve);
     }
@@ -713,7 +717,7 @@
       if (M) { if (M.meetCerceveAc) M.meetCerceveAc('meet/'); else M.disAc(M.meetTamAdres('meet/')); }
       else meetIcAc();
     });
-    kok.appendChild(gr.kart({ baslik: 'MY Medikal Meet', govde: meetAlan }));
+    kok.appendChild(gr.kart({ baslik: 'Mumu Meet', govde: meetAlan }));
     setTimeout(function () { if (!kok.isConnected) return; var M = meetKabuk(); if (M) { if (M.meetCerceveAc) M.meetCerceveAc('meet/'); else meetIcAc(); } else meetIcAc(); }, 0);   
     var form = h('div', { sinif: 'yeni-izgara' }, [alan('Konu', konuS), alan('Tarih', gunI), alan('Saat', saatS), alan('Süre', sureS)]);
     var yedek = h('details', { sinif: 'ust-bosluk' }, [h('summary', { metin: 'Dış katılımcılı toplantı (Google Meet)' })]);   
@@ -727,8 +731,8 @@
     ]) })]));
     if (MM.acik && MM.acik('mesaj')) {
       kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Hemen görüşme', govde: h('div', null, [
-        h('p', { sinif: 'soluk', metin: 'Kısa bir görüşme için Mesajlar bölümünü kullanabilirsiniz.' }),
-        h('a', { sinif: 'dugme ikincil', href: '#mesaj' }, [h('span', { metin: 'Mesajlar’a git' })])]) })]));
+        h('p', { sinif: 'soluk', metin: 'Kısa bir görüşme için Mumu Talk bölümünü kullanabilirsiniz.' }),
+        h('a', { sinif: 'dugme ikincil', href: '#mesaj' }, [h('span', { metin: 'Mumu Talk’a git' })])]) })]));
     }
     guncelle();
     var bekle = window.MM.acikHazir && window.MM.acikHazir.then ? window.MM.acikHazir.then(guncelle, guncelle) : null;

@@ -13,7 +13,7 @@
   var kartlar = new Map();                                    
   var uyeler = new Map();                                     
   var gorunum = 'otomatik', sabit = '', konusan = '', yanAcik = '', elAcik = false, ekranAcik = false, bagliOldu = false;   
-  var lobiGirisi = false, lobiAtla = false, yeniLink = '';
+  var lobiGirisi = false, lobiAtla = false, yeniLink = '', lobiSira = 0;
   var taklitN = (function () { var m = /[?&]n=(\d+)/.exec(location.search); return m ? Math.max(0, Math.min(12, parseInt(m[1], 10))) : 2; })();
   var lobiBos = /[?&]bos=1(&|$)/.test(location.search);
   var saatZ = null, mesajZ = null, sohbetListe = null, adlar = {};
@@ -573,16 +573,16 @@
     if (window.MeetKimlik.yerelUygulama()) { yokGoster('Toplantı bugün yalnız bilgisayar tarayıcısında', 'Bu sayfa uygulama içinde değil, bilgisayarınızın tarayıcısında açılır.', false); durumYaz('desteklenmiyor'); return; }
     if (!taklit) {
       var k = await window.MeetKimlik.hazirla();
-      if (k === 'giris-yok') { yokGoster('Önce uygulamada giriş yapın', 'Meet, uygulamadaki oturumunuzu kullanır; giriş yaptıktan sonra bu sayfaya dönün.', true); durumYaz('giris-yok'); return; }
+      if (k === 'giris-yok') { yokGoster('Önce uygulamada giriş yapın', 'Mumu Meet, uygulamadaki oturumunuzu kullanır; giriş yaptıktan sonra bu sayfaya dönün.', true); durumYaz('giris-yok'); return; }
       if (k !== 'tamam') { yokGoster('Giriş bileşeni hazır değil', 'Sayfayı yenileyin; sürerse uygulamadan açın.', true); durumYaz('giris-yok'); return; }
       ad = window.MeetKimlik.ad();
     }
     var h = hashOku();
-     
-    lobiGirisi = !h.s;   
+    
+
+    lobiGirisi = !h.s;
     if (lobiGirisi && !lobiAtla) { lobiGoster(); durumYaz('hazir'); return; }
     lobiAtla = false;
-     
     oz.kam = h.v !== '0';
     if (h.s && h.g) {
       sohbetId = h.s; grupId = h.g;
@@ -604,10 +604,36 @@
     mesaj(''); lobiHata(''); lobiKapatMenu(); $('l-yeni-baglanti').hidden = true; $('l-kod').value = ''; $('l-kod-katil').disabled = true;
     $('l-baglanti').hidden = !taklit;                       
     $('l-planla').hidden = !taklit;                         
-    $('l-kod').placeholder = taklit ? 'Kod ya da bağlantı girin' : 'Toplantı bağlantısını yapıştırın';   
-    var v = window.MeetLobi.veriAl(taklit, lobiBos);
-    window.MeetLobi.ciz(v, function (g) { lobiKatil({ s: 't1', g: g }); });
+    $('l-kod').placeholder = 'Kod ya da bağlantı girin';   
+    var sira = ++lobiSira;
+    var katilHook = function (g) { if (taklit) lobiKatil({ s: 't1', g: g }); else lobiOdaKatil(g, false); };   
+    window.MeetLobi.ciz({ yaklasan: null, kisiler: null }, katilHook);   
+    Promise.resolve(window.MeetLobi.veriAl(taklit, lobiBos)).then(function (v) {
+      if (sira !== lobiSira || $('panel-lobi').hidden) return;   
+      window.MeetLobi.ciz(v, katilHook);
+    }).catch(function () {   });
     panel('panel-lobi');
+  }
+   
+  async function lobiOdaKatil(kod, kisa) {
+    if (mesgul) return;
+    mesgul = true; lobiHata('');
+    try {
+      var r = kisa ? await window.MeetApi.kodlaKatil(kod) : await window.MeetApi.toplantiKatil(kod);
+      if (r.sonuc === 'bekleme') lobiHata('Toplantı sahibinin onayı bekleniyor.');
+      else if (r.sonuc === 'acilmadi') lobiHata('Toplantı henüz açılmadı. Toplantı sahibi katıldığında yeniden deneyin.');
+      else if (r.sonuc === 'katildi') lobiHata('Toplantıya kabul edildiniz. Ses ve görüntü bağlantısı bu sürümde henüz bağlanmadı.');
+      else lobiHata('Toplantıya katılınamadı.');
+    } catch (e) {
+      var k = e && e.kod;
+      lobiHata(k === 'yok' ? 'Bu kodla açık bir toplantı bulunamadı.'
+        : k === 'erken' ? 'Toplantı henüz başlamadı. Başlangıçtan 10 dakika önce katılabilirsiniz.'
+        : k === 'kapali' ? 'Toplantılar şu anda kapalı.'
+        : k === 'uye-degil' ? 'Bu toplantıya katılma izniniz yok.'
+        : k === 'cok-istek' ? 'Çok fazla deneme yaptınız. Biraz bekleyip yeniden deneyin.'
+        : hataMetni(e));
+    }
+    mesgul = false;
   }
   function lobiKatil(r) {
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {   }
@@ -617,6 +643,10 @@
     var t = $('l-kod').value.trim(); if (!t) return;
     var r = window.MeetLobi.cozumle(t);
     if (!r && taklit && /^[A-Za-z0-9-]{3,64}$/.test(t)) r = { s: 't1', g: 'taklit-' + t };   
+    if (!r && !taklit) {
+      var kk = t.toUpperCase().replace(/[\s-]/g, '');
+      if (/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(kk)) { lobiOdaKatil(kk, true); return; }   
+    }
     if (!r) { lobiHata('Geçerli bir toplantı bağlantısı girin. Bağlantıyı toplantıyı başlatan kişiden alabilirsiniz.'); return; }
     lobiHata(''); lobiKatil(r);
   }

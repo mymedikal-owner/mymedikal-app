@@ -188,6 +188,19 @@
     var kar = h('div', { sinif: 'karsilama' }, [h('div', null, [h('h2', { metin: selam() }), h('p', { sinif: 'soluk', metin: tarihBicim.format(new Date()) })])]);
     kok.appendChild(h('div', { sinif: 'sayfa-basi' }, [h('nav', { sinif: 'kirinti', 'aria-label': 'Konum' }, [h('span', { 'aria-current': 'page', metin: 'Ana sayfa' })])]));
     kok.appendChild(kar);
+     
+    var talkDur = null, talkKart = null;
+    if (MM.talkSayac && MM.acik && MM.acik('mesaj')) {
+      var talkSayi = h('span', { sinif: 'ana-talk-sayi', 'aria-hidden': 'true' });
+      var talkYazi = h('strong');
+      talkKart = h('button', { type: 'button', sinif: 'ana-talk-kart', hidden: true }, [talkYazi, talkSayi]);
+      talkKart.addEventListener('click', function () { location.hash = '#mesaj'; });
+      var talkCiz = function (n) {
+        n = Number(n) || 0; talkKart.hidden = n <= 0;
+        var ceviri = MM.t || function (x) { return x; }; talkYazi.textContent = ceviri('Mumu Talk') + ' · ' + n + ' ' + ceviri('yeni mesaj'); talkSayi.textContent = n > 99 ? '99+' : String(n);
+      };
+      kok.appendChild(talkKart); talkCiz(MM.talkSayac.al()); talkDur = MM.talkSayac.dinle(talkCiz);
+    }
     var govde = h('div', null, [gr.iskelet('kart', 4)]);
     kok.appendChild(govde);
     Promise.all([MM.ozet.yukle(), ekVeri()]).then(function (sonuc) {
@@ -207,6 +220,6 @@
       else { if (km.n >= 3) govde.appendChild(h('h3', { sinif: 'bolum', metin: 'Ayrıntılı özet' })); govde.appendChild(izg); }
       Object.keys(oz.hata).forEach(function (k) { govde.appendChild(h('div', { sinif: 'bant ' + (oz.hata[k].kod === 'ayar_bekleniyor' || oz.hata[k].kod === 'giris_gerekli' ? 'gri' : 'kirmizi'), role: 'status' }, [h('strong', { metin: (BOLUM_AD[k] || 'Bir bölüm') + ' verisi alınamadı' }), ' — ' + oz.hata[k].message])); });
     });
-    return function () { iptal = true; };
+    return function () { iptal = true; if (talkDur) talkDur(); };
   };
 })();

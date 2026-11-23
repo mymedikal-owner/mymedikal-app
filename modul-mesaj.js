@@ -155,15 +155,27 @@
   var h = MM.h, T = function (k) { return MM.t ? MM.t(k) : k; };
   var bekleyenKart = null, ist = null;
    
+  var bildirimSon = '';
   function iosKabuk() { var c = window.Capacitor; return !!(c && c.isNativePlatform && c.isNativePlatform() && c.getPlatform && c.getPlatform() === 'ios'); }
   function bildirimKayit() {
     if (!iosKabuk()) return Promise.reject(new Error('bildirim'));
     var c = window.Capacitor, P = c.Plugins && c.Plugins.MMBildirim;
     if (!P || typeof P.izinIste !== 'function') return Promise.reject(new Error('bildirim'));
     return Promise.resolve(typeof window.MMBildirimIzin === 'function' ? window.MMBildirimIzin() : P.izinIste()).then(function (s) {
+      bildirimSon = s ? String(s.durum || 'yok') + (s.neden ? ':' + String(s.neden).slice(0, 20) : '') : 'yok';   
       if (!s || s.durum !== 'var' || typeof s.belirtec !== 'string' || !s.belirtec) throw new Error('bildirim');
       return { platform: 'apns', handle: s.belirtec };
     });
+  }
+  
+
+  var WEB_TABAN = 'https://mymedikal-owner.github.io/mymedikal-app/';
+  function kabukMu() { var c = window.Capacitor; return !!(c && c.isNativePlatform && c.isNativePlatform()); }
+  function meetTamAdres(adres) { return /^https:\/\//.test(adres) ? adres : WEB_TABAN + String(adres || '').replace(/^\/+/, ''); }
+  function disAc(adres) {
+    var w = null;
+    try { w = window.open(adres, '_blank'); } catch (e) { w = null; }   
+    if (!w) { try { window.open(adres, '_system'); } catch (e2) {   } }
   }
   function ayar() { return (window.MM_AYAR && window.MM_AYAR.mesaj) || {}; }
   function istemci() {
@@ -301,6 +313,8 @@
     bantKapat(); bildir();
   }
   MM.mesaj = Object.assign(MM.mesaj || {}, API, {
+    bildirimDurum: function () { return bildirimSon; },
+    kabukMu: kabukMu, meetTamAdres: meetTamAdres, disAc: disAc,
     paylas: function (rota, bolumAd) {
       var p = paylasMetni(rota || location.hash, bolumAd);   
       if (!p) return p;
@@ -721,6 +735,7 @@
 
      
     function meetAc(adres) {
+      if (kabukMu()) { disAc(meetTamAdres(adres)); return; }   
       var dokunmatik = false;
       try { dokunmatik = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) { dokunmatik = false; }
       if (dokunmatik) { window.location.href = adres; return; }

@@ -691,7 +691,7 @@
     var meetDugme = h('a', { sinif: 'dugme tam', role: 'button', href: 'meet/' }, [h('span', { metin: 'MY Medikal Meet ile başlat/katıl' })]);
     meetDugme.addEventListener('click', function (e) {   
       var M = MM.mesaj;
-      if (M && M.kabukMu && M.kabukMu()) { e.preventDefault(); M.disAc(M.meetTamAdres('meet/')); }
+      if (M && M.kabukMu && M.kabukMu()) { e.preventDefault(); if (M.meetCerceveAc) M.meetCerceveAc('meet/'); else M.disAc(M.meetTamAdres('meet/')); }
     });
     kok.appendChild(gr.kart({ baslik: 'MY Medikal Meet', govde: h('div', null, [
       meetDugme,

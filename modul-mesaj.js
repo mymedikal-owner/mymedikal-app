@@ -177,6 +177,54 @@
     try { w = window.open(adres, '_blank'); } catch (e) { w = null; }   
     if (!w) { try { window.open(adres, '_system'); } catch (e2) {   } }
   }
+  
+
+
+  var cerceveKok = null;
+  function meetCerceveKapat() {
+    if (!cerceveKok) return;
+    try { cerceveKok.parentNode.removeChild(cerceveKok); } catch (e) {   }
+    cerceveKok = null;
+    try { document.documentElement.classList.remove('meet-cerceve-acik'); } catch (e2) {   }
+  }
+  function meetCerceveAc(adres) {
+    meetCerceveKapat();
+    var kok = document.createElement('div');
+    kok.className = 'meet-cerceve-kok';
+    kok.setAttribute('style', 'position:fixed;inset:0;z-index:2147483000;background:#0b1424;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)');
+    var ust = document.createElement('div');
+    ust.setAttribute('style', 'display:flex;gap:8px;justify-content:flex-end;padding:6px 10px');
+    var dugmeStil = 'border:0;border-radius:18px;padding:8px 14px;font:600 14px system-ui;color:#fff;background:rgba(255,255,255,.16)';
+    var yedek = document.createElement('button');
+    yedek.type = 'button'; yedek.textContent = 'Tarayıcıda aç'; yedek.setAttribute('style', dugmeStil + ';display:none');
+    yedek.addEventListener('click', function () { var a = adres; meetCerceveKapat(); disAc(meetTamAdres(a)); });
+    var kapat = document.createElement('button');
+    kapat.type = 'button'; kapat.textContent = 'Kapat'; kapat.setAttribute('aria-label', 'Aramayı kapat'); kapat.setAttribute('style', dugmeStil);
+    kapat.addEventListener('click', meetCerceveKapat);
+    ust.appendChild(yedek); ust.appendChild(kapat);
+    var fr = document.createElement('iframe');
+    fr.setAttribute('allow', 'camera; microphone; autoplay; display-capture');
+    fr.setAttribute('title', 'MY Medikal Meet');
+    fr.setAttribute('style', 'flex:1;width:100%;border:0;background:#0b1424');
+    var hazir = false;
+    var sure = setTimeout(function () { if (!hazir && cerceveKok === kok) yedek.style.display = ''; }, 15000);
+    fr.addEventListener('error', function () { yedek.style.display = ''; });
+    function mesajDinle(e) {
+      if (!cerceveKok || cerceveKok !== kok) { window.removeEventListener('message', mesajDinle); return; }
+      if (e.origin !== window.location.origin || e.source !== fr.contentWindow) return;   
+      var v = e.data || {};   
+      if (v.tur === 'meet-tani') {
+        if (v.asama === 'belirtec_ok' || v.asama === 'katildi') { hazir = true; clearTimeout(sure); yedek.style.display = 'none'; }
+        else if (v.asama === 'belirtec_yok' || v.asama === 'hata_kodu' || v.asama === 'kamera_izin_red') { yedek.style.display = ''; }
+      } else if (v.tur === 'meet-kapat') { clearTimeout(sure); window.removeEventListener('message', mesajDinle); meetCerceveKapat(); }
+    }
+    window.addEventListener('message', mesajDinle);
+    kok.appendChild(ust); kok.appendChild(fr);
+    document.body.appendChild(kok);
+    cerceveKok = kok;
+    try { document.documentElement.classList.add('meet-cerceve-acik'); } catch (e3) {   }
+    fr.src = adres;   
+  }
   function ayar() { return (window.MM_AYAR && window.MM_AYAR.mesaj) || {}; }
   function istemci() {
     if (ist) return ist;
@@ -314,7 +362,7 @@
   }
   MM.mesaj = Object.assign(MM.mesaj || {}, API, {
     bildirimDurum: function () { return bildirimSon; },
-    kabukMu: kabukMu, meetTamAdres: meetTamAdres, disAc: disAc,
+    kabukMu: kabukMu, meetTamAdres: meetTamAdres, disAc: disAc, meetCerceveAc: meetCerceveAc, meetCerceveKapat: meetCerceveKapat,
     paylas: function (rota, bolumAd) {
       var p = paylasMetni(rota || location.hash, bolumAd);   
       if (!p) return p;
@@ -735,7 +783,7 @@
 
      
     function meetAc(adres) {
-      if (kabukMu()) { disAc(meetTamAdres(adres)); return; }   
+      if (kabukMu()) { meetCerceveAc(adres); return; }   
       var dokunmatik = false;
       try { dokunmatik = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) { dokunmatik = false; }
       if (dokunmatik) { window.location.href = adres; return; }

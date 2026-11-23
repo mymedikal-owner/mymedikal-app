@@ -5,10 +5,12 @@
 
 
 
+
 (function () {
   'use strict';
   var A = window.MM_AYAR || {};
   var taban = (A.mesaj && A.mesaj.url) || '';
+  var MAKS_METIN = 4000;
 
   function hata(kod, durum) { var e = new Error(kod); e.kod = kod; e.durum = durum || 0; return e; }
   function kodOf(d) {
@@ -46,6 +48,12 @@
     try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) {   }
     return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
   }
+  function s(v) { return typeof v === 'string' ? v : ''; }
+  function mesajCevir(m) {
+    if (!m || typeof m !== 'object') return null;
+    var tur = typeof m.tur === 'string' ? m.tur : 'metin';
+    return { id: s(m.id), gonderen: s(m.gonderen), ts: (typeof m.ts === 'number' || typeof m.ts === 'string') ? m.ts : '', tur: tur, metin: typeof m.metin === 'string' ? m.metin : '' };
+  }
 
   window.MeetApi = {
     sohbetler: async function () { var v = await cagri('GET', '/sohbetler'); return Array.isArray(v) ? v : []; },
@@ -61,6 +69,18 @@
       var link = window.MeetApi.baglantiOlustur(sohbetId, groupId);
       await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/mesajlar', { tur: 'metin', metin: 'Toplantıya katılın: ' + link, istemciId: yeniId() });
       return link;
+    },
+     
+    mesajlar: async function (sohbetId, adet) {
+      var n = Math.max(1, Math.min(50, parseInt(adet, 10) || 50));
+      var v = await cagri('GET', '/sohbetler/' + sid(sohbetId) + '/mesajlar?adet=' + n);
+      return (Array.isArray(v) ? v : []).map(mesajCevir).filter(Boolean);
+    },
+    mesajGonder: async function (sohbetId, metin) {
+      var t = String(metin == null ? '' : metin).trim();
+      if (!t) throw hata('bos');
+      if (t.length > MAKS_METIN) throw hata('uzun');
+      return mesajCevir(await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/mesajlar', { tur: 'metin', metin: t, istemciId: yeniId() }));
     }
   };
 })();

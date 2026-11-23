@@ -410,7 +410,7 @@
         d.addEventListener('click', function () {
           bantlar = bantlar.filter(function (y) { return y !== x; });
           yaz(T('Aranıyor'));
-          i.aramayaKatil(x.sohbet, x.groupId).then(function (bl) { return window.MMMesajArama.baslat(bl, { video: x.video }); }).then(function () { yaz(T('Arama sürüyor')); }, function (e) { yaz(hataYaz(e)); });
+          meetAc('meet/#s=' + encodeURIComponent(x.sohbet) + '&g=' + encodeURIComponent(x.groupId));
           var s = sohbetBul(x.sohbet); if (!secili && s) sohbetGoster(s); else if (!secili) listeGoster();
         });
         b.appendChild(d);
@@ -719,9 +719,18 @@
       kisiYukle().then(function () { cizListe(); }, function (e) { uyeOto = false; uyeHata(e, function (oto) { if (oto) cizListe(); }); });
     }
 
+     
+    function meetAc(adres) {
+      var dokunmatik = false;
+      try { dokunmatik = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) { dokunmatik = false; }
+      if (dokunmatik) { window.location.href = adres; return; }
+      var w = null;
+      try { w = window.open(adres, '_blank', 'noopener'); } catch (e2) { w = null; }
+      if (!w) window.location.href = adres;
+    }
     function aramaYap(s, video) {
       yaz(T('Aranıyor'));
-      i.aramaBaslat(s.id, video).then(function (b) { return window.MMMesajArama.baslat(b, { video: video }); }).then(function () { yaz(T('Arama sürüyor')); }, function (e) { yaz(hataYaz(e)); });
+      meetAc('meet/#s=' + encodeURIComponent(s.id) + '&v=' + (video ? '1' : '0'));
     }
 
     
@@ -897,9 +906,10 @@
       function altBaslangic() { return grup ? s.uyeler.filter(function (o) { return o !== benOid; }).map(function (o) { return (kisiAdiOid(o) || '').split(' ')[0]; }).filter(Boolean).concat([T('Siz')]).join(', ') : ''; }
       var altYazi = h('span', { sinif: 'ms-alt-yazi', metin: altBaslangic() });
       var goruntulu = yuvarlakDugme('video', T('Görüntülü ara'), function () { aramaYap(s, true); }, 'ms-yd-ust');
+      var sesli = yuvarlakDugme('ahize', T('Sesli ara'), function () { aramaYap(s, false); }, 'ms-yd-ust');
       var baslikDugme = h('button', { sinif: 'ms-baslik-pill', type: 'button', 'aria-label': adEl }, [avatar(adEl, s.id, grup, 'ust'), h('span', { sinif: 'ms-baslik-kutu' }, [h('strong', { sinif: 'ms-baslik', metin: adEl }), altYazi])]);
       baslikDugme.addEventListener('click', function () { bilgiGoster(s); });
-      kap.appendChild(h('div', { sinif: 'ms-ust-cubuk ms-sohbet-ust' }, [yuvarlakDugme('geri', T('Geri'), function () { listeGoster(); }, 'ms-yd-ust'), baslikDugme, goruntulu]));
+      kap.appendChild(h('div', { sinif: 'ms-ust-cubuk ms-sohbet-ust' }, [yuvarlakDugme('geri', T('Geri'), function () { listeGoster(); }, 'ms-yd-ust'), baslikDugme, goruntulu, sesli]));
       kap.appendChild(bantEl());
        
       var filtre = '';

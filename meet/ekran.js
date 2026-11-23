@@ -5,7 +5,7 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var taklit = /[?&]taklit=1(&|$)/.test(location.search);
-  var sag = null, sohbetId = '', ad = 'Katılımcı', meşgul = false;
+  var sag = null, sohbetId = '', ad = 'Katılımcı', meşgul = false, ilkKamera = false;
   var kartlar = new Map();   
 
   var HATA = {
@@ -85,7 +85,10 @@
     kartYap('ben', ad, true);
     panel('sahne');
     saglayiciKur();
-    try { await sag.baglan({ groupId: bilgi.groupId, acsToken: bilgi.acsToken, ad: ad }); }
+    try {
+      await sag.baglan({ groupId: bilgi.groupId, acsToken: bilgi.acsToken, ad: ad });
+      if (ilkKamera) { ilkKamera = false; try { await sag.kamera(true); } catch (ek) { mesaj(hataMetni(ek)); } }
+    }
     catch (e) { mesaj(hataMetni(e)); durumYaz('Hata'); try { await sag.ayril(); } catch (e2) {   } }
   }
 
@@ -121,14 +124,14 @@
   }
 
   function hashOku() {
-    var h = (location.hash || '').replace(/^#/, ''), s = '', g = '';
+    var h = (location.hash || '').replace(/^#/, ''), s = '', g = '', vv = '';
     h.split('&').forEach(function (p) {
       var i = p.indexOf('='); if (i < 0) return;
       var k = p.slice(0, i), v = p.slice(i + 1);
       try { v = decodeURIComponent(v); } catch (e) { v = ''; }
-      if (k === 's') s = v; else if (k === 'g') g = v;
+      if (k === 's') s = v; else if (k === 'g') g = v; else if (k === 'v') vv = v;
     });
-    return { s: s.slice(0, 128), g: g.slice(0, 64) };
+    return { s: s.slice(0, 128), g: g.slice(0, 64), v: vv.slice(0, 1) };
   }
 
   async function sohbetListesi() {
@@ -161,6 +164,13 @@
     }
     if (!taklit && !(window.MM_ACS && window.MM_ACS.CallClient)) mesaj(HATA.sdk);
     var h = hashOku();
+    ilkKamera = h.v === '1';    
+    if (h.s && !h.g && !taklit) {
+      sohbetId = h.s; panel('panel-sec'); durumYaz('hazir');
+      await baslat();
+      if ($('sahne').hidden) { try { await sohbetListesi(); } catch (e0) {   } }
+      return;
+    }
     if (h.s && h.g) {
       sohbetId = h.s;
       $('katil-bilgi').textContent = 'Bağlantıdaki toplantıya katılacaksınız. Katıl dediğinizde tarayıcı mikrofon/kamera izni isteyebilir.';

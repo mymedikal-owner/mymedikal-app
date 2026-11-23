@@ -369,6 +369,14 @@
     liste.forEach(function (p) { if (gor.some(function (m) { return m.id === p[0]; })) k.appendChild(h('a', { href: '#' + p[0], sinif: 'mini-dugme modul-gecis-bag', metin: p[2] === 'geri' ? '← ' + p[1] : p[1] + ' →' })); });
     return k.firstChild ? k : null;
   }
+   
+  function bolumGecis(liste, secili) {   
+    var gor = (window.MM && window.MM.modulListe) || [], uy = liste.filter(function (p) { return p[0] === secili || gor.some(function (m) { return m.id === p[0]; }); });
+    if (uy.length < 2) return null;
+    var k = h('nav', { sinif: 'sekmeler bolum-gecis', 'aria-label': 'Bölüm' });
+    uy.forEach(function (p) { k.appendChild(h('a', p[0] === secili ? { href: '#' + p[0], sinif: 'sekme', 'aria-current': 'page', metin: p[1] } : { href: '#' + p[0], sinif: 'sekme', metin: p[1] })); });
+    return k;
+  }
 
    
    
@@ -406,5 +414,5 @@
   }
 
   window.MM = window.MM || {};
-  window.MM.gr = { excelDugme: excelDugme, veriTablo: veriTablo, h: h, s: s, say: say, kisa: kisa, ikon: ikon, ipucu: ipucu, spark: spark, delta: delta, kpi: kpi, kart: kart, duzTablo: duzTablo, cubuk: cubuk, cizgi: cizgi, yatay: yatay, pareto: pareto, lejant: lejant, iskelet: iskelet, bos: bos, tablo: tablo, cipler: cipler, sekmeler: sekmeler, sayfali: sayfali, sayfaBasi: sayfaBasi, gecis: gecis, IK: IK };
+  window.MM.gr = { excelDugme: excelDugme, veriTablo: veriTablo, h: h, s: s, say: say, kisa: kisa, ikon: ikon, ipucu: ipucu, spark: spark, delta: delta, kpi: kpi, kart: kart, duzTablo: duzTablo, cubuk: cubuk, cizgi: cizgi, yatay: yatay, pareto: pareto, lejant: lejant, iskelet: iskelet, bos: bos, tablo: tablo, cipler: cipler, sekmeler: sekmeler, sayfali: sayfali, sayfaBasi: sayfaBasi, gecis: gecis, bolumGecis: bolumGecis, IK: IK };
 })();

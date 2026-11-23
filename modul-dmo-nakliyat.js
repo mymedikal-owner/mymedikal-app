@@ -63,7 +63,8 @@
   MM.moduller['dmo-nakliyat'] = function (kok) {
     var yuk = null, hata = null, canli = true, firma = 'TOPLAM', sira = 'cikti', ilSec = '', uyz = 'turuncu', sd = { durum: '', teslim: '', ara: '', gec: '' };
     kok.appendChild(G.sayfaBasi({ baslik: 'DMO Nakliyat', alt: 'İhale bazında çıktı, teslim ve DMO onayı', kirinti: [['DMO Nakliyat']] }));
-    var gc = G.gecis([['dmo', 'DMO', 'geri'], ['nakliye', 'Nakliye', 'geri']]); if (gc) kok.appendChild(gc);
+    var bg = G.bolumGecis([['nakliye', 'Genel sevkiyat'], ['dmo-nakliyat', 'DMO Nakliyat']], 'dmo-nakliyat'); if (bg) kok.appendChild(bg);
+    var gc = G.gecis([['dmo', 'DMO', 'geri']]); if (gc) kok.appendChild(gc);
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
 

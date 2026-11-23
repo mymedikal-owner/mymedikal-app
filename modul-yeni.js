@@ -191,11 +191,10 @@
     geri.addEventListener('click', function () { location.hash = geriHedef; });
     var asAv = h('span', { sinif: 'ms-av ms-av-ust ms-av-asistan', 'aria-hidden': 'true' }, [MM.svg('svg', { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', stroke: '#5b4bd5', 'stroke-width': 1.9, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, [MM.svg('path', { d: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6' })])]);
     var ustCubuk = h('div', { sinif: 'ms-ust-cubuk ms-sohbet-ust' }, [geri, h('span', { sinif: 'ms-baslik-pill' }, [asAv, h('span', { sinif: 'ms-baslik-kutu' }, [h('strong', { sinif: 'ms-baslik', metin: 'Asistan' }), h('span', { sinif: 'ms-alt-yazi', metin: 'Şirket içi yapay zekâ asistanı' })])])]);
-    var asKok = h('div', { sinif: 'ms-kok ms-ekran-sohbet asistan-ms' }, [ustCubuk]);
+    var asKok = h('div', { sinif: 'ms-kok ms-ekran-sohbet asistan-ms asistan-sayfa' }, [ustCubuk]);
     if (as.kaynak) asKok.appendChild(as.kaynak);
     asKok.appendChild(sohbetGovde);
-    kok.appendChild(asKok);
-    document.body.classList.add('ms-tam');
+    kok.appendChild(asKok);   
     function asVv() {
       var v = window.visualViewport; if (!v) return;
       var ml = asKok.querySelector('.sohbet-akis');

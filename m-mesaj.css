@@ -142,6 +142,16 @@ body.ms-tam .kabuk { min-height: 0; }
  
 .asistan-ms { background: var(--ms-sohbet-zemin); }
 .asistan-ms .ms-sohbet-ust { gap: 4px; }
+ 
+@media (max-width: 599px) {
+  .asistan-sayfa.ms-ekran-sohbet { top: calc(var(--ust-yukseklik) + env(safe-area-inset-top)); bottom: calc(var(--alt-yukseklik) + env(safe-area-inset-bottom)); height: auto; }
+  .asistan-sayfa .ms-sohbet-ust { padding-top: 6px; }
+  body.ms-klavye .asistan-sayfa.ms-ekran-sohbet { top: var(--ms-ust, 0px); bottom: auto; height: var(--ms-vh, 100dvh); z-index: 7; }
+  body.ms-klavye .asistan-sayfa .ms-sohbet-ust { padding-top: calc(6px + env(safe-area-inset-top)); }
+}
+@media (min-width: 600px) {
+  .asistan-sayfa.ms-ekran-sohbet { position: relative; top: auto; left: auto; right: auto; height: calc(100dvh - var(--ust-yukseklik) - 48px); z-index: auto; }
+}
 .asistan-kaynak { flex: none; margin: 0; padding: 4px 12px; font-size: 11.5px; text-align: center; background: var(--yuzey, #fff); border-bottom: 1px solid var(--ms-ince); overflow-wrap: anywhere; }
 .asistan-ms .sohbet { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; gap: 0; min-width: 0; }
 .asistan-ms .sohbet > p, .asistan-ms .sohbet > a { margin: 8px 12px; }

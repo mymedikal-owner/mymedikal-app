@@ -45,7 +45,8 @@ p { margin: 0; }
 .sekmeler { display: flex; gap: 6px; overflow-x: auto; margin: 8px 0 14px; padding-bottom: 2px; scrollbar-width: none; max-width: 100%; }
 .sekmeler::-webkit-scrollbar { display: none; }
 .sekme { flex: 0 0 auto; background: var(--yuzey); border: 1px solid var(--cizgi); color: var(--yazi); border-radius: 18px; padding: 7px 14px; font: inherit; font-size: 14px; cursor: pointer; }
-.sekme[aria-selected="true"] { background: var(--vurgu); color: var(--vurgu-yazi); border-color: var(--vurgu); font-weight: 600; }
+a.sekme { text-decoration: none; display: inline-flex; align-items: center; }
+.sekme[aria-selected="true"], .sekme[aria-current="page"] { background: var(--vurgu); color: var(--vurgu-yazi); border-color: var(--vurgu); font-weight: 600; }
 .sekme.kapali { color: var(--soluk); }
 .yakinda-kutu { background: var(--yuzey); border: 1px dashed var(--cizgi); border-radius: 12px; padding: 24px; display: grid; gap: 8px; }
 .kart { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 12px; padding: 14px; min-width: 0; }

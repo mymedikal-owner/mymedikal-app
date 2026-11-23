@@ -337,7 +337,7 @@
     var loj = { d: '', tarih: '', durum: '', ara: '' }, gun = { mod: 'gun', bas: '', bit: '', ara: '' };
     var yuk = null, hata = null, canli = true, durum = '', musteri = '', sirket = '', zaman = '', gorunum = 'sevk', kdurum = '';
     kok.appendChild(G.sayfaBasi({ baslik: 'Nakliye', alt: 'Yurtiçi sevkiyatlar: çıkış durumu ve gecikmeler', kirinti: [['Nakliye']] }));
-    var gc = G.gecis([['dmo-nakliyat', 'DMO Nakliyat']]); if (gc) kok.appendChild(gc);
+    var gc = G.bolumGecis([['nakliye', 'Genel sevkiyat'], ['dmo-nakliyat', 'DMO Nakliyat']], 'nakliye'); if (gc) kok.appendChild(gc);
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
     function ciz() {

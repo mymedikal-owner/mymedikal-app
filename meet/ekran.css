@@ -21,6 +21,8 @@ button:disabled { opacity:.45; cursor:not-allowed; }
 .uygulama { display:flex; flex-direction:column; height:100vh; height:100dvh; }
 .ust { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; padding:10px 16px; background:var(--yuzey); border-bottom:1px solid var(--cizgi); }
 body.koyu .ust { display:none; }
+.ust-don { display:inline-flex; align-items:center; min-height:44px; padding:0 12px; border-radius:22px; background:var(--cizgi); color:inherit; font-weight:600; text-decoration:none; }
+.ust-don:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 .logo { height:28px; width:auto; }
 .durum { margin-left:auto; color:var(--soluk); display:flex; gap:12px; flex-wrap:wrap; font-size:13px; }
 .orta { flex:1; display:flex; flex-direction:column; min-height:0; position:relative; }

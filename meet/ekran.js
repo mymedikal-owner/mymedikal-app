@@ -582,8 +582,7 @@
     lobiGirisi = !h.s;   
     if (lobiGirisi && !lobiAtla) { lobiGoster(); durumYaz('hazir'); return; }
     lobiAtla = false;
-    
-
+     
     oz.kam = h.v !== '0';
     if (h.s && h.g) {
       sohbetId = h.s; grupId = h.g;
@@ -646,7 +645,7 @@
     });
     $('l-planla').addEventListener('click', function () { lobiKapatMenu(); tost2('Toplantı planlama yakında.'); });
      
-    ['yok-baglanti', 'b-ana'].forEach(function (id) {
+    ['yok-baglanti', 'b-ana', 'b-app'].forEach(function (id) {
       $(id).addEventListener('click', function (e) {
         if (window.parent === window) return;               
         e.preventDefault(); window.MeetKimlik.kapat();

@@ -264,3 +264,44 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
   .asistan-ms .sohbet-giris { padding-left: clamp(16px, 8%, 160px); padding-right: clamp(16px, 8%, 160px); }
   .asistan-ms .sohbet > .soluk { padding-bottom: 8px; }
 }
+
+ 
+.ms-m { -webkit-touch-callout: none; }
+.ms-m-ok { position: absolute; top: 2px; right: 2px; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ms-saat); display: none; align-items: center; justify-content: center; cursor: pointer; }
+@media (hover: hover) { .ms-m:hover > .ms-m-ok, .ms-m-ok:focus-visible { display: inline-flex; } .ms-m-ok:hover { background: var(--ms-arama-zemin); } }
+.ms-m-tepkili { margin-bottom: 8px; }
+.ms-flash { animation: ms-flash-anim 1.4s ease-out; }
+@keyframes ms-flash-anim { 0%, 60% { box-shadow: 0 0 0 3px var(--ms-yesil); } 100% { box-shadow: 0 1px 1px rgba(0, 0, 0, .13); } }
+.ms-silindi { color: var(--ms-saat); font-style: italic; }
+.ms-etiket { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-style: italic; color: var(--ms-saat); margin-bottom: 2px; }
+.ms-etiket-duz { font-style: italic; }
+.ms-yanit-kutu { display: flex; flex-direction: column; width: 100%; box-sizing: border-box; margin: 0 0 4px; padding: 5px 8px; text-align: left; border: 0; border-left: 4px solid var(--ms-yesil); border-radius: 6px; background: rgba(0, 0, 0, .07); color: inherit; font: inherit; font-size: 13px; cursor: pointer; min-width: 0; }
+.ms-yanit-ozel { font-style: italic; color: var(--ms-saat); cursor: default; }
+.ms-yanit-ad { font-size: 12.5px; font-weight: 700; color: var(--ms-yesil); }
+.ms-yanit-metin { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; color: var(--ms-saat); }
+.ms-bahis-ad { color: var(--ms-yesil); font-weight: 600; }
+.ms-tepkiler { position: absolute; left: 8px; bottom: -12px; display: flex; gap: 3px; }
+.ms-ben .ms-tepkiler { left: auto; right: 8px; }
+.ms-tepki-rozet { display: inline-flex; align-items: center; gap: 2px; height: 22px; padding: 0 6px; font-size: 13px; line-height: 1; border: 1px solid var(--ms-ince); border-radius: 11px; background: var(--ms-karsi-zemin); color: var(--ms-karsi-yazi); box-shadow: 0 1px 2px rgba(0, 0, 0, .2); cursor: pointer; }
+.ms-tepki-benim { border-color: var(--ms-yesil); background: var(--ms-yesil-acik); }
+.ms-tepki-sayi { font-size: 11px; color: var(--ms-saat); }
+.ms-tepki-sira { display: flex; justify-content: space-between; gap: 4px; padding: 4px 6px 8px; }
+.ms-tepki-dugme { flex: 1 1 0; min-width: 0; height: 44px; padding: 0; font-size: 24px; border: 0; border-radius: 22px; background: transparent; }
+.ms-tepki-dugme:active, .ms-tepki-sec { background: var(--ms-yesil-acik); }
+.ms-sheet-oge-ik { display: flex; align-items: center; gap: 12px; }
+.ms-sheet-soru { margin: 0; padding: 10px 14px; font-size: 15px; }
+.ms-serit { flex: none; display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-left: 4px solid var(--ms-yesil); background: var(--ms-karsi-zemin); color: var(--ms-karsi-yazi); min-width: 0; }
+.ms-serit[hidden], .ms-bahis-liste[hidden] { display: none; }
+.ms-serit-yazi { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; font-size: 13px; }
+.ms-serit-yazi strong { font-size: 12.5px; color: var(--ms-yesil); }
+.ms-serit-yazi span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ms-saat); }
+.ms-bahis-liste { flex: none; display: flex; flex-direction: column; max-height: 240px; overflow-y: auto; background: var(--ms-karsi-zemin); color: var(--ms-karsi-yazi); border-top: 1px solid var(--ms-ince); }
+.ms-bahis-oge { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 14px; text-align: left; font-size: 16px; border: 0; background: transparent; color: inherit; }
+.ms-bahis-oge:active, .ms-bahis-oge:hover { background: var(--ms-arama-zemin); }
+.ms-ilet-liste, .ms-bilgi-liste { max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; }
+.ms-ilet-satir { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 14px; text-align: left; font-size: 16px; border: 0; border-radius: 8px; background: transparent; color: inherit; }
+.ms-isaret-kutu { flex: none; width: 22px; height: 22px; box-sizing: border-box; border: 2px solid var(--ms-saat); border-radius: 50%; }
+.ms-ilet-sec .ms-isaret-kutu { border-color: var(--ms-yesil); background: var(--ms-yesil); box-shadow: inset 0 0 0 3px var(--ms-karsi-zemin); }
+.ms-ilet-ad { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-bilgi-satir { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 6px 14px; font-size: 15px; }
+.ms-bilgi-liste .ms-bilgi-etiket { padding: 8px 14px 2px; }

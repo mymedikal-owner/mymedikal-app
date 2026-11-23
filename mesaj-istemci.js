@@ -11,7 +11,9 @@
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'audio/mp4', 'audio/webm', 'audio/aac'];
   var TURLER = ['metin', 'kart', 'dosya', 'ses'];
-  var OLAYLAR = ['mesaj', 'okundu', 'teslim', 'yaziyor', 'arama', 'sohbet'];
+  var OLAYLAR = ['mesaj', 'okundu', 'teslim', 'yaziyor', 'arama', 'sohbet', 'tepki', 'duzenle', 'silindi'];
+  var MID = /^[0-9]{14}-[A-Za-z0-9-]{1,64}$/;   
+  var OID = /^[0-9a-fA-F-]{8,40}$/;
   var ISTEMCI_ID = /^[A-Za-z0-9-]{8,64}$/;
   function yeniIstemciId() {   
     var c = typeof crypto !== 'undefined' ? crypto : null;
@@ -63,7 +65,29 @@
       if (!dosya.blob) dosya = null;
     }
     if ((tur === 'dosya' || tur === 'ses') && !dosya) tur = 'metin';
-    return { id: s(m.id), sohbet: s(m.sohbet), gonderen: s(m.gonderen), ts: (typeof m.ts === 'number' || typeof m.ts === 'string') ? m.ts : '', tur: tur, metin: typeof m.metin === 'string' ? m.metin : '', kart: kart, dosya: dosya, istemciId: ISTEMCI_ID.test(s(m.istemciId)) ? s(m.istemciId) : '' };
+    var r = { id: s(m.id), sohbet: s(m.sohbet), gonderen: s(m.gonderen), ts: (typeof m.ts === 'number' || typeof m.ts === 'string') ? m.ts : '', tur: tur, metin: typeof m.metin === 'string' ? m.metin : '', kart: kart, dosya: dosya, istemciId: ISTEMCI_ID.test(s(m.istemciId)) ? s(m.istemciId) : '' };
+     
+    if (m.silindi && typeof m.silindi === 'object') {   
+      r.silindi = { ts: (typeof m.silindi.ts === 'number' || typeof m.silindi.ts === 'string') ? m.silindi.ts : '', silen: s(m.silindi.silen) };
+      r.tur = 'metin'; r.metin = ''; r.kart = null; r.dosya = null;
+      return r;
+    }
+    var y = m.yanit;
+    if (y && typeof y === 'object') {
+      if (y.silindi) r.yanit = { id: s(y.id), silindi: true };
+      else if (y.yok) r.yanit = { id: s(y.id), yok: true };
+      else r.yanit = { id: s(y.id), gonderen: s(y.gonderen), tur: TURLER.indexOf(y.tur) >= 0 ? y.tur : 'metin', metin: typeof y.metin === 'string' ? y.metin : '' };
+    }
+    var tp = tepkiSuz(m.tepkiler); if (tp) r.tepkiler = tp;
+    if (typeof m.duzenlendi === 'number' || (typeof m.duzenlendi === 'string' && m.duzenlendi)) r.duzenlendi = m.duzenlendi;
+    if (m.iletildi === true) { r.iletildi = true; r.iletimSayisi = Number(m.iletimSayisi) > 0 ? Number(m.iletimSayisi) : 1; }
+    if (Array.isArray(m.bahsedilen)) r.bahsedilen = m.bahsedilen.filter(function (o) { return typeof o === 'string' && OID.test(o); });
+    return r;
+  }
+  function tepkiSuz(v) {   
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return undefined;
+    var r = {}; Object.keys(v).forEach(function (k) { if (OID.test(k) && typeof v[k] === 'string' && v[k] && v[k].length <= 32) r[k] = v[k]; });
+    return r;
   }
   function sohbetCevir(c) {
     if (!c || typeof c !== 'object') return null;
@@ -80,7 +104,9 @@
   }
   function liste(v, f) { return (Array.isArray(v) ? v : []).map(f).filter(Boolean); }
 
-  function durumKodu(d) { return d === 401 ? 'kimlik' : d === 403 ? 'uye' : d === 404 ? 'yok' : d === 400 ? 'gecersiz' : d === 429 ? '429' : d === 503 ? 'mesgul' : 'sunucu'; }
+  function durumKodu(d) { return d === 401 ? 'kimlik' : d === 403 ? 'uye' : d === 404 ? 'yok' : d === 400 ? 'gecersiz' : d === 409 ? 'cakisma' : d === 429 ? '429' : d === 503 ? 'mesgul' : 'sunucu'; }
+   
+  function w1(p) { return p.then(null, function (e) { if (e && e.durum === 404 && !e.hataKod) throw hata('w1yok', { durum: 404 }); throw e; }); }
 
    
   function varsayilanTasiyici(apiUrl) {
@@ -128,7 +154,7 @@
     var blobTasiyici = o.blobTasiyici || varsayilanBlobTasiyici;
     var bekle = o.bekle || function (sn) { return new Promise(function (ok) { setTimeout(ok, sn * 1000); }); };
     var simdi = o.simdi || Date.now;
-    var dinleyici = { mesaj: [], okundu: [], teslim: [], yaziyor: [], arama: [], sohbet: [] };
+    var dinleyici = { mesaj: [], okundu: [], teslim: [], yaziyor: [], arama: [], sohbet: [], tepki: [], duzenle: [], silindi: [] };
     var sonYaziyor = {}, teslimYok = false;   
 
     function cagri(yontem, yol, govde, denendi) {
@@ -147,7 +173,7 @@
         }
          
         if (r && r.durum === 503 && !denendi && (yontem === 'GET' || (govde && typeof govde.istemciId === 'string'))) return Promise.resolve(bekle(1)).then(function () { return cagri(yontem, yol, govde, true); });   
-        if (!r || r.durum < 200 || r.durum >= 300) throw hata(durumKodu(r && r.durum), { durum: r && r.durum });
+        if (!r || r.durum < 200 || r.durum >= 300) throw hata(durumKodu(r && r.durum), { durum: r && r.durum, hataKod: r && r.json && typeof r.json.hata === 'string' ? r.json.hata : '' });
         return r.json;
       });
     }
@@ -166,6 +192,9 @@
       else if (d.olay === 'teslim') yay('teslim', { sohbet: s(d.sohbet), oid: s(d.oid), sonId: s(d.sonId) });
       else if (d.olay === 'yaziyor') yay('yaziyor', { sohbet: s(d.sohbet), oid: s(d.oid) });
       else if (d.olay === 'sohbet') yay('sohbet', { sohbet: s(d.sohbet), islem: s(d.islem) });   
+      else if (d.olay === 'tepki') { if (MID.test(s(d.mid)) && OID.test(s(d.oid))) yay('tepki', { sohbet: s(d.sohbet), mid: s(d.mid), oid: s(d.oid), emoji: typeof d.emoji === 'string' && d.emoji && d.emoji.length <= 32 ? d.emoji : null }); }
+      else if (d.olay === 'duzenle') { var dm = mesajCevir(d.mesaj); if (dm && dm.id) yay('duzenle', dm); }
+      else if (d.olay === 'silindi') { if (MID.test(s(d.mid))) yay('silindi', { sohbet: s(d.sohbet), mid: s(d.mid), silen: s(d.silen) }); }
       else yay('arama', { sohbet: s(d.sohbet), groupId: s(d.groupId), arayan: s(d.arayan || d.gonderen), video: d.video === true });
     }
     function yenidenDene() {
@@ -202,7 +231,14 @@
         var t = String(g.metin == null ? '' : g.metin).trim();
         if (!t) return hata('bos');
         if (t.length > MAKS_GOVDE) return hata('uzun');
-        return { tur: 'metin', metin: t };
+        var gv = { tur: 'metin', metin: t };
+        if (g.yanit != null && g.yanit !== '') { if (!MID.test(String(g.yanit))) return hata('gecersiz'); gv.yanit = String(g.yanit); }   
+        if (Array.isArray(g.bahsedilen) && g.bahsedilen.length) {   
+          var bl = []; g.bahsedilen.forEach(function (o) { if (OID.test(String(o)) && bl.indexOf(String(o)) < 0) bl.push(String(o)); });
+          if (bl.length > 20) return hata('gecersiz');
+          if (bl.length) gv.bahsedilen = bl;
+        }
+        return gv;
       }
       if (tur === 'kart') { var k = kartSuz(g.kart); return k ? { tur: 'kart', kart: k } : hata('gecersiz'); }
       var d = g.dosya;
@@ -252,7 +288,37 @@
         b.istemciId = typeof g.istemciId === 'string' && ISTEMCI_ID.test(g.istemciId) ? g.istemciId : yeniIstemciId();   
         return cagri('POST', '/sohbetler/' + sid(sohbetId) + '/mesajlar', b).then(mesajCevir);
       },
-      metinGonder: function (sohbetId, metin, istemciId) { return api.gonder(sohbetId, { tur: 'metin', metin: metin, istemciId: istemciId }); },
+      metinGonder: function (sohbetId, metin, istemciId, ek) { return api.gonder(sohbetId, { tur: 'metin', metin: metin, istemciId: istemciId, yanit: ek && ek.yanit, bahsedilen: ek && ek.bahsedilen }); },
+       
+      tepki: function (sohbetId, mid, emoji) {   
+        if (!MID.test(String(mid))) return Promise.reject(hata('gecersiz'));
+        if (emoji != null && (typeof emoji !== 'string' || !emoji || Array.from(emoji).length > 8)) return Promise.reject(hata('gecersiz'));
+        return w1(cagri('POST', '/sohbetler/' + sid(sohbetId) + '/mesajlar/' + sid(mid) + '/tepki', { emoji: emoji == null ? null : emoji })).then(function (v) { return tepkiSuz(v && v.tepkiler) || {}; });
+      },
+      duzenle: function (sohbetId, mid, metin) {   
+        if (!MID.test(String(mid))) return Promise.reject(hata('gecersiz'));
+        var t = String(metin == null ? '' : metin).trim();
+        if (!t) return Promise.reject(hata('bos'));
+        if (t.length > MAKS_GOVDE) return Promise.reject(hata('uzun'));
+        return w1(cagri('PATCH', '/sohbetler/' + sid(sohbetId) + '/mesajlar/' + sid(mid), { metin: t })).then(mesajCevir);
+      },
+      herkestenSil: function (sohbetId, mid) {   
+        if (!MID.test(String(mid))) return Promise.reject(hata('gecersiz'));
+        return w1(cagri('DELETE', '/sohbetler/' + sid(sohbetId) + '/mesajlar/' + sid(mid))).then(function () { return true; });
+      },
+      ilet: function (sohbetId, mid, hedefler, istemciId) {   
+        if (!MID.test(String(mid))) return Promise.reject(hata('gecersiz'));
+        var l = []; (Array.isArray(hedefler) ? hedefler : []).forEach(function (x) { if (typeof x === 'string' && x && l.indexOf(x) < 0) l.push(x); });
+        if (!l.length || l.length > 5) return Promise.reject(hata('gecersiz'));
+        var b = { hedefler: l, istemciId: typeof istemciId === 'string' && ISTEMCI_ID.test(istemciId) ? istemciId : yeniIstemciId() };
+        return w1(cagri('POST', '/sohbetler/' + sid(sohbetId) + '/mesajlar/' + sid(mid) + '/ilet', b)).then(function (v) { return liste(v, mesajCevir); });
+      },
+      mesajBilgi: function (sohbetId, mid) {   
+        if (!MID.test(String(mid))) return Promise.reject(hata('gecersiz'));
+        return w1(cagri('GET', '/sohbetler/' + sid(sohbetId) + '/mesajlar/' + sid(mid) + '/bilgi')).then(function (v) {
+          return liste(v && v.uyeler, function (u) { return u && OID.test(s(u.oid)) ? { oid: s(u.oid), teslim: u.teslim === true, okundu: u.okundu === true } : null; });
+        });
+      },
       kartGonder: function (sohbetId, kart, istemciId) { return api.gonder(sohbetId, { tur: 'kart', kart: kart, istemciId: istemciId }); },
       yeniIstemciId: yeniIstemciId,
        
@@ -353,7 +419,7 @@
     }
   };
 
-  var API = { hazirla: hazirla, parcala: parcala, kartSuz: kartSuz, mesajCevir: mesajCevir, sohbetCevir: sohbetCevir, fotografTemizle: fotografTemizle, adTemizle: adTemizle, MIME: MIME, MAKS_DOSYA: MAKS_DOSYA, Arama: Arama };
+  var API = { hazirla: hazirla, parcala: parcala, MID: MID, kartSuz: kartSuz, mesajCevir: mesajCevir, sohbetCevir: sohbetCevir, fotografTemizle: fotografTemizle, adTemizle: adTemizle, MIME: MIME, MAKS_DOSYA: MAKS_DOSYA, Arama: Arama };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   if (typeof window !== 'undefined') { window.MMMesajIstemci = API; window.MMMesajArama = Arama; }
 })();

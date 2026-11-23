@@ -191,9 +191,14 @@
       if (/back|rear|arka|environment|ultra|tele|wide/.test(a)) return 'arka';
       return 'bilinmiyor';
     }
+     
+    function ozelLens(c) { return /ultra|geni[sş]|wide|tele|dual|[cç]ift|triple|[uü][cç]l[uü]|desk|masa/i.test(String((c && c.name) || '')); }
     function onKameraBul(l) {
       if (!l || !l.length) return null;
-      for (var i = 0; i < l.length; i++) if (yonBul(l[i]) === 'on') return l[i];
+      var i;
+      for (i = 0; i < l.length; i++) if (yonBul(l[i]) === 'on' && !ozelLens(l[i])) return l[i];
+      for (i = 0; i < l.length; i++) if (yonBul(l[i]) === 'on') return l[i];
+      for (i = 0; i < l.length; i++) if (!ozelLens(l[i])) return l[i];
       return l[0];
     }
     function aynali() { return yonBul(seciliKamera) !== 'arka'; }
@@ -212,6 +217,11 @@
       var r = new L.VideoStreamRenderer(onizAkis);
       var v = await r.createView({ scalingMode: 'Crop', isMirrored: aynali() });
       onizGorunum = { r: r, v: v };
+       
+      try {
+        var ms = onizAkis.getMediaStream ? await onizAkis.getMediaStream() : null, tr = ms && ms.getVideoTracks ? ms.getVideoTracks()[0] : null, st = tr && tr.getSettings ? tr.getSettings() : null;
+        window.__meetKamera = { ad: seciliKamera.name || '', genislik: st && st.width, yukseklik: st && st.height, fps: st && st.frameRate };
+      } catch (eOl) { window.__meetKamera = { ad: seciliKamera.name || '', hata: msg(eOl) }; }
       ev.yay('onizlemeVideo', { element: v.target });
     }
     function onizlemeGorselKapat() { gorunumKapat(onizGorunum); onizGorunum = null; ev.yay('onizlemeVideo', { element: null }); }
@@ -407,7 +417,8 @@
         try {
           if (!dm || kameralar.length < 2) return false;
           var simdi = yonBul(seciliKamera), hedef = simdi === 'on' ? 'arka' : 'on', c = null;
-          for (var i = 0; i < kameralar.length && !c; i++) if (kameralar[i].id !== seciliKamera.id && yonBul(kameralar[i]) === hedef) c = kameralar[i];
+          for (var i = 0; i < kameralar.length && !c; i++) if (kameralar[i].id !== seciliKamera.id && yonBul(kameralar[i]) === hedef && !ozelLens(kameralar[i])) c = kameralar[i];
+          for (var j = 0; j < kameralar.length && !c; j++) if (kameralar[j].id !== seciliKamera.id && yonBul(kameralar[j]) === hedef) c = kameralar[j];
           if (!c) { var ix = kameralar.findIndex(function (x) { return x.id === seciliKamera.id; }); c = kameralar[(ix + 1) % kameralar.length]; }
           return await kilitli(function () { return kameraGec(c).then(function () { return true; }); });
         } catch (e) { ev.yay('hata', { mesaj: 'Kamera çevrilemedi: ' + msg(e) }); return false; }

@@ -688,13 +688,33 @@
     function alan(ad, el) { return h('label', { sinif: 'alan' }, [h('span', { metin: ad }), el]); }
     kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'MY Medikal Meet ile toplantı', kirinti: [['Toplantı']] }));
      
-    var meetDugme = h('a', { sinif: 'dugme tam', role: 'button', href: 'meet/' }, [h('span', { metin: 'Toplantı odasını aç' })]);   
-    meetDugme.style.fontSize = '1.15rem'; meetDugme.style.padding = '18px 16px';
+    
+
+    var meetDugme = h('a', { sinif: 'dugme ikincil', role: 'button', href: 'meet/' }, [h('span', { metin: 'Lobiyi aç' })]);
+    var meetAlan = h('div', null, [meetDugme]);
+    var meetCerceve = null;
+    function meetKabuk() { var M = MM.mesaj; return (M && M.kabukMu && M.kabukMu()) ? M : null; }
+    function meetIcKapat() { if (meetCerceve) { try { meetCerceve.parentNode.removeChild(meetCerceve); } catch (e0) {   } meetCerceve = null; } meetDugme.style.display = ''; }
+    function meetIcAc() {
+      if (meetCerceve) return;
+      meetDugme.style.display = 'none';
+      meetCerceve = h('iframe', { title: 'MY Medikal Meet', src: 'meet/index.html', allow: 'camera; microphone; autoplay; display-capture' });
+      meetCerceve.setAttribute('style', 'width:100%;height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:460px;border:0;border-radius:12px;background:#0b1424');
+      meetAlan.appendChild(meetCerceve);
+    }
+    function meetIletiDinle(e) {
+      if (e.origin !== location.origin || !meetCerceve || e.source !== meetCerceve.contentWindow) return;
+      if (e.data && e.data.tur === 'meet-kapat') meetIcKapat();
+    }
+    window.addEventListener('message', meetIletiDinle);
     meetDugme.addEventListener('click', function (e) {   
-      var M = MM.mesaj;
-      if (M && M.kabukMu && M.kabukMu()) { e.preventDefault(); if (M.meetCerceveAc) M.meetCerceveAc('meet/'); else M.disAc(M.meetTamAdres('meet/')); }
+      e.preventDefault();
+      var M = meetKabuk();
+      if (M) { if (M.meetCerceveAc) M.meetCerceveAc('meet/'); else M.disAc(M.meetTamAdres('meet/')); }
+      else meetIcAc();
     });
-    kok.appendChild(gr.kart({ baslik: 'MY Medikal Meet', govde: h('div', null, [meetDugme]) }));
+    kok.appendChild(gr.kart({ baslik: 'MY Medikal Meet', govde: meetAlan }));
+    setTimeout(function () { if (!kok.isConnected) return; var M = meetKabuk(); if (M) { if (M.meetCerceveAc) M.meetCerceveAc('meet/'); else meetIcAc(); } else meetIcAc(); }, 0);   
     var form = h('div', { sinif: 'yeni-izgara' }, [alan('Konu', konuS), alan('Tarih', gunI), alan('Saat', saatS), alan('Süre', sureS)]);
     var yedek = h('details', { sinif: 'ust-bosluk' }, [h('summary', { metin: 'Dış katılımcılı toplantı (Google Meet)' })]);   
     kok.appendChild(yedek);
@@ -713,6 +733,6 @@
     guncelle();
     var bekle = window.MM.acikHazir && window.MM.acikHazir.then ? window.MM.acikHazir.then(guncelle, guncelle) : null;
     var t = setTimeout(guncelle, 4000);
-    return function () { clearTimeout(t); bekle = null; };
+    return function () { clearTimeout(t); bekle = null; window.removeEventListener('message', meetIletiDinle); meetIcKapat(); };
   };
 })();

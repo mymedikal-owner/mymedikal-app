@@ -23,7 +23,7 @@
   function turAd(t) { return TUR_AD[t] || 'Diğer'; }   
   function bekleyen(l) { return h('div', { sinif: 'bekle-liste' }, l.map(function (x) { return h('div', { sinif: 'bekle-oge' }, [h('span', { sinif: 'bekle-ik' }, [G.ikon(x.ikon || 'bilgi', 18)]), h('div', null, [h('b', { metin: x.baslik }), h('small', { metin: x.metin })]), h('span', { sinif: 'etiket kismi', metin: 'bekliyor' })]); })); }
 
-  var SEKMELER = [['ozet', 'Özet'], ['mali', 'Mali tablolar'], ['anlik', 'Anlık ciro'], ['ebelge', 'e-Belge'], ['aktarim', 'Aktarım'], ['kapanis', 'Kapanış'], ['mutabakat', 'Mutabakat'], ['duzeltme', 'Düzeltmeler']];
+  var SEKMELER = [['ozet', 'Özet'], ['mali', 'Mali tablolar'], ['tfrs', 'TFRS tabloları'], ['anlik', 'Anlık ciro'], ['ebelge', 'e-Belge'], ['aktarim', 'Aktarım'], ['kapanis', 'Kapanış'], ['mutabakat', 'Mutabakat'], ['duzeltme', 'Düzeltmeler']];
 
   
 
@@ -115,26 +115,49 @@
   var K_DURUM = { tamam: ['Tamam', 'yesil', 'tik'], suruyor: ['Sürüyor', 'sari', 'saat'], bekliyor: ['Bekliyor', 'gri', 'saat'], gecikti: ['Gecikti', 'kirmizi', 'uyari'] };
   function kapanis(v) {
     var k = v.kapanis, say = { tamam: 0, suruyor: 0, bekliyor: 0, gecikti: 0 };
-    k.gorevler.forEach(function (g) { say[g.durum]++; });
+    k.gorevler.forEach(function (g) { if (say[g.durum] != null) say[g.durum]++; });
     var yuzde = Math.round(say.tamam / k.gorevler.length * 100);
-    var tablo = G.tablo({ kolonlar: [{ ad: 'Görev', k: 'ad', genis: true }, { ad: 'Sorumlu rol', k: 'rol' }, { ad: 'Son tarih kuralı', k: 'son' }, { ad: 'Durum', k: 'durum', ciz: function (r) { var d = K_DURUM[r.durum] || K_DURUM.bekliyor; return rozet(d[0], d[1], d[2]); } }], satirlar: k.gorevler, bos: 'Görev yok.' });
+    var kanitVar = k.gorevler.some(function (g) { return g.kanit; });   
+    var kol = [{ ad: 'Görev', k: 'ad', genis: true }, { ad: 'Sorumlu rol', k: 'rol' }, { ad: 'Son tarih kuralı', k: 'son' }, { ad: 'Durum', k: 'durum', ciz: function (r) { var d = K_DURUM[r.durum] || K_DURUM.bekliyor; return rozet(d[0], d[1], d[2]); } }];
+    if (kanitVar) kol.push({ ad: 'Kanıt', k: 'kanit', genis: true, ciz: function (r) { return r.kanit || (r.veri_yok ? 'Veri yok' : '—'); } });
+    var tablo = G.tablo({ kolonlar: kol, satirlar: k.gorevler, bos: 'Görev yok.' });
+    var kpiler = [
+      G.kpi({ baslik: 'Tamamlanan', deger: String(say.tamam) + ' / ' + k.gorevler.length, ikon: 'tik', alt: '% ' + yuzde }),
+      G.kpi({ baslik: 'Sürüyor', deger: String(say.suruyor), ikon: 'saat' }),
+      G.kpi({ baslik: 'Bekliyor', deger: String(say.bekliyor), ikon: 'liste' }),
+      G.kpi({ baslik: 'Gecikti', deger: String(say.gecikti), durum: say.gecikti ? 'kritik' : null, ikon: 'uyari' })];
+    if (k.kapanis_suresi_gun != null) kpiler.push(G.kpi({ baslik: 'Kapanış süresi', deger: String(k.kapanis_suresi_gun), birim: 'gün', ikon: 'saat', alt: 'Son kayıt: ' + (k.son_kayit_olusturma ? tarihTR(k.son_kayit_olusturma) : '—') }));
+    var bosluk = (k.veri_bosluklari || []).map(function (x) { return h('li', { metin: x }); });
     return h('div', { sinif: 'yigin' }, [
-      h('div', { sinif: 'kpi-izgara tq-kpi' }, [
-        G.kpi({ baslik: 'Tamamlanan', deger: String(say.tamam) + ' / ' + k.gorevler.length, ikon: 'tik', alt: '% ' + yuzde }),
-        G.kpi({ baslik: 'Sürüyor', deger: String(say.suruyor), ikon: 'saat' }),
-        G.kpi({ baslik: 'Bekliyor', deger: String(say.bekliyor), ikon: 'liste' }),
-        G.kpi({ baslik: 'Gecikti', deger: String(say.gecikti), durum: say.gecikti ? 'kritik' : null, ikon: 'uyari' })]),
-      G.kart({ baslik: 'Ay sonu kapanış kokpiti', alt: k.donem, govde: tablo })]);
+      h('div', { sinif: 'kpi-izgara tq-kpi' }, kpiler),
+      G.kart({ baslik: 'Ay sonu kapanış kokpiti', alt: k.donem, govde: tablo, dip: k.kapanis_suresi_not || null }),
+      bosluk.length ? G.kart({ baslik: 'Veri boşlukları', alt: 'Muhasebe kayıt izinde görünmeyen adımlar (boş, sıfır değil)', govde: h('ul', { sinif: 'soluk' }, bosluk) }) : null]);
   }
 
-  var M_DURUM = { mutabik: ['Mutabık', 'yesil', 'tik'], gonderildi: ['Gönderildi', 'sari', 'saat'], fark: ['Fark var', 'kirmizi', 'uyari'], gonderilmedi: ['Gönderilmedi', 'gri', 'bilgi'] };
+  var M_DURUM = { mutabik: ['Mutabık', 'yesil', 'tik'], gonderildi: ['Gönderildi', 'sari', 'saat'], fark: ['Fark var', 'kirmizi', 'uyari'], gonderilmedi: ['Gönderilmedi', 'gri', 'bilgi'], veri_yok: ['Veri yok', 'gri', 'bilgi'] };
   function mutabakat(v) {
-    var m = v.mutabakat, say = { mutabik: 0, gonderildi: 0, fark: 0, gonderilmedi: 0 };
-    m.kayitlar.forEach(function (x) { say[x.durum]++; });
-    var tablo = G.tablo({ kolonlar: [{ ad: 'Karşı taraf', k: 'karsi' }, { ad: 'Tür', k: 'tur' }, { ad: 'Durum', k: 'durum', ciz: function (r) { var d = M_DURUM[r.durum] || M_DURUM.gonderilmedi; return rozet(d[0], d[1], d[2]); } }, { ad: 'Sonuç', k: 'sonuc', genis: true }], satirlar: m.kayitlar });
-    return h('div', { sinif: 'yigin' }, [
-      h('div', { sinif: 'kpi-izgara tq-kpi' }, [['Mutabık', 'mutabik', null, 'tik'], ['Gönderildi', 'gonderildi', null, 'saat'], ['Fark var', 'fark', 'kritik', 'uyari'], ['Gönderilmedi', 'gonderilmedi', null, 'bilgi']].map(function (c) { return G.kpi({ baslik: c[0], deger: String(say[c[1]]), durum: say[c[1]] && c[2] ? c[2] : null, ikon: c[3] }); })),
-      G.kart({ baslik: 'Cari mutabakat', alt: 'Müşteri / tedarikçi / grup içi', govde: tablo })]);
+    var m = v.mutabakat, say = { mutabik: 0, gonderildi: 0, fark: 0, gonderilmedi: 0, veri_yok: 0 };
+    m.kayitlar.forEach(function (x) { var d = x.veri_yok ? 'veri_yok' : x.durum; if (say[d] != null) say[d]++; });
+    var P = function (n) { return n == null || !isFinite(n) ? '—' : (MM.s41 ? MM.s41.para(n) : String(Math.round(n))); };
+    var ekAlan = m.kayitlar.concat(m.kayitlar_day || []).some(function (x) { return x.gl != null || x.alt_defter != null; });
+    var KAT = { zamanlama: 'zamanlama', ozel_defter: 'özel defter', aciklanamayan: 'açıklanamayan' };
+    var kolonlar = function () {
+      var kol = [{ ad: 'Karşı taraf', k: 'karsi' }, { ad: 'Tür', k: 'tur' }, { ad: 'Durum', k: 'durum', ciz: function (r) { var d = M_DURUM[r.veri_yok ? 'veri_yok' : r.durum] || M_DURUM.gonderilmedi; return rozet(d[0], d[1], d[2]); } }];
+      if (ekAlan) {
+        kol.push({ ad: 'Genel defter', k: 'gl', sag: true, ciz: function (r) { return P(r.gl); } }, { ad: 'Alt defter', k: 'alt_defter', sag: true, ciz: function (r) { return P(r.alt_defter); } }, { ad: 'Fark', k: 'fark', sag: true, ciz: function (r) { return r.fark == null ? '—' : P(r.fark); } },
+          { ad: 'Fark nedeni', k: 'kategori', ciz: function (r) { var c = r.kategori; if (!c) return '—'; var p = Object.keys(KAT).filter(function (x) { return c[x]; }).map(function (x) { return KAT[x] + ' ' + P(c[x]); }); return p.length ? p.join(' · ') : 'fark yok'; } });
+      }
+      kol.push({ ad: 'Sonuç', k: 'sonuc', genis: true, ciz: function (r) { return r.sonuc || (r.veri_yok ? 'Veri yok' : '—'); } });
+      return kol;
+    };
+    var tablo = G.tablo({ kolonlar: kolonlar(), satirlar: m.kayitlar });
+    var kartlar = [
+      h('div', { sinif: 'kpi-izgara tq-kpi' }, [['Mutabık', 'mutabik', null, 'tik'], ['Gönderildi', 'gonderildi', null, 'saat'], ['Fark var', 'fark', 'kritik', 'uyari'], ['Gönderilmedi', 'gonderilmedi', null, 'bilgi']].concat(say.veri_yok ? [['Veri yok', 'veri_yok', null, 'bilgi']] : []).map(function (c) { return G.kpi({ baslik: c[0], deger: String(say[c[1]]), durum: say[c[1]] && c[2] ? c[2] : null, ikon: c[3] }); })),
+      G.kart({ baslik: 'Cari mutabakat', alt: (m.tarih_itibariyle ? tarihTR(m.tarih_itibariyle) + ' itibarıyla · ' : '') + 'MY · müşteri / tedarikçi / grup içi', govde: tablo, dip: m.yontem || null })];
+    if (m.kayitlar_day && m.kayitlar_day.length) kartlar.push(G.kart({ baslik: 'DAY alt defter (ayrı, MY ile toplanmaz)', alt: 'Yalnız muhasebe rolü', govde: G.tablo({ kolonlar: kolonlar(), satirlar: m.kayitlar_day }) }));
+    var bosluk = (m.veri_bosluklari || []).map(function (x) { return h('li', { metin: typeof x === 'string' ? x : (x.metin || x.ad || '') }); });
+    if (bosluk.length) kartlar.push(G.kart({ baslik: 'Veri boşlukları', alt: 'Hesaplanamayan ya da eksik kaynaklar (boş, sıfır değil)', govde: h('ul', { sinif: 'soluk' }, bosluk) }));
+    return h('div', { sinif: 'yigin' }, kartlar);
   }
 
   var D_DURUM = { acik: ['Açık', 'kirmizi', 'uyari'], cevap: ['Cevap geldi', 'sari', 'saat'], kapandi: ['Kapandı', 'yesil', 'tik'] };
@@ -306,18 +329,23 @@
   MM.moduller.muhasebe = function (kok) {
     var yuk = null, hata = null, canli = true;
     var q = new URLSearchParams(location.search).get('msekme'), durum = { sekme: SEKMELER.some(function (s) { return s[0] === q; }) ? q : 'ozet' };
-    var maliKok = h('div'), maliTemiz = null, anlikKok = h('div'), anlikTemiz = null, perf = null;
+    var maliKok = h('div'), maliTemiz = null, anlikKok = h('div'), anlikTemiz = null, tfrsKok = h('div'), tfrsTemiz = null, perf = null;
     kok.appendChild(G.sayfaBasi({ baslik: 'Muhasebe', alt: 'Mali tablolar, e-Belge, aktarım, kapanış', kirinti: [['Muhasebe']] }));
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
     function ciz() {
       ust.textContent = ''; govde.textContent = '';
-      if (durum.sekme === 'mali' || durum.sekme === 'anlik') {
+      if (durum.sekme === 'mali' || durum.sekme === 'anlik' || durum.sekme === 'tfrs') {
         var vv = yuk && yuk.veri;
         govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return vv ? ((s[0] !== 'kapanis' || vv.kapanis) && (s[0] !== 'mutabakat' || vv.mutabakat)) : (s[0] !== 'kapanis' && s[0] !== 'mutabakat'); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: 4 })]));
         if (durum.sekme === 'anlik') {
           if (!anlikTemiz) anlikTemiz = anlikTab(anlikKok);
           govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [anlikKok]));
+          return;
+        }
+        if (durum.sekme === 'tfrs') {
+          if (!tfrsTemiz) tfrsTemiz = MM.tfrsTab(tfrsKok);
+          govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [tfrsKok]));
           return;
         }
         if (!maliTemiz) maliTemiz = MM.maliTab(maliKok);
@@ -358,6 +386,6 @@
     }
     function yenile() { hata = null; yuk = null; ciz(); window.MMVeri.oku('muhasebe', 'muhasebe').then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
     yenile();
-    return function () { canli = false; if (maliTemiz) maliTemiz(); if (anlikTemiz) anlikTemiz(); if (perf) perf.temizle(); };
+    return function () { canli = false; if (maliTemiz) maliTemiz(); if (anlikTemiz) anlikTemiz(); if (tfrsTemiz) tfrsTemiz(); if (perf) perf.temizle(); };
   };
 })();

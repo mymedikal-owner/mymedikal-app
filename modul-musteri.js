@@ -1,5 +1,7 @@
 
 
+
+
 (function () {
   'use strict';
   var MM = window.MM, h = MM.h, G = MM.gr, S = MM.s41, EN = window.MM_LOC === 'en-GB', ESKI_DK = 36 * 60;
@@ -8,10 +10,24 @@
 
   function tl(n) { return n == null || !isFinite(n) ? '—' : (n === 0 ? '0' : S.para(n)); }   
   function adet(n) { return n == null || !isFinite(n) ? '—' : G.say(n); }
-  function yuzde(n) { return n == null || !isFinite(n) ? '—' : S.pct(n, { arti: true }); }
+   
+  function yuzde(n) {
+    if (n == null || !isFinite(n)) return '—';
+    var t = Math.abs(Math.round(n * 10) / 10), s = String(t).replace('.', ',');
+    return n < 0 && t > 0 ? (EN ? 'down ' + s + '%' : '%' + s + ' azaldı') : (n > 0 && t > 0 ? (EN ? 'up ' + s + '%' : '%' + s + ' arttı') : (EN ? 'unchanged' : 'değişmedi'));
+  }
+
+  var SEV_STIL = {
+    'Risk': 'background:var(--kirmizi-zemin);color:var(--kirmizi);border:1px solid var(--kirmizi)',
+    'İzle': 'background:var(--sari-zemin);color:var(--sari-yazi);border:1px solid var(--sari)',
+    'İyi': 'background:var(--yesil-zemin);color:var(--yesil);border:1px solid var(--yesil)' };
+  function ilkSek() { try { var m = /[?&]msk=(genel|saglik|hat)\b/.exec(location.search); return m ? m[1] : 'genel'; } catch (e) { return 'genel'; } }
+  function sevEtiket(s) { return h('span', { sinif: 'etiket', style: SEV_STIL[s] || null, metin: s }); }
+  function yz(n) { return n == null || !isFinite(n) ? '—' : '%' + String(Math.round(n * 10) / 10).replace('.', ','); }
 
   MM.musteriModul = function (kok) {
-    var yuk = null, hata = null, canli = true, st = { q: '', sec: null, tip: '' }, zam = null;
+    var yuk = null, hata = null, canli = true, st = { q: '', sec: null, tip: '', sek: ilkSek() }, zam = null;
+    var sag = null, sagYok = false;   
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     var inp = h('input', { sinif: 's41-ara', type: 'search', autocomplete: 'off', placeholder: 'Müşteri adı veya numarası ara', 'aria-label': 'Müşteri adı veya numarası ara' });
     kok.appendChild(ust); kok.appendChild(govde);
@@ -34,6 +50,7 @@
         ml('Müşteri faturası (son 12 ay)', tl(m.ciro_son12), null), ml('Müşteri faturası (bu yıl)', tl(m.ciro_yil), d == null ? null : yuzde(d) + (EN ? ' vs last year' : ' geçen yıla göre')),
         ml('Sipariş adedi (12 ay)', adet(m.siparis_adedi_son12), m.ortalama_siparis_tutari ? (EN ? 'Average ' : 'Ortalama ') + tl(m.ortalama_siparis_tutari) : null),
         ml('Açık sipariş', adet(m.acik_siparis_adedi), m.acik_siparis_adedi ? tl(m.acik_siparis_tutari) : null)]));
+      f.appendChild(saglikKutusu(m));
       f.appendChild(h('div', { sinif: 'ust-bosluk s41-kart-ozet' }, [sk('İade oranı', m.iade_orani_yuzde ? S.pct(m.iade_orani_yuzde) : '—'),
         sk('Son sipariş', m.son_siparis_tarihi ? S.tarihTR(m.son_siparis_tarihi) : '—'), sk('Son siparişten geçen', m.son_siparisten_gecen_gun != null ? m.son_siparisten_gecen_gun + (EN ? ' days' : ' gün') : '—'), sk('Önceki yıl aynı dönem', tl(m.ciro_onceki_yil_ayni_donem))]));
       if (m.aylik_ciro && m.aylik_ciro.length && aylar.length === m.aylik_ciro.length && m.aylik_ciro.some(function (x) { return x; })) {
@@ -71,6 +88,105 @@
         if (s.length > 50) gov.appendChild(h('p', { sinif: 'soluk kucuk', metin: 'İlk 50 gösteriliyor, toplam ' + s.length }));
       }).catch(function () { if (!canli) return; kap.textContent = ''; });
       return kap;
+    }
+     
+    function saglikBul(no) { return ((sag && sag.veri && sag.veri.musteriler) || []).filter(function (x) { return x.musteri_no === no; })[0]; }
+    function saglikKutusu(m) {
+      var x = saglikBul(m.musteri_no), kap = h('div', { sinif: 'ust-bosluk' });
+      if (!x) {
+        kap.appendChild(G.kart({ baslik: 'Müşteri sağlığı', alt: 'Sipariş sıklığı, eğilim, teslim, şikâyet, iade', govde: h('p', { sinif: 'soluk', metin: sagYok || !sag ? 'Sağlık verisi henüz yok.' : 'Bu müşteri için sağlık puanı hesaplanmadı (son 24 ayda sipariş yok).' }) }));
+        return kap;
+      }
+      var gec = x.gecikme_orani_yuzde != null ? yz(x.gecikme_orani_yuzde) + ' (' + x.teslim_gecikmeli + '/' + x.teslim_olculen + ')' : (x.teslim_olculemeyen ? 'ölçülemedi (' + x.teslim_olculemeyen + ' sipariş, planlanan tarih yok)' : '—');
+      var govde2 = h('div', null, [
+        h('div', { sinif: 's41-satir' }, [h('div', { sinif: 'ad', metin: 'Puan ' + x.puan + ' / 100' }), h('div', { sinif: 'sag' }, [sevEtiket(x.seviye)])]),
+        h('ul', { sinif: 'ust-bosluk' }, (x.nedenler || []).map(function (n) { return h('li', { metin: n }); })),
+        h('div', { sinif: 'ust-bosluk s41-kart-ozet' }, [
+          sk('Sipariş: son 3 ay / önceki 3 ay', x.siparis_son3 + ' / ' + x.siparis_onceki3 + (x.siparis_egilim_yuzde != null ? ' (' + yuzde(x.siparis_egilim_yuzde) + ')' : '')),
+          sk('Müşteri faturası eğilimi (3 ay)', x.ciro_egilim_yuzde != null ? yuzde(x.ciro_egilim_yuzde) : '—'),
+          sk('Ortalama sipariş aralığı', x.ort_siparis_araligi_gun != null ? Math.round(x.ort_siparis_araligi_gun) + (EN ? ' days' : ' gün') : '—'),
+          sk('Geç teslim oranı', gec),
+          sk('Şikâyet / 100 teslimat', x.sikayet_100_teslimat != null ? String(x.sikayet_100_teslimat).replace('.', ',') : (x.sikayet_12ay != null ? x.sikayet_12ay + ' şikâyet (teslimat az)' : '—')),
+          sk('İade teslimatı (12 ay)', adet(x.iade_adedi_12ay))])]);
+      kap.appendChild(G.kart({ baslik: 'Müşteri sağlığı', alt: 'Puan 100 = sorun işareti yok · puan hesabı geçmiş verilerden', govde: govde2 }));
+      return kap;
+    }
+    function sagBos(baslik) {
+      return G.bos({ baslik: baslik, metin: sagYok ? 'Veri henüz yok. Sağlık ve hat verisi hazırlanınca burada görünür.' : 'Sağlık ve hat verisi yükleniyor…' });
+    }
+    function sekCipleri(v) {
+      var cs = (sag && sag.veri && sag.veri.ozet && sag.veri.ozet.seviye_sayilari) || {}, rs = (cs.Risk || 0) + (cs['İzle'] || 0);
+      return G.cipler([['genel', 'Genel'], ['saglik', 'Sağlık', sag ? rs : null], ['hat', 'Hat']], st.sek, function (d) { st.sek = d; ciz(); }, 'Müşteri görünümü');
+    }
+    function saglikSatir(v, x) {
+      var el = h('div', { sinif: 's41-satir tikla', role: 'button', tabindex: '0' }, [h('div', { sinif: 'ad', metin: x.musteri }), h('div', { sinif: 'sag' }, [sevEtiket(x.seviye), ' ' + x.puan])]);
+      el.appendChild(h('div', { sinif: 'alt', metin: [x.tip, x.sehir].filter(Boolean).join(' · ') }));
+      (x.nedenler || []).forEach(function (n) { el.appendChild(h('div', { sinif: 'alt', metin: '• ' + n })); });
+      var ac = function () { st.sek = 'genel'; git(x.musteri_no); }; el.addEventListener('click', ac); el.addEventListener('keydown', function (e) { if (e.key === 'Enter') ac(); });
+      return el;
+    }
+    function saglikGor(v) {
+      var f = document.createDocumentFragment();
+      if (!sag || !sag.veri) { f.appendChild(sagBos('Sağlık verisi yok')); return f; }
+      var d = sag.veri, o = d.ozet || {}, cs = o.seviye_sayilari || {}, cr = o.seviye_ciro_son12_tl || {}, M = d.musteriler || [];
+      if (d.ornek === true && !(v && v.ornek === true)) f.appendChild(h('div', { sinif: 'bant ornek', role: 'alert', metin: 'ÖRNEK VERİ — gerçek değil' }));
+      f.appendChild(h('div', { sinif: 'ml-kpi-izgara' }, ['Risk', 'İzle', 'İyi'].map(function (s) { return ml(s, adet(cs[s] || 0), tl(cr[s] || 0) + (EN ? ' in 12 months' : ' (12 ay müşteri faturası)')); })));
+      f.appendChild(h('div', { sinif: 'soluk kucuk', metin: 'Puan 0–100: sipariş sıklığı, 3 aylık eğilim, geç teslim, şikâyet ve iade. Puan 100 = sorun işareti yok. Hesap geçmiş verilerdendir; fiyat veya iskonto önerisi içermez.' }));
+      [['Risk', '50 altı'], ['İzle', '50–74']].forEach(function (b) {
+        var r = M.filter(function (x) { return x.seviye === b[0]; });
+        if (!r.length) return;
+        f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: b[0] + ' (' + G.say(r.length) + ')', alt: 'Puan ' + b[1] + ' · en düşük puan üstte, nedenleriyle · bir müşteriye dokununca kartı açılır', govde: G.sayfali(r, function (x) { return saglikSatir(v, x); }, { n: 10 }) })]));
+      });
+      if (!cs.Risk && !cs['İzle']) f.appendChild(G.bos({ baslik: 'Risk ya da İzle seviyesinde müşteri yok', metin: 'Bütün müşteriler İyi seviyesinde.' }));
+      if (d.yontem && d.yontem.agirliklar) {
+        var ag = d.yontem.agirliklar, AD = { siparis_araligi: 'Son siparişten beri geçen süre', siparis_egilimi: 'Sipariş adedi eğilimi', ciro_egilimi: 'Müşteri faturası eğilimi', teslim_gecikmesi: 'Geç teslim oranı', sikayet: 'Şikâyet / 100 teslimat', iade: 'İade teslimatı' };
+        f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Puan nasıl hesaplanır', alt: 'En çok kesinti puanı', govde: G.yatay(Object.keys(ag).map(function (k) { return { e: AD[k] || k, d: ag[k], renk: 'var(--s1)', etiketDeger: String(ag[k]) }; }), { maks: Math.max.apply(null, Object.keys(ag).map(function (k) { return ag[k]; })) }) })]));
+      }
+      return f;
+    }
+     
+    function ortCizgisi(svg, seri, ort, yuk2) {
+      try {
+        var W = 640, alt = 24, ust2 = 12, sol = 46, yy = yuk2 - alt - ust2, vals = seri.concat([0]), mx = Math.max.apply(null, vals), mn = Math.min.apply(null, vals.concat([0]));
+        if (mx === 0 && mn === 0) mx = 1; var ar = (mx - mn) || 1; mx = mx + (mx > 0 ? ar * .06 : 0); mn = mn - (mn < 0 ? ar * .06 : 0); ar = mx - mn;
+        var y = ust2 + yy * (1 - (ort - mn) / ar);
+        svg.appendChild(G.s('line', { x1: sol, x2: W - 4, y1: y, y2: y, stroke: 'var(--vurgu)', 'stroke-width': 1.5, 'stroke-dasharray': '6 4' }));
+        svg.appendChild(G.s('text', { x: sol + 6, y: y - 5, 'text-anchor': 'start', class: 'g-yazi' },['Son 3 ay ortalaması ' + G.kisa(ort)]));
+      } catch (e) { }
+    }
+    function hatGor(v) {
+      var f = document.createDocumentFragment();
+      if (!sag || !sag.veri || !sag.veri.hat) { f.appendChild(sagBos('Hat verisi yok')); return f; }
+      var d = sag.veri, H = d.hat, A = H.acik_siparis || {}, G2 = A.gruplar || [], ih = H.ihale, ci = H.ciro || {};
+      if (d.ornek === true && !(v && v.ornek === true)) f.appendChild(h('div', { sinif: 'bant ornek', role: 'alert', metin: 'ÖRNEK VERİ — gerçek değil' }));
+      var gec =G2.filter(function (g) { return g.anahtar === 'gecikmis'; })[0];
+      f.appendChild(h('div', { sinif: 'ml-kpi-izgara' }, [
+        ml('Açık sipariş', adet(A.toplam_adet), tl(A.toplam_tutar_tl)),
+        ml('Teslim tarihi geçmiş', adet(gec ? gec.siparis_adedi : 0), gec && gec.siparis_adedi ? tl(gec.tutar_tl) : null),
+        ml('Açık ihale / DMO alımı', ih ? adet((ih.liste || []).length) : '—', ih && ih.tarihsiz ? ih.tarihsiz + (EN ? ' without date' : ' tanesinde son tarih yok') : null),
+        ml('Son 3 ay ortalaması', tl(ci.son_3_ay_ortalamasi), EN ? 'actual, not a forecast' : 'gerçekleşen ay başına müşteri faturası')]));
+      function grupKart(baslik, alt, liste, kirmiziAnahtar) {
+        var mk = liste.reduce(function (a, g) { return Math.max(a, g.tutar_tl || 0); }, 0);
+        return h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: baslik, alt: alt,
+          govde: G.yatay(liste.map(function (g) { return { e: g.ad, d: g.tutar_tl || 0, renk: g.anahtar === kirmiziAnahtar ? 'var(--kirmizi)' : (g.anahtar === '90+' ? 'var(--soluk)' : 'var(--s1)'), etiketDeger: g.siparis_adedi + (EN ? ' orders · ' : ' sipariş · ') + S.para(g.tutar_tl || 0),
+            alt: (g.ilk_musteriler || []).slice(0, 3).map(function (x) { return x.musteri; }).join(', ') }; }), { maks: mk || 1 }) })]);
+      }
+      var YG = A.yas_gruplari || [];
+      var tarihKart = grupKart('Açık siparişler, teslim tarihine göre', 'Teslim bekleyen müşteri siparişleri · tutar açık kalan kısımdır' + (A.varsayilan_gorunum === 'yas' ? ' · istenen teslim tarihi çoğunlukla sipariş günüyle aynı girildiği için çoğu sipariş tarihsiz görünür' : ''), G2, 'gecikmis');
+      var yasKart = YG.length ? grupKart('Açık siparişler, sipariş yaşına göre', 'Sipariş tarihinden bugüne geçen gün · tutar açık kalan kısımdır · 90 günden eskiler kapanmamış eski kayıt olabilir', YG, null) : null;
+      if (A.varsayilan_gorunum === 'yas' && yasKart) { f.appendChild(yasKart); f.appendChild(tarihKart); }
+      else { f.appendChild(tarihKart); if (yasKart) f.appendChild(yasKart); }
+      if (!ih || !(ih.liste || []).length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Açık ihale / DMO alımları', alt: 'Son tarih sırasıyla', govde: h('p', { sinif: 'soluk', metin: ih ? 'Açık ihale ya da DMO alımı yok.' : 'Veri henüz yok.' }) })]));
+      else f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Açık ihale / DMO alımları (' + G.say(ih.liste.length) + ')', alt: 'Son tarih sırasıyla · tarihi olmayanlar sonda',
+        govde: G.sayfali(ih.liste, function (x) { return h('div', { sinif: 's41-satir' }, [h('div', { sinif: 'ad', metin: x.kurum }), h('div', { sinif: 'sag', metin: x.son_tarih ? S.tarihTR(x.son_tarih) : (EN ? 'No date' : 'Tarih yok') }), h('div', { sinif: 'alt', metin: [x.konu, x.durum, x.ikn ? 'IKN ' + x.ikn : null].filter(Boolean).join(' · ') })]); }, { n: 10 }) })]));
+      var aylar = ci.aylar || [], dz = ci.aylik_ciro || [];
+      if (aylar.length && aylar.length === dz.length) {
+        var seri = dz.map(function (x, i) { var k = aylar[i] === ci.kismi_ay; return { e: S.ayKisa(aylar[i], i === 0 || aylar[i].slice(5) === '01'), d: x, soluk: k, ipucu: [S.ayAd(aylar[i], true) + (k ? (EN ? ' (month in progress)' : ' (ay devam ediyor)') : ''), (EN ? 'Customer invoices: ' : 'Müşteri faturası: ') + S.para(x)] }; });
+        var svg = S.bar(seri, { ad: 'Ay ay müşteri faturası', yukseklik: 190 });
+        if (ci.son_3_ay_ortalamasi != null) ortCizgisi(svg, dz, ci.son_3_ay_ortalamasi, 190);
+        f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Ay ay müşteri faturası (son 12 ay)', alt: 'Çizgi: son 3 tam ayın ortalaması, geçmiş eğilimdir; tahmin ya da öneri değildir · açık renkli çubuk: ay devam ediyor', govde: svg })]));
+      }
+      return f;
     }
     function ml(ad, deger, alt) { return h('div', { sinif: 'ml-kpi' }, [h('div', { sinif: 'ml-kpi-ad', metin: ad }), h('div', { sinif: 'ml-kpi-deger', metin: deger }), alt ? h('div', { sinif: 'ml-kpi-alt', metin: alt }) : null]); }
     function sk(ad, deger) { return h('div', { sinif: 's41-sayi' }, [h('small', { metin: ad }), h('b', { metin: deger })]); }
@@ -134,7 +250,8 @@
       var v = yuk.veri; ust.appendChild(bantlar(v));
       if (!(v.musteriler || []).length) { govde.appendChild(G.bos({ baslik: 'Müşteri verisi yok', metin: 'Henüz müşteri raporu hazırlanmadı.' })); return; }
       if (st.sec) { var m = musteriBul(v, st.sec); if (m) { govde.appendChild(kartCiz(v, m)); return; } st.sec = null; }
-      govde.appendChild(genel(v));
+      govde.appendChild(sekCipleri(v));
+      govde.appendChild(st.sek === 'saglik' ? saglikGor(v) : (st.sek === 'hat' ? hatGor(v) : genel(v)));
     }
     inp.addEventListener('input', function () { clearTimeout(zam); zam = setTimeout(function () { st.q = inp.value; if (yuk) { var pos = inp.selectionStart; ciz(); var y = govde.querySelector('.s41-ara'); if (y) { y.focus(); try { y.setSelectionRange(pos, pos); } catch (e) { } } } }, 150); });
      
@@ -145,7 +262,8 @@
       var u = v.ust_listeler || {};
       Object.keys(u).forEach(function (k) { if (Array.isArray(u[k])) u[k].forEach(d); });
     }
-    function yenile() { hata = null; yuk = null; ciz(); window.MMVeri.oku('siparisler', 'musteri-rapor', 'siparisler-yonetim').then(function (r) { adTemizle(r && r.veri); yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
+    function saglikYukle() { sag = null; sagYok = false; window.MMVeri.oku('siparisler', 'musteri-saglik', 'siparisler-yonetim').then(function (r) { sag = r; sagYok = false; }).catch(function () { sag = null; sagYok = true; }).then(function () { if (canli && yuk) ciz(); }); }
+    function yenile() { hata = null; yuk = null; ciz(); saglikYukle(); window.MMVeri.oku('siparisler', 'musteri-rapor', 'siparisler-yonetim').then(function (r) { adTemizle(r && r.veri); yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
     yenile();
     return function () { canli = false; clearTimeout(zam); };
   };

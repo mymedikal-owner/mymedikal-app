@@ -18,7 +18,8 @@ window.MM_AYAR = {
     stok:      ['yonetim', 'fabrika', 'satis'],
     ik:        ['yonetim', 'fabrika', 'satis', 'finans', 'muhasebe', 'calisan'],   
     onay:      ['yonetim'],
-    sikayet:   ['yonetim'],   
+    toplanti:  ['yonetim', 'fabrika', 'satis', 'finans', 'muhasebe', 'calisan'],
+    sikayet:  ['yonetim'],   
     asistan:   ['yonetim', 'fabrika', 'satis', 'finans', 'muhasebe', 'calisan'],
     siparis:   ['yonetim', 'satis'],
     siparisTutar: ['yonetim'],   
@@ -62,6 +63,8 @@ window.MM_AYAR = {
     saha: ['35375050-912e-4079-b6f4-89a2b4903810'],   
     onay: ['45c58d2c-cdd9-4ddb-a08d-5a0c6d71982f'],
     
+    toplanti: ['4086cb02-0812-4f8c-a0e5-2d76d923eb26', '45c58d2c-cdd9-4ddb-a08d-5a0c6d71982f', '57a91d63-95b6-48e8-adf5-59ef32841cf1', '3a22fb3b-80a1-48c3-a2e2-8eae9ea65115', 'b7029bca-d5e5-43d4-9188-dfca28869099', '09e9e89a-8d68-472c-9b9f-8c012c398ee8', '31e23193-2bbc-45e7-8c1e-7146fe104e28', 'de1cc524-6b78-4911-a6f3-1fc488624947', 'd8af0072-3f43-4aef-8573-f421731dd012', '2db77edc-f848-478c-b40b-c36ba47dd665', '41050f21-0cfe-47b7-a19f-70e760498f08', '50fea39f-3532-4958-8744-697447630c39', '99f30174-e4c8-4b59-98fd-f2e3c7d5434f'],
+    
     asistan: ['4086cb02-0812-4f8c-a0e5-2d76d923eb26', '45c58d2c-cdd9-4ddb-a08d-5a0c6d71982f', '57a91d63-95b6-48e8-adf5-59ef32841cf1', '3a22fb3b-80a1-48c3-a2e2-8eae9ea65115', 'b7029bca-d5e5-43d4-9188-dfca28869099', '09e9e89a-8d68-472c-9b9f-8c012c398ee8', '31e23193-2bbc-45e7-8c1e-7146fe104e28', 'de1cc524-6b78-4911-a6f3-1fc488624947', 'd8af0072-3f43-4aef-8573-f421731dd012', '2db77edc-f848-478c-b40b-c36ba47dd665', '41050f21-0cfe-47b7-a19f-70e760498f08', '50fea39f-3532-4958-8744-697447630c39', '99f30174-e4c8-4b59-98fd-f2e3c7d5434f'],
     yonetim: ['45c58d2c-cdd9-4ddb-a08d-5a0c6d71982f']
   },
@@ -89,9 +92,9 @@ window.MM_AYAR = {
   rolAdlari: { calisan: 'Çalışan', yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' },
   mesaj: { url: '', apiKapsam: 'api://3f6676f2-d721-4c84-b98e-750eded44dad/mesaj.kullan' },   
   demo: false,         
-  surum: '75',    
+  surum: '76',   
   
   
-  acikModuller: ['ana', 'makineler', 'eldiven', 'siparis', 'kalite', 'nakliye', 'muhasebe', 'finans', 'dmo', 'dmo-nakliyat', 'stok', 'sikayet', 'sterilizasyon', 'ihale', 'kalite-yukle', 'asistan', 'mesaj'],
+  acikModuller: ['ana', 'makineler', 'eldiven', 'siparis', 'kalite', 'nakliye', 'muhasebe', 'finans', 'dmo', 'dmo-nakliyat', 'stok', 'sikayet', 'sterilizasyon', 'ihale', 'kalite-yukle', 'asistan', 'toplanti', 'mesaj'],
   eskiDk: 15            
 };

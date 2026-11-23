@@ -640,4 +640,61 @@
     yenile();
     return function () { canli = false; };
   };
+
+  
+
+
+
+  MM.moduller.toplanti = function (kok) {
+    var KONULAR = ['Genel', 'Satış', 'Üretim ve fabrika', 'DMO ve ihale', 'Tedarik ve ithalat', 'Finans', 'Kalite', 'Nakliye', 'App geliştirme'];
+    var SURELER = [15, 30, 45, 60, 90];
+    var z2 = function (n) { return (n < 10 ? '0' : '') + n; };
+    var simdi = new Date(), ilk = new Date(simdi.getTime() + 30 * 60000);
+    ilk.setMinutes(ilk.getMinutes() < 30 ? 30 : 60, 0, 0);
+    var saatler = []; for (var s = 8; s <= 19; s++) { saatler.push(z2(s) + ':00'); if (s < 19) saatler.push(z2(s) + ':30'); }
+    var ilkSaat = z2(ilk.getHours()) + ':' + z2(ilk.getMinutes()); if (saatler.indexOf(ilkSaat) < 0) ilkSaat = '09:00';
+    var ilkGun = ilk.getFullYear() + '-' + z2(ilk.getMonth() + 1) + '-' + z2(ilk.getDate());
+    function secim(ad, liste, deger) {
+      var sel = h('select', { 'aria-label': ad });
+      liste.forEach(function (x) { var o = h('option', { value: String(x[0]), metin: x[1] }); if (String(x[0]) === String(deger)) o.selected = true; sel.appendChild(o); });
+      return sel;
+    }
+    var konuS = secim('Konu', KONULAR.map(function (k) { return [k, k]; }), 'Genel');
+    var gunI = h('input', { type: 'date', 'aria-label': 'Tarih', value: ilkGun, min: simdi.getFullYear() + '-' + z2(simdi.getMonth() + 1) + '-' + z2(simdi.getDate()) });
+    var saatS = secim('Saat', saatler.map(function (x) { return [x, x]; }), ilkSaat);
+    var sureS = secim('Süre', SURELER.map(function (x) { return [x, x + ' dk']; }), 30);
+    var dugme = h('a', { sinif: 'dugme tam', role: 'button' }, [gr.ikon('gonder', 18), h('span', { metin: 'Toplantı isteğini hazırla' })]);
+    var durum = h('p', { sinif: 'soluk', role: 'status', 'aria-live': 'polite' });
+    function trTarih(iso) { var p = String(iso || '').split('-'); return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : ''; }
+    function guncelle() {
+      var p = window.MM.talimatPosta || '', t = trTarih(gunI.value);
+      if (!p || !t) { dugme.removeAttribute('href'); dugme.setAttribute('aria-disabled', 'true'); dugme.classList.add('pasif'); durum.textContent = !p ? 'Toplantı isteği hazırlanamıyor; biraz sonra yeniden deneyin.' : 'Tarih seçin.'; return; }
+      var konu = '[Toplantı] ' + konuS.value + ' · ' + t + ' ' + saatS.value + ' · ' + sureS.value + ' dk';
+      var govde = 'Merhaba,\n\nAşağıdaki toplantı için Google Meet daveti oluşturulmasını rica ederim.\n\n' +
+        'Konu: ' + konuS.value + '\nTarih: ' + t + '\nSaat: ' + saatS.value + '\nSüre: ' + sureS.value + ' dk\n' +
+        'Katılımcılar: bu mailin CC satırındaki kişiler\nGündem: \n\n(MY Medikal App · Toplantı)';
+      dugme.setAttribute('href', 'mailto:' + p + '?subject=' + encodeURIComponent(konu) + '&body=' + encodeURIComponent(govde));
+      dugme.removeAttribute('aria-disabled'); dugme.classList.remove('pasif'); durum.textContent = '';
+    }
+    [konuS, gunI, saatS, sureS].forEach(function (el) { el.addEventListener('change', guncelle); el.addEventListener('input', guncelle); });
+    function alan(ad, el) { return h('label', { sinif: 'alan' }, [h('span', { metin: ad }), el]); }
+    kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'Google Meet ile toplantı isteği', kirinti: [['Toplantı']] }));
+    var form = h('div', { sinif: 'yeni-izgara' }, [alan('Konu', konuS), alan('Tarih', gunI), alan('Saat', saatS), alan('Süre', sureS)]);
+    kok.appendChild(gr.kart({ baslik: 'Yeni toplantı', govde: h('div', null, [form, h('div', { sinif: 'ust-bosluk' }, [dugme]), durum]) }));
+    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Nasıl çalışır?', govde: h('ol', { sinif: 'ozellik-liste' }, [
+      h('li', { metin: 'Formu doldurup “Toplantı isteğini hazırla”ya dokunun; posta programınızda hazır bir mail açılır.' }),
+      h('li', { metin: 'Katılacak kişileri mailin CC satırına ekleyin, gündemi yazın ve gönderin.' }),
+      h('li', { metin: 'Google Meet daveti ve bağlantısı sizin ve katılımcıların e-postasına gelir; toplantı saatinde bağlantıyı açın.' }),
+      h('li', { metin: 'Toplantılar bilgisayardan da, telefondan da yapılabilir.' })
+    ]) })]));
+    if (MM.acik && MM.acik('mesaj')) {
+      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Hemen görüşme', govde: h('div', null, [
+        h('p', { sinif: 'soluk', metin: 'Kısa bir görüşme için Mesajlar bölümünü kullanabilirsiniz.' }),
+        h('a', { sinif: 'dugme ikincil', href: '#mesaj' }, [h('span', { metin: 'Mesajlar’a git' })])]) })]));
+    }
+    guncelle();
+    var bekle = window.MM.acikHazir && window.MM.acikHazir.then ? window.MM.acikHazir.then(guncelle, guncelle) : null;
+    var t = setTimeout(guncelle, 4000);
+    return function () { clearTimeout(t); bekle = null; };
+  };
 })();

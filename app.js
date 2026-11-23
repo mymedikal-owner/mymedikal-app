@@ -71,6 +71,7 @@
     ik: 'M16 11a3 3 0 100-6 3 3 0 000 6zM8 12a3 3 0 100-6 3 3 0 000 6zM2 20c0-3 3-5 6-5s6 2 6 5M14 15c3 0 8 1 8 5',
     onay: 'M5 12l4.5 4.5L19 7',
     asistan: 'M4 5h16v11H9l-5 4zM8 10h8',
+    toplanti: 'M3 7h12v10H3zM15 10.5l6-3.5v10l-6-3.5',
     mesaj: 'M4 5h16v11H9l-5 4zM8 9h8M8 12h5',
     gizlilik: 'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4',
     siparis: 'M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10',
@@ -109,6 +110,7 @@
     { id: 'ik', ad: 'İK', aktif: true, onizleme: true },
     { id: 'onay', ad: 'Onaylar', aktif: true, onizleme: true },
     { id: 'asistan', ad: 'Asistan', aktif: true },   
+    { id: 'toplanti', ad: 'Toplantı', aktif: true },   
     { id: 'mesaj', ad: 'Mesajlar', aktif: true, mesaj: true },   
     { id: 'yonetim', ad: 'Yönetim', aktif: true },
     { id: 'finans', ad: 'Finans', aktif: true },
@@ -156,7 +158,7 @@
   window.MM.acikHazir = bayrakOku();
   window.MM.bayrakYenile = bayrakOku;   
   
-  var DEMO_KAPALI = ['kalite-yukle', 'nakliye-yukle', 'asistan', 'mesaj', 'ik', 'onay', 'yonetim'];
+  var DEMO_KAPALI = ['kalite-yukle', 'nakliye-yukle', 'asistan', 'toplanti', 'mesaj', 'ik', 'onay', 'yonetim'];
   function yonetimMi() {
     if (window.MMVeri && window.MMVeri.mod() === 'graph') return !!window.MMVeri.ozelErisim('yonetim') && !!(window.MM_AYAR.ozelErisim || {}).yonetim;
     return rolAl() === 'yonetim';

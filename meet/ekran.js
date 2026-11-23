@@ -101,6 +101,8 @@
     try {
       var bilgi = taklit ? { groupId: 'taklit-' + Date.now(), acsToken: 'taklit' } : await window.MeetApi.aramaBaslat(sohbetId);
       await cagriyaGir(bilgi);
+       
+      try { history.replaceState(null, '', location.pathname + location.search + '#s=' + encodeURIComponent(sohbetId) + '&g=' + encodeURIComponent(bilgi.groupId)); } catch (eh) {   }
       var link = window.MeetApi && window.MeetApi.baglantiOlustur ? window.MeetApi.baglantiOlustur(sohbetId, bilgi.groupId) : '';
       $('baglanti').value = link; $('baglanti-satiri').hidden = !link;
       if (!taklit) {

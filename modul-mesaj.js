@@ -410,7 +410,7 @@
         d.addEventListener('click', function () {
           bantlar = bantlar.filter(function (y) { return y !== x; });
           yaz(T('Aranıyor'));
-          meetAc('meet/#s=' + encodeURIComponent(x.sohbet) + '&g=' + encodeURIComponent(x.groupId));
+          meetAc('meet/#s=' + encodeURIComponent(x.sohbet) + '&g=' + encodeURIComponent(x.groupId) + '&v=' + (x.video ? '1' : '0'));
           var s = sohbetBul(x.sohbet); if (!secili && s) sohbetGoster(s); else if (!secili) listeGoster();
         });
         b.appendChild(d);

@@ -172,7 +172,7 @@
     if (!IS) return null;
     var a = ayar();
     var cap = window.Capacitor;
-    if (!(cap && cap.isNativePlatform && cap.isNativePlatform())) return null;   
+    if (!((cap && cap.isNativePlatform && cap.isNativePlatform()) || window.MM_WEB === true)) return null;   
     var cfg = { apiUrl: a.url || '', belirtecAl: function () { return MM.mesaj.belirtecAl ? MM.mesaj.belirtecAl([a.apiKapsam]) : Promise.reject(new Error('belirtec')); }, bildirimKayit: bildirimKayit };
     ist = (MM.mesaj.istemciKur || IS.hazirla)(cfg);
     return ist;

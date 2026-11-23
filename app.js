@@ -60,7 +60,7 @@
   window.MM = Object.assign(window.MM || {}, { h: h, svg: svg, sayi: sayi, saat: saat, yasMetin: yasMetin, yasDk: yasDk, tazelikSatiri: tazelikSatiri, moduller: {} });
    
   window.MM.mesaj = Object.assign(window.MM.mesaj || {}, { hesap: function () { var a = window.MM_AYAR || {}; return { oid: String(a.girisOid || ''), ad: String(a.girisAd || '') }; } });
-  function mesajAcik() { var m = (window.MM_AYAR || {}).mesaj || {}; var cap = window.Capacitor; if (!(cap && cap.isNativePlatform && cap.isNativePlatform())) return false; return !!(String(m.url || '').trim() && String(m.apiKapsam || '').trim()); }   
+  function mesajAcik() { var m = (window.MM_AYAR || {}).mesaj || {}; var cap = window.Capacitor; if (!((cap && cap.isNativePlatform && cap.isNativePlatform()) || window.MM_WEB === true)) return false; return !!(String(m.url || '').trim() && String(m.apiKapsam || '').trim()); }   
 
    
   var IKON = {

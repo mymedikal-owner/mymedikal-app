@@ -123,7 +123,7 @@
   function hazirla(o) {
     o = o || {};
     var apiUrl = typeof o.apiUrl === 'string' ? o.apiUrl.trim().replace(/\/+$/, '') : '';
-    var kapali = !apiUrl || (typeof window !== 'undefined' && !yerelUygulama());   
+    var kapali = !apiUrl || (typeof window !== 'undefined' && !(yerelUygulama() || window.MM_WEB === true));   
     var tasiyici = o.tasiyici || varsayilanTasiyici(apiUrl);
     var blobTasiyici = o.blobTasiyici || varsayilanBlobTasiyici;
     var bekle = o.bekle || function (sn) { return new Promise(function (ok) { setTimeout(ok, sn * 1000); }); };

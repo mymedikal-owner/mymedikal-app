@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://mymesaj-api-p4nhi4.azurewebsites.net https://login.microsoftonline.com https://*.skype.com wss://*.skype.com https://*.microsoft.com wss://*.microsoft.com https://*.azure.net wss://*.azure.net https://*.azure.com wss://*.azure.com https://*.office.com wss://*.office.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>MY Medikal Meet</title>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="ekran.css">
+</head>
+<body>
+<div id="uygulama" class="uygulama">
+  <p id="olgu" class="olgu">Görüşme kaydedilmez. Ses ve görüntü Microsoft Azure üzerinden iletilir.</p>
+  <header class="ust">
+    <img class="logo" src="../marka/logo.svg" alt="MY Medikal">
+    <strong>Meet</strong>
+    <span id="durum" class="durum" role="status" aria-live="polite" data-durum="hazir" data-katilimci="0">
+      <span id="durum-metin">Hazırlanıyor…</span>
+      <span id="katilimci-metin" hidden></span>
+    </span>
+  </header>
+
+  <p id="mesaj" class="mesaj" role="alert" hidden></p>
+
+  <main class="orta">
+    <section id="panel-yok" class="kutu" hidden>
+      <h2 id="yok-baslik">Önce uygulamada giriş yapın</h2>
+      <p id="yok-metin">Meet, uygulamadaki oturumunuzu kullanır.</p>
+      <p><a id="yok-baglanti" class="dugme birincil" href="../">Uygulamaya git</a></p>
+    </section>
+
+    <section id="panel-sec" class="kutu" hidden>
+      <h2>Toplantıyı başlat</h2>
+      <p class="kucuk">Bir sohbet seçin. Sohbetin üyelerine toplantı bağlantısı mesaj olarak gider.</p>
+      <label class="alan">Sohbet
+        <select id="sohbet-sec"></select>
+      </label>
+      <p class="kucuk">Toplantıyı başlatmak, sohbetin diğer üyelerine arama bildirimi gönderir.</p>
+      <div class="satir"><button id="b-baslat" class="birincil" type="button" disabled>Toplantıyı başlat</button></div>
+    </section>
+
+    <section id="panel-katil" class="kutu" hidden>
+      <h2>Toplantıya katıl</h2>
+      <p id="katil-bilgi" class="kucuk">Bağlantıdaki toplantıya katılacaksınız.</p>
+      <div class="satir"><button id="b-katil" class="birincil" type="button">Katıl</button></div>
+    </section>
+
+    <section id="panel-bitti" class="kutu" hidden>
+      <h2>Toplantıdan ayrıldınız</h2>
+      <div class="satir"><button id="b-tekrar" class="birincil" type="button">Yeni toplantı / yeniden katıl</button></div>
+    </section>
+
+    <section id="sahne" class="sahne" aria-label="Toplantı" hidden>
+      <div id="baglanti-satiri" class="baglanti" hidden>
+        <span class="kucuk">Toplantı bağlantısı:</span>
+        <input id="baglanti" type="text" readonly aria-label="Toplantı bağlantısı">
+        <button id="b-kopyala" type="button">Kopyala</button>
+      </div>
+      <div id="izgara" class="izgara" aria-label="Katılımcılar"></div>
+    </section>
+  </main>
+
+  <nav id="cubuk" class="cubuk" aria-label="Toplantı denetimleri" hidden>
+    <button id="b-mik" type="button" aria-pressed="true">Mikrofon</button>
+    <button id="b-kam" type="button" aria-pressed="false">Kamera</button>
+    <button id="b-arka" type="button" disabled title="Sanal arka plan yakında">Arka plan (yakında)</button>
+    <button id="b-ayril" class="tehlike" type="button">Ayrıl</button>
+  </nav>
+</div>
+
+<script src="../vendor/msal-browser.min.js"></script>
+<script src="../ayar.js"></script>
+<script src="vendor/acs-calling-2.0.0.min.js"></script>
+<script src="kimlik.js"></script>
+<script src="api.js"></script>
+<script src="saglayici.js"></script>
+<script src="ekran.js"></script>
+</body>
+</html>

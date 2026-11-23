@@ -38,8 +38,9 @@
   }
 
   async function dosyayaYaz(upn, belirtec) {
-    var V = window.MMVeri, hedef = String(A.bildirimDriveId || A.driveId || '').trim();
-    if (!V || typeof V.cihazBelirteciYaz !== 'function' || !hedef) { kodYaz('f_ayar'); return 'ayar'; }
+    var V = window.MMVeri, hedef = String(A.bildirimDriveId || '').trim();   
+    if (!hedef) return 'yok';   
+    if (!V || typeof V.cihazBelirteciYaz !== 'function') { kodYaz('f_ayar'); return 'ayar'; }
     var ad = await ozet(upn);
     var govde = JSON.stringify({ surum: 1, upn: upn, rol: A.girisRol || 'calisan', belirtec: belirtec, ortam: 'production', platform: 'ios', ts: new Date().toISOString() });
     return V.cihazBelirteciYaz(ad, govde, hedef);   
@@ -56,6 +57,7 @@
       if (!s || s.durum !== 'var' || !s.belirtec) { kodYaz('f_' + String((s && (s.neden || s.durum)) || 'izin_yok').replace(/[^A-Za-z0-9_]/g, '').slice(0, 20)); if (s && s.durum === 'red') bitti = true; return; }
       var sonuc = await dosyayaYaz(upn, s.belirtec);
       if (sonuc === 'tamam') { sonYazimKaydet(); bitti = true; }
+      else if (sonuc === 'yok') { bitti = true; }
       else if (sonuc === 'yetki') { console.warn('bildirim', 'yazma yetkisi yok'); kodYaz('f_yetki'); bitti = true; }   
     } catch (e) { console.warn('bildirim', String((e && (e.code || e.message)) || 'hata').slice(0, 40)); kodYaz('f_' + String((e && (e.code || e.message)) || 'hata').replace(/[^A-Za-z0-9_]/g, '').slice(0, 20)); }
     finally { yapiliyor = false; }

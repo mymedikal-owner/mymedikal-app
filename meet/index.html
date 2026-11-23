@@ -26,7 +26,44 @@
     <section id="panel-yok" class="kutu" hidden>
       <h2 id="yok-baslik">Önce uygulamada giriş yapın</h2>
       <p id="yok-metin">Meet, uygulamadaki oturumunuzu kullanır.</p>
-      <p><a id="yok-baglanti" class="dugme birincil" href="../">Uygulamaya git</a></p>
+      <p><a id="yok-baglanti" class="dugme birincil" href="../index.html">Uygulamaya git</a></p>
+    </section>
+
+    <section id="panel-lobi" class="lobi" aria-label="Ana ekran" hidden>
+      <div class="lobi-sol">
+        <h1 class="lobi-baslik">Görüntülü görüşme ve toplantılar</h1>
+        <p class="lobi-alt">Ekibinizle bağlantı kurun, toplantı başlatın ya da bir toplantıya katılın.</p>
+        <div class="lobi-islem">
+          <div class="acilir-kap lobi-yeni-kap">
+            <button id="l-yeni" class="birincil buyuk" type="button" aria-haspopup="true" aria-expanded="false"><span class="ikon" data-ikon="kam"></span>Yeni toplantı</button>
+            <div id="l-yeni-menu" class="acilir lobi-menu" role="menu" hidden>
+              <button id="l-baglanti" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="baglanti"></span>Toplantı bağlantısı oluştur</button>
+              <button id="l-hemen" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="kam"></span>Hemen toplantı başlat</button>
+              <button id="l-planla" type="button" class="menu-oge" role="menuitem" hidden><span class="ikon" data-ikon="takvim"></span>Toplantı planla</button>
+            </div>
+          </div>
+          <form id="l-kod-form" class="lobi-kod" autocomplete="off">
+            <span class="ikon" data-ikon="klavye"></span>
+            <input id="l-kod" type="text" maxlength="400" placeholder="Kod ya da bağlantı girin" aria-label="Toplantı kodu ya da bağlantısı">
+            <button id="l-kod-katil" type="submit" class="metin-dugme" disabled>Katıl</button>
+          </form>
+        </div>
+        <p id="l-kod-hata" class="lobi-hata" role="alert" hidden></p>
+        <div id="l-yeni-baglanti" class="lobi-baglanti-kutu" hidden>
+          <p class="kucuk">Bu bağlantıyı paylaşın. Toplantıya yalnızca bağlantıyı bilen kişiler katılabilir.</p>
+          <div class="baglanti"><input id="l-yeni-link" type="text" readonly aria-label="Oluşturulan bağlantı"><button id="l-yeni-kopyala" type="button">Kopyala</button><button id="l-yeni-katil" type="button" class="birincil">Katıl</button></div>
+        </div>
+      </div>
+      <div class="lobi-sag">
+        <section id="l-yaklasan" class="lobi-bolum" aria-labelledby="l-yaklasan-b" hidden>
+          <h2 id="l-yaklasan-b">Yaklaşan toplantılar</h2>
+          <ul id="l-yaklasan-liste" class="lobi-liste"></ul>
+        </section>
+        <section id="l-kisiler" class="lobi-bolum" aria-labelledby="l-kisiler-b" hidden>
+          <h2 id="l-kisiler-b">Çevrimiçi kişiler</h2>
+          <ul id="l-kisiler-liste" class="lobi-liste"></ul>
+        </section>
+      </div>
     </section>
 
     <section id="panel-onizleme" class="onizleme" aria-label="Katılmadan önce" hidden>
@@ -34,10 +71,12 @@
         <div class="onizleme-kutu">
           <div id="onizleme-video" class="video"></div>
           <p id="onizleme-bos" class="onizleme-bos">Kamera kapalı</p>
+          <span id="onizleme-ad" class="onizleme-ad"></span>
           <div class="onizleme-dugmeler">
             <button id="o-mik" class="yuvarlak" type="button" aria-pressed="true" aria-label="Mikrofonu kapat" title="Mikrofonu kapat"><span class="ikon" data-ikon="mik"></span></button>
             <button id="o-kam" class="yuvarlak" type="button" aria-pressed="true" aria-label="Kamerayı kapat" title="Kamerayı kapat"><span class="ikon" data-ikon="kam"></span></button>
             <button id="o-cevir" class="yuvarlak" type="button" aria-label="Kamerayı çevir (ön/arka)" title="Kamerayı çevir (ön/arka)" hidden><span class="ikon" data-ikon="cevir"></span></button>
+            <button id="o-efekt" class="yuvarlak" type="button" aria-label="Arka plan ve efektler" title="Arka plan ve efektler"><span class="ikon" data-ikon="arka"></span></button>
           </div>
         </div>
         <div class="cihaz-satir">
@@ -49,12 +88,14 @@
       <div class="onizleme-sag">
         <h1 id="onizleme-baslik">Toplantıyı başlat</h1>
         <p id="onizleme-alt" class="kucuk">Bir sohbet seçin. Sohbetin üyelerine toplantı bağlantısı mesaj olarak gider.</p>
+        <p id="onizleme-icerde" class="icerde" hidden></p>
         <label id="sohbet-alan" class="alan">Sohbet
           <select id="sohbet-sec"></select>
         </label>
         <div class="satir">
           <button id="b-baslat" class="birincil buyuk" type="button" disabled>Toplantıyı başlat</button>
-          <button id="b-katil" class="birincil buyuk" type="button" hidden>Şimdi katıl</button>
+          <button id="b-katil" class="birincil buyuk" type="button" hidden>Hemen katıl</button>
+          <button id="b-lobi" class="buyuk metin-dugme" type="button" hidden>Geri</button>
         </div>
         <p id="olgu" class="kucuk">Görüşme kaydedilmez. Ses ve görüntü Microsoft Azure üzerinden iletilir.</p>
       </div>
@@ -64,8 +105,20 @@
       <h2>Toplantıdan ayrıldınız</h2>
       <div class="satir satir-orta">
         <button id="b-tekrar" class="birincil" type="button">Yeniden katıl</button>
-        <a id="b-ana" class="dugme" href="../">Ana ekrana dön</a>
+        <button id="b-lobiye" class="dugme" type="button">Ana ekrana dön</button>
       </div>
+      <div class="puan" role="group" aria-labelledby="puan-b">
+        <p id="puan-b" class="kucuk">Görüşmenin kalitesi nasıldı?</p>
+        <div class="puan-dugmeler">
+          <button type="button" class="puan-d" data-puan="1" aria-label="1 yıldız">★</button>
+          <button type="button" class="puan-d" data-puan="2" aria-label="2 yıldız">★</button>
+          <button type="button" class="puan-d" data-puan="3" aria-label="3 yıldız">★</button>
+          <button type="button" class="puan-d" data-puan="4" aria-label="4 yıldız">★</button>
+          <button type="button" class="puan-d" data-puan="5" aria-label="5 yıldız">★</button>
+        </div>
+        <p id="puan-tesekkur" class="kucuk" hidden>Geri bildiriminiz için teşekkürler.</p>
+      </div>
+      <p class="kucuk"><a id="b-ana" href="../index.html">Uygulamaya dön</a></p>
     </section>
 
     <section id="sahne" class="sahne" aria-label="Toplantı" hidden>
@@ -86,9 +139,13 @@
             <button id="yan-kapat" class="yuvarlak ince" type="button" aria-label="Paneli kapat" title="Paneli kapat"><span class="ikon" data-ikon="kapat"></span></button>
           </div>
           <div id="yan-kisiler" class="yan-icerik" hidden>
+            <button id="kisi-ekle" class="kisi-ekle" type="button"><span class="ikon" data-ikon="kisiekle"></span>Kişi ekle</button>
+            <input id="kisi-ara" class="kisi-ara" type="search" placeholder="Kişilerde ara" aria-label="Kişilerde ara" autocomplete="off">
+            <p class="liste-baslik">Toplantıda <span id="kisi-toplam">(1)</span></p>
             <ul id="kisi-liste" class="kisi-liste"></ul>
           </div>
           <div id="yan-sohbet" class="yan-icerik sohbet" hidden>
+            <p class="kucuk msg-not">Toplantı içi mesajlar bu sohbetin üyelerine de görünür.</p>
             <p id="msg-bos" class="kucuk" hidden></p>
             <ul id="msg-liste" class="msg-liste" aria-live="polite"></ul>
             <form id="msg-form" class="msg-form" autocomplete="off">
@@ -134,9 +191,14 @@
           <div class="acilir-kap">
             <button id="b-uc" class="yuvarlak" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Diğer seçenekler" title="Diğer seçenekler"><span class="ikon" data-ikon="uc"></span></button>
             <div id="menu" class="acilir menu" role="menu" hidden>
-              <button id="m-izgara" type="button" class="menu-oge" role="menuitemradio" aria-checked="true"><span class="ikon" data-ikon="izgara"></span>Izgara görünümü</button>
-              <button id="m-konusmaci" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="konusmaci"></span>Konuşmacı görünümü</button>
-              <button id="m-arka" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="arka"></span>Arka plan (yakında)</button>
+              <p class="menu-baslik">Düzeni değiştir</p>
+              <button id="m-otomatik" type="button" class="menu-oge" role="menuitemradio" aria-checked="true"><span class="ikon" data-ikon="otomatik"></span>Otomatik</button>
+              <button id="m-izgara" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="izgara"></span>Döşeme</button>
+              <button id="m-spotlight" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="spotlight"></span>Spotlight</button>
+              <button id="m-konusmaci" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="konusmaci"></span>Kenar çubuğu</button>
+              <hr class="menu-cizgi">
+              <button id="m-tamekran" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="tamekran"></span>Tam ekran</button>
+              <button id="m-arka" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="arka"></span>Arka plan ve efektler</button>
               <button id="m-ayar" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="ayar"></span>Ayarlar</button>
               <button id="m-altyazi" type="button" class="menu-oge mobil-ek" role="menuitem"><span class="ikon" data-ikon="altyazi"></span>Altyazı (yakında)</button>
               <button id="m-ekran" type="button" class="menu-oge mobil-ek" role="menuitem"><span class="ikon" data-ikon="ekran"></span>Ekranı paylaş</button>
@@ -170,6 +232,7 @@
 <script src="vendor/acs-calling-2.0.0.min.js"></script>
 <script src="kimlik.js"></script>
 <script src="api.js"></script>
+<script src="lobi.js"></script>
 <script src="saglayici.js"></script>
 <script src="ekran.js"></script>
 </body>

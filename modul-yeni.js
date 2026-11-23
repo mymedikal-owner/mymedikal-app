@@ -112,7 +112,7 @@
   function asEkle(o) {
     o.ts = Date.now(); AS.gecmis.push(o); if (AS.gecmis.length > 40) AS.gecmis.shift();
     var u = AS.ui;
-    if (u && u.akis.isConnected) { u.akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') u.akis.appendChild(asEylemSatiri(o)); }
+    if (u && u.akis.isConnected) { var bosEl = u.akis.querySelector('.asistan-bos'); if (bosEl) bosEl.remove(); u.akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') u.akis.appendChild(asEylemSatiri(o)); }
     asUiGuncelle();
   }
   function asBitir(o) { AS.bekleyen = false; asEkle(o); if (typeof MM.asistanDegisti === 'function') { try { MM.asistanDegisti(); } catch (e) {   } } }
@@ -164,6 +164,15 @@
       } }, [giriKutu, gonderDugme]);
       [akis, giris, h('p', { sinif: 'soluk kucuk', metin: Tt('Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.') })].forEach(function (x) { sohbetGovde.appendChild(x); });
       AS.gecmis.forEach(function (o) { akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') akis.appendChild(asEylemSatiri(o)); });   
+      if (!AS.gecmis.length) {   
+        var ORNEK = { siparis: 'Açık siparişlerin durumu nedir?', makineler: 'Bugün hangi makinelerde duruş var?', stok: 'Kritik stok seviyesindeki ürünler hangileri?', eldiven: 'Eldiven konteynerlerinin durumu nedir?' };
+        var chipler = erisilen.filter(function (k) { return ORNEK[k[0]]; }).slice(0, 4).map(function (k) {
+          var c = h('button', { type: 'button', sinif: 'asistan-ornek', metin: Tt(ORNEK[k[0]]) });
+          c.addEventListener('click', function () { giriKutu.value = Tt(ORNEK[k[0]]); giriKutu.focus(); });
+          return c;
+        });
+        akis.appendChild(h('div', { sinif: 'asistan-bos' }, [h('strong', { metin: Tt('Merhaba, size nasıl yardımcı olabilirim?') }), h('p', { sinif: 'soluk', metin: Tt('Aşağıya sorunuzu yazın; yanıtı yetkiniz olan bölümlerden hazırlarım.') }), chipler.length ? h('div', { sinif: 'asistan-ornekler' }, chipler) : null]));
+      }
       asUiGuncelle();
     }
     function kapiAc(zorla) {

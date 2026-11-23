@@ -228,3 +228,39 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .diger-sheet .ms-nrozet { position: static; margin-left: auto; }
 @media (min-width: 1024px) { .ms-nrozet { position: static; margin-left: auto; } }
 .menu-genis .ms-nrozet { position: static; margin-left: auto; }
+
+ 
+.ms-bolme { display: contents; }
+.ms-kok.ms-sol-bolme { display: none; }
+.asistan-bos { margin: auto; max-width: 420px; padding: 24px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--ms-karsi-yazi); }
+.asistan-bos p { margin: 0; }
+.asistan-ornekler { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
+.asistan-ornek { border: 1px solid var(--ms-ince); border-radius: 18px; padding: 8px 14px; min-height: 36px; background: var(--ms-karsi-zemin); color: var(--ms-karsi-yazi); font: inherit; font-size: 14px; cursor: pointer; }
+.asistan-ornek:hover { border-color: var(--ms-yesil); color: var(--ms-yesil); }
+.ms-bos-sag { margin: auto; text-align: center; color: var(--ms-saat); padding: 24px; }
+.ms-bos-sag strong { display: block; font-size: 18px; font-weight: 500; margin-bottom: 6px; color: var(--ms-karsi-yazi); }
+.ms-bos-sag p { margin: 0; }
+@media (min-width: 1024px) {
+  .icerik:has(.ms-bolme), .icerik:has(.asistan-sayfa) { max-width: none; }
+   
+  .ms-bolme { display: flex; width: 100%; height: calc(100dvh - var(--ust-yukseklik) - 48px); min-height: 420px; border: 1px solid var(--ms-ince); border-radius: 12px; overflow: hidden; background: var(--ms-sohbet-zemin); }
+  .ms-bolme > .ms-kok.ms-sol-bolme { order: -1; display: flex; flex: 0 0 clamp(320px, 30%, 440px); width: auto; max-width: none; margin: 0; padding: 0 14px 8px; box-sizing: border-box; overflow-y: auto; overflow-x: clip; border-right: 1px solid var(--ms-ince); background: var(--yuzey, #fff); }
+  .ms-bolme > .ms-kok:not(.ms-sol-bolme) { flex: 1 1 auto; width: auto; max-width: none; margin: 0; min-width: 0; height: 100%; box-sizing: border-box; }
+  .ms-bolme .ms-ekran-sohbet { position: relative; top: auto; left: auto; right: auto; bottom: auto; height: 100%; max-width: none; margin: 0; z-index: auto; }
+  .ms-bolme .ms-ekran-sohbet .ms-sohbet-ust .ms-yd-ust { display: none; }    
+  .ms-bolme .ms-ekran-kisi, .ms-bolme .ms-ekran-bilgi { min-height: 0; height: 100%; overflow-y: auto; padding: 12px 20px; background: var(--yuzey, #fff); }
+  .ms-bolme .ms-ekran-bos { display: flex; background: var(--ms-sohbet-zemin); }
+  .ms-bolme .ms-mesajlar { padding: 12px clamp(16px, 5%, 72px); }
+  .ms-bolme .ms-m { max-width: min(70%, 720px); }
+  .ms-sat-kap.ms-secili { background: var(--ms-arama-zemin); }
+  .ms-sat-kap.ms-secili .ms-sohbet { background: transparent; }
+  .ms-sol-bolme .ms-sohbet { cursor: pointer; }
+  .ms-sol-bolme .ms-sat-kap:hover { background: var(--ms-arama-zemin); }
+   
+  .asistan-sayfa.ms-ekran-sohbet { max-width: none; margin: 0; width: 100%; }
+  .asistan-ms .sohbet-akis { padding: 20px clamp(20px, 8%, 160px) 16px; gap: 6px; }
+  .asistan-ms .balon { max-width: min(78%, 880px); }
+  .asistan-ms .balon p { font-size: 15.5px; line-height: 1.45; }
+  .asistan-ms .sohbet-giris { padding-left: clamp(16px, 8%, 160px); padding-right: clamp(16px, 8%, 160px); }
+  .asistan-ms .sohbet > .soluk { padding-bottom: 8px; }
+}

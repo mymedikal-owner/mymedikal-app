@@ -593,6 +593,7 @@
     return l.slice(0, 30).map(function (x) { return { id: x.id, kayitNo: x.kayitNo, zaman: x.zaman, durum: x.durum, hata: x.hata, adet: x.dosyalar.length, bolum: x.form.bolum, problem: x.form.problem, onem: x.form.onem }; });
   }
 
+  var ORTAK_OKU = {};
   var MMVeri = {
     demo: function () { return DEMO; },
     demoAc: function () { DEMO = true; },
@@ -622,7 +623,17 @@
     ozelErisim: ozelErisim,
     sahaKip: sahaKip,
     bolumGorur: bolumGorur,
-    async oku(modul, dosya, graphModul) {
+    
+
+    oku(modul, dosya, graphModul) {
+      var anahtar = String(A().girisUpn || '') + '|' + modul + '|' + (graphModul || '') + '|' + dosya, simdi = Date.now(), g = ORTAK_OKU[anahtar];
+      if (g && (!g.bitti || (g.ttl && simdi - g.bitti < g.ttl))) return g.p;
+      var kayit = { p: null, bitti: 0, ttl: modul === 'fabrika' ? 8000 : 0 };
+      kayit.p = MMVeri.okuHam(modul, dosya, graphModul).then(function (s) { kayit.bitti = Date.now(); if (!kayit.ttl) delete ORTAK_OKU[anahtar]; return s; }, function (e) { delete ORTAK_OKU[anahtar]; throw e; });
+      ORTAK_OKU[anahtar] = kayit;
+      return kayit.p;
+    },
+    async okuHam(modul, dosya, graphModul) {
       var m = modAl();
       if (kisitli() || !ozelErisim(modul) || (graphModul && !ozelErisim(graphModul))) throw hata('giris_gerekli', 'Bu bölüm için erişiminiz yok');   
       if (m !== 'graph') return { veri: await yerelOku(modul, dosya), kaynak: m, alindi: new Date() };

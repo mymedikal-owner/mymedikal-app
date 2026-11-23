@@ -364,7 +364,11 @@
   MM.moduller.mesaj = function (kok) {
     var canli = true, i = istemci();
     var kap = h('div', { sinif: 'ms-kok' });
-    kok.appendChild(kap);
+     
+    var sol = h('div', { sinif: 'ms-kok ms-sol-bolme ms-ekran-liste' }), solKurulu = false;
+    var mqGenis = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : null;
+    function genis() { return !!(mqGenis && mqGenis.matches); }
+    kok.appendChild(h('div', { sinif: 'ms-bolme' }, [kap, sol]));   
     if (!i || !i.acik()) {
       kap.appendChild(h('p', { sinif: 'veri-yok', metin: T('Mesaj kapalı') }));
       return function () { canli = false; };
@@ -376,10 +380,10 @@
     D.acilacak = '';
     var durum = h('p', { sinif: 'ms-durum kucuk soluk', metin: '' });
     function yaz(m) { if (canli) durum.textContent = m || ''; }
-    function temizle() { if (!canli) return; kap.textContent = ''; cozucu.forEach(function (f) { f(); }); cozucu = []; listeKut = null; }
+    function temizle() { if (!canli) return; kap.textContent = ''; cozucu.forEach(function (f) { f(); }); cozucu = []; if (!solKurulu) listeKut = null; }
     function ekranSinifi(s) {
       kap.className = 'ms-kok ' + s;
-      var tam = s !== 'ms-ekran-liste';   
+      var tam = s !== 'ms-ekran-liste' && !genis();   
       document.body.classList.toggle('ms-tam', tam);
       if (!tam) vvTemizle(); else vvDegisti();
     }
@@ -434,7 +438,7 @@
       i.tercih(s.id, t).then(function () { s.tercih = Object.assign({}, s.tercih || {}, t); D.sohbetler = siraliSohbetler(D.sohbetler); bildir(); yaz(''); if (sonra) sonra(); }, function (e) { yaz(hataYaz(e)); if (sonra) sonra(); });
     }
     function okunduSay(s) {   
-      s.okunmamis = 0; bildir(); if (canli && gorunum === 'liste') { cipGuncelle(); listeIc(); }
+      s.okunmamis = 0; bildir(); if (canli && (gorunum === 'liste' || solKurulu)) { cipGuncelle(); listeIc(); }
       i.mesajlar(s.id, { adet: 1 }).then(function (l) {   
         var m = null; (l || []).forEach(function (x) { if (x && x.id && (!m || epoch(x.ts) > epoch(m.ts))) m = x; });
         if (m) return i.okundu(s.id, m.id);
@@ -544,9 +548,10 @@
         if (asSon) asUst.push(h('span', { sinif: 'ms-saat', metin: T(saatBicim(asSon.ts)) }));
         var asistan = h('button', { sinif: 'ms-sohbet ms-asistan', type: 'button' }, [h('span', { sinif: 'ms-av ms-av-liste ms-av-asistan', 'aria-hidden': 'true' }, [ikon('kisi', 28, '#5b4bd5')]), h('span', { sinif: 'ms-sol' }, [h('span', { sinif: 'ms-satir-ust' }, asUst), alt])]);
         asistan.addEventListener('click', function () { if (MM.asistanSohbet) asistanGoster(); else location.hash = '#asistan'; });   
+        if (solKurulu && gorunum === 'asistan') asistan.classList.add('ms-secili');
         listeKut.appendChild(asistan);
       }
-      gorunur.forEach(function (s) { listeKut.appendChild(satirSohbet(s)); });
+      gorunur.forEach(function (s) { var el = satirSohbet(s); if (solKurulu && gorunum === 'sohbet' && secili && secili.id === s.id) el.classList.add('ms-secili'); listeKut.appendChild(el); });
       if (!gorunur.length) {
         var yok = !D.sohbetler.length ? (D.sohbetYuklendi ? T('Henüz sohbet yok. Başlatmak için + düğmesine dokunun.') : T('Yükleniyor')) : (filtre.cip === 'arsiv' ? T('Arşivde sohbet yok') : T('Sonuç yok'));
         if (!D.sohbetler.length || filtre.q || filtre.cip !== 'tum') listeKut.appendChild(h('p', { sinif: 'veri-yok ms-bos', metin: yok }));
@@ -554,7 +559,7 @@
     }
      
     function asistanGoster() {
-      if (!canli || !MM.asistanSohbet) return; secili = null; gorunum = 'asistan'; D.acikId = ''; temizle(); ekranSinifi('ms-ekran-sohbet asistan-ms');
+      if (!canli || !MM.asistanSohbet) return; secili = null; gorunum = 'asistan'; D.acikId = ''; temizle(); ekranSinifi('ms-ekran-sohbet asistan-ms'); if (solKurulu) listeIc();
       var as = MM.asistanSohbet();
       var asAv = h('span', { sinif: 'ms-av ms-av-ust ms-av-asistan', 'aria-hidden': 'true' }, [ikon('kisi', 24, '#5b4bd5')]);
       var baslik = h('span', { sinif: 'ms-baslik-pill' }, [asAv, h('span', { sinif: 'ms-baslik-kutu' }, [h('strong', { sinif: 'ms-baslik', metin: T('Asistan') }), h('span', { sinif: 'ms-alt-yazi', metin: T('Şirket içi yapay zekâ asistanı') })])]);
@@ -571,22 +576,30 @@
       kok2.addEventListener('click', function (e) { if (e.target === kok2) kapat(); });
       kok2.appendChild(kutu); kap.appendChild(kok2);
     }
+    function bosGoster() {   
+      kap.appendChild(h('div', { sinif: 'ms-bos-sag' }, [h('strong', { metin: T('Bir sohbet seçin') }), h('p', { sinif: 'soluk', metin: T('Soldaki listeden bir sohbet açın ya da yeni sohbet başlatın.') })]));
+    }
+    function solKur() { sol.textContent = ''; solKurulu = true; listeKut = null; listeKur(sol); }
     function listeGoster() {
-      if (!canli) return; secili = null; gorunum = 'liste'; D.acikId = ''; temizle(); ekranSinifi('ms-ekran-liste');
+      if (!canli) return; secili = null; gorunum = 'liste'; D.acikId = ''; temizle();
+      if (genis()) { ekranSinifi('ms-ekran-bos'); bosGoster(); if (!solKurulu) solKur(); else { cipGuncelle(); listeIc(); } return; }
+      ekranSinifi('ms-ekran-liste'); listeKur(kap);
+    }
+    function listeKur(lk) {
       var menuD = yuvarlakDugme('nokta3', T('Daha fazla'), menuAc), yeniD = yuvarlakDugme('arti', T('Yeni sohbet'), function () { kisiSecGoster(); }, 'ms-yd-yesil');
       var kamD = yuvarlakDugme('kamera', T('Fotoğraf'), function () { kamGirdi.click(); });
       var kamGirdi = h('input', { type: 'file', accept: 'image/*', hidden: true });
       kamGirdi.addEventListener('change', function () { var f = kamGirdi.files && kamGirdi.files[0]; kamGirdi.value = ''; if (!f) return; bekleyenFoto = f; kisiSecGoster(); });   
-      kap.appendChild(h('div', { sinif: 'ms-ust-sat' }, [menuD, h('span', { sinif: 'ms-ust-sag' }, [kamD, yeniD]), kamGirdi]));
-      kap.appendChild(h('h1', { sinif: 'ms-buyuk-baslik', metin: T('Sohbetler') }));
+      lk.appendChild(h('div', { sinif: 'ms-ust-sat' }, [menuD, h('span', { sinif: 'ms-ust-sag' }, [kamD, yeniD]), kamGirdi]));
+      lk.appendChild(h('h1', { sinif: 'ms-buyuk-baslik', metin: T('Sohbetler') }));
       aramaEl = h('input', { sinif: 'ms-arama', type: 'search', placeholder: T('Ara'), 'aria-label': T('Ara'), autocomplete: 'off' });
       aramaEl.value = filtre.q;
       aramaEl.addEventListener('input', function () { filtre.q = aramaEl.value; listeIc(); });
-      kap.appendChild(h('div', { sinif: 'ms-arama-kap' }, [ikon('ara', 20), aramaEl]));
-      cipEl = h('div', { sinif: 'ms-cipler', role: 'group' }); kap.appendChild(cipEl); cipGuncelle();
-      kap.appendChild(bantEl());
-      kap.appendChild(durum);   
-      listeKut = h('div', { sinif: 'ms-sohbetler' }); kap.appendChild(listeKut);
+      lk.appendChild(h('div', { sinif: 'ms-arama-kap' }, [ikon('ara', 20), aramaEl]));
+      cipEl = h('div', { sinif: 'ms-cipler', role: 'group' }); lk.appendChild(cipEl); cipGuncelle();
+      lk.appendChild(bantEl());
+      lk.appendChild(durum);   
+      listeKut = h('div', { sinif: 'ms-sohbetler' }); lk.appendChild(listeKut);
       listeIc();
     }
     function listeYukle() {
@@ -1045,7 +1058,17 @@
     }
 
      
-    function durumDegisti() { if (canli && gorunum === 'liste') { cipGuncelle(); listeIc(); } acilacaksa(); }
+    function durumDegisti() { if (canli && (gorunum === 'liste' || solKurulu)) { cipGuncelle(); listeIc(); } acilacaksa(); }
+     
+    if (mqGenis) {
+      var mqDegisti = function () {
+        if (!canli) return;
+        sol.textContent = ''; solKurulu = false; listeKut = null;
+        if (genis()) solKur();
+        if (gorunum === 'sohbet' && secili) sohbetGoster(secili); else if (gorunum === 'asistan') asistanGoster(); else listeGoster();
+      };
+      if (mqGenis.addEventListener) mqGenis.addEventListener('change', mqDegisti); else if (mqGenis.addListener) mqGenis.addListener(mqDegisti);
+    }
      
     var cekY = null;
     kap.addEventListener('touchstart', function (e) { cekY = (gorunum === 'liste' && (window.scrollY || 0) <= 0 && e.touches.length === 1) ? e.touches[0].clientY : null; }, { passive: true });

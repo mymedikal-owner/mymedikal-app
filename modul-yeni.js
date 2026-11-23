@@ -688,17 +688,18 @@
     function alan(ad, el) { return h('label', { sinif: 'alan' }, [h('span', { metin: ad }), el]); }
     kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'MY Medikal Meet ile toplantı', kirinti: [['Toplantı']] }));
      
-    var meetDugme = h('a', { sinif: 'dugme tam', role: 'button', href: 'meet/' }, [h('span', { metin: 'MY Medikal Meet ile başlat/katıl' })]);
+    var meetDugme = h('a', { sinif: 'dugme tam', role: 'button', href: 'meet/' }, [h('span', { metin: 'Toplantı odasını aç' })]);   
+    meetDugme.style.fontSize = '1.15rem'; meetDugme.style.padding = '18px 16px';
     meetDugme.addEventListener('click', function (e) {   
       var M = MM.mesaj;
       if (M && M.kabukMu && M.kabukMu()) { e.preventDefault(); if (M.meetCerceveAc) M.meetCerceveAc('meet/'); else M.disAc(M.meetTamAdres('meet/')); }
     });
-    kok.appendChild(gr.kart({ baslik: 'MY Medikal Meet', govde: h('div', null, [
-      meetDugme,
-      h('p', { sinif: 'soluk', metin: 'Yapay zekâ dinleyici henüz yok; tutanak gerekiyorsa Google Meet yedek yolunu kullanın.' })]) }));
+    kok.appendChild(gr.kart({ baslik: 'MY Medikal Meet', govde: h('div', null, [meetDugme]) }));
     var form = h('div', { sinif: 'yeni-izgara' }, [alan('Konu', konuS), alan('Tarih', gunI), alan('Saat', saatS), alan('Süre', sureS)]);
-    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Yedek yol (Yapay zekâ dinleyici gelene kadar)', govde: h('div', null, [form, h('div', { sinif: 'ust-bosluk' }, [dugme]), durum]) })]));
-    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Nasıl çalışır?', govde: h('ol', { sinif: 'ozellik-liste' }, [
+    var yedek = h('details', { sinif: 'ust-bosluk' }, [h('summary', { metin: 'Dış katılımcılı toplantı (Google Meet)' })]);   
+    kok.appendChild(yedek);
+    yedek.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Yedek yol (Yapay zekâ dinleyici gelene kadar)', govde: h('div', null, [form, h('div', { sinif: 'ust-bosluk' }, [dugme]), durum]) })]));
+    yedek.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Nasıl çalışır?', govde: h('ol', { sinif: 'ozellik-liste' }, [
       h('li', { metin: 'Formu doldurup “Toplantı isteğini hazırla”ya dokunun; posta programınızda hazır bir mail açılır.' }),
       h('li', { metin: 'Katılacak kişileri mailin CC satırına ekleyin, gündemi yazın ve gönderin.' }),
       h('li', { metin: 'Google Meet daveti ve bağlantısı sizin ve katılımcıların e-postasına gelir; toplantı saatinde bağlantıyı açın.' }),

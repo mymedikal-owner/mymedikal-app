@@ -17,6 +17,10 @@
   var ARALIK = 6 * 3600 * 1000;
   var yapiliyor = false, bitti = false;
 
+   
+  function kodYaz(k) {
+    try { if (window.MM_bildirimKod) window.MM_bildirimKod(k); else (window.MM_bildirimKodBekleyen = window.MM_bildirimKodBekleyen || []).push(String(k).slice(0, 24)); } catch (e) {   }
+  }
   function sonYazim() { try { return +localStorage.getItem(ANAHTAR) || 0; } catch (e) { return 0; } }
   function sonYazimKaydet() { try { localStorage.setItem(ANAHTAR, String(Date.now())); } catch (e) {   } }
 
@@ -35,7 +39,7 @@
 
   async function dosyayaYaz(upn, belirtec) {
     var V = window.MMVeri, hedef = String(A.bildirimDriveId || A.driveId || '').trim();
-    if (!V || typeof V.cihazBelirteciYaz !== 'function' || !hedef) return 'ayar';
+    if (!V || typeof V.cihazBelirteciYaz !== 'function' || !hedef) { kodYaz('f_ayar'); return 'ayar'; }
     var ad = await ozet(upn);
     var govde = JSON.stringify({ surum: 1, upn: upn, rol: A.girisRol || 'calisan', belirtec: belirtec, ortam: 'production', platform: 'ios', ts: new Date().toISOString() });
     return V.cihazBelirteciYaz(ad, govde, hedef);   
@@ -49,11 +53,11 @@
     yapiliyor = true;
     try {
       var s = await window.MMBildirimIzin();
-      if (!s || s.durum !== 'var' || !s.belirtec) { if (s && s.durum === 'red') bitti = true; return; }
+      if (!s || s.durum !== 'var' || !s.belirtec) { kodYaz('f_' + String((s && (s.neden || s.durum)) || 'izin_yok').replace(/[^A-Za-z0-9_]/g, '').slice(0, 20)); if (s && s.durum === 'red') bitti = true; return; }
       var sonuc = await dosyayaYaz(upn, s.belirtec);
       if (sonuc === 'tamam') { sonYazimKaydet(); bitti = true; }
-      else if (sonuc === 'yetki') { console.warn('bildirim', 'yazma yetkisi yok'); bitti = true; }   
-    } catch (e) { console.warn('bildirim', String((e && (e.code || e.message)) || 'hata').slice(0, 40)); }
+      else if (sonuc === 'yetki') { console.warn('bildirim', 'yazma yetkisi yok'); kodYaz('f_yetki'); bitti = true; }   
+    } catch (e) { console.warn('bildirim', String((e && (e.code || e.message)) || 'hata').slice(0, 40)); kodYaz('f_' + String((e && (e.code || e.message)) || 'hata').replace(/[^A-Za-z0-9_]/g, '').slice(0, 20)); }
     finally { yapiliyor = false; }
   }
 
@@ -66,9 +70,9 @@
     else location.hash = '#mesaj';
   }
 
-  try { P.addListener('bildirimAcildi', function (o) { rotayaGit(o && o.rota, o && o.sohbet); }); } catch (e) {   }
+  try { P.addListener('bildirimAcildi', function (o) { rotayaGit(o && o.rota, o && o.sohbet); }); } catch (e) { kodYaz('dinleyici'); }
   setTimeout(function () {
-    try { P.bekleyenRota().then(function (o) { if (o && o.rota) rotayaGit(o.rota, o.sohbet); }).catch(function () {   }); } catch (e) {   }
+    try { P.bekleyenRota().then(function (o) { if (o && o.rota) rotayaGit(o.rota, o.sohbet); }).catch(function () { kodYaz('rota_bekleyen'); }); } catch (e) { kodYaz('rota_bekleyen'); }
   }, 1500);
 
   
@@ -77,7 +81,7 @@
     if (bitti || deneme >= BEKLEME.length) return;
     setTimeout(function () {
       deneme++;
-      Promise.resolve(kayit()).catch(function () {   }).then(planla);
+      Promise.resolve(kayit()).catch(function () { kodYaz('f_kayit'); }).then(planla);
     }, BEKLEME[deneme]);
   }
   planla();

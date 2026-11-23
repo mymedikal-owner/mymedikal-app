@@ -156,16 +156,39 @@
   var bekleyenKart = null, ist = null;
    
   var bildirimSon = '';
+   
+  var BD = { izin: '', token: '', tokenSon: '', kod: '', http: '', ts: '' };
+  var bdDinleyen = [];
+  function bdKod(e) { return String((e && (e.kod || e.code || e.message)) || e || 'hata').replace(/[^A-Za-z0-9_:.\-]/g, '').slice(0, 24) || 'hata'; }
+  function bdSaat() { var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getHours()) + ':' + z(d.getMinutes()); }
+  function bdYaz(a) { for (var k in a) BD[k] = a[k]; bdDinleyen.forEach(function (f) { try { f(); } catch (e) {   } }); }
+  window.MM_bildirimKod = function (kod) { bdYaz({ kod: bdKod(kod) }); };   
+  (function () { var q = window.MM_bildirimKodBekleyen; window.MM_bildirimKodBekleyen = []; if (q && q.length) q.forEach(function (k) { bdYaz({ kod: bdKod(k) }); }); })();   
+  function bdMetin() {
+    var izin = BD.izin === 'var' ? 'verildi' : BD.izin === 'red' ? 'reddedildi' : 'sorulmadı';
+    var tok = BD.token === 'var' ? 'alındı …' + BD.tokenSon : (BD.token ? 'yok' : '—');
+    var srv = BD.http ? BD.http + (BD.ts ? ' ' + BD.ts : '') : '—';
+    return 'Bildirim · izin: ' + izin + ' · Telefon kaydı: ' + tok + ' · sunucu: ' + srv + (BD.kod ? ' · hata: ' + BD.kod : '') + (BD.izin === 'red' ? ' · Ayarlar > MY Medikal > Bildirimler\'den açın' : '');
+  }
+  function bdSatir() {
+    if (!iosKabuk()) return null;   
+    var el = h('p', { sinif: 'soluk ms-bildirim-durum', role: 'status', 'aria-live': 'polite', metin: bdMetin() });
+    var f = function () { el.textContent = bdMetin(); };
+    bdDinleyen.push(f);
+    return el;
+  }
   function iosKabuk() { var c = window.Capacitor; return !!(c && c.isNativePlatform && c.isNativePlatform() && c.getPlatform && c.getPlatform() === 'ios'); }
   function bildirimKayit() {
     if (!iosKabuk()) return Promise.reject(new Error('bildirim'));
     var c = window.Capacitor, P = c.Plugins && c.Plugins.MMBildirim;
-    if (!P || typeof P.izinIste !== 'function') return Promise.reject(new Error('bildirim'));
+    if (!P || typeof P.izinIste !== 'function') { bdYaz({ token: 'yok', kod: 'eklenti_yok' }); return Promise.reject(new Error('bildirim')); }
     return Promise.resolve(typeof window.MMBildirimIzin === 'function' ? window.MMBildirimIzin() : P.izinIste()).then(function (s) {
       bildirimSon = s ? String(s.durum || 'yok') + (s.neden ? ':' + String(s.neden).slice(0, 20) : '') : 'yok';   
-      if (!s || s.durum !== 'var' || typeof s.belirtec !== 'string' || !s.belirtec) throw new Error('bildirim');
+      var ok = !!(s && s.durum === 'var' && typeof s.belirtec === 'string' && s.belirtec);
+      bdYaz({ izin: s && (s.durum === 'var' || s.durum === 'red') ? s.durum : '', token: ok ? 'var' : 'yok', tokenSon: ok ? s.belirtec.slice(-4) : '', kod: ok ? '' : bdKod(s && (s.neden || s.durum) || 'izin_yok') });
+      if (!ok) { var er = new Error('bildirim'); er.kod = BD.kod || 'izin_yok'; throw er; }
       return { platform: 'apns', handle: s.belirtec };
-    });
+    }, function (e) { bdYaz({ token: 'yok', kod: bdKod(e) }); throw e; });
   }
   
 
@@ -188,6 +211,8 @@
     try { document.documentElement.classList.remove('meet-cerceve-acik'); } catch (e2) {   }
   }
   function meetCerceveAc(adres) {
+     
+    adres = String(adres || 'meet/').replace(/^meet\/(?=$|[#?])/, 'meet/index.html');
     meetCerceveKapat();
     var kok = document.createElement('div');
     kok.className = 'meet-cerceve-kok';
@@ -331,15 +356,15 @@
   var CIHAZ_ARALIK = 6 * 3600 * 1000;
   function cihazKaydiDene() {
     if (!iosKabuk()) return;
-    var i = ist; if (!i || !i.acik() || !ben().oid) return;
+    var i = ist; if (!i || !i.acik() || !ben().oid) { bdYaz({ kod: !i || !i.acik() ? 'istemci_yok' : 'oid_yok' }); return; }
     var t = Date.now();
     if (t - D.cihazZaman < CIHAZ_ARALIK) return;
     D.cihazZaman = t;
     var sozu = null;
     try {
-      sozu = bildirimKayit().then(function (k) { D.cihazHandle = k.handle; return i.cihazKaydet(k.platform, k.handle); });
-    } catch (e) { sozu = Promise.reject(e); }
-    sozu.then(null, function () { D.cihazZaman = t - CIHAZ_ARALIK + 10 * 60 * 1000;   });
+      sozu = bildirimKayit().then(function (k) { D.cihazHandle = k.handle; return i.cihazKaydet(k.platform, k.handle).then(function (r) { bdYaz({ http: '2xx', ts: bdSaat(), kod: '' })    ; return r; }, function (e) { bdYaz({ http: String((e && e.durum) || bdKod(e)), ts: bdSaat(), kod: bdKod(e) }); throw e; }); });
+    } catch (e) { bdYaz({ kod: bdKod(e) }); sozu = Promise.reject(e); }
+    sozu.then(null, function (e) { if (e && e.message !== 'bildirim' && !BD.kod) bdYaz({ kod: bdKod(e) }); D.cihazZaman = t - CIHAZ_ARALIK + 10 * 60 * 1000;   });
   }
   function arkaBaslat() {
     if (D.basladi) return;
@@ -660,6 +685,7 @@
       lk.appendChild(h('div', { sinif: 'ms-arama-kap' }, [ikon('ara', 20), aramaEl]));
       cipEl = h('div', { sinif: 'ms-cipler', role: 'group' }); lk.appendChild(cipEl); cipGuncelle();
       lk.appendChild(bantEl());
+      var bds = bdSatir(); if (bds) lk.appendChild(bds);   
       lk.appendChild(durum);   
       listeKut = h('div', { sinif: 'ms-sohbetler' }); lk.appendChild(listeKut);
       listeIc();

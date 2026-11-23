@@ -686,9 +686,13 @@
     }
     [konuS, gunI, saatS, sureS].forEach(function (el) { el.addEventListener('change', guncelle); el.addEventListener('input', guncelle); });
     function alan(ad, el) { return h('label', { sinif: 'alan' }, [h('span', { metin: ad }), el]); }
-    kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'Google Meet ile toplantı isteği', kirinti: [['Toplantı']] }));
+    kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'MY Medikal Meet ile toplantı', kirinti: [['Toplantı']] }));
+     
+    kok.appendChild(gr.kart({ baslik: 'MY Medikal Meet', govde: h('div', null, [
+      h('a', { sinif: 'dugme tam', role: 'button', href: 'meet/' }, [h('span', { metin: 'MY Medikal Meet ile başlat/katıl' })]),
+      h('p', { sinif: 'soluk', metin: 'Yapay zekâ dinleyici henüz yok; tutanak gerekiyorsa Google Meet yedek yolunu kullanın.' })]) }));
     var form = h('div', { sinif: 'yeni-izgara' }, [alan('Konu', konuS), alan('Tarih', gunI), alan('Saat', saatS), alan('Süre', sureS)]);
-    kok.appendChild(gr.kart({ baslik: 'Yeni toplantı', govde: h('div', null, [form, h('div', { sinif: 'ust-bosluk' }, [dugme]), durum]) }));
+    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Yedek yol (Yapay zekâ dinleyici gelene kadar)', govde: h('div', null, [form, h('div', { sinif: 'ust-bosluk' }, [dugme]), durum]) })]));
     kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Nasıl çalışır?', govde: h('ol', { sinif: 'ozellik-liste' }, [
       h('li', { metin: 'Formu doldurup “Toplantı isteğini hazırla”ya dokunun; posta programınızda hazır bir mail açılır.' }),
       h('li', { metin: 'Katılacak kişileri mailin CC satırına ekleyin, gündemi yazın ve gönderin.' }),

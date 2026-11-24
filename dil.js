@@ -408,6 +408,15 @@
   ]);
   PARCA_L.push.apply(PARCA_L, [
      
+    ['taksitli: kalan taksit · diğer: kalan anapara', 'instalment loans: remaining instalments · others: remaining principal'], [' kredi bakiyesi yok', ' loans without balance'], ['TL ve döviz ayrı satır', 'TL and FX on separate rows'], ['Banka düzeyi, kısmi', 'Bank level, partial'], ['Toplam bakiye', 'Total balance'],
+    ['Ödeme teyidi bekleyen kalem var', 'Items awaiting payment confirmation'],['Vadesi geçmiş, ödeme teyidi bekleyen kredi taksiti: ', 'Overdue loan instalments awaiting payment confirmation: '], ['Vadesi geçen verilen çek, ödeme teyidi bekleniyor: ', 'Overdue issued cheques, payment confirmation pending: '],
+    ['Banka hareketi bağlı değil: vadesi geçen kalem ödendi mi bilinmiyor; "gecikti" denmez.', 'Bank transactions are not connected: whether an overdue item was paid is unknown, so it is not called late.'],
+    ['Vadesi geçmiş taksit', 'Overdue instalment'], ['ödeme teyidi bekleniyor', 'payment confirmation pending'], ['Vadesi geçmiş, ödeme teyidi bekleyen', 'Overdue, awaiting payment confirmation'],
+    ['Kredi no', 'Loan no.'], ['Varlık (leasing)', 'Asset (leasing)'], ['Kalan taksitlerdeki sigorta/diğer', 'Insurance/other in remaining instalments'], ['Bakiye', 'Balance'], ['kalan toplam taksit', 'remaining total instalments'],
+    ['Sigorta/diğer', 'Insurance/other'], ['Faiz ve sigorta/diğer', 'Interest and insurance/other'],
+    ['Verilen teminatlar', 'Collateral issued'], ['Verilen teminatlar (', 'Collateral issued ('], ['Alınan teminatlar', 'Collateral received'], ['Alınan teminatlar (', 'Collateral received ('], ['Alınan teminat verisi yok', 'No received-collateral data'],
+    ['Bankaların bizim adımıza verdiği teminat mektupları · vadesi geçmiş olanlar işaretli', 'Guarantee letters banks issued on our behalf · expired ones are marked'], ['Müşteri ve firmalardan aldığımız teminatlar (iade edilenler hariç)', 'Collateral received from customers and firms (returned ones excluded)'],
+    ['Alınan teminat yok.', 'No received collateral.'], ['Çek karşılığı ve çekle karşılanmayan tutar', 'Cheque cover and amount not covered by cheques'], ['Çek karşılıklı kredi', 'Cheque-backed loans'], ['Bankaya verilen çek', 'Cheques given to bank'], ['Çekle karşılanmayan', 'Not covered by cheques'],
     ['Hazine görünümleri', 'Treasury views'], ['Ödeme takvimi', 'Payment schedule'], ['DMO alacakları', 'DMO receivables'], ['Krediler', 'Loans'], ['Çekler', 'Cheques'], ['Teminat listesi', 'Collateral list'], ['Teminat', 'Collateral'], ['Bankalar', 'Banks'], ['Döviz', 'FX'],
     ['Vadesi geçmiş ödeme var', 'Overdue payments'], ['Vadesi geçmiş açık kredi taksiti: ', 'Overdue open loan instalments: '], [' kredi', ' loans'], ['Vadesi geçen verilen çek: ', 'Overdue issued cheques: '],
     ['Bu ay ödenecek kredi', 'Loan payments due this month'], ['Toplam kredi borcu', 'Total loan debt'], ['kalan anapara', 'remaining principal'], ['kredi/leasing', 'loans/leases'], ['30 gün çek çıkışı / girişi', 'Cheques out / in, next 30 days'], ['çıkış', 'outflow'],

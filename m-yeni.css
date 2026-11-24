@@ -57,7 +57,7 @@
 .hz-halka-kap { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b4); } .hz-halka { width: 150px; height: 150px; flex: 0 0 auto; } .hz-halka-b { font-size: 22px; font-weight: 700; fill: var(--yazi); }
 .hz-halka-kap .lejant2 { flex: 1 1 180px; flex-direction: column; gap: 6px; }
 .hz-dl { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 6px var(--b4); margin: 0; font-size: var(--t-s); } .hz-dl dt { color: var(--soluk); } .hz-dl dd { margin: 0; font-weight: 600; text-align: right; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
-tr.hz-gecmis td { color: var(--kirmizi); }
+tr.hz-gecmis td { color: var(--sari-yazi); }  
 .hz .cip-sira { margin-bottom: var(--b3); }
 .hz-banka-izgara { display: grid; gap: var(--b3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); align-items: start; } .hz-banka-izgara > .daha-fazla { grid-column: 1 / -1; }
 .hz-banka { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m); padding: var(--b3); display: grid; gap: 6px; min-width: 0; } .hz-banka h4 { font-size: var(--t-m); }

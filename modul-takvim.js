@@ -18,8 +18,10 @@
   }
   function seri(iso) { var p = iso.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]) / 864e5; }
   function kalanGun(iso) { if (!iso) return null; return Math.round(seri(iso) - bugunSeri()); }
+   
+  function kovaK(k, gun) { return k && k.bilgi_notu === true && gun != null && gun < 0 ? 'bilgi' : kova(gun); }
   function kova(gun) { if (gun == null) return 'bilinmiyor'; if (gun < 0) return 'gecti'; if (gun <= 7) return 'k7'; if (gun <= 30) return 'k30'; if (gun <= 90) return 'k90'; return 'ok'; }
-  var KOVA = { gecti: ['Süresi geçti', 'kirmizi'], k7: ['7 gün içinde', 'kirmizi'], k30: ['30 gün içinde', 'turuncu'], k90: ['90 gün içinde', 'sari'], ok: ['90 günden sonra', 'yesil'], bilinmiyor: ['Tarih bilinmiyor', 'gri'] };
+  var KOVA = { gecti: ['Süresi geçti', 'kirmizi'], k7: ['7 gün içinde', 'kirmizi'], k30: ['30 gün içinde', 'turuncu'], k90: ['90 gün içinde', 'sari'], ok: ['90 günden sonra', 'yesil'], bilgi: ['Bilgi', 'gri'], bilinmiyor: ['Tarih bilinmiyor', 'gri'] };
    
   var STIL = {
     gecti: { isaret: 'var(--kritik)', yazi: 'var(--kirmizi)', zemin: 'var(--kirmizi-zemin)', ikon: 'uyari', ad: 'Süresi geçti' },
@@ -27,15 +29,16 @@
     k30: { isaret: 'var(--ciddi)', yazi: 'var(--turuncu)', zemin: 'var(--turuncu-zemin)', ikon: 'saat', ad: '8–30 gün' },
     k90: { isaret: 'var(--uyari)', yazi: 'var(--sari)', zemin: 'var(--sari-zemin)', ikon: 'saat', ad: '31–90 gün' },
     ok: { isaret: 'var(--iyi)', yazi: 'var(--yesil)', zemin: 'var(--yesil-zemin)', ikon: 'tik', ad: '90 günden sonra' },
+    bilgi: { isaret: 'var(--gri)', yazi: 'var(--soluk)', zemin: 'var(--gri-zemin)', ikon: 'bilgi', ad: 'Bilgi' },
     bilinmiyor: { isaret: 'var(--gri)', yazi: 'var(--soluk)', zemin: 'var(--gri-zemin)', ikon: 'bilgi', ad: 'Tarih bilinmiyor' }
   };
   function tarihTR(iso) { var p = iso.split('-'); return p[2] + '.' + p[1] + '.' + p[0]; }
   function hazirla(v) {
-    return (v.kayitlar || []).map(function (k, i) { var g = kalanGun(k.son_tarih); return { k: k, gun: g, kova: kova(g), i: i }; })
+    return (v.kayitlar || []).map(function (k, i) { var g = kalanGun(k.son_tarih); return { k: k, gun: g, kova: kovaK(k, g), i: i }; })
       .sort(function (a, b) { if (a.gun == null && b.gun == null) return a.i - b.i; if (a.gun == null) return 1; if (b.gun == null) return -1; return a.gun - b.gun; });
   }
   function ozet(v) {
-    var l = hazirla(v), s = { gecti: 0, k7: 0, k30: 0, k90: 0, ok: 0, bilinmiyor: 0, toplam: l.length, liste: l };
+    var l = hazirla(v), s = { gecti: 0, k7: 0, k30: 0, k90: 0, ok: 0, bilgi: 0, bilinmiyor: 0, toplam: l.length, liste: l };
     l.forEach(function (x) { s[x.kova]++; });
     s.yaklasan = l.filter(function (x) { return x.gun != null && x.gun <= 90; });
     return s;
@@ -190,7 +193,7 @@
   }
   function matris(o) {
     var kv = ['gecti', 'k7', 'k30', 'k90', 'ok', 'bilinmiyor'], sat = {};
-    TUR_SIRA.forEach(function (t) { sat[t] = { gecti: 0, k7: 0, k30: 0, k90: 0, ok: 0, bilinmiyor: 0, top: 0 }; });
+    TUR_SIRA.forEach(function (t) { sat[t] = { gecti: 0, k7: 0, k30: 0, k90: 0, ok: 0, bilgi: 0, bilinmiyor: 0, top: 0 }; });
     o.liste.forEach(function (x) { var s = sat[belgeTuru(x.k.belge)]; s[x.kova]++; s.top++; });
     var satirlar = TUR_SIRA.filter(function (t) { return sat[t].top; }).map(function (t) { return [t].concat(kv.map(function (b) { return sat[t][b]; }), [sat[t].top]); });
     var kol = [T('Belge türü')].concat(kv.map(function (b) { return T(STIL[b].ad); }), [T('Toplam')]);
@@ -208,6 +211,7 @@
     o.liste.forEach(function (x) {
       if (!x.k.son_tarih) return;
       var p = x.k.son_tarih.split('-'), fark = (+p[0] - yil) * 12 + (+p[1] - 1 - m0);
+      if (x.kova === 'bilgi') return;
       if (fark < 0 || x.gun < 0) gecmis++; else if (fark < 12) say[fark]++; else ileri++;
     });
     var oge = [{ e: T('Geçmiş'), d: gecmis, renk: 'var(--kritik)', ipucu: [T('Süresi geçmiş') + ': ' + gecmis, ''] }];
@@ -311,10 +315,13 @@
 
   function uyumKarti(x) {
     var k = x.k, st = STIL[x.kova], alt = k.kategori + (kurulusMetin(k.kurulus) ? ' · ' + kurulusMetin(k.kurulus) : '');
+    var bilgi = x.kova === 'bilgi', dz = k.duzenleme_tarihi && /^\d{4}-\d{2}-\d{2}$/.test(k.duzenleme_tarihi) ? 'Düzenleme: ' + tarihTR(k.duzenleme_tarihi) : '';
+    var nt = k.not ? String(k.not) : '';
     return h('div', { sinif: 'tq-kart', style: '--isaret:' + st.isaret + ';cursor:default' }, [
       h('span', { sinif: 'tq-kart-ikon', style: 'color:' + st.yazi + ';background:' + st.zemin }, [G.ikon(st.ikon, 20)]),
-      h('span', { sinif: 'tq-kart-metin' }, [h('span', { sinif: 'tq-kart-ad', metin: k.konu }), h('span', { sinif: 'tq-kart-alt', metin: alt })]),
-      h('span', { sinif: 'tq-kart-sag' }, [h('b', { style: 'color:' + st.yazi, metin: kalanMetin(x.gun) }), k.son_tarih ? h('span', { metin: tarihTR(k.son_tarih) + (k.yaklasik ? ' (yaklaşık)' : '') }) : h('span', { metin: 'tarih kayıtlı değil' })])]);
+      h('span', { sinif: 'tq-kart-metin' }, [h('span', { sinif: 'tq-kart-ad', metin: k.konu }), h('span', { sinif: 'tq-kart-alt', metin: alt }),
+        dz ? h('span', { sinif: 'tq-kart-alt', metin: dz }) : null, nt ? h('span', { sinif: 'tq-kart-alt', metin: nt }) : null]),
+      h('span', { sinif: 'tq-kart-sag' }, [h('b', { style: 'color:' + st.yazi, metin: bilgi ? 'Bilgi' : kalanMetin(x.gun) }), k.son_tarih ? h('span', { metin: tarihTR(k.son_tarih) + (k.yaklasik ? ' (yaklaşık)' : '') }) : h('span', { metin: 'tarih kayıtlı değil' })])]);
   }
 
   function uyumGorunum(v, durum, yeniden) {
@@ -323,7 +330,7 @@
     var kat = {}, kn = (v.kategoriler || []).slice();
     hepsi.forEach(function (x) { kat[x.k.kategori] = (kat[x.k.kategori] || 0) + 1; if (kn.indexOf(x.k.kategori) < 0) kn.push(x.k.kategori); });
     var ck = durum.uKat || '', kv = durum.uKova || '';
-    var liste = hepsi.filter(function (x) { return !ck || x.k.kategori === ck; }), o = { gecti: 0, k7: 0, k30: 0, k90: 0, ok: 0, bilinmiyor: 0 };
+    var liste = hepsi.filter(function (x) { return !ck || x.k.kategori === ck; }), o = { gecti: 0, k7: 0, k30: 0, k90: 0, ok: 0, bilgi: 0, bilinmiyor: 0 };
     liste.forEach(function (x) { o[x.kova]++; });
     var ky = o.gecti + o.k7;
     kap.appendChild(h('div', { sinif: 'tq-saglik ' + (o.gecti ? 'kirmizi' : (o.k7 ? 'turuncu' : 'yesil')), role: 'status' }, [G.ikon(ky ? 'uyari' : 'tik', 18), h('strong', { metin: 'Süresi geçti ' + o.gecti + ' · 7 günde ' + o.k7 })]));
@@ -336,7 +343,7 @@
     kn.forEach(function (c) { if (kat[c]) cp.push([c, c, kat[c]]); });
     kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.cipler(cp, ck, function (d) { durum.uKat = d; yeniden(); }, 'Kategori filtresi')]));
     var kvc = [['', 'Tüm bantlar']];
-    ['gecti', 'k7', 'k30', 'k90', 'ok'].forEach(function (b) { if (o[b]) kvc.push([b, STIL[b].ad, o[b]]); });
+    ['gecti', 'k7', 'k30', 'k90', 'ok', 'bilgi'].forEach(function (b) { if (o[b]) kvc.push([b, STIL[b].ad, o[b]]); });
     kap.appendChild(G.cipler(kvc, kv, function (d) { durum.uKova = d; yeniden(); }, 'Risk bandı filtresi'));
     var tarihli = liste.filter(function (x) { return x.gun != null && (!kv || x.kova === kv); }), lk = h('div', { sinif: 'tq-liste ust-bosluk' });
     if (tarihli.length) lk.appendChild(G.sayfali(tarihli, uyumKarti));

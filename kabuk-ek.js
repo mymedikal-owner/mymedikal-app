@@ -34,6 +34,30 @@
     history.pushState(null, '', location.pathname + (qs ? '?' + qs : '') + hash);
     window.dispatchEvent(new Event('hashchange'));
   };
+   
+  (function () {
+    var ust = document.querySelector('.ust'), marka = ust && ust.querySelector('.marka');
+    if (!ust || !marka) return;
+    var geri = document.createElement('button');
+    geri.type = 'button'; geri.id = 'geri'; geri.className = 'ikon-dugme geri-dugme';
+    geri.setAttribute('aria-label', MM.t ? MM.t('Geri') : 'Geri'); geri.title = 'Geri'; geri.hidden = true;
+    geri.textContent = '←';
+    ust.insertBefore(geri, marka);
+    var yigin = [], onceki = location.hash || '#ana';
+    function anaMi(x) { return !x || x === '#' || x === '#ana' || x.indexOf('#ana/') === 0 || x.indexOf('#ana?') === 0; }
+    function goster() { geri.hidden = anaMi(location.hash); }
+    window.addEventListener('hashchange', function () {
+      var yeni = location.hash || '#ana';
+      if (yigin.length && yigin[yigin.length - 1] === yeni) yigin.pop();
+      else if (yeni !== onceki) { yigin.push(onceki); if (yigin.length > 50) yigin.shift(); }
+      onceki = yeni; goster();
+    });
+    geri.addEventListener('click', function () {
+      if (yigin.length) history.back();
+      else MM.git('#ana');
+    });
+    goster();
+  })();
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href^="#"]');
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || a.target) return;

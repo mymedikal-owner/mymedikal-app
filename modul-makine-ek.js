@@ -43,11 +43,34 @@
       var alt = h('div', { sinif: 'me-canli-alt', metin: eski ? 'veri gecikmeli · artmıyor' : (c.calisiyor ? say(c.hiz_dk) + ' adet/dk' : (c.adet == null ? 'veri yok' : 'duruyor · artmıyor')) });
       var artar = c.calisiyor && !eski;
       var k = h('div', { sinif: 'me-canli-kutu' + (artar ? '' : ' dur') }, [h('div', { sinif: 'me-canli-hat', metin: 'Hat ' + c.hat }), sayi, alt,
+        h('div', { sinif: 'me-canli-vard', 'data-hat': c.hat }),
         eski ? h('span', { sinif: 'me-etiket', metin: 'veri gecikmeli' }) : (c.calisiyor ? h('span', { sinif: 'me-etiket', metin: c.adet_tahmin ? 'canlı tahmini · adet tahmin' : 'canlı tahmini' }) : null)]);
       kutu.appendChild(k);
       ogeler.push({ c: c, sayi: sayi, alt: alt, k: k, t0: simdi, artar: artar, veriMs: veriMs });
     });
     durum.canli = ogeler;
+  }
+
+   
+  var saatBicim = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Istanbul', hour: '2-digit', hour12: false });
+  function vardiyaMetin(bilgi, saat) {
+    var t = window.MM.t || function (x) { return x };
+    if (!bilgi) return t('Vardiya') + ': ' + t('veri yok');
+    if (bilgi.saat === 12) return t('Vardiya') + ': ' + bilgi.sistem + ' · ' + (saat >= 8 && saat < 20 ? t('Gündüz') + ' 08:00–20:00' : t('Gece') + ' 20:00–08:00');
+    if (bilgi.saat === 8) return t('Vardiya') + ': ' + bilgi.sistem + ' · ' + (saat < 8 ? t('Gece') + ' 00:00–08:00' : saat < 16 ? t('Gündüz') + ' 08:00–16:00' : t('Akşam') + ' 16:00–24:00');
+    return t('Vardiya') + ': ' + t('veri yok');
+  }
+   
+  function vardiyaYaz(kutu, vardMap, opMap) {
+    var saat = parseInt(saatBicim.format(new Date()), 10) % 24, t = window.MM.t || function (x) { return x };
+    Array.prototype.forEach.call(kutu.querySelectorAll('.me-canli-vard'), function (e) {
+      var hat = e.getAttribute('data-hat');
+      e.textContent = vardiyaMetin(vardMap[hat], saat);
+      if (opMap) {
+        var ad = opMap[hat];
+        e.appendChild(h('div', { metin: t('Operatör') + ': ' + (ad ? ad : t('veri yok')) }));
+      }
+    });
   }
 
   function paretoBolum(p) {
@@ -102,6 +125,17 @@
     var azHareket = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function kart(baslik, alt, govde) { return G.kart({ baslik: baslik, alt: alt, govde: govde }); }
     var canliKutu = h('div', { sinif: 'me-canli' }), digerKok = h('div', { sinif: 'me-ek' }), ekYuklendi = false;
+    var vardMap = {}, opMap = null;
+    function vardiyaTazele() { vardiyaYaz(canliKutu, vardMap, opMap); }
+    async function operatorYukle() {   
+      var V = window.MMVeri;
+      if (!V || !V.ozelErisim || !V.ozelErisim('ik')) { opMap = null; return; }
+      try {
+        var r = await V.oku('ik', 'makine-operator'), m = {};
+        ((r.veri || {}).hatlar || []).forEach(function (x) { if (x && x.hat) m[x.hat] = x.operator || null; });
+        opMap = m;
+      } catch (e) { opMap = {}; }
+    }
     kok.appendChild(h('h2', { sinif: 'me-ek-baslik', metin: 'Canlı ek bilgiler' }));
     kok.appendChild(kart('Hat adedi (canlı tahmini)', 'Son gerçek adet + adet/dk; her dakika gerçek veriyle düzelir', canliKutu));
     kok.appendChild(digerKok);
@@ -128,7 +162,7 @@
       var v = await MM.fabrika.panoAl(), p = null;   
       if (v.bloklar && typeof v.bloklar['VERI:mabotex'] === 'string') { try { p = JSON.parse(v.bloklar['VERI:mabotex']); } catch (e) { p = null; } }
       if (!p) { var html = v.html(); p = typeof html === 'string' ? panoVerisi(html) : null; }
-      if (p && p.hatlar && p.hatlar.length) { canliCiz(canliKutu, canliListe(p), Date.parse(p.asof) || Date.parse(v.uretildi || v.asof) || 0, durum); return true; }
+      if (p && p.hatlar && p.hatlar.length) { canliCiz(canliKutu, canliListe(p), Date.parse(p.asof) || Date.parse(v.uretildi || v.asof) || 0, durum); vardiyaTazele(); return true; }
       return false;
     }
     async function yukle() {
@@ -143,7 +177,11 @@
             var r = await window.MMVeri.oku('fabrika', 'makine-ek'), d = r.veri || {};
             if (!canli_) return;
             ciz(d); ekYuklendi = true; sonEk = simdi;
+            vardMap = d.vardiya_hat || {};
+            await operatorYukle();
+            if (!canli_) return;
             if (!tamam) canliCiz(canliKutu, d.canli || [], Date.parse(d.asof) || 0, durum);
+            vardiyaTazele();
           } catch (e) { if (!digerKok.firstChild) digerKok.appendChild(bekleniyor('Makine eki')); }
         }
       } finally { yukleniyor = false; }

@@ -730,10 +730,14 @@
     }
     function okunduSay(s) {   
       s.okunmamis = 0; D.sunucuToplam = -1; bildir(); if (canli && (gorunum === 'liste' || solKurulu)) { cipGuncelle(); listeIc(); }
-      i.mesajlar(s.id, { adet: 1 }).then(function (l) {   
+      
+
+      var sonId = s.son && s.son.id ? s.son.id : '';
+      var bul = sonId ? Promise.resolve(sonId) : i.mesajlar(s.id, { adet: 30 }).then(function (l) {
         var m = null; (l || []).forEach(function (x) { if (x && x.id && (!m || epoch(x.ts) > epoch(m.ts))) m = x; });
-        if (m) return i.okundu(s.id, m.id);
-      }).then(function () { cevapsizYukle(); }, function () {   });   
+        return m ? m.id : '';
+      });
+      bul.then(function (id) { if (id) return i.okundu(s.id, id); }).then(function () { cevapsizYukle(); return sohbetYukle(); }).then(null, function () {   });
     }
     function eylemMenusu(s) {   
       var kok2 = h('div', { sinif: 'ms-sheet-kok' }), t = s.tercih || {};
@@ -773,7 +777,7 @@
         arB.addEventListener('click', function () { kapsam.classList.remove('ms-acik'); tercihYaz(s, 'arsiv', !s.tercih.arsiv); });
         eylemler.appendChild(arB);
       }
-      var dgB = h('button', { sinif: 'ms-sat-diger', type: 'button', metin: T('Diğer') });
+      var dgB = h('button', { sinif: 'ms-sat-diger', type: 'button', metin: (secili && secili.id === s.id) ? '…' : T('Diğer'), 'aria-label': T('Diğer') });   
       dgB.addEventListener('click', function () { kapsam.classList.remove('ms-acik'); eylemMenusu(s); });
       eylemler.appendChild(dgB);
       kapsam.style.setProperty('--ms-sw', (eylemler.childNodes.length * 80) + 'px');
@@ -1767,7 +1771,22 @@
       kutu.addEventListener('input', bahisGuncelle);
       kutu.addEventListener('keyup', function (ev) { if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') bahisGuncelle(); });
       kutu.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { if (!bahisKutu.hidden) bahisKapat(); else if (yanitHedef || duzenleHedef) seritIptal(); } });
-      kutu.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); gonder(); } });
+       
+      var dokunmatik = false; try { dokunmatik = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) { dokunmatik = false; }
+      kutu.addEventListener('keydown', function (ev) {
+        if (ev.key !== 'Enter' || ev.isComposing || ev.keyCode === 229) return;
+        if (ev.shiftKey) return;
+        if (dokunmatik && !(ev.ctrlKey || ev.metaKey)) return;
+        ev.preventDefault(); gonder();
+      });
+      kutu.addEventListener('paste', function (ev) {   
+        var it = ev.clipboardData && ev.clipboardData.items, f = null, k;
+        if (!it) return;
+        for (k = 0; k < it.length; k++) { if (it[k].kind === 'file' && /^image\//.test(it[k].type)) { f = it[k].getAsFile(); break; } }
+        if (!f) return;
+        ev.preventDefault();
+        dosyaSecildi({ files: [f], value: '' });
+      });
       function dosyaSecildi(inp) {
         var f = inp.files && inp.files[0]; inp.value = ''; if (!f) return;
         yaz(T('Yükleniyor'));

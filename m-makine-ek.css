@@ -7,6 +7,7 @@
 .me-canli-hat { font-size: var(--t-xs); color: var(--soluk); }
 .me-canli-sayi { font-size: var(--t-xl); font-variant-numeric: tabular-nums; font-weight: 600; overflow-wrap: anywhere; }
 .me-canli-alt { font-size: var(--t-xs); color: var(--soluk); }
+.me-canli-vard { font-size: var(--t-xs); color: var(--soluk); overflow-wrap: anywhere; }
 .me-etiket { display: inline-block; font-size: var(--t-xs); padding: 1px var(--b2); border-radius: var(--r-t); background: var(--tahmin-zemin); color: var(--tahmin); }
 .me-serit { display: grid; gap: var(--b2); }
 .me-serit-satir { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: var(--b2); align-items: center; }

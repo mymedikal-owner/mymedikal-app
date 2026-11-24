@@ -480,6 +480,15 @@
   [[' sipariş · en uzun ', ' orders · longest '], ['İlk teslimat siparişten ', 'First delivery after order: '], [' gün sonra', ' days'], ['İlk fatura ilk tesliminden ', 'First invoice after first delivery: '], [' açık sipariş', ' open orders'], ['Süresi geçti ', 'Expired '], [' · 7 günde ', ' · within 7 days ']].forEach(function (p) {
     if (!PARCA_L.some(function (x) { return x[0] === p[0]; })) PARCA_L.push(p);
   });
+   
+  [['Kredi kartları', 'Credit cards'], ['Kira artışı', 'Rent increases'], ['Sözleşmeler', 'Contracts'], ['Asistan önerisi', 'Assistant suggestion'], ['Kapsam varsayımı', 'Scope assumption'], ['Öneri', 'Suggestion'],
+    ['Kredi önerisi', 'Loan suggestion'], ['Kapatılabilir', 'Can be closed'], ['Yenileme/uzatma değerlendir', 'Consider renewal/extension'], ['Döviz borçları · güncel kur (TCMB)', 'FX debts · current rate (CBRT)'],
+    ['Kur tarihi', 'Rate date'], ['Kur (TCMB satış)', 'Rate (CBRT selling)'], ['PDF/fotoğraf ekle', 'Add PDF/photo'], ['Kredi kartı verisi yok', 'No credit card data'], ['Kira sözleşmesi verisi yok', 'No lease data'],
+    ['Sözleşme kaydı yok', 'No contract records'], ['Yaklaşan kira artışları', 'Upcoming rent increases'], ['Sözleşme ara', 'Search contracts'], ['Ad veya tür', 'Name or type'], ['Aramaya uyan sözleşme yok.', 'No contract matches the search.'],
+    ['Teslim edilmemiş DMO siparişi · öz kaynak açığı', 'Undelivered DMO orders · equity gap'], ['DMO siparişi teslim edilmedi: kredi vadesinde öz kaynaktan ödenecek açık', 'DMO order not delivered: gap to be paid from equity at the loan maturity'],
+    ['Kendiliğinden işlem yapılmaz.', 'No action is taken automatically.'], ['Ödemeye kalan gün', 'Days to payment'], ['Hesap kesim günü', 'Statement day'], ['Son ödeme günü', 'Payment due day'], ['indir', 'download']].forEach(function (p) {
+    if (!PARCA_L.some(function (x) { return x[0] === p[0]; })) PARCA_L.push(p);
+  });
   var PARCA = PARCA_L.slice().sort(function (a, b) { return b[0].length - a[0].length; });
   var REGEX = [
     [/(^|\D)1 days ago/g, '$11 day ago'], [/(^|\D)1 days left/g, '$11 day left'], [/(^|\D)1 days/g, '$11 day'], [/(\d+) sa (\d+) dk önce/g, '$1 h $2 min ago'], [/(\d+) sa önce/g, '$1 h ago'], [/(\d+) dk önce/g, '$1 min ago'], [/(\d+) gün önce/g, '$1 days ago']
@@ -540,6 +549,9 @@
     'Mumu Meet lobisinde, uygulamayı açık tutan iş arkadaşlarınız sizi \'çevrimiçi\' olarak görebilir.': 'In the Mumu Meet lobby, colleagues who keep the app open can see you as \'online\'.'
   };
   Object.keys(TAM_MESAJ).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_MESAJ[k]; });
+   
+  var TAM_VARDIYA = { 'Vardiya': 'Shift', 'Operatör': 'Operator', 'Gündüz': 'Day', 'Gece': 'Night', 'Akşam': 'Evening' };
+  Object.keys(TAM_VARDIYA).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_VARDIYA[k]; });
   var onbellek = {};
   function cevir(m) {
     if (!EN || m == null) return m;

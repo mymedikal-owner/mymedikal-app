@@ -11,6 +11,9 @@
 
 
 
+
+
+
 (function () {
   'use strict';
   function olayYonetici() {
@@ -29,8 +32,10 @@
     var q = (typeof location !== 'undefined' && location.search) || '';
     var nm = /[?&]n=(\d+)/.exec(q);
     var N = nm ? Math.max(1, Math.min(12, parseInt(nm[1], 10))) : 2;
-    var AD = ['Katılımcı 1', 'Katılımcı 2', 'Katılımcı 3', 'Katılımcı 4', 'Katılımcı 5', 'Katılımcı 6', 'Katılımcı 7', 'Katılımcı 8', 'Katılımcı 9', 'Katılımcı 10', 'Katılımcı 11', 'Katılımcı 12'];
-    var sahte = []; for (var i = 0; i < N; i++) sahte.push({ id: 'k' + (i + 1), ad: AD[i] || ('Katılımcı ' + (i + 1)) });
+    var om = /[?&]ovc=(\d+)/.exec(q);
+    var OVC = om ? Math.max(1, Math.min(16, parseInt(om[1], 10))) : 8;   
+    var sahte = []; for (var i = 0; i < N; i++) sahte.push({ id: 'k' + (i + 1), ad: 'Katılımcı ' + (i + 1) });
+    var izinli = null, cizili = {}, gitti = {};   
     var mikAcik = true, kamAcik = false, ozOnizleme = false, ekranAcik = false, elAcik = false;
     var secili = { kamera: 'kam1', mikrofon: 'mik1', hoparlor: 'hop1' };
     var RENK = [['#3b5b92', '#7aa2e3'], ['#8a4b6b', '#e39ab8'], ['#2f7a6a', '#7fd1be'], ['#7a5c2f', '#e3c27a']];
@@ -50,6 +55,14 @@
       return c;
     }
     function tut(f, ms) { zamanlar.push(setTimeout(function () { if (bagli) f(); }, ms)); }
+     
+    function taklitCiz(id) {
+      var i = -1; sahte.forEach(function (k, x) { if (k.id === id) i = x; });
+      if (i < 0 || gitti[id]) return;
+      var ok = !izinli || izinli.has(id);
+      if (ok && !cizili[id]) { cizili[id] = true; ev.yay('uzakVideo', { id: id, element: tuval(sahte[i].ad, i) }); }
+      else if (!ok && cizili[id]) { cizili[id] = false; ev.yay('uzakVideo', { id: id, element: null }); }
+    }
     function listeler() {
       return {
         kameralar: KAMERALAR.map(function (k) { return { id: k.id, ad: k.ad }; }),
@@ -97,10 +110,20 @@
           sahte.forEach(function (k, i) {
             tut(function () {
               ev.yay('katilimciEkle', k); ev.yay('katilimci', { sayi: i + 1 });
-              if (i % 2 === 0) ev.yay('uzakVideo', { id: k.id, element: tuval(k.ad, i) });
+              ev.yay('katilimHaber', { tur: 'katildi', ad: k.ad });
+              ev.yay('videoMevcut', { id: k.id, var: true });
+              taklitCiz(k.id);
             }, 300 + i * 250);
           });
+          ev.yay('optimalVideoCount', { sayi: OVC });
           var t0 = 400 + N * 250;
+          if (N >= 4) {
+            tut(function () {
+              var son = sahte[N - 1]; gitti[son.id] = true;
+              ev.yay('katilimciCikar', { id: son.id }); ev.yay('katilimci', { sayi: N - 1 });
+              ev.yay('katilimHaber', { tur: 'ayrildi', ad: son.ad });
+            }, t0 + 4000);
+          }
           tut(function () { ev.yay('mikrofonDurumu', { id: sahte[Math.min(1, N - 1)].id, acik: false }); }, t0);
           tut(function () { ev.yay('elKalkti', { id: sahte[0].id, acik: true }); }, t0 + 600);
           tut(function () { ev.yay('tepki', { id: sahte[Math.min(1, N - 1)].id, tur: 'love' }); }, t0 + 1500);
@@ -110,6 +133,10 @@
           var sira = 0, kimler = sahte.map(function (k) { return k.id; }).concat(['ben']);
           araclar.push(setInterval(function () { if (!bagli) return; ev.yay('konusan', { id: kimler[sira % kimler.length] }); sira++; }, 3000));
         }, 300);
+      },
+      gorunecek: function (idler) {
+        izinli = new Set(idler || []);
+        sahte.forEach(function (k) { if (cizili[k.id] !== undefined) taklitCiz(k.id); });
       },
       hazir: function () { return true; },
       temizle: async function () { bagli = false; zamanlar.splice(0).forEach(clearTimeout); araclar.splice(0).forEach(clearInterval); },
@@ -139,6 +166,7 @@
     var yerelAkis = null, yerelGorunum = null, yerelHam = '';
     var uzak = new Map();   
     var sayac = 0, bitti = false, sonKonusan = null, ozellikler = {}, ozellikKuruldu = false, dinlList = [], ayrildiYayildi = false;
+    var izinli = null;   
      
     function bagla(obj, adi, fn) { obj.on(adi, fn); dinlList.push([obj, adi, fn]); }
 
@@ -226,16 +254,22 @@
     }
     function onizlemeGorselKapat() { gorunumKapat(onizGorunum); onizGorunum = null; ev.yay('onizlemeVideo', { element: null }); }
 
+     
+    function videoIzinli(k, ekran) { return ekran || !izinli || izinli.has(k.id); }
     async function akisCiz(k, stream) {
       var L = lib();
-      if (k.gorunumler.has(stream)) return;
+      if (k.gorunumler.has(stream) || k.bekle.has(stream)) return;
       var ekran = stream.mediaStreamType === 'ScreenSharing';
+      if (!videoIzinli(k, ekran)) return;
+      k.bekle.add(stream);
       try {
         var r = new L.VideoStreamRenderer(stream);
         var v = await r.createView({ scalingMode: ekran ? 'Fit' : 'Crop' });
+        k.bekle.delete(stream);
+        if (bitti || !uzak.has(k.p) || !stream.isAvailable || !videoIzinli(k, ekran)) { try { v.dispose(); } catch (eA) {   } try { r.dispose(); } catch (eB) {   } return; }
         k.gorunumler.set(stream, { r: r, v: v, tur: ekran ? 'ekran' : 'video' });
         if (ekran) ev.yay('ekranPaylasimi', { id: k.id, element: v.target, acik: true }); else ev.yay('uzakVideo', { id: k.id, element: v.target });
-      } catch (e) { ev.yay('hata', { mesaj: 'Karşı görüntü çizilemedi: ' + msg(e) }); }
+      } catch (e) { k.bekle.delete(stream); ev.yay('hata', { mesaj: 'Karşı görüntü çizilemedi: ' + msg(e) }); }
     }
     function akisKaldir(k, stream) {
       var g = k.gorunumler.get(stream);
@@ -249,12 +283,15 @@
     function akisIzle(k, stream) {
       var t = stream.mediaStreamType;
       if (t !== 'Video' && t !== 'ScreenSharing') return;
+      var kam = t === 'Video';
+      function var_() { if (!kam) return; if (stream.isAvailable) k.akislar.add(stream); else k.akislar.delete(stream); ev.yay('videoMevcut', { id: k.id, var: k.akislar.size > 0 }); }
+      var_();
       if (stream.isAvailable) akisCiz(k, stream);
-      stream.on('isAvailableChanged', function () { if (stream.isAvailable) akisCiz(k, stream); else akisKaldir(k, stream); });
+      stream.on('isAvailableChanged', function () { var_(); if (stream.isAvailable) akisCiz(k, stream); else akisKaldir(k, stream); });
     }
     function katilimciEkle(p) {
       if (uzak.has(p)) return;
-      var k = { id: 'p' + (++sayac), ad: p.displayName || 'Katılımcı', ham: ham(p.identifier), gorunumler: new Map() };
+      var k = { id: 'p' + (++sayac), ad: p.displayName || 'Katılımcı', ham: ham(p.identifier), gorunumler: new Map(), akislar: new Set(), bekle: new Set(), p: p };
       uzak.set(p, k);
       ev.yay('katilimciEkle', { id: k.id, ad: k.ad });
       try { ev.yay('mikrofonDurumu', { id: k.id, acik: !p.isMuted }); } catch (e0) {   }
@@ -282,7 +319,7 @@
       if (ad in ozellikler) return ozellikler[ad];
       var L = window.MM_ACS, F = L && L.Features, ozel = null;
       try {
-        var anahtar = ad === 'el' ? 'RaiseHand' : ad === 'tepki' ? 'Reaction' : ad === 'baskin' ? 'DominantSpeakers' : '';
+        var anahtar = ad === 'el' ? 'RaiseHand' : ad === 'tepki' ? 'Reaction' : ad === 'baskin' ? 'DominantSpeakers' : ad === 'ovc' ? 'OptimalVideoCount' : '';
         ozel = F && anahtar && F[anahtar] ? cagri.feature(F[anahtar]) : null;
       } catch (e) { ozel = null; }
       ozellikler[ad] = ozel;
@@ -312,6 +349,15 @@
             konusanYay(l.length ? idBul(l[0]) : '');
           });
         } catch (e3) {   }
+      }
+       
+      var ovc = ozellik('ovc');
+      if (ovc) {
+        try {
+          var ovcYay = function () { var n = Number(ovc.optimalVideoCount); if (n > 0) ev.yay('optimalVideoCount', { sayi: Math.floor(n) }); };
+          bagla(ovc, 'optimalVideoCountChanged', ovcYay);
+          ovcYay();
+        } catch (e4) {   }
       }
     }
 
@@ -439,7 +485,7 @@
       baglan: async function (p) {
         var L = lib();
         if (!p || !p.groupId || !p.acsToken) throw new Error('groupId/acsToken yok');
-        bitti = false; ayrildiYayildi = false; ozellikler = {}; ozellikKuruldu = false; sonKonusan = null; dinlList = [];
+        bitti = false; ayrildiYayildi = false; ozellikler = {}; ozellikKuruldu = false; sonKonusan = null; dinlList = []; izinli = null;
         ev.yay('durum', { durum: 'Connecting' });
         await istemciHazir();
         var kimlik = new L.AzureCommunicationTokenCredential(p.acsToken);
@@ -466,8 +512,8 @@
           if (cagri.state === 'Disconnected' && !bitti) { bitir(false); }
         });
         bagla(cagri, 'remoteParticipantsUpdated', function (e) {
-          e.added.forEach(katilimciEkle);
-          e.removed.forEach(katilimciCikar);
+          e.added.forEach(function (p) { var yeni = !uzak.has(p); katilimciEkle(p); if (yeni && uzak.has(p)) ev.yay('katilimHaber', { tur: 'katildi', ad: uzak.get(p).ad }); });
+          e.removed.forEach(function (p) { var k = uzak.get(p); katilimciCikar(p); if (k) ev.yay('katilimHaber', { tur: 'ayrildi', ad: k.ad }); });
           sayiYay();
         });
         try { bagla(cagri, 'isScreenSharingOnChanged', function () { ev.yay('ekranPaylasimi', { id: 'ben', element: null, acik: !!cagri.isScreenSharingOn }); }); } catch (e1) {   }
@@ -526,6 +572,14 @@
         catch (e) { return yok('tepki', e); }
       },
 
+       
+      gorunecek: function (idler) {
+        izinli = new Set(idler || []);
+        uzak.forEach(function (k) {
+          var ok = izinli.has(k.id);
+          k.akislar.forEach(function (s) { if (ok) akisCiz(k, s); else akisKaldir(k, s); });
+        });
+      },
       hazir: function () { return !!(window.MM_ACS && window.MM_ACS.CallClient); },
       ayril: function () { return bitir(true); },
       temizle: function () { return temizle(true); }

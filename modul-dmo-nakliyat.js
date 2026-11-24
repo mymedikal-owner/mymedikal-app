@@ -145,7 +145,7 @@
           return h('div', { sinif: 'dm-oge' + (r[0] === 'Gecikmiş sipariş' && i.gecikmis_siparis > 0 ? ' kritik' : '') }, [h('span', { sinif: 'dm-oge-ad', metin: r[0] }), h('strong', { sinif: 'dm-oge-deger', metin: r[1] })]);
         }))]);
       var d = h('button', { type: 'button', sinif: 'dn-ihale' + (i.firma === 'DAY' ? ' day' : ''), 'aria-expanded': 'false', onclick: function () { var ac = det.hidden; det.hidden = !ac; d.setAttribute('aria-expanded', String(ac)); d.classList.toggle('acik', ac); } }, [
-        h('span', { sinif: 'dm-ih-ust' }, [firmaRozet(i.firma), h('strong', { sinif: 'dm-ikn', metin: 'İKN ' + (i.ikn || '—') }), h('span', { sinif: 'dm-ad', metin: i.dosya_no ? 'Dosya ' + i.dosya_no : '' }), kalanRozet(i)]),
+        h('span', { sinif: 'dm-ih-ust' }, [firmaRozet(i.firma), h('strong', { sinif: 'dm-ikn', metin: 'Sipariş no ' + (i.dosya_no || 'veri yok') }), h('span', { sinif: 'dm-ad', metin: 'İKN ' + (i.ikn || '—') }), kalanRozet(i)]),
         sevkYigin(i),
         bar('Çıktı', i.cikti_yuzde, RENK.cikti, say(i.cikan_miktar) + ' adet'),
         bar('Teslim oldu', i.teslim_yuzde, RENK.teslim, say(i.teslim_miktar) + ' adet'),

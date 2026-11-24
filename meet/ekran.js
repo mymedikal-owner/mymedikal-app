@@ -20,6 +20,9 @@
   var lobiBos = /[?&]bos=1(&|$)/.test(location.search);
   var saatZ = null, mesajZ = null, sohbetListe = null, adlar = {};
   var mq = window.matchMedia ? window.matchMedia('(max-width: 700px)') : null;
+   
+  var mqDar = window.matchMedia ? window.matchMedia('(max-width: 600px)') : null;
+  var ovc = 0, videoVar = new Set(), secim = [], seritZ = null;   
 
   var HATA = {
     belirtec: 'Oturum alınamadı. Uygulamaya giriş yapıp bu sayfayı yenileyin.',
@@ -150,7 +153,7 @@
       o.kart.classList.toggle('sabit', s);
     });
   }
-  function sabitle(key) { sabit = sabit === key ? '' : key; pinUi(); duzenle(); }
+  function sabitle(key) { sabit = sabit === key ? '' : key; pinUi(); secimGuncelle(); duzenle(); }
   function videoKoy(key, element) {
     var k = kartlar.get(key); if (!k) return;
     Array.from(k.goruntu.querySelectorAll('[data-video]')).forEach(function (n) { n.remove(); });
@@ -170,9 +173,38 @@
     var r = Math.ceil(n / c);
     return 'izgara c' + c + (r > 6 ? ' cok' : ' r' + r) + (n === 1 ? ' tek' : '');
   }
+  function videoSiniri() {
+    var ust = (mqDar && mqDar.matches) ? 4 : 16;
+    return Math.max(1, ovc > 0 ? Math.min(ovc, ust) : ust);
+  }
+   
+  function secimGuncelle() {
+    var onceki = secim.join(','), lim = videoSiniri();
+    secim = secim.filter(function (id) { return videoVar.has(id) && kartlar.has(id); });
+    var aday = Array.from(videoVar).filter(function (id) { return kartlar.has(id); });
+    if (konusan && konusan !== 'ben' && aday.indexOf(konusan) >= 0 && secim.indexOf(konusan) < 0) secim.unshift(konusan);
+    if (sabit && aday.indexOf(sabit) >= 0 && secim.indexOf(sabit) < 0) secim.unshift(sabit);
+    aday.forEach(function (id) { if (secim.length < lim && secim.indexOf(id) < 0) secim.push(id); });
+    while (secim.length > lim) {
+      var at = -1;
+      for (var i = secim.length - 1; i >= 0; i--) if (secim[i] !== konusan && secim[i] !== sabit) { at = i; break; }
+      secim.splice(at < 0 ? secim.length - 1 : at, 1);
+    }
+    if (secim.join(',') !== onceki && sag && sag.gorunecek) { try { sag.gorunecek(secim.slice()); } catch (e) {   } }
+    if (secim.join(',') !== onceki) duzenle();
+  }
+  function katilimSeridi(metin) {
+    var kap = $('izgara-kap'); if (!kap || !metin) return;
+    var s = $('katilim-serit');
+    if (!s) { s = document.createElement('div'); s.id = 'katilim-serit'; s.className = 'katilim-serit'; s.setAttribute('role', 'status'); s.setAttribute('aria-live', 'polite'); kap.appendChild(s); }
+    s.textContent = metin; s.hidden = false;
+    clearTimeout(seritZ);
+    seritZ = setTimeout(function () { s.hidden = true; s.textContent = ''; }, 4000);
+  }
   function duzenle() {
     var anahtarlar = Array.from(kartlar.keys());
     var uzaklar = anahtarlar.filter(function (k) { return k !== 'ben' && k.indexOf('ekran:') !== 0; });
+    uzaklar = secim.filter(function (k) { return uzaklar.indexOf(k) >= 0; }).concat(uzaklar.filter(function (k) { return secim.indexOf(k) < 0; }));   
     var ekranK = anahtarlar.filter(function (k) { return k.indexOf('ekran:') === 0; })[0] || '';
     var sabitK = sabit && uzaklar.indexOf(sabit) >= 0 ? sabit : '';
     var buyukDuzen = gorunum === 'konusmaci' || gorunum === 'spotlight';
@@ -198,6 +230,7 @@
   function konusanIsaretle(id) {
     konusan = id || '';
     kartlar.forEach(function (o, key) { o.kart.classList.toggle('konusuyor', key === konusan); });
+    secimGuncelle();
     if ((gorunum === 'konusmaci' || gorunum === 'spotlight') && !sabit) duzenle();
   }
   function mikGoster(key, acik) { var k = kartlar.get(key); if (k) k.mikEl.hidden = !!acik; }
@@ -369,15 +402,16 @@
     });
     sag.dinle('katilimci', function (v) { katilimciYaz(v.sayi); });
     sag.dinle('katilimciEkle', function (v) {
-      var yeni = !kartlar.has(v.id);
       kartYap(v.id, v.ad, false); uyeYaz(v.id, v.ad);
-      if (yeni) tost(v.ad + ' katıldı');
     });
     sag.dinle('katilimciCikar', function (v) {
-      var u = uyeler.get(v.id); kartSil(v.id); kartSil('ekran:' + v.id); uyeler.delete(v.id); listeCiz();
+      kartSil(v.id); kartSil('ekran:' + v.id); uyeler.delete(v.id); listeCiz();
+      videoVar.delete(v.id); secimGuncelle();
       if (konusan === v.id) konusanIsaretle('');
-      if (u) tost(u.ad + ' ayrıldı');
     });
+    sag.dinle('katilimHaber', function (v) { if (v && v.ad) katilimSeridi(String(v.ad).slice(0, 60) + (v.tur === 'ayrildi' ? ' ayrıldı' : ' katıldı')); });
+    sag.dinle('optimalVideoCount', function (v) { var n = Number(v && v.sayi); ovc = n > 0 ? Math.floor(n) : 0; secimGuncelle(); });
+    sag.dinle('videoMevcut', function (v) { if (v.var) videoVar.add(v.id); else videoVar.delete(v.id); secimGuncelle(); });
     sag.dinle('uzakVideo', function (v) { videoKoy(v.id, v.element); });
     sag.dinle('yerelVideo', function (v) { videoKoy('ben', v.element); });
     sag.dinle('onizlemeVideo', function (v) {
@@ -418,6 +452,7 @@
     kartlar.forEach(function (o) { o.kart.remove(); }); kartlar.clear(); uyeler.clear();
     ['izgara', 'ana', 'serit', 'kendi'].forEach(function (i) { $(i).textContent = ''; });
     gorunum = 'otomatik'; sabit = ''; konusan = ''; elAcik = false; ekranAcik = false; bagliOldu = false;
+    videoVar.clear(); secim = []; ovc = 0; clearTimeout(seritZ); var ks = $('katilim-serit'); if (ks) { ks.hidden = true; ks.textContent = ''; }
     gorunumUi(); elUi(); ekranUi(); yanKapat(); acilirKapat(); $('tost-alan').textContent = '';
     $('toplanti-adi').textContent = toplantiAdi; $('izgara').className = 'izgara c1 r1 tek';
   }
@@ -941,6 +976,7 @@
       if (yanAcik) yanKapat();
     });
     if (mq && mq.addEventListener) mq.addEventListener('change', duzenle);
+    if (mqDar && mqDar.addEventListener) mqDar.addEventListener('change', secimGuncelle);
     window.addEventListener('beforeunload', function () { try { if (sag) sag.ayril(); } catch (e) {   } });
     window.addEventListener('hashchange', function () { if ($('sahne').hidden) ac().catch(function (e) { mesaj(hataMetni(e)); }); });
      

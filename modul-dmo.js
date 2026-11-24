@@ -289,7 +289,7 @@
       function doluluk(g) { return !g.iptal_hakki_hastane ? (g.kullanilan_iptal_hastane > 0 ? 200 : 0) : g.kullanilan_iptal_hastane / g.iptal_hakki_hastane * 100; }
       liste = liste.filter(function (g) { return (g.kullanilan_iptal_hastane || 0) > 0; }).sort(function (a, b) { return doluluk(b) - doluluk(a); });
       var ilk = liste.slice(0, 6);
-      return G.kart({ baslik: 'Ceza ve iptal kotası (%10)', alt: 'iptal hakkı: hastane sayısının %10\'u, en az 3 · çizgi = hak sınırı', govde: ilk.length ? h('div', null, [h('div', { sinif: 'dm-kt-liste' }, ilk.map(function (g) {
+      return G.kart({ baslik: 'Ceza ve iptal kotası (%10, en az 3)', alt: 'iptal hakkı: %10, en az 3 (hastane azsa hastane sayısı kadar) · çizgi = hak sınırı', govde: ilk.length ? h('div', null, [h('div', { sinif: 'dm-kt-liste' }, ilk.map(function (g) {
         var p = doluluk(g), asim = p > 100, renk = g.yasak_asim_teyitsiz || asim ? 'kirmizi' : (g.yasak_durumu === 'sari' || p >= 80 ? 'sari' : 'yesil');
         return h('div', { sinif: 'dm-kt-satir' }, [h('div', { sinif: 'dm-kt-ust' }, [firmaRozet(g.firma), h('strong', { metin: 'Dosya ' + say(g.dosya_no) + ' · ' + turAdi(g.urun_turu, g.grup_adi) })]),
           h('div', { sinif: 'dm-kt-iz', role: 'img', 'aria-label': 'İptal hakkı: ' + say(g.kullanilan_iptal_hastane) + ' kullanıldı, hak ' + say(g.iptal_hakki_hastane) }, [h('i', { sinif: renk, style: 'width:' + Math.min(100, p).toFixed(1) + '%' }), h('span', { sinif: 'dm-kt-sinir' })]),
@@ -587,7 +587,7 @@
             say(g.hastane_sayisi_toplam != null ? g.hastane_sayisi_toplam : g.hastane_sayisi_pencere) + ' hastane (' + (/^siparişin tamamı/.test(g.hastane_kaynagi || '') ? 'siparişin tamamı' : '90 gün') + ') · dosya ' + say(g.dosya_no) + (g.yasak_asim_teyitsiz ? ' · kota aşıldı' : (g.yasak_durumu === 'sari' ? ' · sınıra yakın' : '')));
         })));
       }
-      govde.appendChild(G.kart({ baslik: 'İptal kotası (%10) · sipariş no ' + sipNo(i), alt: 'yalnız sipariş no düzeyinde: siparişteki hastane sayısının %10\'u · sipariş mektubu × teknik şartname kodu (SMT) bazında; hastane satırında gösterilmez', govde: yb }));
+      govde.appendChild(G.kart({ baslik: 'İptal kotası (%10, en az 3) · sipariş no ' + sipNo(i), alt: 'yalnız sipariş no düzeyinde: %10, en az 3 (hastane azsa hastane sayısı kadar) · sipariş mektubu × teknik şartname kodu (SMT) bazında; hastane satırında gösterilmez', govde: yb }));
 
        
       if (fg) govde.appendChild(G.kart({ baslik: 'Gerçekleşen ceza', govde: h('p', { sinif: 'dm-buyuk-metin', metin: fi.gerceklesen_ceza_tl == null ? 'Bu ihaleye bağlanan kesinti yok / veri yok' : tl(fi.gerceklesen_ceza_tl) }) }));

@@ -19,7 +19,7 @@
 
   MM.moduller.stok = function (kok) {
     var yuk = null, hata = null, canli = true, zamanlayici = null, degerVeri = null;
-    var st = { q: '', sirket: '', depo: '', skt: '', grup: '', tur: '', isaret: '', gorunum: 'parti', n: ILK }, satirlar = [], depolar = [];
+    var st = { q: '', sirket: '', depo: '', skt: '', grup: '', tur: '', isaret: '', gorunum: 'parti', talepDurum: '', n: ILK }, satirlar = [], depolar = [];
     var GRUPLAR = [['spanc', 'Spanç'], ['batin', 'Batın'], ['gazli_bez', 'Gazlı bez'], ['eldiven', 'Eldiven'], ['diger', 'Diğer']], GRUP_KOD = { '1002': 'gazli_bez', '1003': 'batin', '1004': 'spanc', '1006': 'eldiven' };
     var TURLER = [['mamul', T('Mamul', 'Finished goods')], ['ticari', T('Ticari mal', 'Trade goods')], ['iplik', T('İplik / open-end', 'Yarn / open-end')], ['hammadde', T('Hammadde', 'Raw material')], ['diger', T('Diğer', 'Other')]];
     function turAd(k) { for (var i = 0; i < TURLER.length; i++) if (TURLER[i][0] === k) return TURLER[i][1]; return k; }
@@ -80,7 +80,7 @@
     function isaretler(o, urunMu) {   
       var l = [];
       if (o.lotHata) l.push(rozet('⚠ ' + T('Lot 10 hane değil', 'Batch is not 10 digits'), '#c62828'));
-      if (o.hareketsiz) l.push(rozet(o.hareketsizGun != null ? T('60+ gün hareketsiz (' + o.hareketsizGun + ' gün)', '60+ days inactive (' + o.hareketsizGun + ' days)') : T('60+ gün hareketsiz', '60+ days inactive'), '#b26a00', T('Son mal hareketi 60 günden eski', 'Last stock movement older than 60 days')));
+      if (o.hareketsiz) l.push(rozet(T('Ürün 60+ gün hareketsiz', 'Product inactive 60+ days') + (o.hareketsizGun != null ? ' · ' + o.hareketsizGun + (EN ? ' d' : ' gün') : ''), '#7a7a7a', T('Bu parti değil, malzeme × tesis düzeyinde: ürünün son mal hareketi 60 günden eski. Ürün toplamı görünümünde de görünür.', 'Not this batch: at material × plant level the last stock movement is older than 60 days. Also shown in the Product totals view.')));
       if (o.planda) l.push(rozet('★ ' + T('Üretim planında', 'In production plan'), '#1565c0', T('Bu malzeme + lot açık üretim siparişinde hâlâ bekliyor', 'This material + batch is still pending in an open production order')));
       return l.length ? h('div', { sinif: 'alt' }, l) : null;
     }
@@ -139,7 +139,40 @@
       });
       araKok.appendChild(h('div', { sinif: 's41-kart-ozet ust-bosluk' }, [h('div', {}, [h('strong', { metin: st.tur ? T('Ara toplam — ', 'Subtotal — ') + turAd(st.tur) : T('Ara toplam (türe göre)', 'Subtotal (by material type)') })].concat(satirlarEl))]));
     }
+    var TALEP_DURUM = { acik: [T('Açık', 'Open'), '#b26a00'], kismi: [T('Kısmen siparişe döndü', 'Partly ordered'), '#1565c0'], siparis: [T('Siparişe döndü', 'Ordered'), '#2e7d32'] };
+    function talepCiz() {   
+      liste.textContent = ''; araKok.textContent = '';
+      var tv = yuk.veri.satinalma_talepleri;
+      if (!tv || !tv.satirlar) { liste.appendChild(G.bos({ baslik: T('Satınalma talebi verisi yok', 'No requisition data'), metin: T('Veri bir sonraki güncellemede gelir.', 'Data arrives with the next refresh.') })); return; }
+      var ix = {}; tv.kolonlar.forEach(function (k, i) { ix[k] = i; });
+      var q = MM.aramaNorm(st.q.trim()), p = q ? q.split(/\s+/) : [];
+      var f = tv.satirlar.filter(function (r) {
+        if (st.talepDurum && r[ix.durum] !== st.talepDurum) return false;
+        var a = MM.aramaNorm([r[ix.talep], r[ix.malzeme], r[ix.ad], (r[ix.siparisler] || []).join(' ')].join(' '));
+        for (var i = 0; i < p.length; i++) if (a.indexOf(p[i]) < 0) return false;
+        return true;
+      });
+      var say = { acik: 0, kismi: 0, siparis: 0 }; tv.satirlar.forEach(function (r) { say[r[ix.durum]]++; });
+      liste.appendChild(G.cipler([['', T('Tümü', 'All'), G.say(tv.satirlar.length)], ['acik', TALEP_DURUM.acik[0], G.say(say.acik)], ['kismi', TALEP_DURUM.kismi[0], G.say(say.kismi)], ['siparis', TALEP_DURUM.siparis[0], G.say(say.siparis)]], st.talepDurum, function (k) { st.talepDurum = k; st.n = ILK; listeCiz(); }, T('Talep durumu', 'Requisition status')));
+      liste.appendChild(h('div', { sinif: 'soluk kucuk ust-bosluk', metin: G.say(f.length) + T(' talep kalemi · son 180 gün (', ' requisition items · last 180 days (') + tarihYaz(tv.pencere_baslangic) + T(' sonrası) · yalnız görüntüleme', ' onward) · view only') }));
+      if (!f.length) { liste.appendChild(G.bos({ baslik: T('Eşleşen talep yok', 'No matching requisition'), metin: T('Aramayı ya da süzgeci değiştirin.', 'Change the search or filter.') })); return; }
+      f.slice(0, st.n).forEach(function (r) {
+        var d = TALEP_DURUM[r[ix.durum]] || ['', '#7a7a7a'], br = r[ix.birim];
+        var pos = r[ix.siparisler] || [];
+        var alt = [r[ix.malzeme], T('Talep tarihi ', 'Created ') + tarihYaz(r[ix.talep_tarihi]), r[ix.teslim_tarihi] ? T('İstenen teslim ', 'Requested delivery ') + tarihYaz(r[ix.teslim_tarihi]) : null].filter(Boolean).join(' · ');
+        var mik = T('Talep ', 'Requested ') + sayiYaz(r[ix.miktar], br) + ' · ' + T('Siparişe dönen ', 'Ordered ') + sayiYaz(r[ix.siparis_miktar], br);
+        var el = h('div', { sinif: 's41-satir' }, [h('div', { sinif: 'ad', metin: (r[ix.ad] || r[ix.malzeme]) }), h('div', { sinif: 'sag' }, [rozet(d[0], d[1])]),
+          h('div', { sinif: 'alt', metin: T('Talep ', 'Req. ') + r[ix.talep] + ' / ' + r[ix.kalem] + ' · ' + alt }), h('div', { sinif: 'alt', metin: mik }),
+          h('div', { sinif: 'alt', metin: pos.length ? T('Sipariş no ', 'PO no. ') + pos.join(', ') : T('Siparişe dönüşmedi', 'Not yet converted to a PO') })]);
+        if (r[ix.onay_bekliyor]) el.appendChild(h('div', { sinif: 'alt' }, [rozet(T('Onay bekliyor', 'Awaiting release'), '#b26a00')]));
+        liste.appendChild(el);
+      });
+      if (f.length > st.n) liste.appendChild(h('button', { sinif: 'dugme ikincil', type: 'button', metin: T('Daha fazla göster', 'Show more'), onclick: function () { st.n += ADIM; listeCiz(); } }));
+    }
     function listeCiz() {
+      var talepModu = st.gorunum === 'talep';
+      turKok.style.display = grupKok.style.display = aramaKok.style.display = ozetKok.style.display = talepModu ? 'none' : '';
+      if (talepModu) { talepCiz(); return; }
       liste.textContent = '';
       var f = suz();
       if (!f.length) { araKok.textContent = ''; liste.appendChild(G.bos({ baslik: 'Eşleşen stok yok', metin: 'Aramayı ya da süzgeçleri değiştirin.' })); return; }
@@ -185,7 +218,7 @@
       turKok.textContent = ''; grupKok.textContent = ''; gorunumKok.textContent = '';
       turKok.appendChild(G.cipler([['', 'Tümü', G.say(satirlar.length)]].concat(TURLER.map(function (t) { return [t[0], t[1], G.say(say[t[0]] || 0)]; })), st.tur, function (k) { st.tur = k; st.n = ILK; suzgecCiz(); listeCiz(); }, T('Malzeme türü', 'Material type')));
       grupKok.appendChild(G.cipler([['', 'Tümü', G.say(satirlar.length)]].concat(GRUPLAR.map(function (g) { return [g[0], g[1], G.say(sayG[g[0]] || 0)]; })), st.grup, function (k) { st.grup = k; st.n = ILK; suzgecCiz(); listeCiz(); }, 'Ürün grubu'));
-      gorunumKok.appendChild(G.cipler([['parti', T('Parti detayı', 'Batch detail')], ['urun', T('Ürün toplamı', 'Product totals')]], st.gorunum, function (k) { st.gorunum = k; st.n = ILK; suzgecCiz(); listeCiz(); }, T('Görünüm', 'View')));
+      gorunumKok.appendChild(G.cipler([['parti', T('Parti detayı', 'Batch detail')], ['urun', T('Ürün toplamı', 'Product totals')], ['talep', T('Satınalma talepleri', 'Purchase requisitions')]], st.gorunum, function (k) { st.gorunum = k; st.n = ILK; suzgecCiz(); listeCiz(); }, T('Görünüm', 'View')));
     }
     function hepsi() { aramaCiz(yuk.veri); listeCiz(); }
     function ciz() {

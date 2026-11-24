@@ -1738,6 +1738,7 @@
             if (bl.indexOf(bahisler[ad]) < 0 && bl.length < 20) bl.push(bahisler[ad]);
           });
           if (bl.length) { b.bahsedilen = bl; }
+          if (/(^|\s)@Asistan(\s|$|[.,?!:;])/i.test(t)) b.asistan = true;   
         }
         bekleyen.push(b);
         yanitHedef = null; bahisler = {}; bahisKapat(); seritGuncelle();
@@ -1777,6 +1778,10 @@
         if (ev.key !== 'Enter' || ev.isComposing || ev.keyCode === 229) return;
         if (ev.shiftKey) return;
         if (dokunmatik && !(ev.ctrlKey || ev.metaKey)) return;
+        if (!bahisKutu.hidden) {   
+          var ilkAday = bahisKutu.querySelector('.ms-bahis-oge');
+          if (ilkAday) { ev.preventDefault(); ilkAday.click(); return; }
+        }
         ev.preventDefault(); gonder();
       });
       kutu.addEventListener('paste', function (ev) {   

@@ -8,7 +8,7 @@
   'use strict';
   var MM = window.MM, h = MM.h, sayi = MM.sayi, G = MM.gr;
   var ESKI_DK = 36 * 60;   
-  var DURUM_AD = { acik: 'Açık', gecikmis: 'Geciken', tamam: 'Tamamlandı', bilinmiyor: 'Durum bilinmiyor', blokeli: 'Blokeli', tumu: 'Tümü' };
+  var DURUM_AD = { acik: 'Açık', gecikmis: 'Geciken', tamam: 'Tamamlandı', bilinmiyor: 'Durum bilinmiyor', blokeli: 'Blokeli', iade: 'İade', tumu: 'Tümü' };
   var VADE_YOK = { bilinmiyor: 'vade bilinmiyor', girilmemis: 'vade girilmemiş' };
   function vadeMetin(o, tr) { return o.vade_durum ? VADE_YOK[o.vade_durum] : tr(o.vade); }
   var KALEM_AD = { yok: 'Teslim yok', kismi: 'Kısmi teslim', tam: 'Teslim edildi', bilinmiyor: 'Durum bilinmiyor' };
@@ -51,7 +51,8 @@
       if (!q) {    
         if (secili === 'acik' && o.durum !== 'acik') return false;
         if (secili === 'gecikmis' && !o.gecikme_gun) return false;
-        if (secili === 'bilinmiyor') return false;   
+        if (secili === 'bilinmiyor' && o.durum !== 'bilinmiyor') return false;   
+        if (secili === 'iade') return false;   
         if (secili === 'tamam' && o.durum !== 'tamam') return false;
         if (secili === 'blokeli' && o.durum !== 'blokeli') return false;
       }
@@ -83,9 +84,10 @@
       }
       kutu('acik', 'Açık', o.acik, 'siparis', null, 'kayıtlı kanıtla açık');
       kutu('gecikmis', 'Geciken', o.gecikmis, 'uyari', o.gecikmis ? 'kritik' : null, 'istenen teslim geçmiş');
-      kutu('bilinmiyor', 'İadeler', null, 'bilgi', 'yok', 'iade verisi henüz yok — "iade yok" demek değil');   
-      if (o.blokeli) kutu('blokeli', 'Blokeli', o.blokeli, 'uyari', 'uyari', 'teslimat blokajı var');
+      kutu('blokeli', 'Blokeli', o.blokeli, 'uyari', o.blokeli ? 'uyari' : null, 'teslimat blokajı var');
       kutu('tamam', 'Tamamlanan', o.tamam, 'tik', null, 'tam teslim kanıtlı');
+      kutu('iade', 'İade', null, 'bilgi', 'yok', 'iade verisi henüz yok — "iade yok" demek değil');   
+      kutu('bilinmiyor', 'Durum bilinmiyor', o.bilinmiyor, 'bilgi', null, 'kayıtlı kanıt yok; iade sayılmaz');
       return k;
     }
 
@@ -146,14 +148,14 @@
     function secimler(v, vg) {
       var f = h('div', { sinif: 'sp-filtre' });
       var o = ozet(vg || v);
-      var sec = [['acik', 'Açık', o.acik], ['gecikmis', 'Geciken', o.gecikmis]].concat(o.blokeli ? [['blokeli', 'Blokeli', o.blokeli]] : [], [['bilinmiyor', 'İadeler', o.bilinmiyor], ['tamam', 'Tamamlanan', o.tamam], ['tumu', 'Tümü', (vg || v).siparisler.length]]);
+      var sec = [['acik', 'Açık', o.acik], ['blokeli', 'Blokeli', o.blokeli], ['gecikmis', 'Geciken', o.gecikmis], ['tamam', 'Tamamlanan', o.tamam], ['iade', 'İade', o.bilinmiyor], ['bilinmiyor', 'Durum bilinmiyor', o.bilinmiyor], ['tumu', 'Tümü', (vg || v).siparisler.length]];
        
       var say0 = function (fn, yoksay) { return v.siparisler.filter(function (x) { return uygun(x, yoksay) && fn(x); }).length; };
       var ustF = h('div', { sinif: 'sp-filtre' });
       ustF.appendChild(G.cipler([['', 'MY + DAY', say0(function () { return true; }, 'sirket')], ['MY', 'MY', say0(function (x) { return x.sirket === 'MY'; }, 'sirket')], ['DAY', 'DAY', say0(function (x) { return x.sirket === 'DAY'; }, 'sirket')]], sirket === 'DIGER' ? '' : sirket, function (d) { sirket = d || ''; ciz(); }, 'Şirket'));
       ustF.appendChild(G.cipler([['', 'Özel + DMO', say0(function () { return true; }, 'tur')], ['DMO', 'DMO', say0(function (x) { return x.tur_ad === 'DMO'; }, 'tur')], ['OZEL', 'Özel (doğrudan temin dahil)', say0(function (x) { return x.tur_ad !== 'DMO'; }, 'tur')]], tur === 'OZEL' || tur === 'DMO' ? tur : '', function (d) { tur = d || ''; ciz(); }, 'Tür'));
       f.appendChild(ustF);
-      f.appendChild(G.sekmeler(sec.map(function (c) { return [c[0], c[1], h('span', { sinif: 'cip-sayi', metin: c[0] === 'bilinmiyor' ? 'veri yok' : String(c[2]) })]; }), secili, function (d) { secili = d; yas = ''; ciz(); }, { sinif: 'cip', ad: 'Durum', goster: 3 }));
+      f.appendChild(G.sekmeler(sec.map(function (c) { return [c[0], c[1], h('span', { sinif: 'cip-sayi', metin: c[0] === 'iade' ? 'veri yok' : String(c[2]) })]; }), secili, function (d) { secili = d; yas = ''; ciz(); }, { sinif: 'cip', ad: 'Durum', goster: 3 }));
       if (yas) f.appendChild(G.cipler([[yas, 'Gecikme: ' + YAS.filter(function (y) { return y[0] === yas; })[0][1] + ' ✕']], yas, function () { yas = ''; ciz(); }, 'Gecikme filtresi'));
       if (kanit) f.appendChild(G.cipler([[kanit, (kanit === 'irs' ? 'Teslimat kaydı olanlar' : 'Fatura kaydı olanlar') + ' ✕']], kanit, function () { kanit = ''; ciz(); }, 'Kayıt filtresi'));
       return f;
@@ -304,7 +306,14 @@
       var liste = v.siparisler.filter(function (o) { return uygun(o); });
       govde.appendChild(G.cipler([['liste', 'Sipariş listesi'], ['musteri', 'Müşteri bazında'], ['hastane', 'Hastane / teslim yeri bazında']], gor, function (d) { gor = d; ciz(); }, 'Görünüm'));
       govde.appendChild(h('p', { sinif: 'kucuk soluk sp-sayim', metin: (q ? 'Arama: "' + q + '" · ' : '') + DURUM_AD[secili] + ': ' + sayi(liste.length) + ' sipariş' }));
-      if (secili === 'bilinmiyor') { govde.appendChild(G.bos({ baslik: 'İade verisi henüz yok', metin: 'İadeler için kaynak veri gelince burada listelenir; şimdilik "iade yok" anlamına gelmez.' })); return; }
+      if (secili === 'iade') {   
+        govde.appendChild(G.bos({ baslik: 'İade verisi henüz yok', metin: 'İadeler için kaynak veri gelince burada listelenir; şimdilik "iade yok" anlamına gelmez.' }));
+        var iadeAdim = ['İade başlatıldı', 'Lojistik yönlendirildi', 'Hastaneden alındı', 'Depoya ulaştı', 'Mal girişi', 'Kalite kontrol', 'Satışa hazır'];
+        var zin = h('ol', { sinif: 'sp-zincir', 'aria-label': 'İade adımları' });
+        iadeAdim.forEach(function (a) { zin.appendChild(adim('yok', 'bilgi', a, 'veri yok')); });
+        govde.appendChild(G.kart({ baslik: 'İade adımları', alt: 'adım adım takip · adım verisi henüz yok', govde: zin }));
+        return;
+      }
       if (!liste.length) { govde.appendChild(G.bos({ baslik: 'Bu görünümde sipariş yok', metin: 'Filtreleri değiştirin ya da aramayı temizleyin.' })); return; }
       govde.appendChild(G.kart({ govde: gor === 'liste' ? siparisTablosu(liste) : (gor === 'musteri' ? grupTablosu(liste, function (o) { return o.musteri; }, 'Müşteri') : grupTablosu(liste, function (o) { return o.teslim_alan; }, 'Hastane / teslim yeri')), baslik: gor === 'liste' ? 'Sipariş listesi' : (gor === 'musteri' ? 'Müşteri bazında' : 'Hastane / teslim yeri bazında'), alt: 'Başlığa dokununca sıralanır · satıra dokununca ayrıntı açılır' }));
     }

@@ -134,7 +134,7 @@
     </section>
 
     <section id="panel-bitti" class="kutu orta-kutu" hidden>
-      <h2>Toplantıdan ayrıldınız</h2>
+      <h2 id="bitti-baslik">Toplantıdan ayrıldınız</h2>
       <div class="satir satir-orta">
         <button id="b-tekrar" class="birincil" type="button">Yeniden katıl</button>
         <button id="b-lobiye" class="dugme" type="button">Toplantı ana ekranı</button>
@@ -162,6 +162,11 @@
             <div id="serit" class="serit"></div>
           </div>
           <div id="kendi" class="kendi"></div>
+          <div id="caliyor" class="caliyor" role="status" aria-live="polite" hidden>
+            <div id="cal-av" class="cal-av" aria-hidden="true">?</div>
+            <p id="cal-ad" class="cal-ad"></p>
+            <p id="cal-durum" class="cal-durum"></p>
+          </div>
           <div id="tost-alan" class="tost-alan" role="status" aria-live="polite"></div>
         </div>
 
@@ -172,7 +177,14 @@
           </div>
           <div id="yan-kisiler" class="yan-icerik" hidden>
             <button id="kisi-ekle" class="kisi-ekle" type="button"><span class="ikon" data-ikon="kisiekle"></span>Kişi ekle</button>
-            <input id="kisi-ara" class="kisi-ara" type="search" placeholder="Kişilerde ara" aria-label="Kişilerde ara" autocomplete="off">
+            <input id="kisi-ara" class="kisi-ara" type="search" placeholder="Kişi ara" aria-label="Kişi ara" autocomplete="off">
+            <div id="davet-bolum" class="davet-bolum" hidden>
+              <p class="liste-baslik">Çağır</p>
+              <ul id="davet-liste" class="kisi-liste davet-liste"></ul>
+              <p id="davet-durum" class="kucuk davet-durum" role="status" hidden></p>
+              <p id="davet-hata" class="kucuk davet-hata" hidden>Kişiler yüklenemedi <button id="davet-yeniden" type="button" class="davet-dugme">Yeniden dene</button></p>
+              <button id="davet-baglanti" class="davet-dugme davet-baglanti" type="button">Bağlantıyla davet et</button>
+            </div>
             <p class="liste-baslik">Toplantıda <span id="kisi-toplam">(1)</span></p>
             <ul id="kisi-liste" class="kisi-liste"></ul>
           </div>

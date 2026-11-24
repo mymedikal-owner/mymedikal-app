@@ -32,6 +32,8 @@
     var q = (typeof location !== 'undefined' && location.search) || '';
     var nm = /[?&]n=(\d+)/.exec(q);
     var N = nm ? Math.max(1, Math.min(12, parseInt(nm[1], 10))) : 2;
+    var gm = /[?&]gecik=(\d+)/.exec(q);
+    var GECIK = gm ? Math.min(600, parseInt(gm[1], 10)) * 1000 : 0;   
     var om = /[?&]ovc=(\d+)/.exec(q);
     var OVC = om ? Math.max(1, Math.min(16, parseInt(om[1], 10))) : 8;   
     var sahte = []; for (var i = 0; i < N; i++) sahte.push({ id: 'k' + (i + 1), ad: 'Katılımcı ' + (i + 1) });
@@ -113,7 +115,7 @@
               ev.yay('katilimHaber', { tur: 'katildi', ad: k.ad });
               ev.yay('videoMevcut', { id: k.id, var: true });
               taklitCiz(k.id);
-            }, 300 + i * 250);
+            }, GECIK + 300 + i * 250);
           });
           ev.yay('optimalVideoCount', { sayi: OVC });
           var t0 = 400 + N * 250;

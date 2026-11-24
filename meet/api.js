@@ -6,6 +6,10 @@
 
 
 
+
+
+
+
 (function () {
   'use strict';
   var A = window.MM_AYAR || {};
@@ -41,6 +45,10 @@
     if (res.status < 200 || res.status >= 300) throw hata(kodOf(res.status), res.status);
     return j;
   }
+  async function ucYok(f) {   
+    try { return await f(); }
+    catch (e) { if (e && (e.durum === 404 || e.durum === 405)) throw hata('uc_yok', e.durum); throw e; }
+  }
    
   function kisaKodDuzelt(k) { return String(k == null ? '' : k).toUpperCase().replace(/[\s-]/g, ''); }
   function katilSonucu(v) {
@@ -57,7 +65,7 @@
   function sid(x) { return encodeURIComponent(String(x)); }
   function bilgiAl(v) {
     if (!v || typeof v.groupId !== 'string' || typeof v.acsToken !== 'string' || !v.groupId || !v.acsToken) throw hata('gecersiz');
-    return { groupId: v.groupId, acsToken: v.acsToken, acsUserId: v.acsUserId, bitis: v.bitis };
+    return { groupId: v.groupId, acsToken: v.acsToken, acsUserId: v.acsUserId, bitis: v.bitis, aramaId: typeof v.aramaId === 'string' ? v.aramaId : '' };
   }
   function yeniId() {
     try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) {   }
@@ -73,7 +81,26 @@
   window.MeetApi = {
     sohbetler: async function () { var v = await cagri('GET', '/sohbetler'); return Array.isArray(v) ? v : []; },
     kisiler: async function () { var v = await cagri('GET', '/kisiler'); return Array.isArray(v) ? v : []; },
-    aramaBaslat: async function (sohbetId) { return bilgiAl(await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/arama', { video: true })); },
+    aramaBaslat: async function (sohbetId, video) { return bilgiAl(await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/arama', { video: video === undefined ? true : !!video })); },
+     
+    aramaSon: async function (sohbetId) {
+      var v = await cagri('GET', '/sohbetler/' + sid(sohbetId) + '/arama/son');
+      var a = v && v.arama;
+      return a && typeof a.groupId === 'string' ? { groupId: a.groupId, baslangic: s(a.baslangic), aramaId: s(a.aramaId) } : null;
+    },
+    aramaBitti: async function (sohbetId, aramaId, sebep) {
+      if (!aramaId) return;
+      await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/arama/' + sid(aramaId) + '/bitti', { sebep: sebep === 'cevapsiz' ? 'cevapsiz' : 'bitti' });
+    },
+    aramaKatildi: async function (sohbetId, aramaId) {
+      if (!aramaId) return;
+      await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/arama/' + sid(aramaId) + '/katildi', {});
+    },
+    aramaReddet: async function (sohbetId, aramaId) {
+      if (!aramaId) return;
+      try { await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/arama/' + sid(aramaId) + '/reddet', {}); }
+      catch (e) { if (e && e.kod !== 'yok' && e.kod !== 'gecersiz') throw e; }   
+    },
     aramaKatil: async function (sohbetId, groupId) {
       if (typeof groupId !== 'string' || !groupId) throw hata('gecersiz');
       return bilgiAl(await cagri('POST', '/sohbetler/' + sid(sohbetId) + '/arama/katil', { groupId: groupId }));
@@ -135,6 +162,26 @@
       var k = kisaKodDuzelt(kisaKod);
       if (k.length !== 8) throw hata('gecersiz');
       return katilSonucu(await cagri('POST', '/toplanti/kisa-kod/katil', { kisaKod: k }));
+    },
+    
+
+    toplantiCagir: async function (kod, oid) {
+      if (typeof kod !== 'string' || !kod || typeof oid !== 'string' || !oid) throw hata('gecersiz');
+      return ucYok(function () { return cagri('POST', '/toplanti/' + sid(kod) + '/cagir', { oid: oid }); });
+    },
+    aramaCagir: async function (sohbetId, aramaId, oid) {
+      if (typeof sohbetId !== 'string' || !sohbetId || typeof aramaId !== 'string' || !aramaId || typeof oid !== 'string' || !oid) throw hata('gecersiz');
+      return ucYok(function () { return cagri('POST', '/sohbetler/' + sid(sohbetId) + '/arama/' + sid(aramaId) + '/cagir', { oid: oid }); });
+    },
+    toplantiDavet: async function (kod, oidler) {
+      if (typeof kod !== 'string' || !kod || !Array.isArray(oidler)) throw hata('gecersiz');
+      var dv = []; oidler.forEach(function (x) { if (typeof x === 'string' && x && dv.indexOf(x) < 0) dv.push(x); });
+      if (!dv.length || dv.length > 200) throw hata('gecersiz');
+      return cagri('POST', '/toplanti/' + sid(kod) + '/davet', { davetliler: dv });
+    },
+    cagriCevap: async function (kod, cagriId, sonuc) {
+      if (typeof kod !== 'string' || !kod || typeof cagriId !== 'string' || !cagriId) throw hata('gecersiz');
+      return ucYok(function () { return cagri('POST', '/toplanti/' + sid(kod) + '/cagri/' + sid(cagriId) + '/cevap', { sonuc: sonuc === 'kabul' ? 'kabul' : 'red' }); });
     },
      
     baglantiOlustur: function (sohbetId, groupId) { return new URL('./', location.href).href + '#s=' + sid(sohbetId) + '&g=' + sid(groupId); },

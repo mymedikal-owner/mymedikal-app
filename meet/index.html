@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8"><meta name="robots" content="noindex">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://mymesaj-api-p4nhi4.azurewebsites.net https://login.microsoftonline.com https://*.skype.com wss://*.skype.com https://*.microsoft.com wss://*.microsoft.com https://*.azure.net wss://*.azure.net https://*.azure.com wss://*.azure.com https://*.office.com wss://*.office.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>Mumu Meet</title>
@@ -153,7 +153,7 @@
       </div>
     </section>
 
-    <section id="sahne" class="sahne" aria-label="Toplantı" hidden>
+    <section id="sahne" class="sahne" aria-label="Mumu Meet" hidden>
       <div class="sahne-govde">
         <div id="izgara-kap" class="izgara-kap">
           <div id="izgara" class="izgara" aria-label="Katılımcılar"></div>
@@ -212,7 +212,7 @@
         <div class="cubuk-sol">
           <span id="saat" class="saat">--:--</span>
           <span class="ayrac" aria-hidden="true">|</span>
-          <span id="toplanti-adi" class="toplanti-adi">Toplantı</span>
+          <span id="toplanti-adi" class="toplanti-adi">Mumu Meet</span>
         </div>
         <div class="cubuk-orta">
           <button id="b-mik" class="yuvarlak" type="button" aria-pressed="true" aria-label="Mikrofonu kapat" title="Mikrofonu kapat"><span class="ikon" data-ikon="mik"></span></button>
@@ -248,6 +248,15 @@
               <button id="m-ekran" type="button" class="menu-oge mobil-ek" role="menuitem"><span class="ikon" data-ikon="ekran"></span>Ekranı paylaş</button>
               <button id="m-el" type="button" class="menu-oge mobil-ek" role="menuitem"><span class="ikon" data-ikon="el"></span>Elini kaldır</button>
               <button id="m-bilgi" type="button" class="menu-oge mobil-ek" role="menuitem"><span class="ikon" data-ikon="bilgi"></span>Toplantı bilgisi</button>
+              <button id="m-cevir" type="button" class="menu-oge mobil-ek" role="menuitem" hidden><span class="ikon" data-ikon="cevir"></span>Kamerayı çevir</button>
+              <div class="menu-tepki mobil-ek" role="group" aria-label="Tepki gönder">
+                <button type="button" class="emoji-dugme" data-tepki="like" data-emoji="👍" aria-label="Beğen">👍</button>
+                <button type="button" class="emoji-dugme" data-tepki="love" data-emoji="❤️" aria-label="Kalp">❤️</button>
+                <button type="button" class="emoji-dugme" data-tepki="laugh" data-emoji="😂" aria-label="Gülme">😂</button>
+                <button type="button" class="emoji-dugme" data-tepki="surprised" data-emoji="😮" aria-label="Şaşırma">😮</button>
+                <button type="button" class="emoji-dugme" data-tepki="applause" data-emoji="👏" aria-label="Alkış">👏</button>
+                <button type="button" class="emoji-dugme" data-tepki="applause" data-emoji="🎉" aria-label="Kutlama">🎉</button>
+              </div>
             </div>
           </div>
           <button id="b-ayril" class="yuvarlak ayril" type="button" aria-label="Toplantıdan ayrıl" title="Toplantıdan ayrıl"><span class="ikon" data-ikon="ayril"></span></button>

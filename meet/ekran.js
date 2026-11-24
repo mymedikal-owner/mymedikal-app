@@ -8,7 +8,7 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var taklit = /[?&]taklit=1(&|$)/.test(location.search);
-  var sag = null, sohbetId = '', ad = 'Katılımcı', mesgul = false, grupId = '', toplantiAdi = 'Toplantı';
+  var sag = null, sohbetId = '', ad = 'Katılımcı', mesgul = false, grupId = '', toplantiAdi = 'Mumu Meet';
   var oz = { mik: true, kam: true, mod: 'yeni' };          
   var kartlar = new Map();                                    
   var uyeler = new Map();                                     
@@ -288,7 +288,13 @@
       $(p[0]).setAttribute('aria-checked', gorunum === p[1] ? 'true' : 'false');
     });
   }
-  function saatYaz() { try { $('saat').textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); } catch (e) { $('saat').textContent = '--:--'; } }
+   
+  var katilisMs = 0;
+  function saatYaz() {
+    var s = Math.max(0, Math.floor((Date.now() - (katilisMs || Date.now())) / 1000)), z = function (n) { return (n < 10 ? '0' : '') + n; };
+    var sa = Math.floor(s / 3600), dk = Math.floor((s % 3600) / 60), sn = s % 60;
+    $('saat').textContent = sa > 0 ? sa + ':' + z(dk) + ':' + z(sn) : z(dk) + ':' + z(sn);
+  }
 
    
   function acilirKapat() {
@@ -602,7 +608,7 @@
     kartYap('ben', ad, true); uyeYaz('ben', ad);
     mikUi($('b-mik'), oz.mik); kamUi($('b-kam'), oz.kam); mikGoster('ben', oz.mik);
     var u = uyeler.get('ben'); if (u) u.mik = oz.mik;
-    panel('sahne'); saatYaz(); clearInterval(saatZ); saatZ = setInterval(saatYaz, 20000);
+    panel('sahne'); katilisMs = Date.now(); saatYaz(); clearInterval(saatZ); saatZ = setInterval(saatYaz, 1000);
     try {
       await sag.baglan({ groupId: bilgi.groupId, acsToken: bilgi.acsToken, acsUserId: bilgi.acsUserId, ad: ad, kameraAcik: oz.kam, mikrofonAcik: oz.mik });
     } catch (e) { T('hata_kodu', e && e.kod); mesaj(hataMetni(e)); durumYaz('Hata'); try { await sag.temizle(); } catch (e2) {   } panel('panel-onizleme'); throw e; }
@@ -644,7 +650,7 @@
     var harita = { kamera: [c.kameralar, c.secili.kamera, 'Kamera yok'], mikrofon: [c.mikrofonlar, c.secili.mikrofon, 'Mikrofon yok'], hoparlor: [c.hoparlorler, c.secili.hoparlor, 'Hoparlör yok'] };
     SEL.forEach(function (p) { var h = harita[p[1]]; selDoldur($(p[0]), h[0], h[1], h[2]); });
     var cok = (c.kameralar || []).length > 1;
-    ['o-cevir', 'b-cevir'].forEach(function (id) { var d = $(id); if (d) d.hidden = !cok; });
+    ['o-cevir', 'b-cevir', 'm-cevir'].forEach(function (id) { var d = $(id); if (d) d.hidden = !cok; });
   }
   async function kameraCevir() {
     if (!sag || typeof sag.cevir !== 'function') return;
@@ -880,7 +886,7 @@
   async function ac() {
     zilSifirla();   
     aktifAramaId = ''; davetSifirla();
-    durumYaz('hazir'); toplantiAdi = 'Toplantı'; oz.mik = true;
+    durumYaz('hazir'); toplantiAdi = 'Mumu Meet'; oz.mik = true;
     if (window.MeetKimlik.yerelUygulama()) { yokGoster('Toplantı bugün yalnız bilgisayar tarayıcısında', 'Bu sayfa uygulama içinde değil, bilgisayarınızın tarayıcısında açılır.', false); durumYaz('desteklenmiyor'); return; }
     if (!taklit) {
       var k = await window.MeetKimlik.hazirla();
@@ -983,7 +989,7 @@
     } finally { mesgul = false; }
   }
   async function odaAc(t) {
-    lobiGirisi = false; sohbetId = ''; grupId = ''; oz.kam = true; toplantiAdi = 'Toplantı'; odaBilgi = null;
+    lobiGirisi = false; sohbetId = ''; grupId = ''; oz.kam = true; toplantiAdi = 'Mumu Meet'; odaBilgi = null;
     if (!KOD_RE.test(t)) { onBilgi = null; yokGoster('Toplantı bulunamadı', 'Bu adres geçerli bir toplantıya ait değil.', true); durumYaz('hata'); return; }
     odaKod = t;
     var s;
@@ -1197,6 +1203,7 @@
 
     $('o-cevir').addEventListener('click', function () { altIs(kameraCevir); });
     $('b-cevir').addEventListener('click', function () { altIs(kameraCevir); });
+    $('m-cevir').addEventListener('click', function () { acilirKapat(); altIs(kameraCevir); });
     $('b-mik').addEventListener('click', function () { if (sag) altIs(function () { return sag.mikrofon($('b-mik').getAttribute('aria-pressed') !== 'true'); }); });
     $('b-kam').addEventListener('click', function () { if (sag) altIs(function () { return sag.kamera($('b-kam').getAttribute('aria-pressed') !== 'true'); }); });
     function altyazi() { acilirKapat(); tost('Altyazı yakında eklenecek.'); }
@@ -1205,6 +1212,7 @@
     function elDegis() { acilirKapat(); if (sag) altIs(function () { return sag.elKaldir(!elAcik); }); }
     $('b-altyazi').addEventListener('click', altyazi); $('m-altyazi').addEventListener('click', altyazi);
     $('m-arka').addEventListener('click', arka);
+    if (!(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function')) { $('b-ekran').hidden = true; $('m-ekran').hidden = true; }   
     $('b-ekran').addEventListener('click', ekranPaylas); $('m-ekran').addEventListener('click', ekranPaylas);
     $('b-el').addEventListener('click', elDegis); $('m-el').addEventListener('click', elDegis);
     $('b-tepki').addEventListener('click', function (e) { e.stopPropagation(); acilirDegistir('b-tepki', 'tepki-panel'); });

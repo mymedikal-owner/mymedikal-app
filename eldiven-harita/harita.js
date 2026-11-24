@@ -376,7 +376,7 @@ function renderGroupCard(){
   const route=g.kind==='ship'? `${esc(portName(g.list[0].st.from))} → ${esc(portName(g.list[0].st.to))}` : '';
   const eta=t.etaMin!=null && g.kind==='ship'? (t.etaMin===t.etaMax? fmtD(t.etaMin) : `${fmtD(t.etaMin)} – ${fmtD(t.etaMax)}`) : '';
   const rows=g.list.slice().sort((a,b)=>a.c.ref<b.c.ref?-1:1).map(it=>{ const c=it.c, st=it.st; let m=c.unit==='pairs'? `${nf().format(c.qty/1000)}k`:`${nf1().format(c.qty/1e6)} mn`;
-    return `<button type="button" class="row" data-gid="${esc(c.id)}"><span class="pip" style="background:${COL[st.ds]}"></span><span class="r1">${esc(c.ref)} · ${esc(cusName(c.lots[0].cus))}${c.trk?`<i class="lv" title="${L().trk.live}"></i>`:''}</span><span class="m">${m}</span><span class="r2">${c.ktr?esc(c.ktr):'—'} · ${esc(prdName(c.prd))}</span></button>`; }).join('');
+    return `<button type="button" class="row" data-gid="${esc(c.id)}"><span class="pip" style="background:${COL[st.ds]}"></span><span class="r1">${esc(c.ref)} · ${esc(cusName(c.lots[0].cus))}${c.trk?`<i class="lv" title="${L().trk.live}"></i>`:''}</span><span class="m">${m}</span><span class="r2">${c.ktr?esc(c.ktr)+' · ':''}${esc(prdName(c.prd))}</span></button>`; }).join('');
   const finRow=t.fin&&BOARD.fin? `<div class="gstats" style="grid-template-columns:1fr 1fr"><div><b>${usd(t.fob)}</b><span>FOB</span></div><div><b style="color:${t.bal>0?COL.port:COL.ithal}">${usd(t.bal)}</b><span>${l.pay.bal}</span></div></div>`:'';
   card.innerHTML=`<div class="ch"><div class="t"><h2>${esc(groupLabel(g))}</h2><button type="button" class="x" id="cardx" aria-label="${l.close}">✕</button></div>
     <div class="src">${g.kind==='ship'?l.ship:l.port}${route?' · '+route:''}${eta?' · '+l.gTot.eta+' '+eta:''}</div></div>

@@ -64,9 +64,9 @@
     var o = oz.sip.o, v = oz.sip.v, dk = MM.yasDk(v.asof), l = v.siparisler || [], bugun = Date.parse(bugunIso() + 'T00:00:00Z'), gun = new Array(45).fill(0);
     l.forEach(function (s) { if (!s.tarih) return; var f = Math.round((bugun - Date.parse(s.tarih + 'T00:00:00Z')) / 864e5); if (f >= 0 && f < 45) gun[44 - f]++; });
     var gec = l.filter(function (s) { return s.gecikme_gun; }), dmo = gec.filter(function (s) { return s.tur_ad === 'DMO'; }).length;
-    var k = { baslik: 'Siparişler', ikon: 'siparis', deger: String(o.acik), birim: 'açık sipariş', href: '#siparis', durum: o.gecikmis ? 'kritik' : null, spark: gun, sparkAd: 'Son 45 günde açılan sipariş sayısı (günlük)',
+    var k = { baslik: 'Siparişler', ikon: 'siparis', deger: String(l.length), birim: 'sipariş (hepsi)', href: '#siparis', durum: o.gecikmis ? 'kritik' : null, spark: gun, sparkAd: 'Son 45 günde açılan sipariş sayısı (günlük)',
       neden: o.gecikmis ? o.gecikmis + ' sipariş gecikmiş' + (dmo ? ' (' + dmo + ' tanesi DMO)' : '') + '; ' + o.bilinmiyor + ' siparişin durumu bilinmiyor.' : o.bilinmiyor + ' siparişin durumu bilinmiyor.',
-      yas: dk, eski: dk == null || dk > 2160, alt: (o.kismi ? sayi(o.bilinmeyenKalem) + ' kalemin teslim durumu henüz yok' : '') };
+      yas: dk, eski: dk == null || dk > 2160, alt: 'açık ' + sayi(o.acik) + (o.kismi ? ' · ' + sayi(o.bilinmeyenKalem) + ' kalemin teslim durumu henüz yok' : '') };
     if (v.ornek === true) k.etiket = { metin: 'ÖRNEK', tur: 'ornek' };
     return k;
   };
@@ -117,7 +117,7 @@
    
   function komKutu(id, oz, ek) {
     var o, v;
-    if (id === 'siparis') { if (!oz.sip) return null; o = oz.sip.o; return { sayi: String(o.acik), birim: 'açık', alt: o.gecikmis ? '▲ ' + o.gecikmis + ' geciken' : 'gecikme yok', ton: o.gecikmis ? 'kritik' : null, asof: oz.sip.v.asof }; }
+    if (id === 'siparis') { if (!oz.sip) return null; o = oz.sip.o; return { sayi: String((oz.sip.v.siparisler || []).length), birim: 'sipariş', alt: 'açık ' + o.acik + (o.gecikmis ? ' · ▲ ' + o.gecikmis + ' geciken' : ' · gecikme yok'), ton: o.gecikmis ? 'kritik' : null, asof: oz.sip.v.asof }; }
     if (id === 'makineler') {
       if (!oz.fab) return null; var d = oz.fab.v, hl = d.hatlar || [], say = function (s) { return hl.filter(function (x) { return x.durum === s; }).length; }, dur = say('durdu') + say('no_data');
       return { sayi: say('calisiyor') + '/' + hl.length, birim: 'hat', alt: dur ? '▼ ' + dur + ' hat durdu/veri yok' : 'tüm hatlar çalışıyor', ton: dur ? 'kritik' : null, asof: d.asof };
@@ -136,7 +136,7 @@
     if (id === 'dmo') {
       if (!ek.dmo || !ek.dmo.veri || !ek.dmo.veri.toplam) return null; v = ek.dmo.veri; var t = v.toplam;
       if (t.siparis_sayisi == null) return null;
-      return { sayi: String(t.siparis_sayisi), birim: 'açık sipariş', alt: t.kalan != null ? 'kalan ' + sayi(t.kalan) + ' adet' : '', ton: null, asof: v.uretim_zamani ? String(v.uretim_zamani).replace(' ', 'T') + '+03:00' : null };
+      return { sayi: String(t.siparis_sayisi), birim: 'açık DMO siparişi', alt: t.kalan != null ? 'kalan ' + sayi(t.kalan) + ' adet' : '', ton: null, asof: v.uretim_zamani ? String(v.uretim_zamani).replace(' ', 'T') + '+03:00' : null };
     }
     return null;   
   }

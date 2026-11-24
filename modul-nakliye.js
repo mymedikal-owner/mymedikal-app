@@ -246,7 +246,8 @@
   var LOJ_ROZET = { 'Sevk edildi': { yazi: 'var(--yesil)', zemin: 'var(--yesil-zemin)', ikon: 'tik' }, 'Planlandı': { yazi: 'var(--vurgu-sert)', zemin: 'var(--vurgu-zemin)', ikon: 'saat' } };
   function lojDurumAd(r) { return r.durum === 'Planlandı' && r.plan_tarihi && r.plan_tarihi < bugunISO() ? 'Planlandı · gecikmiş' : r.durum; }
   function lojRozet(r) { var d = lojDurumAd(r), st = LOJ_ROZET[r.durum]; if (d !== r.durum) st = { yazi: 'var(--ciddi)', zemin: 'var(--sari-zemin)', ikon: 'uyari' }; return st ? h('span', { sinif: 'tq-rozet', style: 'color:' + st.yazi + ';background:' + st.zemin }, [G.ikon(st.ikon, 13), d]) : '—'; }
-  var ARA_ALAN = ['teslim_alan_kurum', 'malzeme', 'urun_kodu', 'siparis_no', 'irsaliye_no', 'il', 'lojistik', 'yk_no'];
+  var ARA_ALAN = ['teslim_alan_kurum', 'malzeme', 'urun_kodu', 'siparis_no', 'irsaliye_no', 'teslimat_no', 'il', 'lojistik', 'yk_no'];
+  function tesNo(r) { return r.teslimat_no || r.irsaliye_no; }    
   function miktarKol(r) { return r.miktar == null ? '—' : say(r.miktar) + (r.birim ? ' ' + r.birim : ''); }
   function lojistikGorunum(v, st, yeniden) {
     var kap = h('div'), lj = v.lojistik;
@@ -271,7 +272,8 @@
       { ad: 'Koli', k: 'koli', sag: true, ciz: function (r) { return r.koli == null ? '—' : say(r.koli); } },
       { ad: 'İl', k: 'il', ciz: function (r) { return dolu(r.il); } },
       { ad: 'Sipariş no', k: 'siparis_no', ciz: function (r) { return dolu(r.siparis_no); } },
-      { ad: 'İrsaliye no', k: 'irsaliye_no', ciz: function (r) { return dolu(r.irsaliye_no); } },
+      { ad: 'Teslimat no', k: 'teslimat_no', ciz: function (r) { return dolu(tesNo(r)); }, deger: tesNo },
+      { ad: 'İrsaliye no', k: 'irsaliye_no', ciz: function (r) { return dolu(r.teslimat_no ? r.irsaliye_no : null); } },
       { ad: 'Lojistik', k: 'lojistik', ciz: function (r) { return dolu(r.lojistik); } },
       { ad: 'Şirket', k: 'sirket', ciz: function (r) { return dolu(r.sirket); } }];
     function ciz() {
@@ -307,7 +309,8 @@
       { ad: 'Miktar', k: 'miktar', sag: true, ciz: miktarKol, deger: function (r) { return r.miktar; } },
       { ad: 'Koli', k: 'koli', sag: true, ciz: function (r) { return r.koli == null ? '—' : say(r.koli); } },
       { ad: 'Sipariş no', k: 'siparis_no', ciz: function (r) { return dolu(r.siparis_no); } },
-      { ad: 'İrsaliye no', k: 'irsaliye_no', ciz: function (r) { return dolu(r.irsaliye_no); } },
+      { ad: 'Teslimat no', k: 'teslimat_no', ciz: function (r) { return dolu(tesNo(r)); }, deger: tesNo },
+      { ad: 'İrsaliye no', k: 'irsaliye_no', ciz: function (r) { return dolu(r.teslimat_no ? r.irsaliye_no : null); } },
       { ad: 'Lojistik', k: 'lojistik', ciz: function (r) { return dolu(r.lojistik); } },
       { ad: 'Lokasyon', k: 'lokasyon', ciz: function (r) { return dolu(r.lokasyon); } },
       { ad: 'Açıklama', k: 'aciklama', ciz: function (r) { return dolu(r.aciklama); } }];
@@ -319,13 +322,13 @@
         return !q || satirMetin(r, ARA_ALAN.concat(['lokasyon', 'aciklama'])).indexOf(q) >= 0;
       }).sort(function (a, b) { return (b.sevk_tarihi || '') < (a.sevk_tarihi || '') ? -1 : (b.sevk_tarihi || '') > (a.sevk_tarihi || '') ? 1 : 0; });
       var mk = {}, ku = {}, ir = {}, kt = 0, kv = false, tsl = {}, tslK = {};
-      s.forEach(function (r) { if (r.irsaliye_no) { tsl[r.irsaliye_no] = 1; if (r.koli != null) tslK[r.irsaliye_no] = 1; } if (r.miktar != null) mk[r.birim || '—'] = (mk[r.birim || '—'] || 0) + r.miktar; if (r.koli != null) { kt += r.koli; kv = true; } if (r.teslim_alan_kurum) ku[r.teslim_alan_kurum] = 1; if (r.irsaliye_no) ir[r.irsaliye_no] = 1; });
+      s.forEach(function (r) { var tn = tesNo(r); if (tn) { tsl[tn] = 1; if (r.koli != null) tslK[tn] = 1; } if (r.miktar != null) mk[r.birim || '—'] = (mk[r.birim || '—'] || 0) + r.miktar; if (r.koli != null) { kt += r.koli; kv = true; } if (r.teslim_alan_kurum) ku[r.teslim_alan_kurum] = 1; if (tn) ir[tn] = 1; });
       var bu = birimler(mk), kp = h('div', { sinif: 'kpi-izgara tq-kpi' });
       kp.appendChild(G.kpi({ baslik: 'Satır', deger: say(s.length), ikon: 'saat', alt: 'sevk satırı' }));
       kp.appendChild(G.kpi({ baslik: 'Miktar', deger: bu.length ? G.kisa(mk[bu[0]]) : '—', birim: bu.length ? bu[0] : '', ikon: 'saat', alt: bu.length > 1 ? bu.slice(1).map(function (u) { return say(mk[u]) + ' ' + u; }).join(' · ') : 'toplam miktar' }));
       kp.appendChild(G.kpi({ baslik: 'Koli', deger: kv ? say(kt) : '—', ikon: 'saat', alt: kv ? 'toplam koli' + (Object.keys(tsl).length ? ' · ' + Object.keys(tslK).length + '/' + Object.keys(tsl).length + ' teslimatta var' : '') : 'koli bilgisi yok' }));
       kp.appendChild(G.kpi({ baslik: 'Teslim noktası', deger: say(Object.keys(ku).length), ikon: 'saat', alt: 'farklı kurum' }));
-      kp.appendChild(G.kpi({ baslik: 'İrsaliye', deger: say(Object.keys(ir).length), ikon: 'saat', alt: 'farklı irsaliye' }));
+      kp.appendChild(G.kpi({ baslik: 'Teslimat', deger: say(Object.keys(ir).length), ikon: 'saat', alt: 'farklı teslimat' }));
       ozAlan.appendChild(kp);
       var donem = st.mod === 'gun' ? td(st.bas) : st.mod === 'ay' ? ayAd(st.bas.slice(0, 7)) : td(st.bas) + ' – ' + td(st.bit), f = 'Dönem: ' + donem; if (st.ara) f += ' · Arama: ' + st.ara;
       alan.appendChild(G.veriTablo({ ad: 'Günlük rapor', filtre: f, kolonlar: kol, satirlar: s, sayfa: 50, bos: 'Bu dönemde sevkiyat kaydı yok.' }));

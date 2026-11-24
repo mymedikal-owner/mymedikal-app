@@ -35,7 +35,8 @@
     var inp = h('input', { type: 'search', sinif: 'eld-arama ara-girdi', placeholder: o.alanlar || 'Bu sayfada ara…', 'aria-label': 'Bu sayfada ara', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', enterkeyhint: 'search' });
     var sayi = h('span', { sinif: 'ara-sayi soluk kucuk', 'aria-live': 'polite' });
     var temizle = h('button', { type: 'button', sinif: 'ara-temizle', 'aria-label': 'Aramayı temizle', title: 'Temizle', hidden: true }, [gr.ikon('kapat', 16)]);
-    var tumu = h('button', { type: 'button', sinif: 'ara-tumu', title: 'Tüm uygulamada ara (Ctrl/⌘ K)', onclick: function () { MM.araAc && MM.araAc(); } }, ['Tümünde ara']);
+     
+    var tumu = h('button', { type: 'button', sinif: 'ara-tumu', title: 'Bu bölümün bütün sekmelerinde ara (Ctrl/⌘ Shift K: tüm uygulama)', onclick: function () { if (MM.herYerdeAra && MM.herYerdeAra.ac) MM.herYerdeAra.ac(inp.value, modulId()); else MM.araAc && MM.araAc(); } }, ['Tümünde ara']);
     var kutu = h('div', { sinif: 'ara-kutu', role: 'search' }, [h('div', { sinif: 'ara-alan' }, [inp, temizle]), sayi, tumu]);
     var q = '';
     function uygula(zorla) {
@@ -154,13 +155,23 @@
     });
     return hyaDurum.yukleniyor;
   }
+   
+  var HYA_BOLUM = { dmo: ['dmo'], 'dmo-nakliyat': ['dmo-nakliyat', 'nakliye'], nakliye: ['nakliye', 'dmo-nakliyat'], siparis: ['siparis'] };
+  function hyaKapsamda(k) {
+    var b = hyaDurum.bolum; if (!b) return true;
+    var kok = String(k.r || '').split('#')[1] || ''; kok = kok.split('/')[0];
+    return (HYA_BOLUM[b] || [b]).indexOf(kok) >= 0;
+  }
   function hyaAra(q) {
     var j = q.split(' ').filter(Boolean), sonuc = [];
     (hyaDurum.dizin || []).forEach(function (k) {
+      if (!hyaKapsamda(k)) return;
       var puan = 0;
       for (var i = 0; i < j.length; i++) {
         if (k.n.indexOf(j[i]) < 0) return;
         puan += k.na.indexOf(j[i]) === 0 ? 3 : (k.na.indexOf(j[i]) >= 0 ? 2 : 1);
+        if (k.t === 'siparis' && k.na.indexOf(j[i]) >= 0) puan += 4;                        
+        if (/^\d{3,}$/.test(j[i]) && k.na.length >= j[i].length && k.na.slice(-j[i].length) === j[i]) puan += 3;    
       }
       sonuc.push({ k: k, p: puan });
     });
@@ -185,11 +196,13 @@
     var h = MM.gr.h, g = hyaDurum.govde, alt = hyaDurum.alt, q = norm(hyaDurum.girdi.value).trim().replace(/\s+/g, ' ');
     g.textContent = '';
     if (!hyaDurum.dizin) { g.appendChild(h('p', { sinif: 'soluk', metin: 'Kaynaklar okunuyor…' })); alt.textContent = ''; return; }
-    alt.textContent = hyaDurum.kaynakSayi + ' kaynakta arandı';
+    if (hyaDurum.bolum && !hyaDurum.dizin.some(hyaKapsamda)) hyaDurum.bolum = '';    
+    alt.textContent = hyaDurum.kaynakSayi + ' kaynakta arandı' + (hyaDurum.bolum ? ' · yalnız bu bölümün sekmeleri (tümü için Ctrl/⌘ Shift K)' : '');
     if (!q) {
       g.appendChild(h('h3', { sinif: 'hya-grup', metin: 'Bugün ne değişti' }));
-      if (!hyaDurum.bugun.length) g.appendChild(h('p', { sinif: 'soluk', metin: hyaDurum.kaynakSayi ? 'Son 24 saatte yeni ya da değişen kayıt yok.' : 'Erişebildiğiniz kaynakta arama dizini henüz yok.' }));
-      hyaDurum.bugun.forEach(function (k) { g.appendChild(hyaSatir(k)); });
+      var bg = hyaDurum.bugun.filter(hyaKapsamda);
+      if (!bg.length) g.appendChild(h('p', { sinif: 'soluk', metin: hyaDurum.kaynakSayi ? 'Son 24 saatte yeni ya da değişen kayıt yok.' : 'Erişebildiğiniz kaynakta arama dizini henüz yok.' }));
+      bg.forEach(function (k) { g.appendChild(hyaSatir(k)); });
       return;
     }
     var s = hyaAra(q);
@@ -206,9 +219,9 @@
     d.kap.remove(); d.kap = null; document.body.style.overflow = d.eskiTasma || '';
     if (!odaksiz && d.sonOdak && d.sonOdak.focus) { try { d.sonOdak.focus(); } catch (e) { } }
   }
-  function hyaAc(sorgu) {
+  function hyaAc(sorgu, bolum) {
     if (hyaDurum.kap || !MM.gr) return;
-    var h = MM.gr.h, d = hyaDurum;
+    var h = MM.gr.h, d = hyaDurum; d.bolum = (typeof bolum === 'string' && /^[a-z][a-z0-9-]*$/.test(bolum) && bolum !== 'ana') ? bolum : '';
     d.sonOdak = document.activeElement; d.eskiTasma = document.body.style.overflow; document.body.style.overflow = 'hidden';
     d.girdi = h('input', { type: 'search', sinif: 'eld-arama hya-girdi', placeholder: 'Her yerde ara: hastane, ürün, sipariş, konteyner, belge…', 'aria-label': 'Her yerde ara', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', enterkeyhint: 'search' });
     d.govde = h('div', { sinif: 'hya-govde', role: 'region', 'aria-live': 'polite' });

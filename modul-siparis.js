@@ -46,11 +46,13 @@
     function uygun(o, yoksay) {
       if (yoksay !== 'sirket' && sirket) { if (sirket === 'DIGER' ? (o.sirket === 'MY' || o.sirket === 'DAY') : o.sirket !== sirket) return false; }
       if (yoksay !== 'tur' && tur) { if (tur === 'DIGER' ? !!o.tur_ad && o.tur_ad !== 'DMO' && o.tur_ad !== 'Özel müşteri' : (o.tur_ad || '') !== tur) return false; }
-      if (secili === 'acik' && o.durum !== 'acik') return false;
-      if (secili === 'gecikmis' && !o.gecikme_gun) return false;
-      if (secili === 'bilinmiyor' && o.durum !== 'bilinmiyor') return false;
-      if (secili === 'tamam' && o.durum !== 'tamam') return false;
-      if (secili === 'blokeli' && o.durum !== 'blokeli') return false;
+      if (!q) {    
+        if (secili === 'acik' && o.durum !== 'acik') return false;
+        if (secili === 'gecikmis' && !o.gecikme_gun) return false;
+        if (secili === 'bilinmiyor' && o.durum !== 'bilinmiyor') return false;
+        if (secili === 'tamam' && o.durum !== 'tamam') return false;
+        if (secili === 'blokeli' && o.durum !== 'blokeli') return false;
+      }
       if (kanit === 'irs' && !o.irsaliye.length) return false;   
       if (kanit === 'fat' && !o.fatura_no.length) return false;   
       if (yas) { var b = YAS.filter(function (y) { return y[0] === yas; })[0]; if (!o.gecikme_gun || o.gecikme_gun < b[2] || o.gecikme_gun > b[3]) return false; }

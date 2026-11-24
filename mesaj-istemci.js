@@ -208,7 +208,7 @@
       else if (d.olay === 'duzenle') { var dm = mesajCevir(d.mesaj); if (dm && dm.id) yay('duzenle', dm); }
       else if (d.olay === 'silindi') { if (MID.test(s(d.mid))) yay('silindi', { sohbet: s(d.sohbet), mid: s(d.mid), silen: s(d.silen) }); }
       else if (d.olay === 'arama') yay('arama', { sohbet: s(d.sohbet), groupId: s(d.groupId), aramaId: aramaKimlik(d.aramaId), arayan: s(d.arayan || d.gonderen), arayanAd: s(d.arayanAd || d.ad).slice(0, 80), video: d.video === true });
-      else if (d.olay === 'toplanti') yay('toplanti', { islem: s(d.islem).slice(0, 24), sohbet: s(d.sohbet), kod: aramaKimlik(d.kod), cagriId: aramaKimlik(d.cagriId), arayan: s(d.arayan || d.gonderen), arayanAd: s(d.arayanAd || d.ad).slice(0, 80) });
+      else if (d.olay === 'toplanti') yay('toplanti', { islem: s(d.islem).slice(0, 24), sonuc: s(d.sonuc).slice(0, 12), sohbet: s(d.sohbet), kod: aramaKimlik(d.kod), cagriId: aramaKimlik(d.cagriId), arayan: s(d.arayan || d.gonderen), arayanAd: s(d.arayanAd || d.ad).slice(0, 80) });
       else if (d.olay === 'arama_bitti' || d.olay === 'arama_cevap') yay(d.olay, { sohbet: s(d.sohbet), aramaId: aramaKimlik(d.aramaId), kod: aramaKimlik(d.kod), cagriId: aramaKimlik(d.cagriId) });   
     }
     function yenidenDene() {

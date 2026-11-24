@@ -42,6 +42,7 @@
     try { var t = await res.text(); j = t ? JSON.parse(t) : null; } catch (e2) { j = null; }
     if (res.status === 503 && j && j.hata === 'kapali') throw hata('kapali', 503);   
     if (res.status === 425) throw hata('erken', 425);                                
+    if (res.status === 400 && j && j.hata === 'uye') throw hata('uye-grup', 400);   
     if (res.status < 200 || res.status >= 300) throw hata(kodOf(res.status), res.status);
     return j;
   }

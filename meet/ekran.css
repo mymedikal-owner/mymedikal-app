@@ -171,7 +171,7 @@ body.koyu .bant { top:50%; transform:translate(-50%,-50%); }
 .davet-liste li { min-width:0; }
 .davet-durum-metin { font-size:12px; color:var(--s-soluk); flex:none; max-width:40%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .davet-liste li[data-durum="caliyor"] .davet-durum-metin { color:var(--vurgu-acik); }
-.davet-liste li[data-durum="cevapsiz"] .davet-durum-metin, .davet-liste li[data-durum="hata"] .davet-durum-metin { color:#ff8d92; }
+.davet-liste li[data-durum="cevapsiz"] .davet-durum-metin, .davet-liste li[data-durum="reddetti"] .davet-durum-metin, .davet-liste li[data-durum="uyedegil"] .davet-durum-metin, .davet-liste li[data-durum="hata"] .davet-durum-metin { color:#ff8d92; }
 .davet-baglanti { margin-top:12px; width:100%; }
 .davet-hata .davet-dugme { margin-left:8px; }
 .kisi-liste .ikon { width:20px; height:20px; color:var(--s-soluk); }

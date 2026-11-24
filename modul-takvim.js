@@ -317,6 +317,7 @@
     var k = x.k, st = STIL[x.kova], alt = k.kategori + (kurulusMetin(k.kurulus) ? ' · ' + kurulusMetin(k.kurulus) : '');
     var bilgi = x.kova === 'bilgi', dz = k.duzenleme_tarihi && /^\d{4}-\d{2}-\d{2}$/.test(k.duzenleme_tarihi) ? 'Düzenleme: ' + tarihTR(k.duzenleme_tarihi) : '';
     var nt = k.not ? String(k.not) : '';
+    if (k.ortak_degisiklik && /^\d{4}-\d{2}-\d{2}$/.test(k.ortak_degisiklik)) dz = (dz ? dz + ' · ' : '') + 'Ortak klasör: ' + tarihTR(k.ortak_degisiklik);   
     return h('div', { sinif: 'tq-kart', style: '--isaret:' + st.isaret + ';cursor:default' }, [
       h('span', { sinif: 'tq-kart-ikon', style: 'color:' + st.yazi + ';background:' + st.zemin }, [G.ikon(st.ikon, 20)]),
       h('span', { sinif: 'tq-kart-metin' }, [h('span', { sinif: 'tq-kart-ad', metin: k.konu }), h('span', { sinif: 'tq-kart-alt', metin: alt }),

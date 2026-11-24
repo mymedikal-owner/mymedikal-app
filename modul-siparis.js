@@ -171,9 +171,16 @@
       }
       return h('div', { sinif: 'sp-uclu ust-bosluk' }, [kutu('En çok geciken 5 müşteri', ilk5(function (o) { return o.musteri; })), kutu('En çok geciken 5 hastane / teslim yeri', ilk5(function (o) { return o.teslim_alan; }))]);
     }
+     
+    function turEtiket(o) {
+      if (o.tur_ad === 'DMO') return o.yk ? o.yk : 'YK no yok';
+      if (o.tur_ad === 'Özel müşteri') return 'Özel';
+      return o.yk ? o.yk : '—';
+    }
     function siparisTablosu(liste) {
       var kol = [
         { ad: 'Sipariş', k: 'no', ciz: function (o) { return h('a', { href: '#siparis/siparis/' + encodeURIComponent(o.no), sinif: 'sp-no', metin: o.no, onclick: function (e) { e.stopPropagation(); } }); } },
+        { ad: 'YK no / Özel', k: 'turetiket', ciz: turEtiket, csv: turEtiket, deger: turEtiket },
         { ad: 'Durum', k: 'durum', deger: function (o) { return o.gecikme_gun ? 'a' + (1000 - o.gecikme_gun) : (o.durum === 'acik' ? 'b' : o.durum === 'tamam' ? 'c' : 'd'); }, ciz: rozet },
         { ad: 'Gecikme (gün)', k: 'gecikme', sag: true, deger: function (o) { return o.gecikme_gun || 0; }, ciz: function (o) { return o.gecikme_gun ? String(o.gecikme_gun) : '—'; } },
         { ad: 'Şirket', k: 'sirket', ciz: function (o) { return o.sirket || '—'; } },
@@ -214,9 +221,9 @@
       var ilkTarih = function (tar) { var t = Object.keys(tar).map(function (k) { return tar[k]; }).filter(Boolean).sort(); return t.length ? t[0] : null; };
       var gunFark = function (a, b) { if (!a || !b) return null; var d = Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 864e5); return d >= 0 ? d : null; };
       var irIlk = ilkTarih(irT), faIlk = ilkTarih(faT), d1 = gunFark(o.tarih, irIlk), d2 = gunFark(irIlk, faIlk);
-      var irMetin = o.irsaliye.length ? o.irsaliye.length + ' teslimat/irsaliye kaydı: ' + belgeler(o.irsaliye, irT) : 'Kayıt yok';
+      var irMetin = o.irsaliye.length ? o.irsaliye.length + ' teslimat kaydı · Teslimat no: ' + belgeler(o.irsaliye, irT) + ' · İrsaliye no: —' : 'Teslimat no: — · İrsaliye no: —';
       var irAlt = o.irsaliye.length ? (d1 != null ? 'İlk teslimat siparişten ' + d1 + ' gün sonra' : null) : (o.durum === 'bilinmiyor' ? 'Teslimat durumu bilinmiyor.' : 'Teslimat belgesi yok.');
-      var faMetin = o.fatura_no.length ? o.fatura_no.length + ' fatura kaydı: ' + belgeler(o.fatura_no, faT) : 'Kayıt yok';
+      var faMetin = o.fatura_no.length ? o.fatura_no.length + ' fatura kaydı · Fatura no: ' + belgeler(o.fatura_no, faT) : 'Fatura no: —';
       var faAlt = o.fatura_no.length ? (o.irsaliye.length ? (d2 != null ? 'İlk fatura ilk tesliminden ' + d2 + ' gün sonra' : null) : 'Fatura var ama teslimat kaydı yok.') : 'Faturalanmadı.';
       var zincir = h('ol', { sinif: 'sp-zincir' }, [
         adim('tamam', 'siparis', '1 · Sipariş', 'Açıldı ' + tarihTR(o.tarih) + ' · istenen teslim ' + vadeMetin(o, tarihTR) + (o.durum === 'blokeli' ? ' · teslimat blokajı (' + o.blokaj + ')' : '') + (o.gecikme_gun ? ' · ' + o.gecikme_gun + ' gün gecikmiş' : ''), null),

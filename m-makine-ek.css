@@ -28,3 +28,5 @@
 .me-alarm-liste { display: grid; gap: var(--b1); margin: var(--b2) 0 0; padding: 0; list-style: none; font-size: var(--t-s); }
 .me-alarm-liste li { display: flex; flex-wrap: wrap; gap: var(--b2); justify-content: space-between; border-bottom: 1px solid var(--cizgi); padding: var(--b1) 0; }
 .me-soluk { color: var(--soluk); font-size: var(--t-xs); margin: 0; }
+.me-donem { display: flex; flex-wrap: wrap; align-items: end; gap: var(--b2); margin-bottom: var(--b2); }
+.me-donem label { display: grid; gap: 2px; font-size: var(--t-xs); color: var(--soluk); }

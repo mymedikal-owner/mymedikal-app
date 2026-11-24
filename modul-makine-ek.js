@@ -118,6 +118,41 @@
     return h('div', null, [G.yatay(og, {}), h('p', { sinif: 'me-soluk', metin: 'Tahmin: bugünkü üretim + bugünkü ortalama hız × kalan planlı süre. Ölçüm değildir.' })]);
   }
 
+   
+  function fireBolum(f) {
+    var s = (f || []).filter(function (x) { return x.fire_yuzde != null; });
+    if (!s.length) return bekleniyor('Fire');
+    var mx = Math.max.apply(null, s.map(function (x) { return x.fire_yuzde; }).concat([1]));
+    var og = s.map(function (x) { return { e: 'Hat ' + x.hat, d: x.fire_yuzde, alt: x.uretilen != null ? say(x.uretilen) + ' adet üretim' : '', etiketDeger: '%' + x.fire_yuzde.toFixed(1).replace('.', ','), renk: x.fire_yuzde >= 3 ? 'var(--kirmizi)' : 'var(--sari)' }; });
+    var yok = (f || []).filter(function (x) { return x.fire_yuzde == null; }).map(function (x) { return 'Hat ' + x.hat; });
+    return h('div', null, [G.yatay(og, { maks: mx }),
+      h('p', { sinif: 'me-soluk', metin: 'Fire oranı makinenin bildirdiği değerdir (üretim adedi üzerinden %); payda teyit bekleniyor. Adet ya da m² olarak fire miktarı henüz yok (Kısmi).' + (yok.length ? ' Fire verisi yok: ' + yok.join(', ') + '. Dokuma tezgâhlarında fire verisi yok.' : ' Dokuma tezgâhlarında fire verisi yok.') })]);
+  }
+
+   
+  function donemBolum(kayit) {
+    if (!kayit || !kayit.liste) return bekleniyor('Dönem raporu');
+    var bugun = new Date(), gunYaz = function (d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
+    var bas = h('input', { type: 'date', 'aria-label': 'Başlangıç tarihi' }), son = h('input', { type: 'date', 'aria-label': 'Bitiş tarihi' });
+    var bilgi = h('p', { sinif: 'me-soluk' });
+    function ayarla(gun) { var a = new Date(); a.setDate(a.getDate() - gun); bas.value = gunYaz(a); son.value = gunYaz(bugun); guncelle(); }
+    function secili() { return kayit.liste.filter(function (x) { return (!bas.value || x.gun >= bas.value) && (!son.value || x.gun <= son.value); }); }
+    function guncelle() {
+      var s = secili(), dk = s.reduce(function (t, x) { return t + (x.dk || 0); }, 0), y = s.filter(function (x) { return x.yorum; }).length;
+      bilgi.textContent = say(s.length) + ' duruş · ' + say(dk) + ' dk toplam · ' + say(y) + ' kayıtta yorum var. ' + (kayit.not || '');
+    }
+    bas.addEventListener('change', guncelle); son.addEventListener('change', guncelle);
+    var kolonlar = [{ ad: 'Tarih', k: 0 }, { ad: 'Makine', k: 1 }, { ad: 'Vardiya', k: 2 }, { ad: 'Duruş türü', k: 3 }, { ad: 'Başlangıç', k: 4 }, { ad: 'Bitiş', k: 5 }, { ad: 'Süre (dk)', k: 6 }, { ad: 'Duruş yorumu', k: 7 }];
+    var dg = G.excelDugme(function () {
+      var s = secili();
+      return { ad: 'Makineler · duruşlar', filtre: (bas.value || '…') + ' – ' + (son.value || '…') + ' · bütün makineler (Mabotex, dokuma)' + (s.length ? '' : ' · bu dönemde kayıt yok'),
+        kolonlar: kolonlar, satirlar: s.map(function (x) { return [x.gun, x.makine, x.vardiya, x.tur, x.bas, x.bit, x.dk == null ? '' : x.dk, x.yorum || '']; }) };
+    });
+    var secenek = [['Son 7 gün', 7], ['Son 30 gün', 30], ['Son ' + kayit.gun + ' gün', kayit.gun]].map(function (x) { return h('button', { type: 'button', sinif: 'mini-dugme', metin: x[0], onclick: function () { ayarla(x[1]); } }); });
+    ayarla(7);
+    return h('div', null, [h('div', { sinif: 'me-donem' }, [h('label', null, ['Başlangıç ', bas]), h('label', null, ['Bitiş ', son])].concat(secenek).concat([dg])), bilgi]);
+  }
+
   MM.makineEk = function (ust) {
     var kok = h('section', { sinif: 'me-ek', 'aria-label': 'Makineler eki' }), durum = { canli: [] };
     ust.appendChild(kok);
@@ -139,8 +174,20 @@
     kok.appendChild(h('h2', { sinif: 'me-ek-baslik', metin: 'Canlı ek bilgiler' }));
     kok.appendChild(kart('Hat adedi (canlı tahmini)', 'Son gerçek adet + adet/dk; her dakika gerçek veriyle düzelir', canliKutu));
     kok.appendChild(digerKok);
+    var donemKutu = h('div'), donemYuklendi = false;
+    async function donemYukle() {   
+      if (donemYuklendi) return; donemYuklendi = true;
+      donemKutu.textContent = '';
+      try {
+        var r = await window.MMVeri.oku('fabrika', 'makine-durus');
+        if (!canli_) return;
+        donemKutu.appendChild(kart('Duruşlar · dönem Excel', 'Bütün makineler (Mabotex, dokuma) · duruş ve duruş yorumları', donemBolum((r.veri || {}).durus)));
+      } catch (e) { donemYuklendi = false; donemKutu.appendChild(kart('Duruşlar · dönem Excel', null, bekleniyor('Dönem raporu'))); }
+    }
     function ciz(d) {   
       digerKok.textContent = '';
+      digerKok.appendChild(kart('Makine bazında fire', 'makinenin bildirdiği oran · adet', fireBolum(d.fire)));
+      digerKok.appendChild(donemKutu);
       digerKok.appendChild(kart('Duruş nedenleri', 'Vardiya bazlı Pareto', paretoBolum(d.pareto)));
       digerKok.appendChild(kart('Vardiya zaman şeridi', null, seritBolum(d.serit)));
       digerKok.appendChild(kart('OEE kırılımı', null, oeeBolum(d.oee)));
@@ -176,7 +223,7 @@
           try {
             var r = await window.MMVeri.oku('fabrika', 'makine-ek'), d = r.veri || {};
             if (!canli_) return;
-            ciz(d); ekYuklendi = true; sonEk = simdi;
+            ciz(d); ekYuklendi = true; sonEk = simdi; donemYukle();
             vardMap = d.vardiya_hat || {};
             await operatorYukle();
             if (!canli_) return;

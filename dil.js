@@ -553,6 +553,34 @@
    
   var TAM_VARDIYA = { 'Vardiya': 'Shift', 'Operatör': 'Operator', 'Gündüz': 'Day', 'Gece': 'Night', 'Akşam': 'Evening' };
   Object.keys(TAM_VARDIYA).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_VARDIYA[k]; });
+   
+  var TAM_URETIM = {
+    'Üretim Planı': 'Production Plan', 'Plan': 'Plan', 'Hat yükü, açık siparişler ve sterilizasyon önerileri': 'Line load, open orders and sterilization suggestions',
+    'Hat yükü': 'Line load', 'Siparişler': 'Orders', 'Değerler': 'Values', 'Üretim planı görünümleri': 'Production plan views',
+    'Hat yükü yok': 'No line load', 'Hat yükü bilgisi şu an alınamıyor.': 'Line load information is not available right now.',
+    'günlük iş': 'workdays', 'Hat ailesi yükü': 'Line family load', 'açık işin kaç günlük olduğu': 'how many days of work are open', 'Kaç günlük iş': 'Days of work',
+    'Hesaplanabilen hat ailesi yok.': 'No line family can be calculated.', 'Hat aileleri': 'Line families', 'son 10 iş günü ortalaması': 'average of the last 10 working days',
+    'Hat ailesi yok.': 'No line family.', 'Hat ailesi': 'Line family', 'Açık iş': 'Open work', 'Günlük ort.': 'Daily avg.', 'Hedef': 'Target', 'Ölçüm': 'Measurement',
+    'Makine sayacı': 'Machine counter', 'Üretim onayı': 'Production confirmation', 'Kesin değil': 'Not final', 'Mabotex hatları': 'Mabotex lines', 'hat bazında': 'by line', 'Hat yok.': 'No line.', 'Hat': 'Line',
+    'Spanç toplam hedef': 'Total sponge target', 'Dokuma': 'Weaving', 'Çin makineleri': 'China machines', 'Otomatik batın': 'Automatic abdominal', 'Manuel batın': 'Manual abdominal', 'Spanç ortak': 'Sponge shared', 'Diğer': 'Other', 'Diğer (eşlenmedi)': 'Other (unmatched)',
+    'Tümü': 'All', 'Şirket': 'Company', 'Açık sipariş satırı': 'Open order lines', 'Eksiği olan satır': 'Lines with shortage', 'Eksik olup üretimi açılmamış': 'Short with no production opened',
+    'Depo tanımı doğrulanmadı': 'Store definition not verified', 'Açık sipariş yok': 'No open orders', 'Açık sipariş bilgisi şu an alınamıyor.': 'Open order information is not available right now.',
+    'Eşleşen sipariş yok.': 'No matching order.', 'Müşteri': 'Customer', 'Ürün': 'Product', 'İstenen teslim': 'Requested delivery', 'Söz verilen teslim': 'Promised delivery', 'Sipariş': 'Order', 'Eksik': 'Shortage', 'Stok': 'Stock', 'Üretim': 'Production', 'Açık': 'Open', 'Yok': 'None',
+    'Sterilizasyon planı yok': 'No sterilization plan', 'Sterilizasyon bilgisi şu an alınamıyor.': 'Sterilization information is not available right now.',
+    'Günlük iç cihaz kapasitesi': 'Daily in-house unit capacity', 'Sterilizasyon kuyruğu': 'Sterilization queue', 'Kuyruk': 'Queue', 'sterilizasyon bekleyen': 'awaiting sterilization', 'Kuyruk hesaplanamadı.': 'Queue could not be calculated.',
+    'Kuyrukta ürün yok.': 'No product in the queue.', 'Koli': 'Cases', 'Palet': 'Pallets', 'Teslim': 'Delivery', 'Öncelik': 'Priority', 'Döngü önerisi hesaplanamadı.': 'Cycle suggestion could not be calculated.', 'Şu an döngü önerisi yok.': 'No cycle suggestion right now.',
+    'Taslak': 'Draft', 'Döngü önerileri': 'Cycle suggestions', 'tam paletli, döngü başına en çok 168 koli': 'full pallets, at most 168 cases per cycle',
+    'Güncellik bilgisi yok.': 'No freshness information.', 'Veri yok': 'No data', 'Eski': 'Old', 'Sipariş ve stok': 'Orders and stock', 'Üretim onayı ve depo hareketi': 'Production confirmation and store movement',
+    'Dokuma ve Mabotex sayacı': 'Weaving and Mabotex counter', 'Çin ve batın sayacı': 'China and abdominal counter', 'Veri güncelliği': 'Data freshness', 'her bilginin son tarihi': 'latest date of each item',
+    'Değer bilgisi yok.': 'No value information.', 'Planlama değerleri': 'Planning values', 'dokununca ayrıntı': 'tap for details',
+    'İç cihaz: döngü başına koli': 'In-house unit: cases per cycle', 'İç cihaz: günlük koli': 'In-house unit: cases per day', 'Karantina süresi': 'Quarantine time',
+    'Dış sterilizasyon (1): haftalık koli': 'External sterilization (1): cases per week', 'Dış sterilizasyon (2): günlük koli': 'External sterilization (2): cases per day',
+    'Dış sterilizasyon: gidiş dönüş süresi': 'External sterilization: round-trip time', 'Dış sterilizasyon uygunluğu': 'External sterilization suitability', 'Araç palet kapasitesi': 'Vehicle pallet capacity',
+    'Sevk paleti koli adedi': 'Cases per shipping pallet', 'Spanç günlük hedef': 'Sponge daily target', 'Mabotex günlük hedef': 'Mabotex daily target', 'Otomatik batın günlük hedef': 'Automatic abdominal daily target', 'Ölçülen değer': 'Measured value',
+    'Veri henüz yok': 'No data yet', 'Üretim planı hazırlandığında burada görünecek.': 'The production plan will appear here once it is prepared.', 'Üretim planı alınamadı': 'Could not load production plan',
+    'Veri eski': 'Data is old', 'ÖRNEK VERİ — gerçek değil': 'SAMPLE DATA — not real'
+  };
+  Object.keys(TAM_URETIM).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_URETIM[k]; });
   var onbellek = {};
   function cevir(m) {
     if (!EN || m == null) return m;

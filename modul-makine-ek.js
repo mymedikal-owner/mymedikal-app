@@ -126,7 +126,7 @@
     var og = s.map(function (x) { return { e: 'Hat ' + x.hat, d: x.fire_yuzde, alt: x.uretilen != null ? say(x.uretilen) + ' adet üretim' : '', etiketDeger: '%' + x.fire_yuzde.toFixed(1).replace('.', ','), renk: x.fire_yuzde >= 3 ? 'var(--kirmizi)' : 'var(--sari)' }; });
     var yok = (f || []).filter(function (x) { return x.fire_yuzde == null; }).map(function (x) { return 'Hat ' + x.hat; });
     return h('div', null, [G.yatay(og, { maks: mx }),
-      h('p', { sinif: 'me-soluk', metin: 'Fire oranı makinenin bildirdiği değerdir (üretim adedi üzerinden %); payda teyit bekleniyor. Adet ya da m² olarak fire miktarı henüz yok (Kısmi).' + (yok.length ? ' Fire verisi yok: ' + yok.join(', ') + '. Dokuma tezgâhlarında fire verisi yok.' : ' Dokuma tezgâhlarında fire verisi yok.') })]);
+      h('p', { sinif: 'me-soluk', metin: 'Fire oranı makinenin bildirdiği değerdir (üretim adedi üzerinden %). Adet ya da m² olarak fire miktarı henüz yok (Kısmi).' + (yok.length ? ' Fire verisi yok: ' + yok.join(', ') + '. Dokuma tezgâhlarında fire verisi yok.' : ' Dokuma tezgâhlarında fire verisi yok.') })]);
   }
 
    
@@ -139,7 +139,7 @@
     function secili() { return kayit.liste.filter(function (x) { return (!bas.value || x.gun >= bas.value) && (!son.value || x.gun <= son.value); }); }
     function guncelle() {
       var s = secili(), dk = s.reduce(function (t, x) { return t + (x.dk || 0); }, 0), y = s.filter(function (x) { return x.yorum; }).length;
-      bilgi.textContent = say(s.length) + ' duruş · ' + say(dk) + ' dk toplam · ' + say(y) + ' kayıtta yorum var. ' + (kayit.not || '');
+      bilgi.textContent = say(s.length) + ' duruş · ' + say(dk) + ' dk toplam · ' + say(y) + ' kayıtta yorum var.';   
     }
     bas.addEventListener('change', guncelle); son.addEventListener('change', guncelle);
     var kolonlar = [{ ad: 'Tarih', k: 0 }, { ad: 'Makine', k: 1 }, { ad: 'Vardiya', k: 2 }, { ad: 'Duruş türü', k: 3 }, { ad: 'Başlangıç', k: 4 }, { ad: 'Bitiş', k: 5 }, { ad: 'Süre (dk)', k: 6 }, { ad: 'Duruş yorumu', k: 7 }];

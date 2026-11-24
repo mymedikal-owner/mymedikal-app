@@ -587,7 +587,7 @@
             say(g.hastane_sayisi_toplam != null ? g.hastane_sayisi_toplam : g.hastane_sayisi_pencere) + ' hastane (' + (/^siparişin tamamı/.test(g.hastane_kaynagi || '') ? 'siparişin tamamı' : '90 gün') + ') · dosya ' + say(g.dosya_no) + (g.yasak_asim_teyitsiz ? ' · kota aşıldı' : (g.yasak_durumu === 'sari' ? ' · sınıra yakın' : '')));
         })));
       }
-      govde.appendChild(G.kart({ baslik: 'İptal kotası (%10, en az 3) · sipariş no ' + sipNo(i), alt: 'yalnız sipariş no düzeyinde: %10, en az 3 (hastane azsa hastane sayısı kadar) · sipariş mektubu × teknik şartname kodu (SMT) bazında; hastane satırında gösterilmez', govde: yb }));
+      govde.appendChild(G.kart({ baslik: 'İptal kotası (%10, en az 3) · sipariş no ' + sipNo(i), alt: 'yalnız sipariş no düzeyinde: %10, en az 3 (hastane azsa hastane sayısı kadar) · sipariş mektubu × teknik şartname kodu (SMT) bazında', govde: yb }));
 
        
       if (fg) govde.appendChild(G.kart({ baslik: 'Gerçekleşen ceza', govde: h('p', { sinif: 'dm-buyuk-metin', metin: fi.gerceklesen_ceza_tl == null ? 'Bu ihaleye bağlanan kesinti yok / veri yok' : tl(fi.gerceklesen_ceza_tl) }) }));

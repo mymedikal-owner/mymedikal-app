@@ -1,0 +1,16 @@
+ 
+#icerik .kpi-izgara { margin-bottom: var(--b3); }
+#icerik .ny-ipucu { margin: var(--b3) 0; }
+.up-liste { display: flex; flex-direction: column; }
+.up-satir { display: flex; justify-content: space-between; align-items: center; gap: var(--b3); padding: 10px 0; border-bottom: 1px solid var(--cizgi, var(--gri-zemin)); width: 100%; text-align: left; background: none; border-left: 0; border-right: 0; border-top: 0; color: inherit; font: inherit; }
+.up-ad { color: var(--yazi2); min-width: 0; overflow-wrap: anywhere; }
+.up-deger { font-weight: 650; text-align: right; white-space: nowrap; }
+.up-tikla { cursor: pointer; min-height: 44px; }
+.up-ayrinti { display: flex; flex-wrap: wrap; gap: 4px var(--b3); padding: 6px 0 10px; font-size: var(--t-s); color: var(--soluk); }
+.up-dongu { padding: var(--b3) 0; border-bottom: 1px solid var(--cizgi, var(--gri-zemin)); }
+.up-dongu:last-child { border-bottom: 0; }
+.up-dongu-ust { display: flex; align-items: center; gap: var(--b2, 8px); }
+.up-dongu-say { font-size: var(--t-l, 1.15rem); font-weight: 650; margin-top: 4px; }
+.up-dongu-alt { font-size: var(--t-s); color: var(--soluk); margin-top: 2px; }
+.up-dayanak { margin: 6px 0 0; padding-left: 18px; font-size: var(--t-s); color: var(--yazi2); }
+@media (max-width: 480px) { .up-deger { white-space: normal; } }

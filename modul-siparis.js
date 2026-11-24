@@ -117,7 +117,7 @@
       kap.appendChild(G.lejant(segK.map(function (x) { return [x[0] + ' ' + sayi(x[1]), x[2]]; })));
       return G.kart({ baslik: 'Sipariş hunisi', alt: 'Açık → teslim → fatura: yalnız kayıtlı kanıt sayılır', govde: kap,
         tablo: { kolonlar: ['Ölçü', 'Adet'], satirlar: [['Sipariş', n], ['İrsaliye kaydı olan', ir], ['Fatura kaydı olan', fa], ['Geciken', sn.gecikmis], ['Açık (zamanında)', sn.acik], ['Tamamlandı', sn.tamam], ['Durum bilinmiyor', sn.bilinmiyor], ['Kalem: teslim edildi', kal.tam], ['Kalem: kısmi', kal.kismi], ['Kalem: teslim yok', kal.yok], ['Kalem: bilinmiyor', kal.bilinmiyor]] },
-        dip: 'Durumu bilinmeyen siparişler ayrı dilimdir ("Durum bilinmiyor"); "teslim edildi" ya da 0 sayılmaz. İadeler sekmesi: iade verisi henüz yok, sayı gösterilmez.' });
+        dip: 'Durumu bilinmeyen siparişler ayrı dilimdir ("Durum bilinmiyor"); "teslim edildi" ya da 0 sayılmaz.' });
     }
 
      
@@ -307,7 +307,7 @@
       govde.appendChild(G.cipler([['liste', 'Sipariş listesi'], ['musteri', 'Müşteri bazında'], ['hastane', 'Hastane / teslim yeri bazında']], gor, function (d) { gor = d; ciz(); }, 'Görünüm'));
       govde.appendChild(h('p', { sinif: 'kucuk soluk sp-sayim', metin: (q ? 'Arama: "' + q + '" · ' : '') + DURUM_AD[secili] + ': ' + sayi(liste.length) + ' sipariş' }));
       if (secili === 'iade') {   
-        govde.appendChild(G.bos({ baslik: 'İade verisi henüz yok', metin: 'İadeler için kaynak veri gelince burada listelenir; şimdilik "iade yok" anlamına gelmez.' }));
+        govde.appendChild(G.bos({ baslik: 'İade verisi henüz yok', metin: 'İadeler için kaynak veri gelince burada listelenir.' }));
         var iadeAdim = ['İade başlatıldı', 'Lojistik yönlendirildi', 'Hastaneden alındı', 'Depoya ulaştı', 'Mal girişi', 'Kalite kontrol', 'Satışa hazır'];
         var zin = h('ol', { sinif: 'sp-zincir', 'aria-label': 'İade adımları' });
         iadeAdim.forEach(function (a) { zin.appendChild(adim('yok', 'bilgi', a, 'veri yok')); });

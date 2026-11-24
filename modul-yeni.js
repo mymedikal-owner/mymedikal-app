@@ -690,7 +690,7 @@
     }
     [konuS, gunI, saatS, sureS].forEach(function (el) { el.addEventListener('change', guncelle); el.addEventListener('input', guncelle); });
     function alan(ad, el) { return h('label', { sinif: 'alan' }, [h('span', { metin: ad }), el]); }
-    kok.appendChild(gr.sayfaBasi({ baslik: 'Toplantı', alt: 'Mumu Meet ile toplantı', kirinti: [['Toplantı']] }));
+    kok.appendChild(gr.sayfaBasi({ baslik: 'Mumu Meet', alt: 'Mumu Meet ile toplantı', kirinti: [['Mumu Meet']] }));
      
     
 

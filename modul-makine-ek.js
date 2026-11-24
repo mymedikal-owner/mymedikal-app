@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var MM = window.MM, h = MM.h, G = MM.gr;
-  var YENILE_MS = 60000, EK_MS = 5 * 60000;
+  var YENILE_MS = 30000, EK_MS = 5 * 60000;   
   function say(n) { return n == null ? '—' : Math.round(n).toLocaleString('tr-TR'); }
   function bekleniyor(ad) { return h('p', { sinif: 'me-soluk', metin: ad + ': Veri bekleniyor' }); }
 
@@ -125,7 +125,9 @@
       });
     }
     async function yukleCanli() {   
-      var r = await window.MMVeri.oku('fabrika', 'pano-uygulama'), v = r.veri || {}, p = typeof v.html === 'string' ? panoVerisi(v.html) : null;
+      var v = await MM.fabrika.panoAl(), p = null;   
+      if (v.bloklar && typeof v.bloklar['VERI:mabotex'] === 'string') { try { p = JSON.parse(v.bloklar['VERI:mabotex']); } catch (e) { p = null; } }
+      if (!p) { var html = v.html(); p = typeof html === 'string' ? panoVerisi(html) : null; }
       if (p && p.hatlar && p.hatlar.length) { canliCiz(canliKutu, canliListe(p), Date.parse(p.asof) || Date.parse(v.uretildi || v.asof) || 0, durum); return true; }
       return false;
     }

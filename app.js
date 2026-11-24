@@ -110,7 +110,7 @@
     { id: 'ik', ad: 'İK', aktif: true, onizleme: true },
     { id: 'onay', ad: 'Onaylar', aktif: true, onizleme: true },
     { id: 'asistan', ad: 'Asistan', aktif: true },   
-    { id: 'toplanti', ad: 'Toplantı', aktif: true },   
+    { id: 'toplanti', ad: 'Mumu Meet', aktif: true },   
     { id: 'mesaj', ad: 'Mumu Talk', aktif: true, mesaj: true },   
     { id: 'yonetim', ad: 'Yönetim', aktif: true },
     { id: 'finans', ad: 'Finans', aktif: true },

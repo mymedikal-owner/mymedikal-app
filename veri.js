@@ -65,6 +65,7 @@
     var p = function (x) { return (x < 10 ? '0' : '') + x; };
     n.textContent = 'Son güncelleme ' + p(zaman.getHours()) + ':' + p(zaman.getMinutes()) + ' · bağlantı yenileniyor';
   }
+  var ETIKET_ONB = {};   
   var SON_IYI = {};   
 
   async function jsonGetir(url, secenek) {
@@ -110,6 +111,11 @@
       if (!token2) throw e1;
       bilgi = await jsonGetir(graphUrl, { headers: { Authorization: 'Bearer ' + token2 }, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
     }
+    
+
+    var etiket = bilgi && (bilgi.cTag || bilgi.eTag), ckAnahtar = String(a.girisUpn || '') + '|' + a.driveId + '|' + yol;
+    var onb = etiket ? ETIKET_ONB[ckAnahtar] : null;
+    if (onb && onb.etiket === etiket) { try { return JSON.parse(onb.metin); } catch (e0) { delete ETIKET_ONB[ckAnahtar]; } }
     var indir = bilgi && bilgi['@microsoft.graph.downloadUrl'];
     if (!indir) throw hata('bicim', 'İndirme adresi alınamadı');
     
@@ -117,7 +123,14 @@
     try { r = await fetch(indir, { cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', signal: ac2 ? ac2.signal : undefined }); } catch (e) { if (kt2) clearTimeout(kt2); throw hata('ag', 'Ağ hatası (veri indirme)'); }
     try {
       if (!r.ok) throw hata('ag', 'Sunucu cevabı ' + r.status);
-      try { return await r.json(); } catch (e) { throw hata('bicim', 'JSON okunamadı'); }
+      var metin, sonuc;
+      try { metin = await r.text(); sonuc = JSON.parse(metin); } catch (e) { throw hata('bicim', 'JSON okunamadı'); }
+      if (etiket && metin.length < 8e6) {   
+        ETIKET_ONB[ckAnahtar] = { etiket: etiket, metin: metin }; var ks = Object.keys(ETIKET_ONB), top = 0;
+        ks.forEach(function (k) { top += ETIKET_ONB[k].metin.length; });
+        for (var i = 0; i < ks.length && top > 4e7 && ks[i] !== ckAnahtar; i++) { top -= ETIKET_ONB[ks[i]].metin.length; delete ETIKET_ONB[ks[i]]; }
+      }
+      return sonuc;
     } finally { if (kt2) clearTimeout(kt2); }
   }
 

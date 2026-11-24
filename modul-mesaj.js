@@ -67,13 +67,29 @@
     return '';   
   }
    
+  
+
+  var SESSIZ_BIT = {};
+  function sessizBitisi(s) {
+    var t = s.tercih || {}, b = typeof t.sessizBitis === 'number' ? t.sessizBitis : SESSIZ_BIT[s.id];
+    return typeof b === 'number' ? b : null;   
+  }
+  function sessizAltYazi(s) {
+    if (!(s.tercih && s.tercih.sessiz)) return '';
+    var b = sessizBitisi(s), c = function (x) { return MM.t ? MM.t(x) : x; };
+    if (b === 0) return c('Her zaman');
+    if (b === null) return c('Sessize alındı');
+    var d = new Date(b), p2 = function (n) { return (n < 10 ? '0' : '') + n; };
+    if (b - Date.now() > 24 * 3600 * 1000) return p2(d.getDate()) + '.' + p2(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + c('tarihine kadar');
+    return p2(d.getHours()) + ':' + p2(d.getMinutes()) + ' ' + c('saatine kadar');
+  }
   function sessizSayfasi(s, ist, ebeveyn, yazFn, sonra) {
     var t = s.tercih || {}, kok2 = h('div', { sinif: 'ms-sheet-kok' });
     var kutu = h('div', { sinif: 'ms-sheet', role: 'dialog' });
     function kapat() { if (kok2.parentNode) kok2.parentNode.removeChild(kok2); }
     function uygula(sure) {
       var deger = sure !== null;
-      function yerel() { s.tercih = Object.assign({}, s.tercih || {}, { sessiz: deger }); D.sohbetler = siraliSohbetler(D.sohbetler); bildir(); yazFn(''); if (sonra) sonra(); }
+      function yerel() { if (sure === '8s') SESSIZ_BIT[s.id] = Date.now() + 8 * 3600 * 1000; else if (sure === '1h') SESSIZ_BIT[s.id] = Date.now() + 7 * 24 * 3600 * 1000; else if (sure === 'hep') SESSIZ_BIT[s.id] = 0; else delete SESSIZ_BIT[s.id]; s.tercih = Object.assign({}, s.tercih || {}, { sessiz: deger }); D.sohbetler = siraliSohbetler(D.sohbetler); bildir(); yazFn(''); if (sonra) sonra(); }
       function eskiYol() { return ist.tercih(s.id, { sessiz: deger }).then(yerel, function (e) { yazFn(hataYaz(e)); if (sonra) sonra(); }); }
       if (!ist.sessizAl) { eskiYol(); return; }
       ist.sessizAl(s.id, sure).then(yerel, function (e) {
@@ -85,17 +101,33 @@
         yazFn(hataYaz(e)); if (sonra) sonra();
       });
     }
-    function oge(ad, sure) { var b = h('button', { sinif: 'ms-sheet-oge', type: 'button', metin: T(ad) }); b.addEventListener('click', function () { kapat(); uygula(sure); }); kutu.appendChild(b); }
-    if (t.sessiz) oge('Sesi aç', null);
-    else { oge('8 saat', '8s'); oge('1 hafta', '1h'); oge('Her zaman', 'hep'); }
-    var v = h('button', { sinif: 'ms-sheet-oge', type: 'button', metin: T('Vazgeç') }); v.addEventListener('click', kapat); kutu.appendChild(v);
+    var enDil = T('Vazgeç') === 'Cancel';
+    if (t.sessiz) {   
+      var sb = h('button', { sinif: 'ms-sheet-oge', type: 'button', metin: T('Sesi aç') }); sb.addEventListener('click', function () { kapat(); uygula(null); }); kutu.appendChild(sb);
+      var v = h('button', { sinif: 'ms-sheet-oge', type: 'button', metin: T('Vazgeç') }); v.addEventListener('click', kapat); kutu.appendChild(v);
+    } else {
+      var secili = '8s', grupAd = 'ms-sessiz-sure';
+      kutu.classList.add('ms-sessiz-diyalog'); kutu.setAttribute('aria-label', T('Bildirimleri sessize al'));
+      kutu.appendChild(h('p', { sinif: 'ms-sessiz-baslik', metin: T('Bildirimleri sessize al') }));
+      kutu.appendChild(h('p', { sinif: 'ms-sessiz-acik', metin: T('Sessize aldığınızı diğer kişi görmez. Bahsedildiğinizde yine bildirim alırsınız.') }));
+      [['8 saat', '8s'], ['1 hafta', '1h'], ['Her zaman', 'hep']].forEach(function (o) {
+        var r = h('input', { type: 'radio', name: grupAd, value: o[1] });
+        if (o[1] === secili) r.checked = true;
+        r.addEventListener('change', function () { if (r.checked) secili = o[1]; });
+        kutu.appendChild(h('label', { sinif: 'ms-sessiz-sec' }, [r, h('span', { metin: T(o[0]) })]));
+      });
+      var dsira = h('div', { sinif: 'ms-sessiz-dugmeler' });
+      var ip = h('button', { sinif: 'ms-sessiz-dugme', type: 'button', metin: enDil ? 'Cancel' : 'İptal' }); ip.addEventListener('click', kapat);
+      var tm = h('button', { sinif: 'ms-sessiz-dugme ms-sessiz-tamam', type: 'button', metin: T('Tamam') }); tm.addEventListener('click', function () { kapat(); uygula(secili); });
+      dsira.appendChild(ip); dsira.appendChild(tm); kutu.appendChild(dsira);
+    }
     kok2.addEventListener('click', function (e) { if (e.target === kok2) kapat(); });
     kok2.appendChild(kutu); ebeveyn.appendChild(kok2);
   }
   function onizMetni(son, ceviri) {
     var c = ceviri || function (x) { return x; };
     if (!son) return '';
-    if (typeof son.metin === 'string' && son.metin && toplantiBag(son.metin)) return '📹 ' + c('Toplantı');
+    if (typeof son.metin === 'string' && son.metin && toplantiBag(son.metin)) return '📹 ' + c('Mumu Meet');
     if (typeof son.metin === 'string' && son.metin) return kirp(son.metin, 80);
     var o = String(son.ozet || '');
     if (o === 'metin') return '';
@@ -583,7 +615,7 @@
     geri: 'M15 5l-7 7 7 7', arti: 'M12 5v14M5 12h14', ara: 'M11 4a7 7 0 100 14 7 7 0 000-14zM20 20l-4-4', gonder: 'M3 20l18-8L3 4v6l11 2-11 2z', mikrofon: 'M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3zM6 11a6 6 0 0012 0M12 17v4',
     kamera: 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 100-8 4 4 0 000 8z', video: 'M3 7h12v10H3zM15 11l6-3v8l-6-3', ahize: 'M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z',
     nokta3: 'M5 12h.01M12 12h.01M19 12h.01', sag: 'M9 5l7 7-7 7', kisi: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6', grup: 'M16 11a3 3 0 100-6 3 3 0 000 6zM8 12a3 3 0 100-6 3 3 0 000 6zM2 20c0-3 3-5 6-5s6 2 6 5M14 15c3 0 8 1 8 5',
-    sessiz: 'M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0M3 3l18 18', paylas: 'M12 3v12M8 7l4-4 4 4M5 12v8h14v-8', dosyaIk: 'M6 3h8l4 4v14H6zM14 3v4h4',
+    hoparlorKapali: 'M11 5L6 9H3v6h3l5 4zM15.5 9.5a3.5 3.5 0 010 5M3 3l18 18', sessiz: 'M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0M3 3l18 18', paylas: 'M12 3v12M8 7l4-4 4 4M5 12v8h14v-8', dosyaIk: 'M6 3h8l4 4v14H6zM14 3v4h4',
     tik: 'M5 12.5l4.5 4.5L19 7', tikcift: 'M2 12.5l4.2 4.2L15 8M9.2 14.8l1.9 1.9L21 7', saat: 'M12 4a8 8 0 100 16 8 8 0 000-16zM12 8v4l3 2', unlem: 'M12 4a8 8 0 100 16 8 8 0 000-16zM12 8v5M12 16h.01',
     kapat: 'M6 6l12 12M18 6L6 18', asagi: 'M6 9l6 6 6-6', yanitla: 'M9 14L4 9l5-5M4 9h10a6 6 0 016 6v3', ilet: 'M15 14l5-5-5-5M20 9H10a6 6 0 00-6 6v3', kopya: 'M8 8h11v13H8zM5 16V3h11', kalem: 'M4 20l1-5L16 4l4 4L9 19zM14 6l4 4', cop: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13', bilgiIk: 'M12 4a8 8 0 100 16 8 8 0 000-16zM12 11v5M12 8h.01', sabit: 'M9 4h6l-1 6 3 3v2H7v-2l3-3zM12 15v6', arsiv: 'M4 5h16v4H4zM5 9v10h14V9M10 13h4', cift: 'M3 12l4 4L14 8M10 16l1 1 9-9', yenile: 'M20 12a8 8 0 11-3-6.2M20 4v5h-5'
   };
@@ -710,7 +742,7 @@
       oge('Okundu say', function () { okunduSay(s); });
       if (s.tercih) {
         oge(t.favori ? 'Favoriden çıkar' : 'Favoriye ekle', function () { tercihYaz(s, 'favori', !t.favori); });
-        oge(t.sessiz ? 'Sesi aç' : 'Sessize al', function () { sessizSayfasi(s, i, kap, yaz); });
+        oge(t.sessiz ? 'Sesi aç' : 'Bildirimleri sessize al', function () { sessizSayfasi(s, i, kap, yaz); });
         oge(t.sabit ? 'Sabitlemeyi kaldır' : 'Sabitle', function () { tercihYaz(s, 'sabit', !t.sabit); });
         oge(t.arsiv ? 'Arşivden çıkar' : 'Arşivle', function () { tercihYaz(s, 'arsiv', !t.arsiv); });
       }
@@ -725,7 +757,7 @@
       var benimSon = !!(s.son && benOid && s.son.gonderen === benOid && s.son.id), tikO = benimSon ? tikEl(sohbetTik(s, s.son.id, benOid)) : null;   
       var altEl = [h('span', { sinif: 'ms-ozet' + (tikO ? ' ms-ozet-tikli' : '') }, [tikO, document.createTextNode(s.son ? onizOnek(s) + onizMetni(s.son, T) : '')])];
       var rozetler = h('span', { sinif: 'ms-simge-sira' });
-      if (s.tercih && s.tercih.sessiz) rozetler.appendChild(h('span', { sinif: 'ms-simge', 'aria-label': T('Sessize alındı') }, [ikon('sessiz', 16)]));
+      if (s.tercih && s.tercih.sessiz) rozetler.appendChild(h('span', { sinif: 'ms-simge', 'aria-label': T('Sessize alındı') }, [ikon('hoparlorKapali', 16)]));
       if (s.tercih && s.tercih.sabit) rozetler.appendChild(h('span', { sinif: 'ms-simge', 'aria-label': T('Sabit') }, [ikon('sabit', 16)]));
       if (okunmamis) rozetler.appendChild(h('span', { sinif: 'ms-rozet', metin: rozetMetni(s.okunmamis) }));
       if (rozetler.childNodes.length) altEl.push(rozetler);
@@ -1050,8 +1082,9 @@
       var govde = h('div', { sinif: 'ms-bilgi-govde' });
       kap.appendChild(h('div', { sinif: 'ms-ust-cubuk ms-sohbet-ust' }, [yuvarlakDugme('geri', T('Geri'), function () { sohbetGoster(s); }, 'ms-yd-ust'), h('strong', { sinif: 'ms-ekran-ad', metin: grup ? T('Grup bilgisi') : T('Kişi bilgisi') })]));
       kap.appendChild(govde); kap.appendChild(durum);
-      function satir(ikonAd, metin, fn, ek) {
-        var b = h('button', { sinif: 'ms-bilgi-sat', type: 'button' }, [ikon(ikonAd, 22), h('span', { sinif: 'ms-bilgi-ad', metin: metin })].concat(ek ? [ek] : []));
+      function satir(ikonAd, metin, fn, ek, alt) {
+        var adEl = alt ? h('span', { sinif: 'ms-bilgi-ad' }, [h('span', { metin: metin }), h('small', { sinif: 'ms-bilgi-altyazi', metin: alt })]) : h('span', { sinif: 'ms-bilgi-ad', metin: metin });
+        var b = h('button', { sinif: 'ms-bilgi-sat', type: 'button' }, [ikon(ikonAd, 22), adEl].concat(ek ? [ek] : []));
         b.addEventListener('click', fn); return b;
       }
       function ciz() {
@@ -1171,7 +1204,7 @@
       function ayarCiz(ic) {
         var kart = h('div', { sinif: 'ms-bilgi-kart' }), t = s.tercih || {};
         if (tercihVar) {
-          if ('sessiz' in t) kart.appendChild(satir('sessiz', t.sessiz ? T('Sesi aç') : T('Sessize al'), function () { sessizSayfasi(s, i, kap, yaz, ciz); }));
+          if ('sessiz' in t) kart.appendChild(satir('sessiz', T('Bildirimleri sessize al'), function () { sessizSayfasi(s, i, kap, yaz, ciz); }, null, sessizAltYazi(s)));
           if ('favori' in t) kart.appendChild(satir('cift', t.favori ? T('Favoriden çıkar') : T('Favoriye ekle'), function () { tercihYaz(s, 'favori', !t.favori, ciz); }));
           if ('arsiv' in t) kart.appendChild(satir('arsiv', t.arsiv ? T('Arşivden çıkar') : T('Arşivle'), function () { tercihYaz(s, 'arsiv', !t.arsiv, ciz); }));
         }
@@ -1207,8 +1240,9 @@
         i.sohbetAc([oid]).then(function (s) { if (!canli || !s) return; D.sohbetler = siraliSohbetler([s].concat(D.sohbetler.filter(function (c) { return c.id !== s.id; }))); bildir(); yaz(''); sonra(s); }, function (e) { yaz(hataYaz(e)); });
       }
       function yuvKutu(ikonAd, etiket, fn) { var b = h('button', { sinif: 'ms-eylem', type: 'button' }, [ikon(ikonAd, 22), h('span', { metin: etiket })]); b.addEventListener('click', fn); return b; }
-      function satirK(ikonAd, metin, fn, ek) {
-        var b = h('button', { sinif: 'ms-bilgi-sat', type: 'button' }, [ikon(ikonAd, 22), h('span', { sinif: 'ms-bilgi-ad', metin: metin })].concat(ek ? [ek] : []));
+      function satirK(ikonAd, metin, fn, ek, alt) {
+        var adEl = alt ? h('span', { sinif: 'ms-bilgi-ad' }, [h('span', { metin: metin }), h('small', { sinif: 'ms-bilgi-altyazi', metin: alt })]) : h('span', { sinif: 'ms-bilgi-ad', metin: metin });
+        var b = h('button', { sinif: 'ms-bilgi-sat', type: 'button' }, [ikon(ikonAd, 22), adEl].concat(ek ? [ek] : []));
         b.addEventListener('click', fn); return b;
       }
       function ciz() {
@@ -1228,7 +1262,7 @@
           var medyaSay = bilgi.ortakMedyaSayisi > 0 ? h('span', { sinif: 'ms-bilgi-n', metin: String(bilgi.ortakMedyaSayisi) }) : null;
           kart.appendChild(satirK('kisi', T('Medya ve dosyalar'), function () { bilgiGoster(s1); }, medyaSay));
           var sessizMi = !!(s1.tercih && s1.tercih.sessiz) || (bilgi.sessiz != null && bilgi.sessiz !== false);
-          kart.appendChild(satirK('sessiz', sessizMi ? T('Sesi aç') : T('Sessize al'), function () { sessizSayfasi(s1, i, kap, yaz, ciz); }));
+          kart.appendChild(satirK('sessiz', T('Bildirimleri sessize al'), function () { sessizSayfasi(s1, i, kap, yaz, ciz); }, null, sessizMi ? (sessizAltYazi(s1) || T('Sessize alındı')) : ''));
         }
         if (kart.childNodes.length) govde.appendChild(kart);
         if (bilgi.ortakGruplar.length) {

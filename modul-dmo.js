@@ -35,10 +35,15 @@
   function kalanMetin(n) { if (n == null) return 'veri yok'; return n < 0 ? Math.abs(n) + ' gün geçti' : n + ' gün kaldı'; }
   function ikiSatir(ad, deger, sinif) { return h('div', { sinif: 'dm-oge' + (sinif ? ' ' + sinif : '') }, [h('span', { sinif: 'dm-oge-ad', metin: ad }), h('strong', { sinif: 'dm-oge-deger', metin: deger })]); }
 
-  async function yukle() {
-    var sonuc = {};
-    var oku = await Promise.all(DOSYALAR.map(function (d) { return window.MMVeri.oku('dmo', d); }));
-    DOSYALAR.forEach(function (d, i) { sonuc[d] = oku[i].veri; });
+  
+
+  var GEREK = {
+    '*': ['dmo-ihaleler', 'dmo-siparisler', 'dmo-muayene', 'dmo-ceza', 'fy', 'tb', 'as', 's49'],
+    ozet: ['dmo-ihaleler', 'as', 's49'], acik: ['as'], hastaneler: ['dmo-ihaleler'], ihaleler: ['dmo-ihaleler', 'fy'],
+    ihale: ['dmo-ihaleler', 'dmo-siparisler', 'fy', 'tb'], siparis: ['dmo-siparisler', 'fy', 'tb'], muayene: ['dmo-muayene'],
+    ceza: ['dmo-ceza', 'fy'], belge: ['tb'], anlik: []
+  };
+  async function fyOku() {
      
     var fy = null;
     if (fiyatGor()) {
@@ -50,16 +55,25 @@
         ((d.ceza || {}).satirlar || []).forEach(function (x) { fy.ceza[x.satir_id] = x; });
       } catch (e) { fy = null; }   
     }
+    return fy;
+  }
+  async function yukle(sekme) {
+    var g = {}; (GEREK[sekme] || GEREK['*']).forEach(function (k) { g[k] = 1; });
+    var sonuc = {}, ad = DOSYALAR.filter(function (d) { return d === 'dmo-ozet' || g[d]; });
+    var fyS = (g.fy && fiyatGor()) ? fyOku() : null;   
+    var oku = await Promise.all(ad.map(function (d) { return window.MMVeri.oku('dmo', d); }));
+    ad.forEach(function (d, i) { sonuc[d] = oku[i].veri; });
+    var fy = fyS ? await fyS : null;
      
     var tb = null;
-    try { var rb = await window.MMVeri.oku('dmo', 'dmo-teslim-belge'); tb = rb.veri || null; } catch (e) { tb = null; }
+    if (g.tb) try { var rb = await window.MMVeri.oku('dmo', 'dmo-teslim-belge'); tb = rb.veri || null; } catch (e) { tb = null; }
      
     var as = null;
-    try { var ra = await window.MMVeri.oku('dmo', 'dmo-acik-siparis'); as = ra.veri || null; } catch (e) { as = null; }
+    if (g.as) try { var ra = await window.MMVeri.oku('dmo', 'dmo-acik-siparis'); as = ra.veri || null; } catch (e) { as = null; }
      
     var s49 = null, s49f = null;
-    try { var r49 = await window.MMVeri.oku('dmo', 'dmo-s49'); s49 = r49.veri || null; } catch (e) { s49 = null; }
-    if (fiyatGor()) { try { var r49f = await window.MMVeri.oku('dmo', 'dmo-s49-fiyat', 'dmo-fiyat-gor'); s49f = r49f.veri || null; } catch (e) { s49f = null; } }
+    if (g.s49) try { var r49 = await window.MMVeri.oku('dmo', 'dmo-s49'); s49 = r49.veri || null; } catch (e) { s49 = null; }
+    if (g.s49 && fiyatGor()) { try { var r49f = await window.MMVeri.oku('dmo', 'dmo-s49-fiyat', 'dmo-fiyat-gor'); s49f = r49f.veri || null; } catch (e) { s49f = null; } }
     return { v: sonuc, kaynak: oku[0].kaynak, fy: fy, tb: tb, as: as, s49: s49, s49f: s49f };
   }
   var TUR_AD = { nitril: 'Nitril', pudrali_lateks: 'Pudralı lateks', pudrasiz_lateks_muayene: 'Pudrasız lateks', cerrahi_lateks: 'Cerrahi lateks', spanc: 'Spanç', batin: 'Batın', gazli_bez: 'Gazlı bez' };
@@ -815,7 +829,16 @@
       else if (sekme === 'ceza') cezaEkrani();
       else ozetGoster();
     }
-    function yenile() { hata = null; yuk = null; ciz(); yukle().then(function (y) { yuk = y; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
+    function yenile() {
+      hata = null; yuk = null; ciz();
+      yukle(sekme).then(function (y) { yuk = y; hata = null; }).catch(function (e) { hata = e; }).then(function () {
+        if (canli) ciz();
+        if (canli && yuk && sekme === 'ozet' && fiyatGor() && !yuk.fy) {   
+          var y0 = yuk;
+          fyOku().then(function (fy) { if (canli && yuk === y0 && fy) { y0.fy = fy; ciz(); } }, function () { });
+        }
+      });
+    }
     yenile();
     return function () { canli = false; };
   };

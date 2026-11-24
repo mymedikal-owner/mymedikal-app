@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   var MM = window.MM, h = MM.h, G = MM.gr;
-  var YENILE_MS = 60000;      
+  var YENILE_MS = 30000;      
   var YUKLEME_ZA_MS = 12000;  
 
   function gunToplamlari(d) {   
@@ -86,10 +86,47 @@
     return h('div', { sinif: 'bant ' + (e.kod === 'ayar_bekleniyor' || e.kod === 'giris_gerekli' || e.kod === 'bulunamadi' ? 'gri' : 'kirmizi'), role: 'alert' }, [h('strong', { metin: baslik }), ' — ' + e.message]);
   }
 
+  
+
+
+
+  var PS = { sablon: null, sablonSurum: null, gecmis: null, gecmisSurum: null, yokMs: 0 };
+  var ISARET_SIRA = ['VERI:mabotex', 'GECMIS:mabotex', 'VERI:dokuma', 'GECMIS:dokuma', 'KUME:dokuma'];
+  function panoDoldur(sablon, bloklar) {
+    var html = sablon;
+    for (var i = 0; i < ISARET_SIRA.length; i++) {
+      var is = ISARET_SIRA[i], bas = '/*' + is + '*/', son = '/*/' + is + '*/', eski = bas + 'null' + son, a = html.indexOf(eski), b = bloklar[is];
+      if (a < 0 || (typeof b !== 'string' && b !== null)) return null;
+      html = html.slice(0, a) + bas + (b === null ? 'null' : b) + son + html.slice(a + eski.length);
+    }
+    return html;
+  }
+  async function panoAl() {
+    var V = window.MMVeri, simdi = Date.now();
+    if (simdi - PS.yokMs > 300000) {
+      try {
+        var c = (await V.oku('fabrika', 'pano-canli')).veri;
+        if (c && c.surum === 2 && c.bloklar && c.sablon_surum && c.gecmis_surum) {
+          var gerek = [];
+          if (PS.sablonSurum !== c.sablon_surum) gerek.push(V.oku('fabrika', 'pano-sablon').then(function (r) { var s = r.veri || {}; if (s.surum !== c.sablon_surum || typeof s.html !== 'string') throw new Error('sablon'); PS.sablon = s.html; PS.sablonSurum = s.surum; }));
+          if (PS.gecmisSurum !== c.gecmis_surum) gerek.push(V.oku('fabrika', 'pano-gecmis-app').then(function (r) { var g = r.veri || {}; if (g.surum !== c.gecmis_surum || !g.bloklar) throw new Error('gecmis'); PS.gecmis = g.bloklar; PS.gecmisSurum = g.surum; }));
+          if (gerek.length) await Promise.all(gerek);   
+          var bl = Object.assign({}, PS.gecmis, c.bloklar);
+          return { kaynak: 'uc', asof: c.asof, uretildi: c.uretildi, bloklar: bl, html: function () { return panoDoldur(PS.sablon, bl); } };
+        }
+      } catch (e) {
+        if (e && (e.kod === 'giris_gerekli' || e.kod === 'ayar_bekleniyor' || e.kod === 'ag')) throw e;   
+        PS.sablonSurum = PS.gecmisSurum = null; PS.yokMs = Date.now();   
+      }
+    }
+    var r = await V.oku('fabrika', 'pano-uygulama'), v = r.veri || {};
+    return { kaynak: 'eski', asof: v.asof, uretildi: v.uretildi, bloklar: null, html: function () { return v.html; } };
+  }
+
   MM.moduller.makineler = function (kok) {
     var sayfa = h('div', { sinif: 'mk-pano' }), uyari = h('div', { 'aria-live': 'polite' });
     kok.appendChild(sayfa); if (MM.makineEk) MM.makineEk(kok);  
-    var bekci = null, aktif = null, bekleyen = null, bekleyenHtml = null, sonSurum = null, ss = {}, canli_ = true, yukleniyor = false;
+    var bekci = null, aktif = null, bekleyen = null, bekleyenHtml = null, sonSurum = null, ss = {}, canli_ = true, yukleniyor = false, sonCizim = 0;
     var yukleme = G.iskelet('kart', 4);
     sayfa.appendChild(yukleme);
     function yuklemeKaldir() { if (yukleme && yukleme.parentNode) yukleme.parentNode.removeChild(yukleme); yukleme = null; }
@@ -145,17 +182,20 @@
     async function yukle() {
       if (yukleniyor || !canli_) return; yukleniyor = true;
       try {
-        var r = await window.MMVeri.oku('fabrika', 'pano-uygulama');
-        var v = r.veri || {};
-        if (typeof v.html !== 'string' || v.html.length < 1000) throw Object.assign(new Error('Pano dosyası okunamadı'), { kod: 'bicim' });
-        uyari.textContent = '';
-        if (sayfa.contains(uyari)) sayfa.removeChild(uyari);
+        var v = await panoAl();
         var surum = String(v.uretildi || v.asof || '');
         if (!aktif || surum !== sonSurum) {
-          sonSurum = surum;
-          yuklemeKaldir();
-          cerceve(v.html);
-        }
+          if (aktif && Date.now() - sonCizim < 55000) {   }
+          else {
+            var html = v.html();
+            if (typeof html !== 'string' || html.length < 1000) throw Object.assign(new Error('Pano dosyası okunamadı'), { kod: 'bicim' });
+            uyari.textContent = '';
+            if (sayfa.contains(uyari)) sayfa.removeChild(uyari);
+            sonSurum = surum; sonCizim = Date.now();
+            yuklemeKaldir();
+            cerceve(html);
+          }
+        } else { uyari.textContent = ''; if (sayfa.contains(uyari)) sayfa.removeChild(uyari); }
       } catch (e) {
         yuklemeKaldir();
         uyari.textContent = '';
@@ -174,5 +214,5 @@
       document.removeEventListener('visibilitychange', onGorun); window.removeEventListener('message', mesaj);
     };
   };
-  MM.fabrika = { gunToplamlari: gunToplamlari, rozetMantik: rozetMantik, rozetEkle: rozetEkle };
+  MM.fabrika = { gunToplamlari: gunToplamlari, rozetMantik: rozetMantik, rozetEkle: rozetEkle, panoAl: panoAl, panoDoldur: panoDoldur };
 })();

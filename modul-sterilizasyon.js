@@ -11,14 +11,13 @@
 
   MM.moduller.sterilizasyon = function (kok) {
     var yuk = null, hata = null, canli = true, sekme = 'bugun', q = '';
-    kok.appendChild(G.sayfaBasi({ baslik: 'Sterilizasyon', alt: 'Sterilizasyon deposu ve lotlar', kirinti: [['Sterilizasyon']] }));
+    kok.appendChild(G.sayfaBasi({ baslik: 'Sterilizasyon', alt: 'Sevk geçiş deposu ve lotlar', kirinti: [['Sterilizasyon']] }));
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
 
     function bugun(v) {
       var o = v.ozet || {}, k = h('div', { sinif: 'kpi-izgara' });
-      k.appendChild(G.kpi({ baslik: 'Sterilizasyon deposunda', deger: sayiYaz(o.depoda_adet), birim: o.depoda_adet == null ? '' : 'adet', ikon: 'stok', alt: (o.depoda_lot == null ? '' : G.say(o.depoda_lot) + ' lot') + (o.depoda_ns_adet ? ' · ayrıca steril olmayan (NS): ' + G.say(o.depoda_ns_adet) + ' adet' : '') + (o.depo_tanim_teyit_bekliyor ? ' · depo tanımı doğrulanıyor' : '') }));
-      k.appendChild(G.kpi({ baslik: 'Karantinada', deger: sayiYaz(o.karantina_adet), birim: o.karantina_adet == null ? '' : 'adet', ikon: 'uyari', alt: o.karantina_lot == null ? '' : G.say(o.karantina_lot) + ' lot' }));
+      k.appendChild(G.kpi({ baslik: 'Sevk geçiş deposunda', deger: sayiYaz(o.depoda_adet), birim: o.depoda_adet == null ? '' : 'adet', ikon: 'stok', alt: (o.depoda_lot == null ? '' : G.say(o.depoda_lot) + ' lot') + (o.depoda_ns_adet ? ' · ayrıca steril olmayan (NS): ' + G.say(o.depoda_ns_adet) + ' adet' : '') }));
       k.appendChild(G.kpi({ baslik: 'Kalite kararı bekleyen', deger: sayiYaz(o.kalite_bekleyen_parti), birim: o.kalite_bekleyen_parti == null ? '' : 'parti', ikon: 'saat', alt: 'son 30 günde açılan' }));
       var gn = v.gunluk || [], ciftler = gn.map(function (x) { return { e: gunKisa(x.gun), giren: x.giren, cikan: x.cikan }; });
       var ham = ciftler.filter(function (x) { return x.giren != null || x.cikan != null; }), toplam = 0;
@@ -26,7 +25,7 @@
       var kok2 = h('div');
       kok2.appendChild(k);
       if (!ham.length) kok2.appendChild(h('p', { sinif: 'ny-ipucu', metin: 'Hareket bilgisi şu an alınamıyor.' }));
-      else if (!toplam) kok2.appendChild(h('p', { sinif: 'ny-ipucu', metin: 'Son 7 günde sterilizasyon deposunda hareket olmadı.' }));
+      else if (!toplam) kok2.appendChild(h('p', { sinif: 'ny-ipucu', metin: 'Son 7 günde sevk geçiş deposunda hareket olmadı.' }));
       else {
         kok2.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Giren adet', alt: 'son 7 gün', govde: G.cubuk(ciftler.map(function (x) { return { e: x.e, d: x.giren }; }), { ad: 'Günlük giren adet' }) })]));
         kok2.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Çıkan adet', alt: 'son 7 gün', govde: G.cubuk(ciftler.map(function (x) { return { e: x.e, d: x.cikan }; }), { ad: 'Günlük çıkan adet', renk: 'var(--s2)' }) })]));
@@ -36,7 +35,7 @@
 
     function lotlar(v) {
       var l = v.lotlar || [], kap = h('div');
-      if (!l.length) { kap.appendChild(G.bos({ baslik: 'Lot kaydı yok', metin: 'Sterilizasyon deposunda lot bulunamadı.' })); return kap; }
+      if (!l.length) { kap.appendChild(G.bos({ baslik: 'Lot kaydı yok', metin: 'Sevk geçiş deposunda lot bulunamadı.' })); return kap; }
       var inp = h('input', { sinif: 's41-ara', type: 'search', autocomplete: 'off', placeholder: 'Ürün veya lot ara', 'aria-label': 'Ürün veya lot ara' });
       var liste = h('div');
       function ciz() {

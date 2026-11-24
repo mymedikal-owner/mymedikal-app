@@ -103,7 +103,8 @@
     var ok = harita(c.okundu), te = harita(c.teslim);
     if (ok) r.okundu = ok;      
     if (te) r.teslim = te;
-    if (c.tercih && typeof c.tercih === 'object') { r.tercih = {}; ['arsiv', 'favori', 'sessiz', 'sabit'].forEach(function (k) { if (typeof c.tercih[k] === 'boolean') r.tercih[k] = c.tercih[k]; }); if (typeof c.tercih.sessizBitis === 'number' && isFinite(c.tercih.sessizBitis)) r.tercih.sessizBitis = c.tercih.sessizBitis; }
+    if (c.tercih && typeof c.tercih === 'object') { r.tercih = {}; ['arsiv', 'favori', 'sessiz', 'sabit'].forEach(function (k) { if (typeof c.tercih[k] === 'boolean') r.tercih[k] = c.tercih[k]; }); var sb = c.tercih.sessizBitis, sbs = typeof sb === 'number' ? sb : (typeof sb === 'string' ? Date.parse(sb) : NaN);   
+      if (c.tercih.sessiz === true && c.tercih.sessizSure === 'hep') r.tercih.sessizBitis = 0; else if (isFinite(sbs)) r.tercih.sessizBitis = sbs; }
     return r;
   }
   function liste(v, f) { return (Array.isArray(v) ? v : []).map(f).filter(Boolean); }

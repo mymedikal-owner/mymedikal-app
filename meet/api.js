@@ -90,9 +90,10 @@
       return (Array.isArray(v) ? v : []).map(function (t) {
         if (!t || typeof t !== 'object' || typeof t.kod !== 'string') return null;
         var ms = Date.parse(t.baslangic);
-        return { id: t.kod, ad: s(t.baslik) || 'Toplantı', baslangic: isNaN(ms) ? 0 : ms, katilimci: typeof t.katilimci === 'number' ? t.katilimci : 0, g: t.kod };
+        return { id: t.kod, ad: s(t.baslik) || 'Toplantı', baslangic: isNaN(ms) ? 0 : ms, katilimci: typeof t.katilimci === 'number' ? t.katilimci : 0, g: t.kod, bitis: Date.parse(t.bitis) || 0, benDuzenleyen: t.benDuzenleyen === true };
       }).filter(Boolean);
     },
+     
     toplantiOlustur: async function (o) {
       o = o || {};
       var b = String(o.baslik == null ? '' : o.baslik).trim();

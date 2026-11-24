@@ -943,6 +943,19 @@
     if (mq && mq.addEventListener) mq.addEventListener('change', duzenle);
     window.addEventListener('beforeunload', function () { try { if (sag) sag.ayril(); } catch (e) {   } });
     window.addEventListener('hashchange', function () { if ($('sahne').hidden) ac().catch(function (e) { mesaj(hataMetni(e)); }); });
+     
+    var lobiSonTazele = 0;
+    function lobiOneGelince() {
+      if ($('panel-lobi').hidden) return;
+      var t = Date.now();
+      if (t - lobiSonTazele < 1500) return;
+      lobiSonTazele = t;
+      lobiVeriYenile(false);
+    }
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') lobiOneGelince(); });
+    window.addEventListener('pageshow', lobiOneGelince);
+    window.addEventListener('focus', lobiOneGelince);
+    window.addEventListener('online', lobiOneGelince);
   }
 
   ikonlariKur();

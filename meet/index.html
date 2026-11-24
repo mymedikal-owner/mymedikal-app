@@ -13,8 +13,8 @@
 <div id="uygulama" class="uygulama">
   <header id="ust" class="ust">
     <a id="b-app" class="ust-don" href="../index.html" aria-label="Uygulamaya dön">&#8249; Uygulama</a>
-    <img class="logo" src="../marka/logo.svg" alt="MY Medikal">
-    <strong>Mumu Meet</strong>
+    <div class="ust-marka"><img class="logo" src="../marka/logo.svg" alt="MY Medikal"><strong>Mumu Meet</strong></div>
+    <time id="l-saat" class="ust-saat"><span id="l-saat-s" class="ust-saat-s"></span><span id="l-saat-t" class="ust-saat-t"></span></time>
     <span id="durum" class="durum" role="status" aria-live="polite" data-durum="hazir" data-katilimci="0">
       <span id="durum-metin">Hazırlanıyor…</span>
       <span id="katilimci-metin" hidden></span>
@@ -31,29 +31,20 @@
     </section>
 
     <section id="panel-lobi" class="lobi" aria-label="Ana ekran" hidden>
+    <div class="lobi-ic">
       <div class="lobi-sol">
-        <h1 class="lobi-baslik">Görüntülü görüşme ve toplantılar</h1>
-        <p class="lobi-alt">Ekibinizle bağlantı kurun, toplantı başlatın ya da bir toplantıya katılın.</p>
-        <div class="lobi-islem">
-          <div class="acilir-kap lobi-yeni-kap">
-            <button id="l-yeni" class="birincil buyuk" type="button" aria-haspopup="true" aria-expanded="false"><span class="ikon" data-ikon="kam"></span>Yeni toplantı</button>
-            <div id="l-yeni-menu" class="acilir lobi-menu" role="menu" hidden>
-              <button id="l-baglanti" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="baglanti"></span>Toplantı bağlantısı oluştur</button>
-              <button id="l-hemen" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="kam"></span>Hemen toplantı başlat</button>
-              <button id="l-planla" type="button" class="menu-oge" role="menuitem" hidden><span class="ikon" data-ikon="takvim"></span>Toplantı planla</button>
-            </div>
-          </div>
-          <form id="l-kod-form" class="lobi-kod" autocomplete="off">
-            <span class="ikon" data-ikon="klavye"></span>
-            <input id="l-kod" type="text" maxlength="400" placeholder="Kod ya da bağlantı girin" aria-label="Toplantı kodu ya da bağlantısı">
-            <button id="l-kod-katil" type="submit" class="metin-dugme" disabled>Katıl</button>
-          </form>
+        <h1 class="gizli-metin">Görüntülü görüşme ve toplantılar</h1>
+        <div class="lobi-kutucuklar" role="group" aria-label="Toplantı işlemleri">
+          <button id="l-hemen" class="kutucuk k-yeni" type="button" aria-label="Yeni toplantı, hemen başlat"><span class="kutucuk-ikon"><span class="ikon" data-ikon="kam"></span></span><span class="kutucuk-ad">Yeni toplantı</span><span class="kutucuk-alt">Hemen başlat</span></button>
+          <button id="l-planla" class="kutucuk k-planla" type="button" aria-label="Toplantı planla"><span class="kutucuk-ikon"><span class="ikon" data-ikon="takvim"></span></span><span class="kutucuk-ad">Planla</span><span class="kutucuk-alt">Sonrası için</span></button>
+          <button id="l-katil-ac" class="kutucuk k-katil" type="button" aria-label="Toplantıya katıl, kod ya da bağlantıyla" aria-expanded="false" aria-controls="l-kod-form"><span class="kutucuk-ikon"><span class="ikon" data-ikon="klavye"></span></span><span class="kutucuk-ad">Katıl</span><span class="kutucuk-alt">Kod ya da bağlantı</span></button>
         </div>
+        <form id="l-kod-form" class="lobi-kod" autocomplete="off" hidden>
+          <span class="ikon" data-ikon="klavye"></span>
+          <input id="l-kod" type="text" maxlength="400" placeholder="Kod ya da bağlantı girin" aria-label="Toplantı kodu ya da bağlantısı">
+          <button id="l-kod-katil" type="submit" class="metin-dugme" disabled>Katıl</button>
+        </form>
         <p id="l-kod-hata" class="lobi-hata" role="alert" hidden></p>
-        <div id="l-yeni-baglanti" class="lobi-baglanti-kutu" hidden>
-          <p class="kucuk">Bu bağlantıyı paylaşın. Toplantıya yalnızca bağlantıyı bilen kişiler katılabilir.</p>
-          <div class="baglanti"><input id="l-yeni-link" type="text" readonly aria-label="Oluşturulan bağlantı"><button id="l-yeni-kopyala" type="button">Kopyala</button><button id="l-yeni-katil" type="button" class="birincil">Katıl</button></div>
-        </div>
         <form id="p-form" class="plan-kutu" autocomplete="off" hidden aria-labelledby="p-baslik-b">
           <h2 id="p-baslik-b">Toplantı planla</h2>
           <label class="plan-etiket" for="p-baslik">Başlık</label>
@@ -100,10 +91,11 @@
           <ul id="l-yaklasan-liste" class="lobi-liste"></ul>
         </section>
         <section id="l-kisiler" class="lobi-bolum" aria-labelledby="l-kisiler-b" hidden>
-          <h2 id="l-kisiler-b">Çevrimiçi kişiler</h2>
-          <ul id="l-kisiler-liste" class="lobi-liste"></ul>
+          <h2 id="l-kisiler-b">Çevrimiçi</h2>
+          <ul id="l-kisiler-liste" class="serit-kisiler"></ul>
         </section>
       </div>
+    </div>
     </section>
 
     <section id="panel-onizleme" class="onizleme" aria-label="Katılmadan önce" hidden>

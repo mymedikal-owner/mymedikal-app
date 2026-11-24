@@ -605,13 +605,12 @@
 
    
   function lobiHata(m) { var e = $('l-kod-hata'); e.textContent = m || ''; e.hidden = !m; }
-  function lobiKapatMenu() { $('l-yeni-menu').hidden = true; $('l-yeni').setAttribute('aria-expanded', 'false'); }
+  function lobiKodAc(ac0) { $('l-kod-form').hidden = !ac0; $('l-katil-ac').setAttribute('aria-expanded', ac0 ? 'true' : 'false'); if (!ac0) lobiHata(''); }
   function lobiGoster() {
     if (sag) { try { sag.temizle(); } catch (e0) {   } sag = null; }
     odaKod = ''; odaBilgi = null; onBilgi = null;
-    mesaj(''); lobiHata(''); lobiKapatMenu(); $('l-yeni-baglanti').hidden = true; $('l-kod').value = ''; $('l-kod-katil').disabled = true;
-    $('l-baglanti').hidden = !taklit;                       
-    $('l-planla').hidden = false;                           
+    mesaj(''); lobiHata(''); lobiKodAc(false); $('l-kod').value = ''; $('l-kod-katil').disabled = true;
+    $('l-planla').hidden = false;                          
     planKapat(); $('p-sonuc').hidden = true; planSon = null;
     $('l-kod').placeholder = 'Kod ya da bağlantı girin';   
     lobiVeriYenile(true);
@@ -620,10 +619,10 @@
   function lobiKatilHook(g) { if (taklit) lobiKatil({ s: 't1', g: g }); else lobiOdaKatil(g, false); }   
   function lobiVeriYenile(gizle) {
     var sira = ++lobiSira;
-    if (gizle) window.MeetLobi.ciz({ yaklasan: null, kisiler: null }, lobiKatilHook);   
+    if (gizle) window.MeetLobi.ciz({ yaklasan: null, kisiler: null }, lobiKatilHook, lobiKisiyleBaslat);   
     Promise.resolve(window.MeetLobi.veriAl(taklit, lobiBos)).then(function (v) {
       if (sira !== lobiSira || $('panel-lobi').hidden) return;   
-      window.MeetLobi.ciz(v, lobiKatilHook);
+      window.MeetLobi.ciz(v, lobiKatilHook, lobiKisiyleBaslat);
     }).catch(function () {   });
   }
 
@@ -736,7 +735,7 @@
     $('p-form').hidden = false; planKisiler = []; planKisiCiz();
     try { $('p-baslik').focus(); } catch (e) {   }
     try {
-      planKisiler = taklit ? [1, 2, 3, 4].map(function (i) { return { oid: 'c' + i, ad: 'Katılımcı ' + i }; })
+      planKisiler = taklit ? window.MeetLobi.taklitKisiAdlari.map(function (a, i) { return { oid: 'c' + (i + 1), ad: a }; })
         : (await window.MeetApi.kisiler()).filter(function (k) { return k && typeof k.oid === 'string'; }).map(function (k) { return { oid: k.oid, ad: typeof k.ad === 'string' ? k.ad : '' }; });
     } catch (e2) { planKisiler = []; }
     if (!$('p-form').hidden) planKisiCiz();
@@ -817,22 +816,24 @@
     if (!r) { lobiHata('Geçerli bir toplantı bağlantısı girin. Bağlantıyı toplantıyı başlatan kişiden alabilirsiniz.'); return; }
     lobiHata(''); lobiKatil(r);
   }
-  function lobiBaglantiUret() {
-    var kod = Math.random().toString(36).slice(2, 5) + '-' + Math.random().toString(36).slice(2, 6);
-    yeniLink = location.origin + location.pathname + location.search + '#s=t1&g=taklit-' + kod;
-    $('l-yeni-link').value = yeniLink; $('l-yeni-baglanti').hidden = false;
+   
+  function lobiKisiyleBaslat(k) {
+    if (mesgul || !k || !k.id) return;
+    planSecili = new Set([k.id]); planSon = null; planHata('');
+    $('p-baslik').value = ((k.ad || 'Kişi') + ' ile görüşme').slice(0, 120);
+    $('p-sure').value = '60';
+    planGonder(true).then(function () {
+      var h = $('p-hata');
+      if (!h.hidden && h.textContent) { mesaj(h.textContent); h.textContent = ''; h.hidden = true; }
+    });
   }
   function lobiDugmeleri() {
-    $('l-yeni').addEventListener('click', function (e) {
-      e.stopPropagation(); var ac0 = $('l-yeni-menu').hidden;
-      $('l-yeni-menu').hidden = !ac0; $('l-yeni').setAttribute('aria-expanded', ac0 ? 'true' : 'false');
+    $('l-hemen').addEventListener('click', function () { lobiAtla = true; ac().catch(function (e) { mesaj(hataMetni(e)); }); });
+    $('l-katil-ac').addEventListener('click', function () {
+      var ac0 = $('l-kod-form').hidden; if (ac0) planKapat();
+      lobiKodAc(ac0);
+      if (ac0) { try { $('l-kod').focus(); $('l-kod-form').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {   } }
     });
-    $('l-hemen').addEventListener('click', function () { lobiKapatMenu(); lobiAtla = true; ac().catch(function (e) { mesaj(hataMetni(e)); }); });
-    $('l-baglanti').addEventListener('click', function () { lobiKapatMenu(); lobiBaglantiUret(); });
-    $('l-yeni-kopyala').addEventListener('click', async function () {
-      try { await navigator.clipboard.writeText($('l-yeni-link').value); lobiHata(''); } catch (e) { $('l-yeni-link').select(); }
-    });
-    $('l-yeni-katil').addEventListener('click', function () { var r = window.MeetLobi.cozumle(yeniLink); if (r) lobiKatil(r); });
     $('l-kod').addEventListener('input', function () { $('l-kod-katil').disabled = !this.value.trim(); lobiHata(''); });
     $('l-kod-form').addEventListener('submit', function (e) { e.preventDefault(); lobiKodGonder(); });
     $('b-lobi').addEventListener('click', function () { lobiGoster(); });
@@ -840,7 +841,10 @@
       try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {   }
       if (sag) { try { sag.temizle(); } catch (e0) {   } } sag = null; katilimciYaz(0); lobiAtla = false; lobiGirisi = true; lobiGoster();
     });
-    $('l-planla').addEventListener('click', function () { lobiKapatMenu(); planAc(); });
+    $('l-planla').addEventListener('click', function () {
+      lobiKodAc(false); planAc();
+      try { $('p-form').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {   }
+    });
     planDugmeleri();
      
     ['yok-baglanti', 'b-ana', 'b-app'].forEach(function (id) {
@@ -928,10 +932,10 @@
     });
     $('b-tekrar').addEventListener('click', function () { mesaj(''); katilimciYaz(0); if (sag) { try { sag.temizle(); } catch (e0) {   } } sag = null; ac().catch(function (e) { mesaj(hataMetni(e)); }); });
 
-    document.addEventListener('click', function (e) { if (!e.target.closest || !e.target.closest('.acilir-kap')) { acilirKapat(); lobiKapatMenu(); } });
+    document.addEventListener('click', function (e) { if (!e.target.closest || !e.target.closest('.acilir-kap')) { acilirKapat(); } });
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
-      if (!$('l-yeni-menu').hidden) { lobiKapatMenu(); return; }
+      if (!$('panel-lobi').hidden && !$('l-kod-form').hidden) { lobiKodAc(false); return; }
       if (!$('ayar').hidden) { $('ayar').hidden = true; return; }
       if (!$('menu').hidden || !$('tepki-panel').hidden) { acilirKapat(); return; }
       if (yanAcik) yanKapat();

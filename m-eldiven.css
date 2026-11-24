@@ -118,3 +118,5 @@ a.eld-k.kirmizi { border-left: 4px solid var(--kritik); } a.eld-k.sari { border-
 .eld-harita-alan { margin: 0 calc(var(--b4) * -1); } .eld-harita-cerceve { display: block; width: 100%; border: 0; background: #060B14; height: calc(100vh - var(--ust-yukseklik) - var(--alt-yukseklik) - env(safe-area-inset-top) - env(safe-area-inset-bottom)); height: calc(100dvh - var(--ust-yukseklik) - var(--alt-yukseklik) - env(safe-area-inset-top) - env(safe-area-inset-bottom)); min-height: 480px; }
 @media (max-width: 599px) { .eld-harita-alan { margin-bottom: -24px; } }    
 @media (max-width: 599px) { .eld-zaman { grid-template-columns: auto 1fr auto; } .eld-zaman-in { grid-column: 1 / -1; order: 5; } }
+ 
+.icerik:has(.eld-harita-cerceve)::after { display: none; }

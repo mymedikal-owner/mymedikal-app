@@ -573,9 +573,10 @@
         var ac = sat.filter(function (x) { return x.uyari && x.teslimsiz_mn_tl > 0; });
         var kap = h('div');
         if (ac.length) kap.appendChild(h('div', { sinif: 'bant kirmizi hz-kirmizi-uyari', role: 'alert' }, [h('strong', { metin: 'DMO siparişi teslim edilmedi: kredi vadesinde öz kaynaktan ödenecek açık' }), h('span', { sinif: 'hz-etiket', metin: 'Kapsam varsayımı' }),
-          h('ul', null, ac.map(function (x) { return h('li', { metin: x.banka + ' · ₺ ' + f2(x.teslimsiz_mn_tl) + ' mn' + (x.kredi_vade ? ' · en yakın kredi vadesi ' + trT(x.kredi_vade) : ' · kredi vadesi verisi yok') + ' · şahsi kefalete taşınacak' }); }))]));
+          h('ul', null, ac.map(function (x) { return h('li', { metin: x.banka + ' · ₺ ' + f2(x.teslimsiz_mn_tl) + ' mn' + (x.kredi_vade ? ' · en yakın kredi son vadesi ' + trT(x.kredi_vade) + (x.sonraki_taksit ? ' · sonraki taksit ' + trT(x.sonraki_taksit) : '') : ' · kredi vadesi verisi yok') + ' · şahsi kefalete taşınacak' }); }))]));
         var kol = [{ ad: 'Banka', k: 'banka' }, { ad: 'Teslim edilmemiş sipariş (mn ₺)', k: 'teslimsiz_mn_tl', sag: true, ciz: function (r) { return f2(r.teslimsiz_mn_tl); } },
-          { ad: 'En yakın kredi vadesi', k: 'kredi_vade', ciz: function (r) { return r.kredi_vade ? trT(r.kredi_vade) : 'veri yok'; } },
+          { ad: 'En yakın kredi son vadesi', k: 'kredi_vade', ciz: function (r) { return r.kredi_vade ? trT(r.kredi_vade) : 'veri yok'; } },
+          { ad: 'Sonraki taksit', k: 'sonraki_taksit', ciz: function (r) { return r.sonraki_taksit ? trT(r.sonraki_taksit) : '—'; } },
           { ad: 'Öz kaynak açığı (mn ₺)', k: 'ozkaynak_acik_mn_tl', sag: true, ciz: function (r) { return f2(r.ozkaynak_acik_mn_tl); } },
           { ad: 'Şahsi kefalete taşınacak (mn ₺)', k: 'sahsi_kefalete_tasinacak_mn_tl', sag: true, ciz: function (r) { return f2(r.sahsi_kefalete_tasinacak_mn_tl); } },
           { ad: 'Kredi no', k: 'kredi_no', ciz: function (r) { return r.kredi_no ? r.kredi_no.join(', ') : '—'; } }];
@@ -700,6 +701,7 @@
           var x = dp[p]; if (!x) return null; var PB = x.pb;
           var bar = gr.yatay([{ e: 'Varlık', d: Math.abs(x.varlik.toplam), renk: 'var(--s3)', etiketDeger: dvz(x.varlik.toplam, PB) }, { e: 'Yükümlülük', d: Math.abs(x.yukumluluk.toplam), renk: 'var(--s2)', etiketDeger: dvz(x.yukumluluk.toplam, PB) }, { e: 'Net', d: Math.abs(x.net), renk: x.net < 0 ? 'var(--kritik)' : 'var(--iyi)', etiketDeger: dvz(x.net, PB) }]);
           var sat = []; Object.keys(x.varlik).forEach(function (a) { if (a !== 'toplam' && !(a === 'doviz_alacak' && x.varlik[a] < 0)) sat.push({ kalem: 'Varlık · ' + (AD[a] || a), tutar: x.varlik[a] }); });   
+          Object.keys(x.yukumluluk).forEach(function (a) { if (a !== 'toplam') sat.push({ kalem: 'Yükümlülük · ' + (AD[a] || a), tutar: x.yukumluluk[a] }); });
           return gr.kart({ baslik: PB + ' pozisyonu', alt: 'Kur ' + String(x.kur).replace('.', ',') + ' · net TL karşılığı ' + mn(x.net_tl_karsiligi), govde: h('div', null, [bar, tabloX('Döviz · ' + PB + ' pozisyonu', { satirlar: sat, bos: 'Kalem yok.', sayfa: 20, kolonlar: [{ ad: 'Kalem', k: 'kalem' }, { ad: 'Tutar (' + PB + ')', k: 'tutar', sag: true, ciz: function (r) { return r.tutar == null ? 'veri yok' : dvz(r.tutar, PB); } }] })]) });
         }).filter(Boolean);
         k.appendChild(h('div', { sinif: 'iki-kolon' }, kartlar));
@@ -707,8 +709,8 @@
         var db = v.doviz_borc_tcmb, kt = v.kur_tcmb;
         if (db && db.satirlar && db.satirlar.length) {
           k.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Döviz borçları · güncel kur (TCMB)', alt: 'Kur tarihi ' + (db.kur_tarihi ? trT(db.kur_tarihi) : '—') + (db.canli ? '' : ' · son alınan kur') + ' · döviz satış',
-            govde: h('div', null, [tabloX('Döviz borçları · TCMB kuru', { satirlar: db.satirlar, bos: 'Kayıt yok.', kolonlar: [{ ad: 'Para birimi', k: 'pb' }, { ad: 'Borç (döviz)', k: 'tutar', sag: true, ciz: function (r) { return tut(r.tutar, r.pb); } },
-              { ad: 'Kur (TCMB satış)', k: 'kur', sag: true, ciz: function (r) { return r.kur == null ? '—' : String(r.kur).replace('.', ','); } }, { ad: 'TL karşılığı', k: 'tl', sag: true, ciz: function (r) { return tl(r.tl); } }, { ad: 'Kur tarihi', k: 'kt', ciz: function () { return db.kur_tarihi ? trT(db.kur_tarihi) : '—'; } }] }),
+            govde: h('div', null, [tabloX('Döviz borçları · TCMB kuru', { satirlar: db.satirlar, bos: 'Kayıt yok.', kolonlar: [{ ad: 'Para birimi', k: 'pb' }, { ad: 'Borç / net alacak (döviz)', k: 'tutar', sag: true, ciz: function (r) { return r.tutar < 0 ? 'Net alacak ' + tut(Math.abs(r.tutar), r.pb) : tut(r.tutar, r.pb); } },
+              { ad: 'Kur (TCMB satış)', k: 'kur', sag: true, ciz: function (r) { return r.kur == null ? '—' : String(r.kur).replace('.', ','); } }, { ad: 'TL karşılığı', k: 'tl', sag: true, ciz: function (r) { return r.tutar < 0 ? 'Net alacak ' + tl(Math.abs(r.tl)) : tl(r.tl); } }, { ad: 'Kur tarihi', k: 'kt', ciz: function () { return db.kur_tarihi ? trT(db.kur_tarihi) : '—'; } }] }),
               db.not ? h('p', { sinif: 'hz-kaynak kucuk soluk', metin: db.not }) : null]) })]));
         } else {
           k.appendChild(h('p', { sinif: 'hz-kaynak kucuk soluk', metin: 'Döviz borçları güncel kur (TCMB): kur verisi yok' + (kt && kt.not ? ' · ' + kt.not : '') }));

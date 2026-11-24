@@ -11,7 +11,8 @@
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'audio/mp4', 'audio/webm', 'audio/aac'];
   var TURLER = ['metin', 'kart', 'dosya', 'ses'];
-  var OLAYLAR = ['mesaj', 'okundu', 'teslim', 'yaziyor', 'arama', 'sohbet', 'tepki', 'duzenle', 'silindi'];
+  var OLAYLAR_SUNUCU = ['mesaj', 'okundu', 'teslim', 'yaziyor', 'arama', 'sohbet', 'tepki', 'duzenle', 'silindi'];   
+  var OLAYLAR = OLAYLAR_SUNUCU.concat(['baglandi', 'one']);   
   var MID = /^[0-9]{14}-[A-Za-z0-9-]{1,64}$/;   
   var OID = /^[0-9a-fA-F-]{8,40}$/;
   var ISTEMCI_ID = /^[A-Za-z0-9-]{8,64}$/;
@@ -159,7 +160,7 @@
     var blobTasiyici = o.blobTasiyici || varsayilanBlobTasiyici;
     var bekle = o.bekle || function (sn) { return new Promise(function (ok) { setTimeout(ok, sn * 1000); }); };
     var simdi = o.simdi || Date.now;
-    var dinleyici = { mesaj: [], okundu: [], teslim: [], yaziyor: [], arama: [], sohbet: [], tepki: [], duzenle: [], silindi: [] };
+    var dinleyici = { mesaj: [], okundu: [], teslim: [], yaziyor: [], arama: [], sohbet: [], tepki: [], duzenle: [], silindi: [], baglandi: [], one: [] };
     var sonYaziyor = {}, teslimYok = false;   
 
     function cagri(yontem, yol, govde, denendi) {
@@ -191,7 +192,7 @@
       var j; try { j = typeof ham === 'string' ? JSON.parse(ham) : ham; } catch (e) { return; }
       if (!j || j.type !== 'message' || j.from !== 'server' || !j.data) return;   
       var d = j.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e2) { return; } }
-      if (!d || OLAYLAR.indexOf(d.olay) < 0) return;
+      if (!d || OLAYLAR_SUNUCU.indexOf(d.olay) < 0) return;
       if (d.olay === 'mesaj') { var m = mesajCevir(d.mesaj); if (m) yay('mesaj', m); }
       else if (d.olay === 'okundu') yay('okundu', { sohbet: s(d.sohbet), oid: s(d.oid), sonId: s(d.sonId) });
       else if (d.olay === 'teslim') yay('teslim', { sohbet: s(d.sohbet), oid: s(d.oid), sonId: s(d.sonId) });
@@ -208,24 +209,38 @@
       var sn = Math.min(60, Math.pow(2, denemeSay - 1));   
       Promise.resolve(bekle(sn)).then(function () { planli = false; if (istenen && !askida && !ws) ac().then(null, yenidenDene); });
     }
+    var acSozu = null;   
+    function wsOlu(w) { return !!w && typeof w.readyState === 'number' && w.readyState > 1; }   
     function ac() {
+      if (ws && wsOlu(ws)) { var olu = ws; ws = null; try { olu.close(); } catch (e0) {   } }
       if (ws) return Promise.resolve();
-      return cagri('POST', '/negotiate').then(function (v) {
+      if (acSozu) return acSozu;
+      acSozu = cagri('POST', '/negotiate').then(function (v) {
+        acSozu = null;
+        if (askida || !istenen) return;   
         if (!v || typeof v.url !== 'string' || !/^wss:\/\//.test(v.url)) throw hata('gecersiz');
         var w = (o.wsFabrika || varsayilanWs)(v.url, 'json.webpubsub.azure.v1');
         ws = w;
-        w.onopen = function () { denemeSay = 0; };
+        w.onopen = function () { denemeSay = 0; if (ws === w) yay('baglandi', {}); };   
         w.onmessage = function (e) { gelen(e && e.data); };
         w.onerror = function () {   };
         w.onclose = function () { if (ws === w) ws = null; yenidenDene(); };
-      });
+      }, function (e) { acSozu = null; throw e; });
+      return acSozu;
+    }
+    var sonOne = -1e12;
+    function oneGeldi() {   
+      var t = simdi(); if (t - sonOne < 1500) return; sonOne = t;
+      yay('one', {});
     }
     function gorunurlukDegisti(gizli) {
       if (gizli) { askida = true; var w = ws; ws = null; if (w) { try { w.close(); } catch (e) {   } } }
-      else { askida = false; if (istenen && !ws) ac().then(null, yenidenDene); }
+      else { askida = false; if (istenen) ac().then(null, yenidenDene); oneGeldi(); }
     }
+    function onePlan() { if (typeof document !== 'undefined' && document.hidden) return; gorunurlukDegisti(false); }   
     if (!kapali && o.gorunurluk !== false && typeof document !== 'undefined' && document.addEventListener) {
       document.addEventListener('visibilitychange', function () { gorunurlukDegisti(!!document.hidden); });
+      if (typeof window !== 'undefined' && window.addEventListener) { ['pageshow', 'focus', 'online'].forEach(function (ad) { window.addEventListener(ad, onePlan); }); }
     }
 
     function gonderGovde(g) {

@@ -556,6 +556,7 @@
     D.abone.push(i.on('teslim', function (ev) { if (haritaOlay('teslim', ev)) bildir(); }));
     cihazKaydiDene();
     if (!D.vgDinler && typeof document !== 'undefined' && document.addEventListener) { D.vgDinler = true; document.addEventListener('visibilitychange', function () { if (!document.hidden && D.basladi) { cihazKaydiDene(); cevapsizYukle(); } }); }   
+    ['one', 'baglandi'].forEach(function (o) { D.abone.push(i.on(o, function () { D.sunucuToplam = -1; sohbetYukle().then(null, function () {   }); })); });   
     D.abone.push(i.on('sohbet', function () { sohbetYukle().then(null, function () {   }); }));   
     ['duzenle', 'silindi'].forEach(function (o) { D.abone.push(i.on(o, function () { sohbetYukle().then(null, function () {   }); })); });   
     i.baglan().then(null, function () {   });
@@ -1639,6 +1640,28 @@
           if (!yenidenDugme) { yenidenDugme = h('button', { sinif: 'ms-ac', type: 'button', metin: T('Yeniden dene') }); yenidenDugme.addEventListener('click', function () { yenidenDugme.parentNode && yenidenDugme.parentNode.removeChild(yenidenDugme); yenidenDugme = null; yukle(); }); durum.parentNode && durum.parentNode.insertBefore(yenidenDugme, durum.nextSibling); }
         });
       }
+       
+      var yenileSurer = false, yenileTekrar = false;
+      function yenile() {
+        if (s.taslak || !canli || secili !== s) return;
+        if (yenileSurer) { yenileTekrar = true; return; }
+        yenileSurer = true;
+        i.mesajlar(s.id, { adet: 30 }).then(function (l) {
+          yenileSurer = false;
+          if (canli && secili === s) {
+            var degisti = false;
+            l.forEach(function (m) {
+              var ix = -1; mesajlar.forEach(function (x, k) { if (ix < 0 && (x.id === m.id || (m.istemciId && x.istemciId === m.istemciId))) ix = k; });
+              if (ix < 0) { var b = bekleyenEsle(m); if (b) bekleyenKaldir(b); mesajlar.push(m); degisti = true; }
+              else if (!mesajlar[ix].yerel && JSON.stringify(mesajlar[ix]) !== JSON.stringify(m)) { mesajlar[ix] = m; degisti = true; }   
+            });
+            if (degisti) { mesajlar = sirala(mesajlar); ciz(); sonOkundu(); }
+          }
+          if (yenileTekrar) { yenileTekrar = false; yenile(); }
+        }, function () { yenileSurer = false; yenileTekrar = false;   });
+      }
+      cozucu.push(i.on('one', yenile));
+      cozucu.push(i.on('baglandi', yenile));
        
       cozucu.push(i.on('mesaj', function (m) { if (m.sohbet === s.id) ekle(m); }));
       cozucu.push(i.on('okundu', function (ev) { if (ev.sohbet === s.id) { haritaOlay('okundu', ev); ciz(); } }));   

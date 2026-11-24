@@ -640,7 +640,7 @@
   function odaSonuc(r) {
     if (!r) return { mesaj: 'Toplantıya katılınamadı.' };
     if (r.sonuc === 'bekleme') return { mesaj: 'Toplantı sahibinin onayı bekleniyor.' };
-    if (r.sonuc === 'acilmadi') return { mesaj: 'Toplantı henüz başlamadı. Düzenleyen katılınca girebilirsiniz.' };
+    if (r.sonuc === 'acilmadi') return { mesaj: 'Oda henüz açılmadı; davetlilerden biri katılınca girebilirsiniz.' };
     if (r.sonuc === 'katildi') {
       if (r.acsToken && r.groupId) return { bilgi: { groupId: r.groupId, acsToken: r.acsToken, acsUserId: r.acsUserId, bitis: r.bitis }, kod: r.kod };
       return { mesaj: 'Toplantıya kabul edildiniz. Ses ve görüntü bağlantısı bu sürümde henüz bağlanmadı.' };

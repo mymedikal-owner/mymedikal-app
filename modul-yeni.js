@@ -148,7 +148,7 @@
       sohbetGovde.textContent = '';
       sohbetGovde.appendChild(h('p', { metin: Tt(metin) }));
       if (yeniden) { var yd = h('button', { type: 'button', sinif: 'dugme ikincil', metin: Tt('Yeniden dene') }); yd.addEventListener('click', function () { kapiAc(true); }); sohbetGovde.appendChild(yd); }
-      sohbetGovde.appendChild(h('a', { sinif: 'dugme', href: asMailHref(''), hidden: !asMailHref(''), metin: Tt('Soruyu mail ile ilet') }));
+      sohbetGovde.appendChild(h('a', { sinif: 'dugme dugme-mail', href: asMailHref(''), hidden: !asMailHref(''), metin: Tt('Soruyu mail ile ilet') }));
     }
     function acikGorunum() {
       sohbetGovde.textContent = '';

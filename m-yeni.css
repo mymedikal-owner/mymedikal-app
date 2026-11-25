@@ -43,6 +43,10 @@
 .sohbet-giris { display: flex; gap: var(--b2); } .sohbet-giris input { flex: 1 1 auto; min-width: 0; width: 100%; min-height: 44px; border: 1px solid var(--cizgi); border-radius: var(--r-t); padding: 0 16px; background: var(--yuzey2); color: var(--yazi); font: inherit; } .sohbet-giris .dugme[disabled] { opacity: .45; cursor: not-allowed; }
 
  
+.asistan-ms .sohbet > a.dugme-mail { display: flex; justify-content: center; align-items: center; text-align: center; text-decoration: none; }
+.ms-ust-cubuk .hya-dugme { white-space: nowrap; flex: 0 0 auto; font-size: 13px; padding: 0 10px; min-height: 36px; height: 36px; position: relative; } .ms-ust-cubuk .hya-dugme::after { content: ''; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; } .ms-sohbet-ust .ms-baslik-kutu { min-width: 0; flex: 1 1 auto; }
+
+ 
 .mh-liste { display: grid; gap: var(--b2); margin-top: var(--b3); }
 .mh-satir { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--b2) var(--b3); align-items: start; padding: var(--b3); background: var(--yuzey); border: 1px solid var(--cizgi); border-left: 4px solid var(--isaret, var(--gri)); border-radius: var(--r-m); margin-top: var(--b2); }
 .mh-liste .mh-satir { margin-top: 0; }

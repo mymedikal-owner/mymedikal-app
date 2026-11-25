@@ -782,6 +782,20 @@
   };
   Object.keys(TAM_A4).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_A4[k]; });
   PARCA.push.apply(PARCA, [['Talep no ÖRNEK', 'Request no. SAMPLE'], ['invoices kaydı', 'invoice records'], ['invoice kaydı', 'invoice record'], [' · Satış', ' · Sales'], [' · İletişim', ' · Communication'], [' · İhale', ' · Tender'], [' · Fatura', ' · Invoice']]);
+   
+  var TAM_8028 = {
+    'Alım türü': 'Procurement type', 'Açık ihaleden': 'From open tender', 'Pazarlık usulü': 'Negotiated', 'Doğrudan temin': 'Direct procurement', 'Özel müşteri': 'Private customer', 'DMO (tür bilinmiyor)': 'DMO (type unknown)',
+    'aynı hastanede doğrudan temin siparişi: açık': 'direct procurement order at the same hospital: open',
+    'Süren': 'In progress', 'Tamamlanan': 'Completed', 'Henüz değil': 'Not yet', 'Bilinmiyor': 'Unknown', 'Başlatıldı': 'Started', 'Teslim alındı': 'Received', 'Kalite kontrol': 'Quality check', 'Satışa hazır': 'Ready for sale',
+    'İade durumu': 'Return status', 'İade adımları': 'Return steps', 'Aramaya uyan iade yok': 'No return matches the search', 'süren iade': 'returns in progress', 'iade': 'returns',
+    'Hastane, belge no ara…': 'Search hospital or document no.…', 'Hastane, belge no ara': 'Search hospital or document no.'
+  };
+  Object.keys(TAM_8028).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8028[k]; });
+  REGEX.unshift([/^aynı hastanede doğrudan temin siparişi: teslim edildi · bugün$/, 'direct procurement order at the same hospital: delivered · today'],
+    [/^aynı hastanede doğrudan temin siparişi: teslim edildi · (\d+) gün önce$/, function (m, n) { return 'direct procurement order at the same hospital: delivered · ' + n + (n === '1' ? ' day ago' : ' days ago'); }],
+    [/^aynı hastanede doğrudan temin siparişi: teslim edildi$/, 'direct procurement order at the same hospital: delivered'],
+    [/^(\d+) gündür bu adımda$/, function (m, n) { return n + (n === '1' ? ' day' : ' days') + ' at this step'; }],
+    [/^Alım türü · (\d+) belgede bilinmiyor$/, function (m, n) { return 'Procurement type · unknown for ' + n + (n === '1' ? ' order' : ' orders'); }]);
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

@@ -375,7 +375,7 @@
       function sekCiz() {
         sekUst.textContent = '';
         if (!ekVar || detay != null) return;
-        var sek = h('div', { sinif: 'cip-sira', role: 'tablist', 'aria-label': 'Kalite bölümleri' });
+        var sek = h('div', { sinif: 'cip-sira tq-ana-sekme', role: 'tablist', 'aria-label': 'Kalite bölümleri' });
         [['belge', 'Belgeler', 'takvim'], ['tedarikci', 'Tedarikçiler', 'liste'], ['uyum', 'Uyum takvimi', 'saat']].forEach(function (s) {
           sek.appendChild(h('button', { type: 'button', role: 'tab', sinif: 'cip' + (ana === s[0] ? ' secili' : ''), 'aria-selected': ana === s[0] ? 'true' : 'false',
             onclick: function () { ana = s[0]; urlSekme(ana === 'belge' ? durum.sekme : ana); sekCiz(); ciz(); } }, [G.ikon(s[2], 16), s[1]]));

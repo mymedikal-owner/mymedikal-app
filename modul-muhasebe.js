@@ -214,12 +214,14 @@
   function veriBekleniyor(baslik, metin) { return G.bos({ tur: 'bekle', baslik: baslik || 'Veri bekleniyor', metin: metin }); }
 
   function aramaKutusu(v, git) {
-    var kap = h('div', { sinif: 'ms-arama' }), kutu = h('input', { type: 'search', sinif: 'ms-arama-giris', placeholder: 'Fatura numarası ya da düzeltme konusu ara', 'aria-label': 'Fatura ya da düzeltme ara', autocomplete: 'off', maxlength: '60' });
-    var sonuc = h('div', { sinif: 'ms-arama-sonuc', 'aria-live': 'polite' });
-    kap.appendChild(h('div', { sinif: 'ms-arama-ust' }, [G.ikon('arama', 18), kutu])); kap.appendChild(sonuc);
+    var kap = h('div', { sinif: 'mhs-arama' }), deger = '';
+    var cubuk = G.aracCubugu({ arama: { deger: '', yerTutucu: 'Fatura numarası ya da düzeltme konusu ara', degisti: function (x) { deger = x; ara(); } } });
+    var kutu = cubuk.querySelector('input'); kutu.setAttribute('maxlength', '60'); kutu.setAttribute('autocomplete', 'off');
+    var sonuc = h('div', { sinif: 'mhs-arama-sonuc','aria-live': 'polite' });
+    kap.appendChild(cubuk); kap.appendChild(sonuc);
     var sap = v.e_belge && v.e_belge.sap, gib = v.e_belge && v.e_belge.gib_kontrol, dz = v.duzeltme;
     function ara() {
-      var q = kutu.value.trim().toLowerCase(); sonuc.textContent = '';
+      var q = deger.trim().toLowerCase(); sonuc.textContent = '';
       if (q.length < 3) return;
       var bul = [];
       ((sap && sap.bekleyen) || []).forEach(function (x) { if (String(x.belge).toLowerCase().indexOf(q) >= 0) bul.push(['Aktarım bekliyor', x.belge, turAd(x.tur) + ' · ' + x.sirket + ' · ' + tarihTR(x.fatura_tarihi), 'aktarim']); });
@@ -227,11 +229,10 @@
       ((dz && dz.kayitlar) || []).forEach(function (x) { if (String(x.konu).toLowerCase().indexOf(q) >= 0) bul.push(['Düzeltme ricası', x.konu, x.sahip_rol + ' · açıldı ' + tarihTR(x.acildi), 'duzeltme']); });
       if (!bul.length) { sonuc.appendChild(h('p', { sinif: 'soluk kucuk', metin: 'Sonuç yok. Arama yalnız aktarım bekleyen faturalarda, GİB kontrol kararlarında ve düzeltme ricalarında yapılır; cari adı bu kaynakta tutulmuyor.' })); return; }
       bul.slice(0, 12).forEach(function (b) {
-        sonuc.appendChild(h('button', { type: 'button', sinif: 'ms-arama-satir', onclick: function () { git(b[3]); } }, [h('span', { sinif: 'etiket', metin: b[0] }), h('b', { metin: b[1] }), h('small', { metin: b[2] })]));
+        sonuc.appendChild(h('button', { type: 'button', sinif: 'mhs-arama-satir', onclick: function () { git(b[3]); } }, [h('span', { sinif: 'etiket', metin: b[0] }), h('b', { metin: b[1] }), h('small', { metin: b[2] })]));
       });
       if (bul.length > 12) sonuc.appendChild(h('p', { sinif: 'soluk kucuk', metin: bul.length + ' sonuç, ilk 12 gösteriliyor. Aramayı daraltın.' }));
     }
-    kutu.addEventListener('input', ara);
     return kap;
   }
 
@@ -356,7 +357,11 @@
       if (!yuk) { govde.appendChild(G.iskelet('kart', 4)); return; }
       var v = yuk.veri, dk = MM.yasDk(v.asof), eski = dk == null || dk > ESKI_DK;
       if (v.ornek === true) ust.appendChild(h('div', { sinif: 'bant ornek', role: 'alert', metin: 'ÖRNEK VERİ — gerçek değil' }));
-      if (eski) ust.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Veri eski' }), ' — son dışa aktarım ' + MM.yasMetin(dk) + '. Gösterilen değerler güncel olmayabilir.']));
+      if (eski) {
+        var uzunMetin = 'Veri eski — son dışa aktarım ' + MM.yasMetin(dk) + '. Gösterilen değerler güncel olmayabilir.';
+        var rozet = h('button', { type: 'button', sinif: 'mhs-eski-rozet', title: uzunMetin, 'aria-label': uzunMetin, onclick: function () { G.sheet('Veri durumu', function () { return h('p', { metin: uzunMetin }); }).ac(); } }, [h('i', { 'aria-hidden': 'true' }), 'Eski · ' + MM.yasMetin(dk).replace(' önce', '')]);
+        ust.appendChild(h('div', { sinif: 'mhs-eski' }, [rozet]));
+      }
       ust.appendChild(h('div', { sinif: 'tazelik' }, [h('span', { sinif: 'nokta ' + (eski ? 'sari' : 'yesil'), 'aria-hidden': 'true' }), h('span', { metin: 'Veri: ' + tarihSaat(v.asof) + ' itibarıyla · ' + MM.yasMetin(dk) + ' güncellendi' }), h('span', { sinif: 'kaynak-etiket', metin: yuk.kaynak === 'graph' ? 'OneDrive' : 'yerel kopya' })]));
       var sap = v.e_belge && v.e_belge.sap, gib = v.e_belge && v.e_belge.gib_kontrol, dz = v.duzeltme;
       var bek = sap ? sap.bekleyen.length : null, kontrol = sap ? sap.bekleyen.filter(function (x) { return x.sinif === 'kontrol'; }).length : 0;
@@ -372,7 +377,7 @@
         G.kpi({ baslik: 'Aktarılmayan', deger: bek == null ? '—' : String(bek), birim: bek == null ? 'veri yok' : 'fatura', ikon: 'belge', durum: kontrol ? 'kritik' : (bek == null ? 'yok' : null), alt: bek == null ? 'veri yok' : (kontrol ? kontrol + ' tanesi kontrol gerektirir' : 'tamamı kural gereği bekliyor'), tikla: git('aktarim') }),
         G.kpi({ baslik: 'GİB engeli', deger: gib ? String(gib.gonderilemez) : '—', birim: gib ? 'belge' : 'veri yok', ikon: 'uyari', durum: gib ? (gib.gonderilemez ? 'kritik' : null) : 'yok', alt: gib ? tarihTR(gib.tarih) + ' kontrolü · ' + gib.gonderilebilir + ' gönderilebilir' : 'veri yok', tikla: git('ebelge') }),
         ucuncu]));
-      var sek =h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return (s[0] !== 'kapanis' || v.kapanis) && (s[0] !== 'mutabakat' || v.mutabakat); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: 4 })]);
+      var sek =h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return (s[0] !== 'kapanis' || v.kapanis) && (s[0] !== 'mutabakat' || v.mutabakat); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: window.matchMedia && window.matchMedia('(max-width: 599px)').matches ? 2 : 4 })]);
       govde.appendChild(sek);
       if ((durum.sekme === 'kapanis' && !v.kapanis) || (durum.sekme === 'mutabakat' && !v.mutabakat)) durum.sekme = 'ebelge';
       if (ozetMi) {

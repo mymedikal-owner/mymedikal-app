@@ -170,7 +170,8 @@
     });
   }
   function izgaraSinif(n) {
-    var m = mobil(), c = n <= 1 ? 1 : n === 2 ? (m ? 1 : 2) : n <= 4 ? 2 : n <= 9 ? (m ? 2 : 3) : (m ? 2 : 4);
+    var kp = $('izgara-kap'), dik = !!(kp && kp.clientWidth > 0 && kp.clientHeight > kp.clientWidth * 1.15);   
+    var m = mobil() || dik, c = n <= 1 ? 1 : n === 2 ? (m ? 1 : 2) : n <= 4 ? 2 : n <= 9 ? (m ? 2 : 3) : (m ? 2 : 4);
     var r = Math.ceil(n / c);
     return 'izgara c' + c + (r > 6 ? ' cok' : ' r' + r) + (n === 1 ? ' tek' : '');
   }
@@ -1266,6 +1267,7 @@
       if (yanAcik) yanKapat();
     });
     if (mq && mq.addEventListener) mq.addEventListener('change', duzenle);
+    var yenidenZ = null; window.addEventListener('resize', function () { clearTimeout(yenidenZ); yenidenZ = setTimeout(function () { if ($('sahne') && !$('sahne').hidden) duzenle(); }, 150); });   
     if (mqDar && mqDar.addEventListener) mqDar.addEventListener('change', secimGuncelle);
     window.addEventListener('beforeunload', function () { try { if (sag) sag.ayril(); } catch (e) {   } });
     window.addEventListener('hashchange', function () { if ($('sahne').hidden) ac().catch(function (e) { mesaj(hataMetni(e)); }); });

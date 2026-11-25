@@ -9,7 +9,7 @@
   function uretim(oz) {
     var kk = MM.ozet.kompresKarsilastir(oz.fab); if (!kk) return null;
     var son = kk.l.slice(-14), e = MM.anaKpi.gunEt;
-    var cub = gr.cubuk(son.map(function (x) { var top = x.o + x.t; return { e: e(x.g), d: top, tahmin: x.t > 0 && x.o === 0, renk: 'var(--s1)', ipucu: [sayi(top) + ' kompres', e(x.g) + (x.t ? ' · içinde ' + sayi(x.t) + ' tahmin (ölçüm değil)' : ' · makine ölçümü')] }; }), { ad: 'Son 14 tam gün kompres toplamı' });
+    var cub = gr.cubuk(son.map(function (x) { var top = x.o + x.t; return { e: e(x.g), d: top, tahmin: x.t > 0 && x.o === 0, renk: 'var(--s1)', ipucu: [sayi(top) + ' kompres', e(x.g) + (x.t ? ' · içinde ' + sayi(x.t) + ' tahmin (ölçüm değil)' : ' · makine ölçümü')] }; }), { ad: 'Son 14 tam gün kompres toplamı', yukseklik: window.innerWidth < 600 ? 110 : 200 });
     var kap = h('div', null, [cub, gr.lejant([['makine ölçümü', 'var(--s1)'], ['tahmin içeren gün (ölçüm değil)', 'var(--tahmin)', 'tx']])]);
     return kart('Kompres üretimi — son ' + son.length + ' tam gün', 'Hat toplamı; devam eden gün karşılaştırmaya girmez', kap, ['Makineler', '#makineler'],
       { kolonlar: ['Gün', 'Kompres', 'Not'], satirlar: son.map(function (x) { return [e(x.g), sayi(x.o + x.t), x.t ? 'tahmin payı ' + sayi(x.t) : 'ölçüm']; }) });
@@ -21,7 +21,7 @@
       if (x.d.ds === 'late') sayilar.late++; else if (x.d.grup === 'yolda') sayilar.yolda++; else if (x.d.grup === 'liman') sayilar.liman++; else if (x.d.grup === 'gelen' || x.d.grup === 'teslim') sayilar.gelen++; else sayilar.bekleyen++;
     });
     var et = ['Bu hf'].concat([1, 2, 3, 4, 5, 6, 7].map(function (i) { return '+' + i + ' hf'; }));
-    var kap = h('div', null, [gr.cubuk(hf.map(function (n, i) { return { e: et[i], d: n, ipucu: [n + ' konteyner', i === 0 ? 'önümüzdeki 7 gün içinde varış' : 'varış: ' + i + '–' + (i + 1) + '. hafta (liste verisi, tahmini ETA)'] }; }), { yukseklik: 150, ad: 'Haftalık varış' }),
+    var kap = h('div', null, [gr.cubuk(hf.map(function (n, i) { return { e: et[i], d: n, ipucu: [n + ' konteyner', i === 0 ? 'önümüzdeki 7 gün içinde varış' : 'varış: ' + i + '–' + (i + 1) + '. hafta (liste verisi, tahmini ETA)'] }; }), { yukseklik: window.innerWidth < 600 ? 100 : 150, ad: 'Haftalık varış' }),
       gr.yatay([{ e: 'Yolda', d: sayilar.yolda, renk: 'var(--s1)', tikla: function () { MM.git('?esekme=yolda#eldiven'); } }, { e: 'Limanda / antrepoda', d: sayilar.liman, renk: 'var(--uyari)', tikla: function () { MM.git('?esekme=liman#eldiven'); } },
         { e: 'Serbest süresi dolan', d: sayilar.late, renk: 'var(--kritik)', tikla: function () { MM.git('?esekme=liman#eldiven'); } }, { e: 'Bekleyen / hold', d: sayilar.bekleyen, renk: 'var(--gri)', tikla: function () { MM.git('?esekme=bekleyen#eldiven'); } }, { e: 'İthal / teslim', d: sayilar.gelen, renk: 'var(--iyi)', tikla: function () { MM.git('?esekme=gelen#eldiven'); } }].filter(function (x) { return x.d > 0 || x.e === 'Yolda'; }), { birim: 'konteyner' })]);
     return kart('Eldiven — varışlar ve durum', 'Yoldaki konteynerlerin haftalık varışı; durum dağılımı', kap, ['Eldiven', '#eldiven'], { kolonlar: ['Dilim', 'Konteyner'], satirlar: hf.map(function (n, i) { return [et[i], n]; }) });
@@ -70,14 +70,27 @@
       { ad: 'Durum', k: 'durum', ciz: function (r) { return h('span', { sinif: 'etiket ' + (r.durum === 'güncel' ? '' : 'kismi'), metin: r.durum }); } }, { ad: 'Kaynak', k: 'kaynak' }], satirlar: rows, sira: { k: 'yas', yon: 'asagi' } }), null);
   }
 
+  function tazelikRozeti(oz) {
+    var kay = [['fab', 15], ['eld', 360], ['sip', 2160], ['kal', 4320], ['isg', 4320]], en = null, eski = false;
+    kay.forEach(function (c) {
+      var m = oz[c[0]]; if (!m) return; var dk = MM.yasDk(m.v && m.v.asof), esik = c[0] === 'fab' ? (window.MM_AYAR.eskiDk || 15) : c[1], oran = dk == null ? Infinity : dk / esik;
+      if (oran > 1) eski = true; if (!en || oran > en.oran) en = { oran: oran, asof: m.v && m.v.asof };
+    });
+    if (Object.keys(oz.hata).length) eski = true;
+    var d = h('details', { sinif: 'yn-tazelik' }, [h('summary', null, [gr.tazelik(en ? en.asof : null, eski ? 'eski' : 'taze'), h('span', { sinif: 'kucuk soluk', metin: 'Veri kaynakları' })]), MM.kaynakSatiri(oz)]);
+    return d;
+  }
+
   MM.moduller.yonetim = function (kok) {
     var iptal = false;
     kok.appendChild(gr.sayfaBasi({ baslik: 'Yönetim paneli', alt: 'Operasyonel özet (finans verisi yok)', kirinti: [['Yönetim']] }));
     var govde = h('div', null, [gr.iskelet('kart', 6)]); kok.appendChild(govde);
     MM.ozet.yukle().then(function (oz) {
       if (iptal) return; govde.textContent = '';
-      if (oz.fab && MM.anaKpi.ORNEK(oz.fab.v)) govde.appendChild(h('div', { sinif: 'bant ornek', role: 'alert', metin: 'ÖRNEK VERİ — fabrika rakamları gerçek değil' }));
-      govde.appendChild(MM.dikkatSeridi(oz)); govde.appendChild(MM.kaynakSatiri(oz));
+      if (oz.fab && MM.anaKpi.ORNEK(oz.fab.v)) govde.appendChild(h('div', { sinif: 'bant ornek yn-ornek', role: 'alert', metin: 'ÖRNEK VERİ — fabrika rakamları gerçek değil' }));
+      var dk = MM.dikkatSeridi(oz);
+      Array.prototype.forEach.call(dk.querySelectorAll('.dikkat-kart'), function (a) { var t = (a.textContent || '').replace(/\s+/g, ' ').trim(); a.setAttribute('title', t); a.setAttribute('aria-label', t); });
+      govde.appendChild(tazelikRozeti(oz)); govde.appendChild(dk);
       var kutular = []; ['hatlar', 'dokuma', 'alarm', 'eldiven', 'siparis', 'kalite', 'isg'].forEach(function (a) { var k = MM.anaKpi.yap(a, oz); if (k) kutular.push(k); });
       govde.appendChild(gr.ozetSerit(kutular, { en: 4 }));
       var sekmeler = { ozet: [uretim, eldiven], risk: [siparis, takvim, yaklasan], veri: [veriDurumu] }, secili = 'ozet';

@@ -319,7 +319,7 @@
    
    
   function sekmeler(liste, secili, sec, o) {
-    o = o || {}; var N = liste.length, sn = o.sinif || 'sekme', acik = false, kap = h('div', { sinif: 'sekme-sira', role: 'tablist', 'aria-label': o.ad || 'Görünümler' });
+    o = o || {}; var N = (o.goster > 0 && o.goster < liste.length) ? o.goster : liste.length, sn = o.sinif || 'sekme', acik = false, kap = h('div', { sinif: 'sekme-sira', role: 'tablist', 'aria-label': o.ad || 'Görünümler' });
     function ciz() {
       kap.textContent = '';
       var gor = liste.slice(0, N), ek = liste.slice(N);
@@ -542,9 +542,10 @@
   function tazelik(tarih, durum) {
     var t = tarih instanceof Date ? tarih.getTime() : (tarih ? Date.parse(tarih) : NaN), dk = isNaN(t) ? null : (Date.now() - t) / 60000;
     var eski = durum ? durum === 'eski' : (dk == null || dk > 1440), metin;
-    if (dk == null) metin = T(eski ? 'Eski veri' : 'Güncel');
-    else if (!eski) metin = T('Güncel') + ' · ' + tzSaat.format(new Date(t));
-    else metin = T('Eski veri') + ' · ' + (dk < 60 ? Math.max(1, Math.round(dk)) + ' ' + T('dk') : dk < 1440 ? Math.floor(dk / 60) + ' ' + T('sa') : Math.floor(dk / 1440) + ' ' + T('gün'));
+     
+    if (dk == null) metin = T(eski ? 'Eski' : 'Güncel');
+    else if (!eski || dk < 1440) metin = T(eski ? 'Eski' : 'Güncel') + ' · ' + tzSaat.format(new Date(t));
+    else metin = T('Eski') + ' · ' + Math.floor(dk / 1440) + ' ' + T('gün');
     return h('span', { sinif: 'tazelik-rozet' + (eski ? ' eski' : ''), role: 'status' }, [h('i', { 'aria-hidden': 'true' }), metin]);
   }
 

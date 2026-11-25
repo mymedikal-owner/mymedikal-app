@@ -118,5 +118,11 @@ a.eld-k.kirmizi { border-left: 4px solid var(--kritik); } a.eld-k.sari { border-
 .eld-harita-alan { margin: 0 calc(var(--b4) * -1); } .eld-harita-cerceve { display: block; width: 100%; border: 0; background: #060B14; height: calc(100vh - var(--ust-yukseklik) - var(--alt-yukseklik) - env(safe-area-inset-top) - env(safe-area-inset-bottom)); height: calc(100dvh - var(--ust-yukseklik) - var(--alt-yukseklik) - env(safe-area-inset-top) - env(safe-area-inset-bottom)); min-height: 480px; }
 @media (max-width: 599px) { .eld-harita-alan { margin-bottom: -24px; } }    
 @media (max-width: 599px) { .eld-zaman { grid-template-columns: auto 1fr auto; } .eld-zaman-in { grid-column: 1 / -1; order: 5; } }
+.eld-harita-alan { position: relative; }
+.eld-harita-bant { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; min-width: 0; margin-bottom: 6px; }
+.eld-harita-bant .bant { margin: 0; padding: 4px 10px; font-size: 12px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+.eld-harita-bant .bant.ornek { flex: none; }
+.eld-yukle { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #060B14; color: #9fb0c8; font-size: var(--t-s); pointer-events: none; }
+@media (min-width: 900px) { .eld-harita-alan { margin-bottom: -40px; } }    
  
 .icerik:has(.eld-harita-cerceve)::after { display: none; }

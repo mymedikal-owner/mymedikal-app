@@ -105,3 +105,49 @@ td:not(.sag) .hz-dvz { align-items: flex-start; }
 tr.hz-vurgulu td { color: var(--turuncu); font-weight: 650; }
 .hz-ara { display: grid; gap: 4px; margin: 0 0 var(--b3, 12px); max-width: 420px; font-size: var(--t-s); color: var(--soluk); } .hz-ara input { min-height: 44px; border: 1px solid var(--cizgi); border-radius: var(--r-s); background: var(--yuzey); color: var(--yazi); font: inherit; padding: 0 12px; }
 .hz-indir { color: var(--vurgu); text-decoration: underline; }
+ 
+.inbox-oge .palet-ad b { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+.inbox-oge .palet-ad small { white-space: normal; overflow: visible; text-overflow: clip; }
+.ik-form .dugme { white-space: nowrap; grid-column: 1 / -1; justify-self: start; padding-inline: 14px; }
+ 
+.hz-ilkn > .tablo-kaydir > .daha-fazla { display: none; }
+.hz-ilkn > .ilkn-tumu { display: block; margin: var(--b2, 8px) auto 0; }
+.hz-ilkn > .ilkn-tumu[hidden] { display: none; }
+.hz-acilir-kart { min-width: 0; margin-bottom: var(--b3, 12px); }
+.hz-acilir-kart > summary { display: flex; align-items: center; min-height: 44px; padding: 0 var(--b4, 16px); background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m); font-weight: 600; cursor: pointer; }
+.hz-acilir-kart[open] > summary { margin-bottom: var(--b2, 8px); }
+.hz-acilir-kart > .kart2 > .kart2-ust h3 { display: none; }
+@media (max-width: 599px) { .hz-sekme .sekme-sira { flex-wrap: wrap; overflow-x: visible; } }
+.hz-kredi td[data-et="Kalan anapara"] { min-width: 11ch; white-space: nowrap; text-align: right; }
+.hz-kredi td[data-et="Kalan anapara"] .hz-dvz { align-items: flex-end; white-space: nowrap; }
+@media (max-width: 599px) { .icerik .hz-kredi.hz-kredi table.tablo-siralanir td[data-et="Kalan anapara"] { flex: 0 0 auto; min-width: 0; } .icerik .hz-kredi.hz-kredi td[data-et="Kalan anapara"] > * { white-space: nowrap; } }
+ 
+@media (max-width: 599px) {
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik) { padding: 6px 10px 4px; margin-bottom: 6px; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; row-gap: 0; }
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik) td { padding: 2px 0; min-height: 0; border-bottom: 0; gap: 6px; font-size: var(--t-xs); min-width: 0; align-items: baseline; }
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik) td::before { flex: 0 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik) td:first-child { grid-column: 1 / -1; font-size: var(--t-s); }
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik) td:first-child .hz-bad > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik)::after { grid-column: 1 / -1; padding: 0; line-height: 1.2; }
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik) td:first-child { padding-right: 18px; }
+  .icerik .hz .hz-sekme + div table.tablo-siralanir tr:not(.acik) td:first-child::before { flex: 0 0 auto; overflow: visible; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) td[data-et="Kalan anapara"] { grid-column: 1 / -1; }
+  .icerik .hz .ozet-serit-ana { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+  .icerik .hz .ozet-serit-ana .kpi-ikon { display: none; }
+  .icerik .hz .ozet-serit-ana .kpi-ana { padding: var(--b2) var(--b3); gap: 4px; }
+  .icerik .hz .ozet-serit-ana .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-s); }
+  .icerik .hz .ozet-serit-ana .kpi-sayi { font-size: 26px; }
+  .icerik .hz .ozet-serit { margin-bottom: var(--b2); }
+  .icerik .hz .kpi-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+  .icerik .hz .kpi-izgara .kpi-ikon { display: none; }
+  .icerik .hz .kpi-izgara .kpi-ana { padding: var(--b2) var(--b3); gap: 4px; }
+  .icerik .hz .kpi-izgara .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-s); }
+  .icerik .hz .kpi-izgara .kpi-sayi { font-size: 22px; }
+  .icerik .hz > .bant { padding: 8px 12px; margin-bottom: var(--b2); font-size: 13px; line-height: 1.35; }
+  .icerik .hz > .bant .hz-teyit-not { margin: 2px 0; font-size: 12px; }
+  .icerik .hz > .bant .hz-uyari li { font-size: 12.5px; }
+  .hz-uyari-diger > summary { cursor: pointer; font-weight: 650; min-height: 32px; display: flex; align-items: center; }
+  .icerik .hz .hz-top { gap: var(--b2); } .icerik .hz .hz-top-k { padding: var(--b2) var(--b3); gap: 3px; }
+  .icerik .hz .hz-sekme + div .hz-banka { gap: 2px; padding: var(--b2, 8px) var(--b3, 12px); }
+  .icerik .hz .hz-sekme + div .hz-banka .hz-b-satir { font-size: var(--t-xs); }}

@@ -84,12 +84,14 @@
     var sar = h('div', { sinif: 'dn-sar' });
     kok.appendChild(sar);
     var sb = G.sayfaBasi({ baslik: 'DMO Nakliyat', alt: 'İhale bazında çıktı, teslim ve DMO onayı', kirinti: [['DMO Nakliyat']] }); sb.style.order = 1; sar.appendChild(sb);
-    var sekKap = h('div', { sinif: 'dn-sekme' }); sekKap.style.order = 6; sar.appendChild(sekKap);
-    var bg = G.bolumGecis([['nakliye', 'Genel sevkiyat'], ['dmo-nakliyat', 'DMO Nakliyat']], 'dmo-nakliyat'); if (bg) { bg.style.order = 2; sar.appendChild(bg); }
-    var gc = G.gecis([['dmo', 'DMO', 'geri']]); if (gc) { gc.style.order = 3; sar.appendChild(gc); }
-    var ust = h('div'), govde = h('div', { 'aria-live': 'polite' }), icerik = h('div', { sinif: 'dn-icerik' });
-    ust.style.order = 4; govde.style.order = 5; icerik.style.order = 7;
-    sar.appendChild(ust); sar.appendChild(govde); sar.appendChild(icerik);
+    var sekKap = h('div', { sinif: 'dn-sekme' }); sekKap.style.order = 5; sar.appendChild(sekKap);
+     
+    var modGor = MM.modulListe || [];
+    var bolumler = [['nakliye', 'Genel sevkiyat'], ['dmo-nakliyat', 'DMO Nakliyat'], ['dmo', 'DMO']].filter(function (p) { return p[0] === 'dmo-nakliyat' || modGor.some(function (m) { return m.id === p[0]; }); });
+    if (bolumler.length > 1) { var bg = G.segment(bolumler, 'dmo-nakliyat', function (id) { if (id !== 'dmo-nakliyat') location.hash = '#' + id; }, { ad: T('Bölüm') }); bg.style.order = 2; sar.appendChild(bg); }
+    var ust = h('div'), ozetKap = h('div', { sinif: 'dn-ozet' }), govde = h('div', { 'aria-live': 'polite' }), icerik = h('div', { sinif: 'dn-icerik' });
+    ust.style.order = 3; ozetKap.style.order = 4; govde.style.order = 6; icerik.style.order = 7;
+    sar.appendChild(ust); sar.appendChild(ozetKap); sar.appendChild(govde); sar.appendChild(icerik);
 
      
     function sevkYigin(i) {
@@ -160,13 +162,32 @@
           h('div', { sinif: 'dm-sp-alt kucuk' }, [h('span', {}, ['Çıkış ' + tarihTR(x.cikis_tarihi) + ' · ', h('strong', { metin: say(x.gun) + ' gün' })]), h('span', { metin: x.ihale_ikn ? iknEt('', x.ihale_ikn) : 'İhale bağı yok' }), h('span', { metin: ESLEME_AD[x.eslesme] || '' })])]);
       }, { n: 10, sinif: 'dn-liste' })]);
     }
-    function ihaleKart(i, kg) {
+     
+    function siparisKirilim(i, v) {
+      var sv = v && v.sevk_satirlari, tum = sv && Array.isArray(sv.satirlar) ? sv.satirlar.filter(function (x) { return x.firma === i.firma && x.ikn === i.ikn; }) : [];
+      var kol = [
+        { ad: 'Sipariş no', k: 'siparis_no', ciz: function (r) { return r.siparis_no || '—'; } },
+        { ad: 'Hastane', k: 'hastane', ciz: function (r) { return r.hastane || '—'; } },
+        { ad: 'Ürün', k: 'urun_adi', ciz: function (r) { return r.urun_adi || '—'; } },
+        { ad: 'Adet', k: 'miktar', sag: true, ciz: function (r) { return say(r.miktar); } },
+        { ad: 'Sevk edilen', k: 'sevk_edilen_adet', sag: true, ciz: function (r) { return say(r.sevk_edilen_adet); } },
+        { ad: 'Teslim adet', k: 'teslim_adet', sag: true, ciz: function (r) { return say(r.teslim_adet); } },
+        { ad: 'Durum', k: 'durum', ciz: function (r) { return r.durum || '—'; } },
+        { ad: 'Son teslim', k: 'son_teslim', ciz: function (r) { return tarihTR(r.son_teslim); } }];
+      var ad = 'Sipariş no ' + (i.dosya_no || 'veri yok') + ' · İKN ' + i.ikn;
+      var sh = G.sheet(ad, function (g) {
+        if (!tum.length) return h('p', { sinif: 'dm-yok dm-bekle', metin: 'Veri yok: bu ihalenin sevk satırı kaynakta yok (' + say(i.siparis_sayisi) + ' sipariş kayıtlı).' });
+        return G.veriTablo({ ad: 'Siparişler', filtre: ad, kolonlar: kol, satirlar: tum, sayfa: 10, bos: 'Kayıt yok.' });
+      });
+      return h('button', { type: 'button', sinif: 'mini-dugme dn-siparisler', onclick: function (e) { e.stopPropagation(); sh.ac(); } }, ['Siparişleri gör (' + say(tum.length || i.siparis_sayisi) + ')']);
+    }
+    function ihaleKart(i, kg, vv) {
       var det = h('div', { sinif: 'dn-detay', hidden: true }, [
         h('div', { sinif: 'dm-oge-izgara' }, [
           ['Hastane', say(i.hastane_sayisi)], ['Sipariş', say(i.siparis_sayisi)], ['Gecikmiş sipariş', say(i.gecikmis_siparis)],
-          ['Ortalama çıkıştan teslime', gun(i.ort_cikis_teslim_gun)], ['Son çıkış', tarihTR(i.en_son_cikis)], ['İlk son teslim tarihi', tarihTR(i.son_teslim_ilk)], ['Teslim kanıtı yok', say(i.kanit_yok_miktar) + ' adet']].map(function (r) {
+          ['Ortalama çıkıştan teslime', gun(i.ort_cikis_teslim_gun)], ['Son çıkış', tarihTR(i.en_son_cikis)], ['İlk son teslim tarihi', tarihTR(i.son_teslim_ilk)], ['Teslim kanıtı yok', say(i.kanit_yok_miktar) + ' adet'], ['Çıkan', say(i.cikan_miktar) + ' adet'], ['Teslim oldu', say(i.teslim_miktar) + ' adet'], ['DMO onayladı', say(i.onay_miktar) + ' adet']].map(function (r) {
           return h('div', { sinif: 'dm-oge' + (r[0] === 'Gecikmiş sipariş' && i.gecikmis_siparis > 0 ? ' kritik' : '') }, [h('span', { sinif: 'dm-oge-ad', metin: r[0] }), h('strong', { sinif: 'dm-oge-deger', metin: r[1] })]);
-        }))]);
+        })), vv ? siparisKirilim(i, vv) : null]);
       var d = h('button', { type: 'button', sinif: 'dn-ihale' + (i.firma === 'DAY' ? ' day' : ''), 'aria-expanded': 'false', onclick: function () { var ac = det.hidden; det.hidden = !ac; d.setAttribute('aria-expanded', String(ac)); d.classList.toggle('acik', ac); } }, [
         h('span', { sinif: 'dm-ih-ust' }, [firmaRozet(i.firma), h('strong', { sinif: 'dm-ikn', metin: 'Sipariş no ' + (i.dosya_no || 'veri yok') }), h('span', { sinif: 'dm-ad', metin: iknEt(i.firma, i.ikn, i.dosya_no).replace(/ · Sipariş no [^·]*/, '') }), kalanRozet(i)]),
         sevkYigin(i),
@@ -283,17 +304,18 @@
       return G.kart({ baslik: 'İl haritası', alt: 'sevk durumu · ile dokunun, listeler o ile süzülsün', govde: h('div', null, [kutu, lej, bilg]) });
     }
     function ciz() {
-      ust.textContent = ''; govde.textContent = ''; sekKap.textContent = ''; icerik.textContent = ''; cv = null; coz = null;
+      ust.textContent = ''; ozetKap.textContent = ''; govde.textContent = ''; sekKap.textContent = ''; icerik.textContent = ''; cv = null; coz = null;
       if (hata) { govde.appendChild(G.bos({ tur: hata.kod === 'ayar_bekleniyor' || hata.kod === 'giris_gerekli' ? 'bekle' : 'hata', baslik: 'DMO Nakliyat alınamadı', metin: hata.message, eylem: { ad: 'Yeniden dene', fn: yenile } })); return; }
       if (!yuk) { govde.appendChild(G.iskelet('kart', 4)); return; }
       var v = yuk.veri, dk = MM.yasDk(v.asof), eski = dk == null || dk > ESKI_DK;
       iknHazirla(v);
       var oz = (v.ozet || {})[firma] || null;
-      if (v.ornek === true) ust.appendChild(h('div', { sinif: 'bant ornek kucuk-bant', role: 'alert', metin: 'ÖRNEK VERİ — gerçek değil' }));
       var zt = zamanTR(v.asof);
-      var tz = G.tazelik(v.asof, eski ? 'eski' : 'taze'); if (zt) tz.title = zt; ust.appendChild(tz);    
+      var tz = G.tazelik(v.asof, eski ? 'eski' : 'taze'); tz.title = (v.ornek === true ? 'Örnek veri, gerçek değil. ' : '') + (zt || '');    
+      if (v.ornek === true) { tz.classList.add('ornek'); tz.insertBefore(h('b', { sinif: 'dn-ornek-et', metin: 'ÖRNEK VERİ' }), tz.firstChild); }
        
-      govde.appendChild(G.cipler([['TOPLAM', 'Tümü'], ['MY', 'MY'], ['DAY', 'DAY']], firma, function (d) { firma = d; if (ihaleSec && ihaleSec.split('|')[0] !== firma && firma !== 'TOPLAM') ihaleSec = ''; ciz(); }, 'Şirket'));
+      ust.appendChild(h('div', { sinif: 'dn-durum' }, [tz, G.cipler([['TOPLAM', 'Tümü'], ['MY', 'MY'], ['DAY', 'DAY']], firma, function (d) { firma = d; if (ihaleSec && ihaleSec.split('|')[0] !== firma && firma !== 'TOPLAM') ihaleSec = ''; ciz(); }, 'Şirket')]));
+       
       var ihSecenek = (v.ihaleler || []).filter(function (i) { return firma === 'TOPLAM' || i.firma === firma; });
       var hzF = sevkHazir(v);
       var panel = filtrePanel(v, ihSecenek, hzF);
@@ -312,12 +334,21 @@
       if (!oz) { govde.appendChild(G.bos({ baslik: 'Kayıt yok', metin: 'Bu seçimde nakliyat kaydı yok.' })); return; }
 
        
-      govde.appendChild(h('div', { sinif: 'dn-hk-sira' }, [
+      ozetKap.appendChild(h('div', { sinif: 'dn-hk-sira' }, [
         halka('Çıktı', oz.cikti_yuzde, 'mavi', say(oz.cikan_miktar) + ' adet çıktı'),
         halka('Teslim oldu', oz.teslim_yuzde, 'yesil', say(oz.teslim_miktar) + ' adet'),
         halka('DMO onayladı', oz.onay_yuzde, 'lacivert', say(oz.onay_miktar) + ' adet')]));
-      govde.appendChild(h('p', { sinif: 'dn-sip kucuk soluk', metin: say(oz.siparis_miktar) + ' adet sipariş · ' + say(oz.siparis_sayisi) + ' sipariş · ' + say(oz.ihale_sayisi) + ' ihale · ' + say(oz.gecikmis_siparis) + ' gecikmiş' }));
-      govde.appendChild(h('div', { sinif: 'dn-gri' }, [h('span', { sinif: 'dn-gri-ad', metin: 'Teslim kanıtı yok' }), h('strong', { sinif: 'dn-gri-say', metin: say(oz.kanit_yok_miktar) }), h('span', { sinif: 'dn-gri-alt', metin: 'adet · belgeli ' + say(oz.belgeli_miktar) + ' adet' })]));
+       
+      ozetKap.appendChild(h('div', { sinif: 'dn-oz3' }, [['Çıktı', oz.cikti_yuzde, oz.cikan_miktar], ['Teslim oldu', oz.teslim_yuzde, oz.teslim_miktar], ['DMO onayladı', oz.onay_yuzde, oz.onay_miktar]].map(function (r) {
+        return h('div', { sinif: 'dn-oz3-k' }, [h('strong', { metin: yz(r[1]) }), h('span', { sinif: 'dn-oz3-ad', metin: r[0] }), h('span', { sinif: 'dn-oz3-adet', metin: say(r[2]) + ' adet' })]);
+      })));
+      ozetKap.appendChild(h('p', { sinif: 'dn-sip kucuk soluk', metin: say(oz.siparis_miktar) + ' adet sipariş · ' + say(oz.siparis_sayisi) + ' sipariş · ' + say(oz.ihale_sayisi) + ' ihale · ' + say(oz.gecikmis_siparis) + ' gecikmiş' }));
+       
+      var kanitSh = G.sheet('Teslim kanıtı', function (g) {
+        g.appendChild(h('div', { sinif: 'dm-oge-izgara' }, [['Teslim kanıtı yok', say(oz.kanit_yok_miktar) + ' adet'], ['Belgeli', say(oz.belgeli_miktar) + ' adet']].map(function (r) {
+          return h('div', { sinif: 'dm-oge' }, [h('span', { sinif: 'dm-oge-ad', metin: r[0] }), h('strong', { sinif: 'dm-oge-deger', metin: r[1] })]);
+        })));      });
+      ozetKap.appendChild(h('button', { type: 'button', sinif: 'dn-gri', 'aria-label': 'Teslim kanıtı yok, ayrıntı', onclick: function () { kanitSh.ac(); } }, [h('span', { sinif: 'dn-gri-ad', metin: 'Teslim kanıtı yok' }), h('strong', { sinif: 'dn-gri-say', metin: say(oz.kanit_yok_miktar) }), h('span', { sinif: 'dn-gri-alt', metin: 'adet · belgeli ' + say(oz.belgeli_miktar) + ' adet' }), h('span', { sinif: 'dn-gri-ok', 'aria-hidden': 'true', metin: '›' })]));
 
        
       cv = v; coz = oz;
@@ -379,14 +410,27 @@
       var govde = h('div');
        
       var ihaleler = (v.ihaleler || []).filter(function (i) { return firmaEsles(i); });
-      govde.appendChild(h('h3', { sinif: 'bolum', metin: 'İhale bazında (' + ihaleler.length + ')' }));
-      var sirali = ihaleler.slice().sort(function (a, b) {
-        if (sira === 'gecikme') return (b.gecikmis_siparis || 0) - (a.gecikmis_siparis || 0);
-        if (sira === 'kalan') return ordKey(a.kalan_gun, true) - ordKey(b.kalan_gun, true);   
-        var k = sira === 'cikti' ? 'cikti_yuzde' : 'onay_yuzde';
-        return ordKey(a[k], true) - ordKey(b[k], true);   
-      });
-      govde.appendChild(sirali.length ? G.ilkN(sirali, function (i) { return ihaleKart(i, v.kargo); }, { n: 5, sinif: 'dn-liste' }) : G.bos({ baslik: 'İhale yok' }));
+      var ihBas = h('div', { sinif: 'dn-ihale-bas' }, [h('h3', { sinif: 'bolum', metin: 'İhale bazında (' + ihaleler.length + ')' })]);
+      var ihKol = [
+        { ad: 'Firma', k: 'firma' }, { ad: 'İKN', k: 'ikn' }, { ad: 'Sipariş no (dosya)', k: 'dosya_no', ciz: function (i) { return i.dosya_no == null ? '' : i.dosya_no; } },
+        { ad: 'Hastane', k: 'hastane_sayisi' }, { ad: 'Sipariş', k: 'siparis_sayisi' }, { ad: 'Sipariş adedi', k: 'siparis_miktar' },
+        { ad: 'Çıkan adet', k: 'cikan_miktar' }, { ad: 'Teslim adet', k: 'teslim_miktar' }, { ad: 'DMO onay adet', k: 'onay_miktar' },
+        { ad: 'Çıktı %', k: 'cikti_yuzde' }, { ad: 'Teslim %', k: 'teslim_yuzde' }, { ad: 'Onay %', k: 'onay_yuzde' },
+        { ad: 'Gecikmiş sipariş', k: 'gecikmis_siparis' }, { ad: 'Kalan gün', k: 'kalan_gun' }];
+      var ihEx = ihaleler.length && G.excelDugme ? G.excelDugme(function () { return { ad: 'DMO Nakliyat ihale bazında', filtre: 'Firma: ' + (firma === 'TOPLAM' ? 'tümü' : firma) + (ihaleSec ? ' · İhale: ' + ihaleSec.split('|')[1] : ''), kolonlar: ihKol, satirlar: sirali2() }; }) : null;
+      if (ihEx) ihBas.appendChild(ihEx);
+      govde.appendChild(ihBas);
+      function sirali2() { return sirala(ihaleler); }
+      function sirala(l) {
+        return l.slice().sort(function (a, b) {
+          if (sira === 'gecikme') return (b.gecikmis_siparis || 0) - (a.gecikmis_siparis || 0);
+          if (sira === 'kalan') return ordKey(a.kalan_gun, true) - ordKey(b.kalan_gun, true);   
+          var k = sira === 'cikti' ? 'cikti_yuzde' : 'onay_yuzde';
+          return ordKey(a[k], true) - ordKey(b[k], true);   
+        });
+      }
+      var sirali = sirala(ihaleler);
+      govde.appendChild(sirali.length ? G.ilkN(sirali, function (i) { return ihaleKart(i, v.kargo, v); }, { n: 3, sinif: 'dn-liste' }) : G.bos({ baslik: 'İhale yok' }));
       return govde;
     }
     function secUzun(v) {

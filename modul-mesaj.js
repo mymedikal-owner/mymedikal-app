@@ -772,7 +772,7 @@
     var kap = h('div', { sinif: 'ms-kok' });
      
     var sol = h('div', { sinif: 'ms-kok ms-sol-bolme ms-ekran-liste' }), solKurulu = false;
-    var mqGenis = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : null;
+    var mqGenis = window.matchMedia ? window.matchMedia('(min-width: 600px) and (min-height: 500px)') : null;
     function genis() { return !!(mqGenis && mqGenis.matches); }
     kok.appendChild(h('div', { sinif: 'ms-bolme' }, [kap, sol]));   
     if (!i || !i.acik()) {
@@ -865,14 +865,16 @@
         var m = null; (l || []).forEach(function (x) { if (x && x.id && (!m || epoch(x.ts) > epoch(m.ts))) m = x; });
         return m ? m.id : '';
       });
-      bul.then(function (id) { if (id && id > (D.okGonder[s.id] || '')) return i.okundu(s.id, id).then(function () { if (id > (D.okGonder[s.id] || '')) D.okGonder[s.id] = id; }); }).then(function () { cevapsizYukle(); return sohbetYukle(); }).then(null, function () {   });
+      bul.then(function (id) {
+        if (id && id > (D.okGonder[s.id] || '')) return i.okundu(s.id, id).then(function () { if (id > (D.okGonder[s.id] || '')) D.okGonder[s.id] = id; }, function (e) { if (canli && !(e && e.kod === 'yok')) yaz(hataYaz(e));   });
+      }).then(function () { cevapsizYukle(); return sohbetYukle(); }).then(null, function () {   });
     }
     function eylemMenusu(s) {   
       var kok2 = h('div', { sinif: 'ms-sheet-kok' }), t = s.tercih || {};
       function kapat() { if (kok2.parentNode) kok2.parentNode.removeChild(kok2); }
       var kutu = h('div', { sinif: 'ms-sheet', role: 'dialog' });
       function oge(ad, fn) { var b = h('button', { sinif: 'ms-sheet-oge', type: 'button', metin: T(ad) }); b.addEventListener('click', function () { kapat(); fn(); }); kutu.appendChild(b); }
-      oge('Okundu say', function () { okunduSay(s); });
+      oge('Okundu olarak işaretle', function () { okunduSay(s); });
       if (s.tercih) {
         oge(t.favori ? 'Favoriden çıkar' : 'Favoriye ekle', function () { tercihYaz(s, 'favori', !t.favori); });
         oge(t.sessiz ? 'Sesi aç' : 'Bildirimleri sessize al', function () { sessizSayfasi(s, i, kap, yaz); });

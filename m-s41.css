@@ -55,3 +55,30 @@
 .s41-dikkat.orta { background: var(--sari-zemin); color: var(--turuncu); }
 .s41-dikkat.dusuk { background: var(--yuzey2); color: var(--yazi2); }
 .s41-mini { display: block; width: 100%; max-width: 100%; }
+ 
+.stk-ozet .ozet-serit-ana, .stk-ozet .ozet-serit-ek { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+@media (min-width: 700px) { .stk-ozet .ozet-serit-ana { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.stk-ozet .s41-sayi { padding: 6px var(--b3); gap: 0; }
+.stk-ozet .s41-sayi b { font-size: var(--t-md, 1.1rem); }
+.s41-satir.stk { grid-template-columns: minmax(0, 1fr) auto; gap: 0 var(--b2); padding: 6px 0; align-items: baseline; }
+.stk .stk-gizli { display: none; }
+.s41-satir.stk-kritik { border-left: 3px solid var(--kirmizi); padding-left: var(--b2); }
+.stk .stk-mik .s41-miktar { flex-wrap: nowrap; white-space: nowrap; }
+.skk-ozet .ozet-serit-ana { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+@media (min-width: 700px) { .skk-ozet .ozet-serit-ana { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.skk-ozet .ml-kpi { padding: 6px var(--b3); gap: 0; }
+.skk-ozet .ml-kpi-deger { font-size: var(--t-md, 1.1rem); }
+.stk-sek { margin: 0 0 var(--b2); }
+.stk-sek .cip-sayi { margin-left: 6px; }
+.stk .stk-kod { grid-column: 1; grid-row: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stk .stk-mik { grid-column: 2; grid-row: 2; justify-self: end; }
+.stk .ad { grid-column: 1; grid-row: 1; font-size: var(--t-s); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stk .sag { grid-column: 2; grid-row: 1; text-align: right; font-size: var(--t-xs); min-width: 0; white-space: nowrap; }
+.stk > .alt:not(.stk-kod):not(.stk-mik) { grid-column: 1 / -1; grid-row: auto; }
+.stk-ozet .s41-sayi small.stk-not { display: block; margin-top: 2px; font-size: var(--t-xs); color: var(--soluk); line-height: 1.25; }
+@media (max-width: 599px) {
+  .stk .ad { grid-column: 1 / -1; }
+  .stk .sag { grid-column: 1; grid-row: 2; text-align: left; }
+  .stk .stk-kod { grid-column: 1 / -1; grid-row: 3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; }
+  .stk .stk-mik .s41-miktar span:nth-child(n+2) { display: none; }
+}

@@ -1,16 +1,18 @@
  
-.kpi-izgara.ih-kpi { grid-template-columns: 1fr 1fr; gap: var(--b2); }
-.ih-kpi .kpi-ana { padding: var(--b3); }
-.ih-kpi .kpi-baslik { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
+.ih-ozet .ozet-serit-ana { grid-template-columns: 1fr 1fr; gap: var(--b2); }
+.ih-ozet .kpi-ana { padding: var(--b2) var(--b3); }
+@media (min-width: 900px) { .ih-ozet .ozet-serit-ana { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 599px) { .ih-arac .arac-arama { padding: 0 10px; font-size: var(--t-s); } .ih-ozet .kpi-ana { gap: 4px; } }
+.ih-ozet .kpi-baslik { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
 .ih-rozetler { margin: var(--b2) 0; }
 .ih-bilgi { display: inline-block; font-size: var(--t-xs); padding: 3px 10px; border-radius: var(--r-s); background: var(--yesil-zemin); color: var(--yesil); font-weight: 600; }
 .ih-bilgi.kirmizi { background: var(--kirmizi-zemin); color: var(--kirmizi); }
 .ih-filtre { margin-bottom: var(--b3); }
-.ih-liste { display: grid; gap: var(--b3); }
+.ih-liste { display: grid; gap: var(--b2); }
 .ih-kart { background: var(--yuzey); border: 1px solid var(--cizgi); border-left: 4px solid var(--vurgu); border-radius: var(--r-m); overflow: hidden; }
 .ih-kart.dis { border-left-color: var(--tahmin); }
 .ih-kart.acik { border-color: var(--vurgu); }
-.ih-kart-ust { display: flex; flex-direction: column; gap: var(--b2); width: 100%; text-align: left; font: inherit; color: var(--yazi); background: transparent; border: 0; padding: var(--b3) var(--b4); cursor: pointer; min-height: 44px; }
+.ih-kart-ust { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; font: inherit; color: var(--yazi); background: transparent; border: 0; padding: var(--b2) var(--b3); cursor: pointer; min-height: 44px; }
 .ih-kurum { font-weight: 600; overflow-wrap: anywhere; }
 .ih-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b1) var(--b3); font-size: var(--t-s); color: var(--yazi2); }
 .ih-ikn { font-variant-numeric: tabular-nums; }

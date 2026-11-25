@@ -895,7 +895,7 @@
       cerceve.contentWindow.postMessage({ tip: 'eldiven-board', board: yuk.r.veri }, hedef());
     }
     function hataGoster(e) {
-      alan.textContent = ''; cerceve = null; hazir = false;
+      yukleKapat(); alan.textContent = ''; cerceve = null; hazir = false;
       var gri = e && (e.kod === 'ayar_bekleniyor' || e.kod === 'giris_gerekli');
       alan.appendChild(G.bos({ baslik: gri ? 'Giriş gerekli' : 'Harita verisine ulaşılamadı', metin: (e && e.message) || 'Eldiven veri dosyası okunamadı', tur: gri ? 'bekle' : 'hata',
         eylem: gri ? null : { ad: 'Yeniden dene', fn: function () { yenile(true); } } }));
@@ -904,13 +904,23 @@
       bant.textContent = '';
       var dk = MM.yasDk(v.asof), eski = dk == null || dk > ESKI_DK;
       if (v.ornek === true) bant.appendChild(h('div', { sinif: 'bant ornek kucuk-bant', role: 'alert', metin: 'ÖRNEK VERİ — gerçek değil' }));
-      if (eski) bant.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Veri eski' }), ' — harita günde 3 kez güncellenir; son güncelleme ' + MM.yasMetin(dk) + '.']));
+      if (eski) bant.appendChild(h('div', { sinif: 'bant sari', role: 'status', title: 'Harita günde 3 kez güncellenir; son güncelleme ' + MM.yasMetin(dk) + '.' }, [h('strong', { metin: 'Veri eski' }), ' · ' + MM.yasMetin(dk)]));
+    }
+    var yukKutu = null, yukTm = null;   
+    function yukleKapat() { clearTimeout(yukTm); if (yukKutu && yukKutu.parentNode) yukKutu.parentNode.removeChild(yukKutu); yukKutu = null; }
+    function yukleGoster() {
+      yukleKapat();
+      yukKutu = h('div', { sinif: 'eld-yukle', role: 'status', metin: 'Harita yükleniyor…' });
+      alan.appendChild(yukKutu);
+      yukTm = setTimeout(function () { if (canli && !hazir) hataGoster({ message: 'Harita zamanında açılamadı. Bağlantınızı kontrol edip yeniden deneyin.' }); }, 20000);
     }
     function cercevePrepare() {   
       alan.textContent = ''; hazir = false;
       cerceve = h('iframe', { sinif: 'eld-harita-cerceve', title: 'Eldiven haritası', allow: 'fullscreen', loading: 'eager' });
       cerceve.src = 'eldiven-harita/harita.html' + (yuk.finans ? '?r=y' : '?r=p') + '&dil=' + (MM.dil && MM.dil() === 'en' ? 'en' : 'tr');   
+      cerceve.addEventListener('load', yukleKapat);
       alan.appendChild(cerceve);
+      yukleGoster();
       boyutla();
     }
     
@@ -931,7 +941,7 @@
     window.addEventListener('resize', boyutla); window.addEventListener('orientationchange', boyutla);
     function mesaj(e) {
       if (!cerceve || e.source !== cerceve.contentWindow) return;
-      if (e.data && e.data.tip === 'eldiven-hazir') { hazir = true; boyutla(); gonder(); }
+      if (e.data && e.data.tip === 'eldiven-hazir') { hazir = true; yukleKapat(); boyutla(); gonder(); }
     }
     window.addEventListener('message', mesaj);
     async function yenile(zorla) {
@@ -948,6 +958,6 @@
     tm = setInterval(yenile, 5 * 60000);
     function onGorun() { if (!document.hidden) yenile(); }
     document.addEventListener('visibilitychange', onGorun);
-    return function temizle() { canli = false; clearInterval(tm); window.removeEventListener('message', mesaj); window.removeEventListener('resize', boyutla); window.removeEventListener('orientationchange', boyutla); document.removeEventListener('visibilitychange', onGorun); };
+    return function temizle() { canli = false; clearInterval(tm); clearTimeout(yukTm); window.removeEventListener('message', mesaj); window.removeEventListener('resize', boyutla); window.removeEventListener('orientationchange', boyutla); document.removeEventListener('visibilitychange', onGorun); };
   };
 })();

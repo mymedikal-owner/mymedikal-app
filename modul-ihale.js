@@ -34,7 +34,7 @@
     var yuk = null, hata = null, canli = true;
     var bantDmo = null, maliyet = null;
     var SAHA = !!(window.MMVeri && window.MMVeri.sahaKip && window.MMVeri.sahaKip());   
-    var durum = { sekme: 'dmo', ilgiliYalniz: true, grup: 'hepsi', acik: null, fiyat: {} };
+    var durum = { sekme: 'dmo', ilgiliYalniz: true, grup: 'hepsi', q: '', fiyat: {} };
     var secili = {};   
 
     kok.appendChild(G.sayfaBasi({ baslik: 'İhaleler', alt: 'Açık ihaleler ve bizimle ilgili kalemler', kirinti: [['İhaleler']] }));
@@ -139,7 +139,7 @@
       return p;
     }
 
-    function kalemListesi(ih) {
+    function kalemListesi(ih, yeniden) {
       var s = secimAl(ih), liste = (ih.kalemler || []).filter(function (k) { return !durum.ilgiliYalniz || ilgili(k); });
       var kap = h('div', { sinif: 'ih-kalemler' });
       if (!liste.length) { kap.appendChild(h('p', { sinif: 'ih-yok', metin: ih.kalem_sayisi ? 'Bizimle ilgili kalem yok.' : 'Kalem bilgisi yok.' })); return kap; }
@@ -148,7 +148,7 @@
         var satir = h('label', { sinif: 'ih-kalem' + (ilgili(k) ? '' : ' ilgisiz') });
         var kutu = h('input', { type: 'checkbox', 'aria-label': 'Kalem ' + k.no + ' seç', hidden: SAHA });
         kutu.checked = !!s[k.no];
-        kutu.addEventListener('change', function () { if (kutu.checked) s[k.no] = true; else delete s[k.no]; if (mail) mail.setAttribute('href', mailHref(ih)); if (durum.fiyat[ih.id]) cizFiyat(); });
+        kutu.addEventListener('change', function () { if (kutu.checked) s[k.no] = true; else delete s[k.no]; if (mail) mail.setAttribute('href', mailHref(ih)); if (durum.fiyat[ih.id]) yeniden(); });
         var miktar = k.miktar != null && isFinite(k.miktar) ? sayiYaz(k.miktar) + (k.birim ? ' ' + String(k.birim).toLowerCase() : '') : 'miktar yok';
         satir.appendChild(kutu);
         satir.appendChild(h('span', { sinif: 'ih-kalem-metin' }, [h('span', { sinif: 'ih-kalem-no', metin: String(k.no) }), h('span', { sinif: 'ih-kalem-tanim', metin: k.tanim || '—' }), h('span', { sinif: 'ih-kalem-miktar', metin: miktar })]));
@@ -157,7 +157,7 @@
       });
       var eylem = h('div', { sinif: 'ih-eylem' });
       var fiyatVar = !SAHA && (ih.bolum !== 'dmo' || dmoFiyatGor());
-      if (fiyatVar) eylem.appendChild(h('button', { type: 'button', sinif: 'dugme ih-fiyat-dugme', 'aria-expanded': durum.fiyat[ih.id] ? 'true' : 'false', onclick: function () { durum.fiyat[ih.id] = !durum.fiyat[ih.id]; ciz(); } }, ['Fiyat önerisi']));
+      if (fiyatVar) eylem.appendChild(h('button', { type: 'button', sinif: 'dugme ih-fiyat-dugme', 'aria-expanded': durum.fiyat[ih.id] ? 'true' : 'false', onclick: function () { durum.fiyat[ih.id] = !durum.fiyat[ih.id]; yeniden(); } }, ['Fiyat önerisi']));
       if (!SAHA) {
         mail = h('a', { sinif: 'dugme ih-mail-dugme', href: mailHref(ih), hidden: !mailHref(ih), metin: 'Mail at' });
         eylem.appendChild(mail);
@@ -167,19 +167,22 @@
       if (fiyatVar && durum.fiyat[ih.id]) { var fp = fiyatPaneli(ih); fp.setAttribute('data-fiyat', '1'); kap.appendChild(fp); }
       return kap;
     }
-    var cizFiyat = function () { ciz(); };
+    function detayAc(ih) {
+      G.sheet(kisalt(ih.kurum || ih.id, 60), function (g) {
+        function kur() { g.textContent = ''; g.appendChild(kalemListesi(ih, kur)); }
+        kur();
+      }).ac();
+    }
 
     function kart(ih) {
-      var acik = durum.acik === ih.id, kg = kalanGun(ih.son_tarih), tr = tarihTR(ih.son_tarih);
+      var kg = kalanGun(ih.son_tarih), tr = tarihTR(ih.son_tarih);
       var sonMetin = tr ? tr + (kg == null ? '' : kg < 0 ? ' · süresi geçti' : kg === 0 ? ' · bugün' : ' · ' + kg + ' gün kaldı') : 'son tarih bilinmiyor';
       var acil = kg != null && kg >= 0 && kg <= 7;
-      var ust2 = h('button', { type: 'button', sinif: 'ih-kart-ust', 'aria-expanded': acil || acik ? String(acik) : 'false', onclick: function () { durum.acik = acik ? null : ih.id; ciz(); } }, [
+      var ust2 = h('button', { type: 'button', sinif: 'ih-kart-ust', 'aria-haspopup': 'dialog', onclick: function () { detayAc(ih); } }, [
         h('span', { sinif: 'ih-kurum', metin: ih.kurum || ih.id }),
         h('span', { sinif: 'ih-meta' }, [ih.ikn ? h('span', { sinif: 'ih-ikn', metin: 'İKN ' + ih.ikn }) : null, h('span', { sinif: 'ih-son' + (acil ? ' acil' : ''), metin: sonMetin })]),
         h('span', { sinif: 'ih-meta' }, [h('span', { sinif: 'etiket', metin: durumMetin(ih.durum_etiket) }), h('span', { sinif: 'ih-say', metin: (ih.ilgili_kalem == null ? 0 : ih.ilgili_kalem) + ' ilgili kalem' + (ih.kalem_sayisi ? ' · ' + ih.kalem_sayisi + ' kalem' : '') })])]);
-      var k = h('article', { sinif: 'ih-kart' + (acik ? ' acik' : '') + (ih.bolum === 'dmo' ? ' dmo' : ' dis') }, [ust2]);
-      if (acik) k.appendChild(kalemListesi(ih));
-      return k;
+      return h('article', { sinif: 'ih-kart' + (ih.bolum === 'dmo' ? ' dmo' : ' dis') }, [ust2]);
     }
 
     function rozet(v) {
@@ -197,32 +200,45 @@
       if (!yuk) { govde.appendChild(G.iskelet('kart', 4)); return; }
       var v = yuk.veri || {}, tum = Array.isArray(v.ihaleler) ? v.ihaleler : [];
       var dkG = MM.yasDk(v.zaman);
-      if (MM.veriTarihi) MM.veriTarihi(ust, v.zaman);
-      if (v.eski === true || dkG == null || dkG > ESKI_DK) ust.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Veri eski' }), ' — son güncelleme ' + MM.yasMetin(dkG) + '. Liste güncel olmayabilir.']));
+      ust.appendChild(G.tazelik(v.zaman, (v.eski === true || dkG == null || dkG > ESKI_DK) ? 'eski' : 'taze'));
       var acikSay = tum.length, ilgSay = 0, yedi = 0, karar = 0;
       tum.forEach(function (x) { ilgSay += x.ilgili_kalem || 0; var g = kalanGun(x.son_tarih); if (g != null && g >= 0 && g <= 7) yedi++; if (x.durum === 'karar-bekleniyor') karar++; });
-      var kz = h('div', { sinif: 'kpi-izgara ih-kpi' });
-      kz.appendChild(G.kpi({ baslik: 'Açık ihale', deger: sayiYaz(acikSay), ikon: 'belge' }));
-      kz.appendChild(G.kpi({ baslik: 'İlgili kalem', deger: sayiYaz(ilgSay), ikon: 'stok' }));
-      kz.appendChild(G.kpi({ baslik: '7 gün içinde son tarih', deger: sayiYaz(yedi), ikon: 'saat', durum: yedi ? 'uyari' : null }));
-      kz.appendChild(G.kpi({ baslik: 'Karar bekleyen', deger: sayiYaz(karar), ikon: 'uyari' }));
-      ust.appendChild(kz);
+      var ozetKap = h('div', { sinif: 'ih-ozet' });
+      ust.appendChild(ozetKap);
+      ozetKap.appendChild(G.ozetSerit([
+        { baslik: 'Açık ihale', deger: sayiYaz(acikSay), ikon: 'belge' },
+        { baslik: 'İlgili kalem', deger: sayiYaz(ilgSay), ikon: 'stok' },
+        { baslik: '7 gün içinde son tarih', deger: sayiYaz(yedi), ikon: 'saat', durum: yedi ? 'uyari' : null },
+        { baslik: 'Karar bekleyen', deger: sayiYaz(karar), ikon: 'uyari' }], { en: 4 }));
       var sayDmo = tum.filter(function (x) { return x.bolum === 'dmo'; }).length;
-      ust.appendChild(G.sekmeler([['dmo', 'DMO', h('span', { sinif: 'sekme-sayi', metin: String(sayDmo) })], ['dis', 'DMO dışı', h('span', { sinif: 'sekme-sayi', metin: String(tum.length - sayDmo) })]], durum.sekme, function (id) { durum.sekme = id; durum.acik = null; ciz(); }, { ad: 'İhale türleri' }));
-      ust.appendChild(rozet(v));
-      var flt = h('div', { sinif: 'ih-filtre' });
-      flt.appendChild(G.cipler([['ilgili', 'Yalnız ilgili'], ['tum', 'Tümü']], durum.ilgiliYalniz ? 'ilgili' : 'tum', function (id) { durum.ilgiliYalniz = id === 'ilgili'; ciz(); }, 'İlgi filtresi'));
-      flt.appendChild(G.cipler(GRUPLAR, durum.grup, function (id) { durum.grup = id; ciz(); }, 'Ürün grubu'));
-      ust.appendChild(flt);
-      var liste = tum.filter(function (x) {
-        if ((x.bolum || 'dis') !== durum.sekme) return false;
-        if (durum.ilgiliYalniz && !(x.ilgili_kalem > 0)) return false;
-        if (durum.grup !== 'hepsi' && !(x.kalemler || []).some(function (k) { return k.grup === durum.grup; })) return false;
-        return true;
+      ust.appendChild(G.segment([['dmo', 'DMO', sayDmo], ['dis', 'DMO dışı', tum.length - sayDmo]], durum.sekme, function (id) { durum.sekme = id; ciz(); }, { ad: 'İhale türleri' }));
+      var eskiBolum = (function () { var b = v.bolumler || {}, o = durum.sekme === 'dmo' ? b.dmo : b.dis, dk = o ? MM.yasDk(o.zaman) : null; return !o || o.eski === true || dk == null || dk > ESKI_DK; })();
+      if (eskiBolum) ust.appendChild(rozet(v));
+      var liste2 = h('div');
+      function listeCiz() {
+        liste2.textContent = '';
+        var n = MM.aramaNorm ? MM.aramaNorm(durum.q || '') : String(durum.q || '').toLowerCase();
+        var liste = tum.filter(function (x) {
+          if ((x.bolum || 'dis') !== durum.sekme) return false;
+          if (durum.ilgiliYalniz && !(x.ilgili_kalem > 0)) return false;
+          if (durum.grup !== 'hepsi' && !(x.kalemler || []).some(function (k) { return k.grup === durum.grup; })) return false;
+          if (n) { var ham = [x.kurum, x.ikn, x.id].concat((x.kalemler || []).map(function (k) { return k.tanim; })).join(' '); if ((MM.aramaNorm ? MM.aramaNorm(ham) : ham.toLowerCase()).indexOf(n) < 0) return false; }
+          return true;
+        });
+        liste.sort(function (a, b) { var ga = kalanGun(a.son_tarih), gb = kalanGun(b.son_tarih); if (ga == null) ga = 99999; if (gb == null) gb = 99999; return ga - gb; });
+        if (!liste.length) { liste2.appendChild(G.bos({ baslik: 'İhale yok', metin: durum.ilgiliYalniz || durum.grup !== 'hepsi' || n ? 'Bu filtreyle eşleşen ihale yok.' : 'Şu an açık ihale görünmüyor.' })); return; }
+        liste2.appendChild(G.ilkN(liste, kart, { n: 10, sinif: 'ih-liste' }));
+      }
+      var zm = null;
+      var aracKutu = G.aracCubugu({
+        arama: { deger: durum.q || '', yerTutucu: 'Kurum, İKN veya kalem ara', degisti: function (q) { clearTimeout(zm); zm = setTimeout(function () { durum.q = q; listeCiz(); }, 120); } },
+        cipler: [{ id: 'ilgili', ad: 'Yalnız ilgili', secili: durum.ilgiliYalniz, degisti: function (s) { durum.ilgiliYalniz = s; listeCiz(); } }],
+        filtre: { baslik: 'Filtre', temizle: function () { durum.grup = 'hepsi'; listeCiz(); }, gruplar: [{ ad: 'Ürün grubu', secenekler: GRUPLAR, secili: durum.grup, varsayilan: 'hepsi', sec: function (id) { durum.grup = id; listeCiz(); } }] }
       });
-      liste.sort(function (a, b) { var ga = kalanGun(a.son_tarih), gb = kalanGun(b.son_tarih); if (ga == null) ga = 99999; if (gb == null) gb = 99999; return ga - gb; });
-      if (!liste.length) { govde.appendChild(G.bos({ baslik: 'İhale yok', metin: durum.ilgiliYalniz || durum.grup !== 'hepsi' ? 'Bu filtreyle eşleşen ihale yok.' : 'Şu an açık ihale görünmüyor.' })); return; }
-      govde.appendChild(G.sayfali(liste, kart, { sinif: 'ih-liste' }));
+      if (aracKutu && aracKutu.classList) aracKutu.classList.add('ih-arac');
+      ust.appendChild(aracKutu);
+      govde.appendChild(liste2);
+      listeCiz();
     }
 
     function yenile() {

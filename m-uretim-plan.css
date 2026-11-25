@@ -8,6 +8,48 @@
   #icerik[data-modul="uretim-plan"] .kpi-izgara .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-s); }
   #icerik[data-modul="uretim-plan"] .kpi-izgara .kpi-sayi { font-size: 26px; }
 }
+@media (max-width: 599px) {
+  #icerik[data-modul="uretim-plan"] .ozet-serit-tumu { min-height: 30px; padding-top: 0; padding-bottom: 0; }
+  #icerik[data-modul="uretim-plan"] .ozet-serit { margin-bottom: var(--b2); }
+  #icerik[data-modul="uretim-plan"] .yatay2 .y2-satir { min-height: 20px; padding-top: 0; padding-bottom: 0; gap: var(--b2); }
+  #icerik[data-modul="uretim-plan"] .yatay2 .y2-yol { height: 8px; }
+  #icerik[data-modul="uretim-plan"] .yatay2 { gap: 0; }
+  #icerik[data-modul="uretim-plan"] .up-grafik .kart2-alt { display: none; }
+  #icerik[data-modul="uretim-plan"] .sekme-sira { gap: 4px; overflow-x: hidden; }
+  #icerik[data-modul="uretim-plan"] .sekme-sira .sekme { flex: 1 1 auto; padding: 7px 6px; font-size: 13px; text-align: center; }
+}
+#icerik[data-modul="yonetim"] .iki-kolon > * { margin-top: 0; }
+@media (max-width: 599px) {
+  #icerik[data-modul="yonetim"] .dikkat { padding: var(--b2) var(--b3); margin-bottom: var(--b2); }
+  #icerik[data-modul="yonetim"] .dikkat-ust { min-height: 28px; margin-bottom: 4px; }
+  #icerik[data-modul="yonetim"] .dikkat-sira { gap: 6px; }
+  #icerik[data-modul="yonetim"] .dikkat-kart { min-height: 40px; padding: 6px var(--b3); gap: var(--b2); align-items: center; }
+  #icerik[data-modul="yonetim"] .dk-metin { display: block; min-width: 0; flex: 1 1 auto; }
+  #icerik[data-modul="yonetim"] .dk-metin b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #icerik[data-modul="yonetim"] .dk-metin small { display: none; }
+  #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-taze, #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-ust .etiket { display: none; }
+  #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-ana { gap: 2px; }
+  #icerik[data-modul="yonetim"] .ozet-serit-tumu { min-height: 32px; }
+  #icerik[data-modul="yonetim"] .yn-tazelik { margin-bottom: var(--b2); }
+}
+#icerik[data-modul="yonetim"] .yn-tazelik > summary > .soluk { font-size: var(--t-xs); }
+#icerik[data-modul="yonetim"] .yn-tazelik { margin: 0 0 var(--b2); }
+#icerik[data-modul="yonetim"] .yn-tazelik summary { display: flex; align-items: center; gap: var(--b2); cursor: pointer; min-height: 36px; list-style: none; }
+#icerik[data-modul="yonetim"] .yn-tazelik summary::-webkit-details-marker { display: none; }
+#icerik[data-modul="yonetim"] .yn-tazelik[open] .kaynak-sira { margin-top: var(--b2); }
+@media (max-width: 599px) {
+  #icerik[data-modul="yonetim"] .yn-ornek { padding: 6px 12px; font-size: var(--t-s); }
+  #icerik[data-modul="yonetim"] .ozet-serit-ana { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+  #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-ikon, #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-spark { display: none; }
+  #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-ana { padding: var(--b2) var(--b3); gap: 4px; }
+  #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-s); }
+  #icerik[data-modul="yonetim"] .ozet-serit-ana .kpi-sayi { font-size: 26px; }
+}
+.up-acilir > .up-ozet { display: flex; align-items: center; min-height: 44px; padding: 0 var(--b4); background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m); font-weight: 600; cursor: pointer; }
+.up-acilir[open] > .up-ozet { margin-bottom: var(--b2); }
+@media (max-width: 599px) {
+  #icerik[data-modul="uretim-plan"] .bant.ornek { padding: 6px 12px; font-size: var(--t-s); }
+}
 #icerik .ny-ipucu { margin: var(--b3) 0; }
 .up-liste { display: flex; flex-direction: column; }
 .up-satir { display: flex; justify-content: space-between; align-items: center; gap: var(--b3); padding: 10px 0; border-bottom: 1px solid var(--cizgi, var(--gri-zemin)); width: 100%; text-align: left; background: none; border-left: 0; border-right: 0; border-top: 0; color: inherit; font: inherit; }

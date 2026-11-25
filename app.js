@@ -283,6 +283,9 @@
     });
     var ekstraSecili = MODULLER.some(function (x) { return x.id === (altMenu(m) || m.id) &&!BAR[x.id]; });
     digerDugme.classList.toggle('secili', ekstraSecili);
+     
+    var digerAd = digerDugme.querySelector('.ad'), mAd = altMenu(m) ? (MODULLER.filter(function (x) { return x.id === altMenu(m); })[0] || m) : m;
+    if (digerAd) { var yazi = ekstraSecili ? (mAd.kisa || mAd.ad) : 'Diğer'; digerAd.textContent = window.MM.t ? window.MM.t(yazi) : yazi; if (ekstraSecili) digerDugme.setAttribute('title', mAd.ad); else digerDugme.removeAttribute('title'); }
     sheet.hidden = true;
     if (aktifTemizle) { aktifTemizle(); aktifTemizle = null; }
     icerik.textContent = '';

@@ -27,7 +27,9 @@
 .dikkat-sira { grid-template-columns: 1fr; gap: var(--b2); }
 .dikkat-kart { align-items: center; min-height: 56px; padding: 10px var(--b3); }
 .dk-metin b { font-size: var(--t-s); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.dk-metin small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.dk-metin small { white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.kom-izgara .kom-kutu:last-child:nth-child(3n+1) { grid-column: 1 / -1; }
+@media (min-width: 900px) { .kom-izgara .kom-kutu:last-child:nth-child(3n+1) { grid-column: auto; } .kom-izgara .kom-kutu:last-child:nth-child(4n+3) { grid-column: span 2; } }
 .dk-git { color: var(--soluk2); display: inline-flex; flex: 0 0 auto; }
 .baglanti-dugme { min-height: 44px; padding: 0 var(--b2); background: none; border: 0; color: var(--vurgu); font: inherit; font-size: var(--t-s); font-weight: 600; cursor: pointer; border-radius: var(--r-s); }
 .baglanti-dugme:hover { background: var(--vurgu-zemin); }

@@ -123,7 +123,7 @@
      
     'Canlı': 'Live', '{n} hatta veri gecikmeli': 'Data delayed on {n} line(s)', 'Veri gecikmeli (son: {t})': 'Data delayed (last: {t})', 'Veri gecikmeli': 'Data delayed',
      
-    'Filtre': 'Filter', 'Filtreyi temizle': 'Clear filter', 'Eski veri': 'Old data', 'Görünümler': 'Views', 'Filtreler': 'Filters', 'dk': 'min', 'sa': 'h'
+    'Filtre': 'Filter', 'Filtreyi temizle': 'Clear filter', 'Eski veri': 'Old data', 'Görünümler': 'Views', 'Filtreler': 'Filters', 'dk': 'min', 'sa': 'h', 'Daha az': 'Less'
   };
    
   var TAM41 = {
@@ -134,6 +134,7 @@
     'Bu dönem': 'This period', 'Önceki dönem': 'Previous period', 'Değişim': 'Change', 'Toplam': 'Total', 'Dönem': 'Period', 'Seçili dönem': 'Selected period',
     'Son 3 ay': 'Last 3 months', 'Son 6 ay': 'Last 6 months', 'Son 9 ay': 'Last 9 months', 'Son 12 ay': 'Last 12 months',
     'Aylık net satış': 'Monthly net sales', 'Aylık FAVÖK': 'Monthly EBITDA', 'Marj eğilimi': 'Margin trend', 'Brüt marj ve FAVÖK marjı, % olarak': 'Gross margin and EBITDA margin, in %',
+    'Veri kaynakları': 'Data sources', 'Kod, ad, lot, EAN ara': 'Search code, name, batch, EAN', 'Barkod okut': 'Scan barcode', 'Eylemler ▾': 'Actions ▾', 'Riskli olanlar': 'At-risk only', 'Önümüzdeki 30 gün taksit': 'Instalments, next 30 days', 'Gecikmiş sipariş': 'Overdue orders', 'Dikkat seviyesi': 'Attention level',
     'Bilanço özeti': 'Balance sheet summary', 'Varlıklar': 'Assets', 'Kaynaklar': 'Liabilities and equity', 'Nakit ve benzeri': 'Cash and equivalents', 'Ticari alacaklar': 'Trade receivables', 'Stoklar': 'Inventories',
     'Diğer dönen varlıklar': 'Other current assets', 'Duran varlıklar': 'Non-current assets', 'Kısa vadeli borçlar': 'Short-term liabilities', 'Uzun vadeli borçlar': 'Long-term liabilities', 'Özkaynak': 'Equity',
     'Finansal oranlar': 'Financial ratios', 'Cari oran': 'Current ratio', 'Likidite oranı': 'Liquidity ratio', 'Nakit oranı': 'Cash ratio', 'Alacak tahsil süresi': 'Receivables collection period',
@@ -514,7 +515,7 @@
   }
   [['sipariş', 'order', 'orders'], ['kayıt', 'record', 'records'], ['kalem', 'item', 'items'], ['konteyner', 'container', 'containers'], ['belge', 'document', 'documents'], ['fatura', 'invoice', 'invoices'],
    ['hastane', 'hospital', 'hospitals'], ['ihale', 'tender', 'tenders'], ['taksit', 'instalment', 'instalments'], ['rica', 'request', 'requests'], ['teslimat', 'delivery', 'deliveries'], ['alarm', 'alarm', 'alarms'], ['tezgâh', 'loom', 'looms'], ['hat', 'line', 'lines']].forEach(function (a) { say(a[0], a[1], a[2]); });
-  REGEX.splice.apply(REGEX, [0, 0].concat([[/^(.+) hakkında ayrıntı$/, 'Details: $1'], [/(?:Eğilim|Trend):\s*son\s+(\d+)\s+günde açılan sipariş sayısı \(günlük\)/g, 'Trend: daily number of orders opened in the last $1 days'], [/(?:Eğilim|Trend):\s*son\s+(\d+)\s+gün(?![a-zçğıöşü])/gi, 'Trend: last $1 days'], [/kaynak dosya\s+(.+?)\s+tarihli/g, 'source file dated $1'], [/\(\+(\d+) alarm\w* daha\)/g, '(+$1 more alarms)'], [/(\d+) milyon adet yolda/g, '$1 million units in transit'], [/Etiket yok, [“"]sorun yok[”"] anlamına gelmez/g, 'A missing label does not mean “no problem”'], [/kaynak (\d+) günlük pencere[^\s.;,]*/g, 'source window of $1 days'],
+  REGEX.splice.apply(REGEX, [0, 0].concat([[/^Daha fazla \((\d+)\)$/, 'More ($1)'], [/^(.+) hakkında ayrıntı$/, 'Details: $1'],[/(?:Eğilim|Trend):\s*son\s+(\d+)\s+günde açılan sipariş sayısı \(günlük\)/g, 'Trend: daily number of orders opened in the last $1 days'], [/(?:Eğilim|Trend):\s*son\s+(\d+)\s+gün(?![a-zçğıöşü])/gi, 'Trend: last $1 days'], [/kaynak dosya\s+(.+?)\s+tarihli/g, 'source file dated $1'], [/\(\+(\d+) alarm\w* daha\)/g, '(+$1 more alarms)'], [/(\d+) milyon adet yolda/g, '$1 million units in transit'], [/Etiket yok, [“"]sorun yok[”"] anlamına gelmez/g, 'A missing label does not mean “no problem”'], [/kaynak (\d+) günlük pencere[^\s.;,]*/g, 'source window of $1 days'],
    [/^son (\d+) gün/g, 'last $1 days'], [/(^|[^\d.,])1 (?:delivery|teslimat) müşteri\/hastane sevkiyatı sayılarına dahil değildir; /g, '$11 delivery is not included in customer/hospital shipment counts; '], [/(\d+) (?:delivery|deliveries|teslimat) müşteri\/hastane sevkiyatı sayılarına dahil değildir; /g, '$1 deliveries are not included in customer/hospital shipment counts; '], [/Önümüzdeki (\d+) günde günlük varış sayısı/g, 'Daily arrivals over the next $1 days'], [/Önümüzdeki (\d+) günde/g, 'In the next $1 days'], [/Önümüzdeki (\d+) gün(?![a-zçğıöşü])/g, 'Next $1 days'],
    [/(\d+) gün içinde/g, 'within $1 days'], [/Son (\d+) gün çıkan/g, 'Dispatched in the last $1 days'], [/son (\d+) gün penceresi/g, 'last $1-day window'], [/son (\d+) günde/g, 'in the last $1 days'], [/Trend: son (\d+) gün/g, 'Trend: last $1 days'],
    [/Trend: Son (\d+) tam gün/g, 'Trend: last $1 full days'], [/Analiz \(huni, gecikme, son (\d+) gün\)/g, 'Analysis (funnel, delay, last $1 days)'], [/(\S+) tarihinde açıldı/g, 'opened on $1'], [/kaynak dosya (\d+) gün önceki tarihli/g, 'source file dated $1 days earlier'],
@@ -583,6 +584,65 @@
     'Veri eski': 'Data is old', 'ÖRNEK VERİ — gerçek değil': 'SAMPLE DATA — not real'
   };
   Object.keys(TAM_URETIM).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_URETIM[k]; });
+   
+  var TAM_GECE = {
+     
+    'Kurum, İKN veya kalem ara': 'Search institution, tender no. or item', 'Depodaki lot': 'Lot in warehouse', 'Eşleşen lot yok': 'No matching lot', 'Aramayı değiştirin.': 'Try a different search.',
+     
+    'Siparişleri gör': 'View orders', 'Veri yok: bu ihalenin sevk satırı kaynakta yok': 'No data: this tender has no dispatch lines in the source', 'Ortalama çıkıştan teslime': 'Average dispatch-to-delivery', 'İlk son teslim tarihi': 'First delivery deadline',
+    'DMO onayladı': 'DMO approved', 'İKN': 'Tender no.', 'Çıktı %': 'Dispatched %', 'Çıktı': 'Dispatched', 'tümü': 'all', 'Eşleşmeyen teslim belgeleri': 'Unmatched delivery documents', 'Tüm firmalar': 'All companies',
+    'Firmaya göre kırılım': 'Breakdown by company', 'MY ve DAY ayrı ayrı': 'MY and DAY separately', 'ödenmemiş DMO faturaları': 'unpaid DMO invoices', 'aktif, siparişli, teslimi başlayan': 'active, with orders, delivery started',
+    'zamanında ve tam teslim': 'on-time and complete delivery', 'iptal hakkı doluluğu': 'cancellation allowance used', 'DMO Nakliyat ihale bazında': 'DMO Logistics by tender', 'Teslim kanıtı yok, ayrıntı': 'No delivery evidence, details',
+    'Teslim kanıtı yok, teslim edilmedi demek değildir; yalnız belge kaydı bulunamadı demektir.': 'No delivery evidence does not mean not delivered; it only means no document record was found.', 'Örnek veri, gerçek değil. ': 'Sample data, not real. ',
+    'Teslim edilmedi DEĞİL, kanıt yok': 'NOT undelivered, no evidence',
+     
+    'Hatlar': 'Lines', 'Duruşlar': 'Downtime', 'Teslim oldu': 'Delivered', 'Teslim edilen': 'Delivered', 'Teslim kanıtı': 'Delivery evidence', 'Malzeme türü': 'Material type', 'Canlı pano': 'Live board', 'Makineler görünümü': 'Machines view', 'Çalışan hat': 'Running lines', 'Duran / sorunlu hat': 'Stopped / faulty lines', 'Alarm (24 sa)': 'Alarms (24 h)',
+    'gerçek makine verisi değil': 'not real machine data', 'ÖRNEK VERİ — fabrika rakamları gerçek değil': 'SAMPLE DATA — factory figures are not real', 'Hat adedi (canlı tahmini)': 'Line count (live estimate)',
+     
+    'Bu hastanenin siparişleri': 'Orders of this hospital', 'Bu IKN toplam ciro (son 90 gün)': 'Total turnover of this tender no. (last 90 days)', 'Bu hastanede sipariş kalemi yok': 'No order items for this hospital', 'Sipariş verisi şu an yok': 'No order data at the moment',
+    'Açık sipariş takibi': 'Open order tracking', 'DMO hastaneler': 'DMO hospitals', 'DMO ihaleler': 'DMO tenders', 'DMO siparişler': 'DMO orders', 'Olumsuz muayeneler': 'Failed inspections', 'DMO ceza kesintileri': 'DMO penalty deductions',
+    'Açık siparişi olanlar': 'With open orders', 'Cezalı süre kalan gün': 'Penalty period days left', 'Cezalı süre sonu': 'Penalty period end', 'İşlem son tarihi': 'Action deadline', 'Tüm etiketliler': 'All flagged', 'En yakın son teslim': 'Nearest delivery deadline',
+    'Gönderilecek adet': 'Units to ship', 'Sipariş sayısı': 'Number of orders', 'Ceza ve iptal kotası': 'Penalty and cancellation quota', 'sipariş ayına göre sayı': 'count by order month', 'İl': 'Province',
+    'Riskli, süresi geçmiş ya da teslim edilmemiş etiketli hastane yok.': 'No flagged hospitals that are at risk, overdue or undelivered.',
+     
+    'Borç ve teminat': 'Debt and collateral', 'Taksitler': 'Instalments', 'Alacak / borç': 'Receivables / payables', 'DMO ödemesi': 'DMO payment', 'Finans bölümleri': 'Finance sections', 'Tutar (TL karş.)': 'Amount (TRY equiv.)',
+     
+    'Harita yükleniyor…': 'Loading map…', 'Harita zamanında açılamadı. Bağlantınızı kontrol edip yeniden deneyin.': 'The map did not open in time. Check your connection and try again.',
+     
+    'Mabotex hatları': 'Mabotex lines', 'makinenin bildirdiği oran · adet': 'rate reported by the machine · units', 'önümüzdeki 7 gün içinde varış': 'arriving within the next 7 days',
+     
+    'Taşıyıcı': 'Carrier', 'Firma': 'Company', 'Tarih': 'Date', 'Şirket': 'Company', 'Gecikme (gün)': 'Delay (days)', 'Çıkış tarihi': 'Dispatch date', 'Kargo durumu': 'Cargo status', 'Nakliye teslimat listesi': 'Transport delivery list',
+    'EAN / UBB': 'EAN / UBB', 'Onay %': 'Approval %', 'SKT': 'Expiry date', 'Okundu olarak işaretle': 'Mark as read', 'Özet verisi yok': 'No summary data', 'Sevkiyat bölümü': 'Shipments section', 'Teslim durumu yok': 'No delivery status',
+     
+    'Baskın tür': 'Dominant type', 'Sıra': 'Rank', 'Yaş (gün)': 'Age (days)', 'Hedef aşıldı': 'Target exceeded', 'Hayır': 'No', 'Yönlendirme': 'Routing', 'Öncelik sırası': 'Priority order', 'Şikâyet öncelik sırası': 'Complaint priority order',
+    'Şikâyet dikkat listesi': 'Complaint watch list', 'Açık olay yok': 'No open events', 'Sıralanacak açık şikâyet bulunmuyor.': 'There are no open complaints to rank.',
+    'Açık olaylar; önce bakılacak olan üstte. Sıralama karar değildir, yöntem alttadır': 'Open events; the one to look at first is on top. The ranking is not a decision; the method is below',
+     
+    'Tedarikçi lotu': 'Supplier lot', 'Parti oluşturma tarihi': 'Batch creation date', 'Satınalma talep no': 'Purchase requisition no.', 'Satınalma talepleri': 'Purchase requisitions', 'Talep miktarı': 'Requested quantity', 'Siparişe dönen': 'Converted to order',
+    'Parti sayısı': 'Number of batches', 'ürün toplamı': 'product totals', 'Stok değeri': 'Stock value',
+     
+    'Anlık sonuç': 'Instant result', 'Dikkat skoruna göre sıralı': 'Sorted by attention score', 'Aramayı ya da süzgeci değiştirin.': 'Change the search or the filter.', 'Tüm hastaneler izleme seviyesinde.': 'All hospitals are at watch level.',
+    'Eşleşen hastane yok': 'No matching hospital', 'Hastane ara': 'Search hospitals', 'Kalite bölümleri': 'Quality sections', 'Örnek veri: hastane adları, sipariş numaraları ve tutarlar gerçek değil.': 'Sample data: hospital names, order numbers and amounts are not real.'
+  };
+  Object.keys(TAM_GECE).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_GECE[k]; });
+   
+  REGEX.splice.apply(REGEX, [0, 0].concat([
+    [/^Siparişleri gör \((\d+)\)$/, 'View orders ($1)'], [/^Mabotex hatları \((\d+)\)$/, 'Mabotex lines ($1)'], [/^Tümünü gör \((\d+)\)$/, 'See all ($1)'], [/^İhale bazında \((\d+)\)$/, 'By tender ($1)'],
+    [/^Veri yok: bu ihalenin sevk satırı kaynakta yok \((\S+) sipariş kayıtlı\)\.?$/, 'No data: this tender has no dispatch lines in the source ($1 orders on record).'],
+    [/(^|[^\d.,])1 kesinti satırı/g, '$11 deduction line'], [/(\S+) kesinti satırı/g, '$1 deduction lines'],
+    [/(\S+) hastane satırı \(her satır bir IKN × hastane; aynı hastane birden çok ihalede görünebilir\)/g, '$1 hospital rows (each row is one tender no. × hospital; the same hospital can appear in several tenders)'],
+    [/(\S+) sipariş kalemi \(özet kartları tekil sipariş sayar; bir sipariş birden çok kalem olabilir\)/g, '$1 order items (summary cards count unique orders; one order can have several items)'],
+    [/(\S+) ihale · çubuk: koyu = hastane kabulü, açık = teslim, çizgi = temlik eşiği/g, '$1 tenders · bar: dark = hospital acceptance, light = delivery, line = assignment threshold'],
+    [/(\S+) kayıt · 15 günlük değişim süresi "işlem son tarihi"nden izlenir · ret gerekçesi metni kaynakta yok/g, '$1 records · the 15-day change period is tracked from the "action deadline" · rejection reason text is not in the source'],
+    [/(\S+) sipariş kalemi$/, '$1 order items'], [/^(\d+) sipariş · (\S+) ürün$/, '$1 orders · $2 products'],
+    [/(\S+) talep kalemi · son 180 gün \((.+?) sonrası\) · yalnız görüntüleme/g, '$1 requisition items · last 180 days (after $2) · view only'],
+    [/Toplamda yer almayan: fiyatı kontrol edilecek (\S+) kalem, değeri girilmemiş (\S+) kalem/g, 'Not included in the total: $1 items with price to be checked, $2 items without a value'],
+    [/(\S+) gün geçti/g, '$1 days overdue'], [/(\S+) gün kaldı/g, '$1 days left'], [/ · içinde (\S+) tahmin \(ölçüm değil\)/g, ' · of which $1 estimated (not measured)'], [/ · makine ölçümü/g, ' · machine measurement'],
+    [/^Plan tarihi: bugün \(/, 'Planned date: today ('], [/^Plan tarihi: tümü$/, 'Planned date: all'], [/(^| · )İhale: /g, '$1Tender: '], [/^Şikâyet olayları - /, 'Complaint events - ']
+  ]));
+  [['tümü', 'all'], [' · son teslim ', ' · delivery deadline '], ['Şirket: ', 'Company: '], ['Tür: ', 'Type: '], ['Müşteri: ', 'Customer: '], ['Arama: ', 'Search: '], ['Dönem: ', 'Period: '], ['Ürün grubu: ', 'Product group: '], ['İşaret: ', 'Flag: '], ['varış: ', 'arrival: '],
+   ['Sıradaki varış: ', 'Next arrival: '], ['Durum: ', 'Status: '], ['Hedef tarih = kaynaktaki son teslim tarihi (ayrı bir hedef tarihi alanı yok).', 'Target date = last delivery date in the source (there is no separate target date field).']].forEach(function (p) { PARCA.push(p); });
+  PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {
     if (!EN || m == null) return m;

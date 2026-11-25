@@ -25,6 +25,18 @@
 .tablo-siralanir th, .tablo-siralanir td { text-align: left; } .tablo-siralanir th.sag, .tablo-siralanir td.sag { text-align: right; }
 @media (max-width: 599px) { .cip, .mini-dugme { min-height: 44px; } }
 .y2-satir.tikla { min-height: 44px; }
+@media (max-width: 599px) {
+  #icerik[data-modul="siparis"] .ozet-serit-ana { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ikon { display: none; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ana { padding: var(--b2) var(--b3); gap: 4px; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-s); }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-sayi { font-size: 26px; }
+  #icerik[data-modul="siparis"] .ozet-serit { margin-bottom: var(--b2); }
+}
+.sp-segment > .segment { margin: 0 0 var(--b2); }
+.sp-daha[hidden] { display: none; }
+.sp-eylem { display: inline-flex; align-items: center; gap: var(--b2); flex-wrap: wrap; justify-content: flex-end; }
+.sp-eylem .excel-dugme { font-size: 0; gap: 0; padding: 0 10px; }
 .sp-sayim-satir { display: flex; align-items: center; justify-content: space-between; gap: var(--b2); margin: var(--b2) 0; } .sp-sayim-satir .sp-sayim { margin: 0; }
 .sp-arama-ust { margin: var(--b1, 4px) 0 var(--b2); }
 .sp-kpi { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); } .sp-kpi .kpi-sayi { font-size: var(--t-2xl); } .sp-kpi .kpi-baslik { white-space: normal; }

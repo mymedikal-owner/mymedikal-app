@@ -64,16 +64,21 @@
       var ciftler = aileler.filter(function (a) { return a.kac_gunluk_is != null; }).map(function (a) { return { e: a.etiket || AILE_AD[a.aile] || a.aile, d: a.kac_gunluk_is }; });
       var kutular = [];
       aileler.forEach(function (a) {
+        if (a.kac_gunluk_is == null) return;
         kutular.push({ baslik: a.etiket || AILE_AD[a.aile] || a.aile, deger: ondalik(a.kac_gunluk_is), birim: a.kac_gunluk_is == null ? '' : 'günlük iş', ikon: 'makine',
           alt: 'Açık iş ' + sayiYaz(a.acik_uretim_yuku) + (a.acik_uretim_yuku == null ? '' : ' ' + birimAd(a.birim)) + ' · günlük ort. ' + sayiYaz(a.son10_ort) });
       });
       (hy.toplam_hedefler || []).forEach(function (t) {
+        if (t.hedef == null) return;
         kutular.push({ baslik: (t.ad === 'spanc_toplam' ? 'Spanç toplam hedef' : metin(t.etiket)), deger: t.hedef == null ? '—' : G.say(t.hedef), birim: t.hedef == null ? '' : birimAd(t.birim),
           ikon: 'hedef', etiket: t.hedef != null && t.hedef_durum === 'teyitsiz' ? { metin: 'Kesin değil', tur: 'tahmin' } : null,
           alt: 'Son 10 iş günü toplamı: ' + sayiYaz(t.toplam_son10_ort) });
       });
       kap.appendChild(G.ozetSerit(kutular, { en: 4 }));
-      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Hat ailesi yükü', alt: 'açık işin kaç günlük olduğu', govde: ciftler.length ? G.cubuk(ciftler, { ad: 'Kaç günlük iş' }) : h('p', { sinif: 'ny-ipucu', metin: 'Hesaplanabilen hat ailesi yok.' }) })]));
+      var dar = window.innerWidth < 600;
+      var grafikGovde = !ciftler.length ? h('p', { sinif: 'ny-ipucu', metin: 'Hesaplanabilen hat ailesi yok.' })
+        : (dar ? G.yatay(ciftler.map(function (c) { return { e: c.e, d: c.d, etiketDeger: ondalik(c.d) }; }), {}) : G.cubuk(ciftler, { ad: 'Kaç günlük iş', yukseklik: 200 }));
+      var grafikKart = h('div', { sinif: 'ust-bosluk' }, [G.kart({ sinif: 'up-grafik', baslik: 'Hat ailesi yükü', alt: 'açık işin kaç günlük olduğu', govde: grafikGovde })]);
       kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Hat aileleri', alt: 'son 10 iş günü ortalaması', govde: G.tablo({ sayfa: 10, bos: 'Hat ailesi yok.', satirlar: aileler, kolonlar: [
         { k: 'etiket', ad: 'Hat ailesi', ciz: function (r) { return r.etiket || AILE_AD[r.aile] || r.aile; } },
         { k: 'acik_uretim_yuku', ad: 'Açık iş', sag: true, tur: 'sayi', ciz: function (r) { return r.acik_uretim_yuku == null ? '—' : G.say(r.acik_uretim_yuku) + ' ' + birimAd(r.birim); } },
@@ -81,8 +86,9 @@
         { k: 'kac_gunluk_is', ad: 'Kaç günlük iş', sag: true, tur: 'sayi', ciz: function (r) { return ondalik(r.kac_gunluk_is); } },
         { k: 'hedef', ad: 'Hedef', sag: true, tur: 'sayi', ciz: hedefHucre },
         { k: 'olcum_kaynagi', ad: 'Ölçüm', ciz: function (r) { return olcumAd(r.olcum_kaynagi); } }] }) })]));
+      kap.appendChild(grafikKart);
       var mab = null; aileler.forEach(function (a) { if (a.aile === 'mabotex' && a.hatlar && a.hatlar.length) mab = a; });
-      if (mab) kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Mabotex hatları', alt: 'hat bazında', govde: G.tablo({ sayfa: 10, bos: 'Hat yok.', satirlar: mab.hatlar, kolonlar: [
+      if (mab) kap.appendChild(h('details', { sinif: 'ust-bosluk up-acilir' }, [h('summary', { sinif: 'up-ozet', metin: 'Mabotex hatları (' + mab.hatlar.length + ')' }), G.kart({ baslik: 'Mabotex hatları', alt: 'hat bazında', govde: G.tablo({ sayfa: 10, bos: 'Hat yok.', satirlar: mab.hatlar, kolonlar: [
         { k: 'hat', ad: 'Hat' },
         { k: 'acik_uretim_yuku', ad: 'Açık iş', sag: true, tur: 'sayi', ciz: function (r) { return r.acik_uretim_yuku == null ? '—' : G.say(r.acik_uretim_yuku) + ' ' + birimAd(r.birim); } },
         { k: 'son10_ort', ad: 'Günlük ort.', sag: true, tur: 'sayi', ciz: function (r) { return sayiYaz(r.son10_ort); } },

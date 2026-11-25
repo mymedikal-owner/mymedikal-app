@@ -107,7 +107,7 @@
     var v = h('div', { sinif: 'me-vardiya' }, a.vardiyalar.map(function (x) {
       return h('div', null, [h('span', { metin: x.ad + ' · ' + x.saat }), h('b', { metin: say(x.adet) + ' alarm' }), h('span', { metin: say(x.dk) + ' dk toplam' }), h('span', { sinif: 'me-soluk', metin: x.neden_girildi + ' / ' + x.adet + ' kayıtta neden girilmiş' })]);
     }));
-    var l = h('ul', { sinif: 'me-alarm-liste' }, (a.son || []).map(function (x) { return h('li', null, [h('span', { metin: x.bas + ' · ' + x.hat }), h('span', { metin: x.alarm + ' · ' + say(x.dk) + ' dk · ' + x.vardiya })]); }));
+    var l = G.ilkN(a.son || [], function (x) { return h('div', { sinif: 'me-alarm-satir' }, [h('span', { metin: x.bas + ' · ' + x.hat }), h('span', { metin: x.alarm + ' · ' + say(x.dk) + ' dk · ' + x.vardiya })]); }, { n: 10, sinif: 'me-alarm-liste' });
     return h('div', null, [v, l, h('p', { sinif: 'me-soluk', metin: 'Son 24 saat, ' + say(a.toplam) + ' alarm; kişi adı yok.' })]);
   }
 
@@ -159,7 +159,10 @@
     var canli_ = true, tmr = null, sayacTmr = null, yukleniyor = false, sonEk = 0;
     var azHareket = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function kart(baslik, alt, govde) { return G.kart({ baslik: baslik, alt: alt, govde: govde }); }
-    var canliKutu = h('div', { sinif: 'me-canli' }), digerKok = h('div', { sinif: 'me-ek' }), ekYuklendi = false;
+    var canliKutu = h('div', { sinif: 'me-canli' }), digerKok = h('div', { sinif: 'me-ek' }), durusKok = h('div', { sinif: 'me-ek', hidden: true }), gecmisKok = h('div', { sinif: 'me-ek', hidden: true }), hatKok = h('div', { sinif: 'me-ek' }), ekYuklendi = false;
+     
+    MM.makineEkGoster = function (id) { hatKok.hidden = id !== 'hatlar'; durusKok.hidden = id !== 'duruslar'; gecmisKok.hidden = id !== 'gecmis'; };
+    MM.makineEkDurum = null;
     var vardMap = {}, opMap = null;
     function vardiyaTazele() { vardiyaYaz(canliKutu, vardMap, opMap); }
     async function operatorYukle() {   
@@ -171,10 +174,12 @@
         opMap = m;
       } catch (e) { opMap = {}; }
     }
-    kok.appendChild(h('h2', { sinif: 'me-ek-baslik', metin: 'Canlı ek bilgiler' }));
-    kok.appendChild(kart('Hat adedi (canlı tahmini)', 'Son gerçek adet + adet/dk; her dakika gerçek veriyle düzelir', canliKutu));
-    kok.appendChild(digerKok);
+    hatKok.appendChild(kart('Hat adedi (canlı tahmini)', 'Son gerçek adet + adet/dk; her dakika gerçek veriyle düzelir', canliKutu));
+    hatKok.appendChild(digerKok);
+    kok.appendChild(hatKok); kok.appendChild(durusKok); kok.appendChild(gecmisKok);
     var donemKutu = h('div'), donemYuklendi = false;
+    var gecmisUst = h('div', { sinif: 'me-ek' });
+    gecmisKok.appendChild(donemKutu); gecmisKok.appendChild(gecmisUst);
     async function donemYukle() {   
       if (donemYuklendi) return; donemYuklendi = true;
       donemKutu.textContent = '';
@@ -185,14 +190,16 @@
       } catch (e) { donemYuklendi = false; donemKutu.appendChild(kart('Duruşlar · dönem Excel', null, bekleniyor('Dönem raporu'))); }
     }
     function ciz(d) {   
-      digerKok.textContent = '';
-      digerKok.appendChild(kart('Makine bazında fire', 'makinenin bildirdiği oran · adet', fireBolum(d.fire)));
-      digerKok.appendChild(donemKutu);
-      digerKok.appendChild(kart('Duruş nedenleri', 'Vardiya bazlı Pareto', paretoBolum(d.pareto)));
-      digerKok.appendChild(kart('Vardiya zaman şeridi', null, seritBolum(d.serit)));
-      digerKok.appendChild(kart('OEE kırılımı', null, oeeBolum(d.oee)));
-      digerKok.appendChild(kart('Alarm geçmişi', 'Son 24 saat · vardiya', alarmBolum(d.alarm_24s)));
+      digerKok.textContent = ''; durusKok.textContent = '';
       digerKok.appendChild(kart('Gün sonu tahmini', 'tahmin', tahminBolum(d.tahmin)));
+      gecmisUst.textContent = '';
+      gecmisUst.appendChild(kart('OEE kırılımı', null, oeeBolum(d.oee)));
+      gecmisUst.appendChild(kart('Makine bazında fire', 'makinenin bildirdiği oran · adet', fireBolum(d.fire)));
+      durusKok.appendChild(kart('Duruş nedenleri', 'Vardiya bazlı Pareto', paretoBolum(d.pareto)));
+      durusKok.appendChild(kart('Vardiya zaman şeridi', null, seritBolum(d.serit)));
+      durusKok.appendChild(kart('Alarm geçmişi', 'Son 24 saat · vardiya', alarmBolum(d.alarm_24s)));
+      MM.makineEkDurum = { alarm: d.alarm_24s && typeof d.alarm_24s.toplam === 'number' ? d.alarm_24s.toplam : null };   
+      window.dispatchEvent(new Event('mm-makine-ek'));
     }
     function sayacAdim() {
       var simdi = Date.now();
@@ -229,7 +236,7 @@
             if (!canli_) return;
             if (!tamam) canliCiz(canliKutu, d.canli || [], Date.parse(d.asof) || 0, durum);
             vardiyaTazele();
-          } catch (e) { if (!digerKok.firstChild) digerKok.appendChild(bekleniyor('Makine eki')); }
+          } catch (e) { if (!digerKok.firstChild) digerKok.appendChild(bekleniyor('Makine eki')); if (!durusKok.firstChild) durusKok.appendChild(bekleniyor('Makine eki')); }
         }
       } finally { yukleniyor = false; }
     }

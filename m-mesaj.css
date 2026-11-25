@@ -250,7 +250,7 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .menu-oge[data-modul="mesaj"] { position: relative; }
 .ms-nrozet { position: absolute; top: 4px; left: calc(50% + 4px); min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 9px; background: var(--ms-yesil); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; }
 .diger-sheet .ms-nrozet { position: static; margin-left: auto; }
-@media (min-width: 1024px) { .ms-nrozet { position: static; margin-left: auto; } }
+@media (min-width: 600px) and (min-height: 500px) { .ms-nrozet { position: static; margin-left: auto; } }
 .menu-genis .ms-nrozet { position: static; margin-left: auto; }
 
  
@@ -264,7 +264,7 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .ms-bos-sag { margin: auto; text-align: center; color: var(--ms-saat); padding: 24px; }
 .ms-bos-sag strong { display: block; font-size: 18px; font-weight: 500; margin-bottom: 6px; color: var(--ms-karsi-yazi); }
 .ms-bos-sag p { margin: 0; }
-@media (min-width: 1024px) {
+@media (min-width: 600px) and (min-height: 500px) {
   .icerik:has(.ms-bolme), .icerik:has(.asistan-sayfa) { max-width: none; }
    
   .ms-bolme { display: flex; width: 100%; height: calc(100dvh - var(--ust-yukseklik) - 48px); min-height: 420px; border: 1px solid var(--ms-ince); border-radius: 12px; overflow: hidden; background: var(--ms-sohbet-zemin); }
@@ -357,7 +357,7 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .ms-meta { float: none; }
 .ms-sol-bolme .ms-ust-sat { position: sticky; top: 0; z-index: 2; background: var(--yuzey, #fff); }
 .ms-sol-bolme .ms-arama-kap { position: sticky; top: 0; z-index: 1; }
-@media (min-width: 1024px) {
+@media (min-width: 600px) and (min-height: 500px) {
   .ms-bolme > .ms-kok.ms-sol-bolme { padding: 0; gap: 0; overscroll-behavior: contain; }
   .ms-sol-bolme > .ms-ust-sat, .ms-sol-bolme > .ms-buyuk-baslik { padding-left: 16px; padding-right: 16px; }
   .ms-sol-bolme > .ms-arama-kap { margin: 6px 12px; }
@@ -367,3 +367,57 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
   .ms-bolme .ms-m { max-width: min(65%, 680px); }
   .ms-bolme .ms-ekran-sohbet { overflow: hidden; }
 }
+
+ 
+@media (min-width: 600px) and (max-width: 1023px) and (min-height: 500px) {
+  .ms-bolme > .ms-kok.ms-sol-bolme { flex-basis: clamp(270px, 40%, 340px); }
+  .ms-bolme .ms-m { max-width: 82%; }
+  .ms-bolme .ms-mesajlar { padding: 10px 12px; }
+  .ms-sol-bolme > .ms-buyuk-baslik { font-size: 24px; }
+}
+ 
+.ms-sohbet { position: relative; border-bottom: 0; }
+.ms-sohbet::after { content: ""; position: absolute; left: 66px; right: 0; bottom: 0; height: 1px; background: var(--ms-ince); }
+.ms-sat-kap:last-child .ms-sohbet::after { display: none; }
+.ms-sohbet .ms-av { margin-left: 0; }
+.ms-sol-bolme .ms-sohbet { padding-left: 14px; }
+.ms-sat-eylem { visibility: hidden; transition: visibility 0s .2s; }
+.ms-sat-kap.ms-acik .ms-sat-eylem { visibility: visible; transition-delay: 0s; }
+.ms-sol-bolme .ms-sat-kap > .ms-sohbet { background: var(--yuzey, #fff); }
+.ms-sol-bolme .ms-sat-kap.ms-secili > .ms-sohbet { background: var(--ms-arama-zemin); }
+.ms-sol-bolme .ms-sohbet::after { left: 80px; }
+.ms-sat-kap.ms-secili .ms-sohbet::after { display: none; }
+ 
+.ms-karsi + .ms-karsi, .ms-ben + .ms-ben { margin-top: -1px; }
+.ms-karsi + .ms-karsi { border-top-left-radius: 10px; }
+.ms-ben + .ms-ben { border-top-right-radius: 10px; }
+.ms-karsi + .ms-karsi::before, .ms-ben + .ms-ben::before { display: none; }
+.ms-karsi + .ms-ben, .ms-ben + .ms-karsi { margin-top: 6px; }
+ 
+.ms-meta { margin-top: -1px; line-height: 1; }
+.ms-m { padding: 6px 8px 4px 9px; }
+ 
+.ms-gun { margin: 10px 0 6px; }
+.ms-gun span { border-radius: 999px; padding: 4px 12px; font-size: 12px; text-transform: none; }
+ 
+.ms-yaz-kap { box-shadow: 0 1px 1px rgba(0, 0, 0, .06); }
+.ms-yaz { padding: 11px 14px; }
+.ms-gonder { background: var(--ms-yesil); }
+ 
+.ms-sohbet-ust { border-bottom: 1px solid var(--ms-ince); }
+.ms-baslik { font-weight: 500; }
+ 
+.ms-bos-sag { max-width: 360px; line-height: 1.4; }
+.ms-bolme .ms-ekran-bos { align-items: center; justify-content: center; }
+ 
+.ms-m { max-width: 75%; }
+.ms-bolme .ms-m { max-width: min(75%, 680px); }
+.ms-karsi { border-radius: 10px 10px 10px 2px; }
+.ms-ben { border-radius: 10px 10px 2px 10px; }
+.ms-karsi:has(+ .ms-karsi) { border-bottom-left-radius: 10px; }
+.ms-ben:has(+ .ms-ben) { border-bottom-right-radius: 10px; }
+.ms-karsi::before, .ms-ben::before { top: auto; bottom: 0; }
+.ms-karsi::before { clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.ms-ben::before { clip-path: polygon(0 0, 100% 100%, 0 100%); }
+.ms-karsi + .ms-karsi::before, .ms-ben + .ms-ben::before { display: block; }
+.ms-karsi:has(+ .ms-karsi)::before, .ms-ben:has(+ .ms-ben)::before { display: none; }

@@ -123,16 +123,70 @@
     return { kaynak: 'eski', asof: v.asof, uretildi: v.uretildi, bloklar: null, html: function () { return v.html; } };
   }
 
+  function panoJson(v) {   
+    var p = null, a = '/*VERI:mabotex*/', b = '/*/VERI:mabotex*/';
+    try {
+      if (v.bloklar && typeof v.bloklar['VERI:mabotex'] === 'string') p = JSON.parse(v.bloklar['VERI:mabotex']);
+      else { var html = v.html(), i = html.indexOf(a), j = html.indexOf(b); if (i >= 0 && j > i) p = JSON.parse(html.slice(i + a.length, j)); }
+    } catch (e) { p = null; }
+    return p && p.hatlar && p.hatlar.length ? p : null;
+  }
+
   MM.moduller.makineler = function (kok) {
-    var sayfa = h('div', { sinif: 'mk-pano' }), uyari = h('div', { 'aria-live': 'polite' });
-    kok.appendChild(sayfa); if (MM.makineEk) MM.makineEk(kok);  
+    var sayfa = h('div', { sinif: 'mk-pano', hidden: true }), uyari = h('div', { 'aria-live': 'polite' });
+     
+    var ozetKap = h('div', { sinif: 'mk-ozet' }), segKap = h('div', { sinif: 'mk-seg' }), sonPano = null, panoSurum = null, denendi = false, panoAcik = false, sonV = null;
+    function ozetCiz() {
+      var p = sonPano, m = p ? rozetMantik(p, Date.now()) : null, taze = !!m && m.seviye === 'iyi', tarih = null;
+      ozetKap.textContent = '';
+      if (!p && !denendi) { ozetKap.appendChild(G.iskelet('kart', 2)); return; }   
+      if (m) {
+        tarih = m.sonMs || null;
+        if (!taze && m.gecikmeli > 0 && m.taze > 0) {   
+          var en = null, j = 0;
+          (p.hatlar || []).forEach(function (x) {
+            if (!x || x.kapali === true) return;
+            var hh = m.hatlar[j++], t = Date.parse(p.asof) - (typeof x.veri_yas_sn === 'number' ? x.veri_yas_sn * 1000 : NaN);
+            if (hh && !hh.taze && !isNaN(t) && (en == null || t < en)) en = t;
+          });
+          if (en != null) tarih = en;
+        }
+      }
+      var rozet = G.tazelik(tarih ? new Date(tarih) : null, taze ? 'taze' : 'eski'), not = null;
+      if (m && !taze) not = h('span', { sinif: 'mk-not', metin: m.taze > 0 ? MM.t('{n} hatta veri gecikmeli').replace('{n}', m.gecikmeli) : MM.t('Veri gecikmeli (son: {t})').replace('{t}', tarih ? new Date(tarih).toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' }) : '—') });
+      if (!m) not = h('span', { sinif: 'mk-not', metin: MM.t('Veri yok') });
+      ozetKap.appendChild(h('div', { sinif: 'mk-rozet-sira' }, [rozet, not]));
+      var ks = p && p.kaynak ? p.kaynak : null;
+      if (p && (p.ornek === true || (ks && ks.durum === 'ornek'))) ozetKap.appendChild(h('div', { sinif: 'bant sari', role: 'alert' }, [h('strong', { metin: MM.t('ÖRNEK VERİ') }), ' — ' + MM.t('gerçek makine verisi değil')]));
+      else if (ks && ks.durum && ks.durum !== 'ok') ozetKap.appendChild(h('div', { sinif: 'bant gri', role: 'status' }, [h('strong', { metin: MM.t('Veri yok') }), ' — ' + (ks.mesaj || ks.durum)]));
+      var cal = 0, dur = 0, yok = 0, n = m ? m.hatlar.length : 0;
+      if (m) m.hatlar.forEach(function (x) { if (!x.taze || x.durum === 'no_data' || x.durum === 'unknown') yok++; else if (x.durum === 'durdu' || x.durum === 'sorunlu') dur++; else cal++; });
+      var al = MM.makineEkDurum && MM.makineEkDurum.alarm != null ? MM.makineEkDurum.alarm : null;
+      var kutular = [
+        { baslik: MM.t('Çalışan hat'), deger: m ? cal + ' / ' + n : '—', durum: m && cal === 0 ? 'kritik' : null },
+        { baslik: MM.t('Duran / sorunlu hat'), deger: m ? String(dur) : '—', durum: dur > 0 ? 'uyari' : null },
+        { baslik: MM.t('Veri yok'), deger: m ? String(yok) : '—', durum: yok > 0 ? 'yok' : null }
+      ];
+      if (al != null) kutular.push({ baslik: MM.t('Alarm (24 sa)'), deger: String(al) });
+      ozetKap.appendChild(G.ozetSerit(kutular, { en: 4 }));
+    }
+    window.addEventListener('mm-makine-ek', ozetCiz);
+    var ozetTmr = setInterval(function () { if (!document.hidden) ozetCiz(); }, 15000);
+    function bolumGoster(id) {
+      sayfa.hidden = id !== 'pano'; ozetKap.hidden = id === 'pano'; kok.classList.toggle('mk-pano-ac', id === 'pano');
+      if (MM.makineEkGoster) MM.makineEkGoster(id);
+      if (id === 'pano') { panoAc(); boyutla(); setTimeout(boyutla, 300); } else if (panoAcik) panoKapat();
+    }
+    segKap.appendChild(G.segment([['hatlar', MM.t('Hatlar')], ['duruslar', MM.t('Duruşlar')], ['gecmis', MM.t('Geçmiş')], ['pano', MM.t('Canlı pano')]], 'hatlar', bolumGoster, { ad: MM.t('Makineler görünümü') }));
+    kok.appendChild(ozetKap); kok.appendChild(segKap); kok.appendChild(sayfa); if (MM.makineEk) MM.makineEk(kok);  
+    ozetCiz();
     var bekci = null, aktif = null, bekleyen = null, bekleyenHtml = null, sonSurum = null, ss = {}, canli_ = true, yukleniyor = false, sonCizim = 0;
     var yukleme = G.iskelet('kart', 4);
     sayfa.appendChild(yukleme);
     function yuklemeKaldir() { if (yukleme && yukleme.parentNode) yukleme.parentNode.removeChild(yukleme); yukleme = null; }
 
     function degistir() {   
-      clearTimeout(bekci); if (sayfa.contains(uyari)) { uyari.textContent = ''; sayfa.removeChild(uyari); }
+      clearTimeout(bekci); if (kok.contains(uyari)) { uyari.textContent = ''; kok.removeChild(uyari); }
       var eski = aktif; aktif = bekleyen; bekleyen = null; bekleyenHtml = null;
       aktif.classList.remove('bekleyen');
       if (eski && eski.parentNode) eski.parentNode.removeChild(eski);
@@ -162,7 +216,7 @@
         d.addEventListener('click', function () { sonSurum = null; yukle(); });
         var b = h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Pano açılamadı' }), ' — veri alındı ama pano çizilemedi. ', d]);
         uyari.textContent = ''; uyari.appendChild(b);
-        if (!sayfa.contains(uyari)) sayfa.insertBefore(uyari, sayfa.firstChild);
+        if (!kok.contains(uyari)) kok.insertBefore(uyari, segKap);
       }, YUKLEME_ZA_MS);
       f.src = 'pano-kabuk.html' + (MM.dil && MM.dil() === 'en' ? '?dil=en' : '');   
       sayfa.appendChild(f);
@@ -179,38 +233,58 @@
     }
     window.addEventListener('resize', boyutla); window.addEventListener('orientationchange', boyutla);
 
+    function panoCiz(v, surum) {   
+      if (!panoAcik) return;
+      if (!aktif || surum !== sonSurum) {
+        if (aktif && Date.now() - sonCizim < 55000) {   }
+        else {
+          var html = v.html();
+          if (typeof html !== 'string' || html.length < 1000) throw Object.assign(new Error('Pano dosyası okunamadı'), { kod: 'bicim' });
+          uyari.textContent = '';
+          if (kok.contains(uyari)) kok.removeChild(uyari);
+          sonSurum = surum; sonCizim = Date.now();
+          yuklemeKaldir();
+          cerceve(html);
+        }
+      } else { uyari.textContent = ''; if (kok.contains(uyari)) kok.removeChild(uyari); }
+    }
+    function panoAc() {
+      panoAcik = true; sonSurum = null; sonCizim = 0;
+      if (!sonV) return;
+      try { panoCiz(sonV.v, sonV.surum); } catch (e) {
+        yuklemeKaldir(); uyari.textContent = ''; uyari.appendChild(hataKutusu(e)); kok.insertBefore(uyari, segKap);
+      }
+    }
+    function panoKapat() {
+      panoAcik = false; clearTimeout(bekci);
+      [aktif, bekleyen].forEach(function (f) { if (f && f.parentNode) f.parentNode.removeChild(f); });
+      aktif = null; bekleyen = null; bekleyenHtml = null; sonSurum = null;
+      uyari.textContent = ''; if (kok.contains(uyari)) kok.removeChild(uyari);
+    }
     async function yukle() {
       if (yukleniyor || !canli_) return; yukleniyor = true;
       try {
         var v = await panoAl();
         var surum = String(v.uretildi || v.asof || '');
-        if (!aktif || surum !== sonSurum) {
-          if (aktif && Date.now() - sonCizim < 55000) {   }
-          else {
-            var html = v.html();
-            if (typeof html !== 'string' || html.length < 1000) throw Object.assign(new Error('Pano dosyası okunamadı'), { kod: 'bicim' });
-            uyari.textContent = '';
-            if (sayfa.contains(uyari)) sayfa.removeChild(uyari);
-            sonSurum = surum; sonCizim = Date.now();
-            yuklemeKaldir();
-            cerceve(html);
-          }
-        } else { uyari.textContent = ''; if (sayfa.contains(uyari)) sayfa.removeChild(uyari); }
+        if (panoSurum !== surum || !sonPano) { var pj = panoJson(v); if (pj) { sonPano = pj; panoSurum = surum; } ozetCiz(); }
+        sonV = { v: v, surum: surum };
+        panoCiz(v, surum);
       } catch (e) {
         yuklemeKaldir();
         uyari.textContent = '';
         if (aktif) uyari.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Pano güncellenemedi' }), ' — gördüğünüz son alınabilen sürümdür.']));
         else uyari.appendChild(hataKutusu(e));
-        sayfa.insertBefore(uyari, sayfa.firstChild);
+        kok.insertBefore(uyari, segKap);
       }
       yukleniyor = false;
+      if (!denendi) { denendi = true; ozetCiz(); }
     }
     yukle();
     var zamanlayici = setInterval(function () { if (!document.hidden) yukle(); }, YENILE_MS);
     function onGorun() { if (!document.hidden) yukle(); }
     document.addEventListener('visibilitychange', onGorun);
     return function temizle() {
-      canli_ = false; clearInterval(zamanlayici); clearTimeout(bekci);
+      canli_ = false; panoKapat(); clearInterval(zamanlayici); clearTimeout(bekci); clearInterval(ozetTmr); kok.classList.remove('mk-pano-ac'); window.removeEventListener('mm-makine-ek', ozetCiz);
       document.removeEventListener('visibilitychange', onGorun); window.removeEventListener('message', mesaj);
     };
   };

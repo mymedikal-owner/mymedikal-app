@@ -35,7 +35,7 @@ p { margin: 0; }
 .bant.sari { background: var(--sari-zemin); color: var(--sari-yazi); border: 1px solid var(--sari); }
 .bant.kirmizi { background: var(--kirmizi-zemin); color: var(--kirmizi); border: 1px solid var(--kirmizi); }
 .bant.gri { background: var(--gri-zemin); color: var(--yazi); border: 1px solid var(--cizgi); }
-.bant.ornek { background: var(--tahmin); color: #fff; text-align: center; font-size: 18px; font-weight: 700; letter-spacing: .04em; padding: 14px; }
+.bant.ornek { background: var(--tahmin); color: #fff; text-align: left; font-size: 12px; font-weight: 700; letter-spacing: .03em; line-height: 1.4; padding: 4px 12px; margin: 0 0 var(--b2); border-radius: var(--r-t); width: fit-content; max-width: 100%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tazelik { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--soluk); font-size: 13px; margin: 6px 0 12px; }
 .nokta { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .nokta.yesil { background: var(--yesil); } .nokta.sari { background: var(--sari); }

@@ -49,4 +49,9 @@
   .tq-kpi-serit .kpi-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tq-kpi-serit .kpi-ikon, .tq-kpi-serit .kpi-alt, .tq-kpi-serit .kpi-spark { display: none; }
   .tq-kpi-serit .kpi { padding: var(--b2) var(--b3); min-height: 0; }
+  .tq-kpi-serit .kpi-ana { flex-direction: row; align-items: center; justify-content: space-between; gap: var(--b2); padding: 6px 28px 6px 10px; }
+  .tq-kpi-serit .kpi-ust { padding-right: 0; flex: 1 1 auto; min-width: 0; } .tq-kpi-serit .kpi-orta { flex: 0 0 auto; }
+  .tq-kpi-serit .kpi-deger small { font-size: 0; }
+  .tq-saglik.yesil { display: none; }
+  .tq-ana-sekme .cip svg { display: none; }
 }

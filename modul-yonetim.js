@@ -78,11 +78,16 @@
       if (iptal) return; govde.textContent = '';
       if (oz.fab && MM.anaKpi.ORNEK(oz.fab.v)) govde.appendChild(h('div', { sinif: 'bant ornek', role: 'alert', metin: 'ÖRNEK VERİ — fabrika rakamları gerçek değil' }));
       govde.appendChild(MM.dikkatSeridi(oz)); govde.appendChild(MM.kaynakSatiri(oz));
-      var izg = h('div', { sinif: 'kpi-izgara' }); ['hatlar', 'dokuma', 'alarm', 'eldiven', 'siparis', 'kalite', 'isg'].forEach(function (a) { var k = MM.anaKpi.yap(a, oz); if (k) izg.appendChild(k); });
-      govde.appendChild(izg);
-      var ik = h('div', { sinif: 'iki-kolon ust-bosluk' });
-      [uretim(oz), eldiven(oz), siparis(oz), takvim(oz), yaklasan(oz), veriDurumu(oz)].forEach(function (k) { if (k) ik.appendChild(k); });
-      govde.appendChild(ik);
+      var kutular = []; ['hatlar', 'dokuma', 'alarm', 'eldiven', 'siparis', 'kalite', 'isg'].forEach(function (a) { var k = MM.anaKpi.yap(a, oz); if (k) kutular.push(k); });
+      govde.appendChild(gr.ozetSerit(kutular, { en: 4 }));
+      var sekmeler = { ozet: [uretim, eldiven], risk: [siparis, takvim, yaklasan], veri: [veriDurumu] }, secili = 'ozet';
+      var alan = h('div', { sinif: 'iki-kolon ust-bosluk' });
+      function ciz() {
+        alan.textContent = '';
+        sekmeler[secili].forEach(function (f) { var k = f(oz); if (k) alan.appendChild(k); });
+      }
+      govde.appendChild(gr.segment([['ozet', 'Özet'], ['risk', 'Yaklaşan son tarihler'], ['veri', 'Veri durumu']], secili, function (id) { secili = id; ciz(); }));
+      govde.appendChild(alan); ciz();
       Object.keys(oz.hata).forEach(function (k) { govde.appendChild(h('div', { sinif: 'bant kirmizi', role: 'status' }, [h('strong', { metin: 'Bir bölümün verisi alınamadı' }), ' — ' + oz.hata[k].message])); });
     });
     return function () { iptal = true; };

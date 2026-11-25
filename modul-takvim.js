@@ -347,13 +347,13 @@
     ['gecti', 'k7', 'k30', 'k90', 'ok', 'bilgi'].forEach(function (b) { if (o[b]) kvc.push([b, STIL[b].ad, o[b]]); });
     kap.appendChild(G.cipler(kvc, kv, function (d) { durum.uKova = d; yeniden(); }, 'Risk bandı filtresi'));
     var tarihli = liste.filter(function (x) { return x.gun != null && (!kv || x.kova === kv); }), lk = h('div', { sinif: 'tq-liste ust-bosluk' });
-    if (tarihli.length) lk.appendChild(G.sayfali(tarihli, uyumKarti));
+    if (tarihli.length) lk.appendChild(G.sayfali(tarihli, uyumKarti, { n: 10 }));
     else lk.appendChild(h('p', { sinif: 'veri-yok', metin: 'Bu süzgeçte tarihi kayıtlı yükümlülük yok.' }));
     kap.appendChild(lk);
     var bil = liste.filter(function (x) { return x.gun == null; });
     if (bil.length && !kv) {
       var bk = h('div', { sinif: 'tq-liste' });
-      bk.appendChild(G.sayfali(bil, uyumKarti));
+      bk.appendChild(G.sayfali(bil, uyumKarti, { n: 5 }));
       kap.appendChild(h('section', { sinif: 'tq-bilinmiyor ust-bosluk', 'aria-label': 'Tarihi bilinmeyen kayıtlar' }, [
         h('h3', { sinif: 'bolum' }, [G.ikon('bilgi', 18), ' Tarihi bilinmiyor (' + bil.length + ')']), bk]));
     }
@@ -364,7 +364,7 @@
   function modul(cfg) {
     return function (kok) {
       var yuk = null, hata = null, canli = true, filtre = '';
-      var q = new URLSearchParams(location.search).get('tsekme'), durum = { ay: 0, gun: null, sekme: q === 'takvim' ? 'takvim' : 'liste' };
+      var q = new URLSearchParams(location.search).get('tsekme'), durum = { ay: 0, gun: null, sekme: q === 'takvim' || q === 'ozet' ? q : 'liste' };
       var yol = MM.yol(), detay = yol[0] === 'belge' && yol[1] != null && !isNaN(+yol[1]) ? +yol[1] : null;
       var ekVar = cfg.id === 'kalite', ana = ekVar && (q === 'tedarikci' || q === 'uyum') ? q : 'belge', ek = {};
       var baslik = detay == null ? G.sayfaBasi({ baslik: cfg.ad, alt: cfg.alt, kirinti: [[cfg.ad]] }) : null;
@@ -419,36 +419,35 @@
         govde.appendChild(saglikOzeti(o));
 
          
-        var kpiler = h('div', { sinif: 'kpi-izgara tq-kpi' });
-        [['gecti', 'Süresi geçti', 'kritik'], ['k7', '7 gün içinde', 'kritik'], ['k30', '30 gün içinde', 'uyari'], ['k90', '90 gün içinde', 'uyari']].forEach(function (b) {
+        var kutular = [['gecti', 'Süresi geçti', 'kritik'], ['k7', '7 gün içinde', 'kritik'], ['k30', '30 gün içinde', 'uyari'], ['k90', '90 gün içinde', 'uyari']].map(function (b) {
           var alt = { gecti: 'tarihi geçmiş', k7: '0–7 gün', k30: '8–30 gün', k90: '31–90 gün', ok: '91+ gün' }[b[0]];
-          kpiler.appendChild(G.kpi({ baslik: b[1], deger: String(o[b[0]]), birim: 'kayıt', durum: o[b[0]] && b[2] ? b[2] : null, ikon: STIL[b[0]].ikon, alt: alt, tikla: function () { filtre = filtre === b[0] ? '' : b[0]; durum.sekme = 'liste'; ciz(); } }));
+          return { baslik: b[1], deger: String(o[b[0]]), birim: 'kayıt', durum: o[b[0]] && b[2] ? b[2] : null, ikon: STIL[b[0]].ikon, alt: alt, tikla: function () { filtre = filtre === b[0] ? '' : b[0]; durum.sekme = 'liste'; urlSekme('liste'); ciz(); } };
         });
+        var kpiler = G.ozetSerit(kutular, { en: 4 }); kpiler.classList.add('tq-kpi-serit');
         govde.appendChild(kpiler);
-        if (cfg.id === 'kalite') {
-          govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [matris(o)]));
-          govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [aylikGrafik(o)]));
-          govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [sikayetKutusu(v)]));
+
+         
+        govde.appendChild(G.segment([['liste', 'Belge kartları'], ['takvim', 'Ay takvimi'], ['ozet', 'Özet']], durum.sekme, function (id) { durum.sekme = id; urlSekme(id); ciz(); }, { ad: 'Görünüm' }));
+
+        if (durum.sekme === 'ozet') {
+          govde.appendChild(G.kart({ baslik: 'Önümüzdeki 12 ay', alt: '', govde: zamanCizelgesi(o, cfg, (kok.clientWidth || window.innerWidth) - 56),
+            tablo: { kolonlar: ['Belge', 'Son tarih', 'Kalan gün'], satirlar: o.liste.filter(function (x) { return x.gun != null; }).map(function (x) { return [x.k.belge, tarihTR(x.k.son_tarih) + (x.k.yaklasik ? ' (yaklaşık)' : ''), x.gun]; }) } }));
+          if (cfg.id === 'kalite') {
+            govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [matris(o)]));
+            govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [aylikGrafik(o)]));
+            govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [sikayetKutusu(v)]));
+          }
+          return;
         }
-
-        govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Önümüzdeki 12 ay', alt: '', govde: zamanCizelgesi(o, cfg, (kok.clientWidth || window.innerWidth) - 56),
-          tablo: { kolonlar: ['Belge', 'Son tarih', 'Kalan gün'], satirlar: o.liste.filter(function (x) { return x.gun != null; }).map(function (x) { return [x.k.belge, tarihTR(x.k.son_tarih) + (x.k.yaklasik ? ' (yaklaşık)' : ''), x.gun]; }) } })]));
-
-        var sek = h('div', { sinif: 'cip-sira ust-bosluk', role: 'tablist', 'aria-label': 'Görünüm' });
-        [['liste', 'Belge kartları'], ['takvim', 'Ay takvimi']].forEach(function (s) {
-          sek.appendChild(h('button', { type: 'button', role: 'tab', sinif: 'cip' + (durum.sekme === s[0] ? ' secili' : ''), 'aria-selected': durum.sekme === s[0] ? 'true' : 'false', onclick: function () { durum.sekme = s[0]; ciz(); } }, [G.ikon(s[0] === 'liste' ? 'liste' : 'takvim', 16), s[1]]));
-        });
-        govde.appendChild(sek);
-
         if (durum.sekme === 'takvim') {
           govde.appendChild(G.kart({ baslik: 'Ay takvimi', alt: 'Günün rengi o günkü en yakın riski gösterir; dokununca o günün belgeleri açılır', govde: ayTakvimi(o, cfg, durum, ciz) }));
         } else {
           var cp = [['', 'Tümü', o.toplam - o.bilinmiyor]];
           ['gecti', 'k7', 'k30', 'k90', 'ok'].forEach(function (b) { if (o[b]) cp.push([b, STIL[b].ad, o[b]]); });
-          govde.appendChild(G.cipler(cp, filtre, function (d) { filtre = d; ciz(); }, 'Risk bandı filtresi'));
+          govde.appendChild(h('div', { sinif: 'tq-cip-tek' }, [G.cipler(cp, filtre, function (d) { filtre = d; ciz(); }, 'Risk bandı filtresi')]));
           var liste = o.liste.filter(function (x) { return x.gun != null && (!filtre || x.kova === filtre); });
           var kap = h('div', { sinif: 'tq-liste' });
-          if (liste.length) kap.appendChild(G.sayfali(liste, function (x) { return belgeKarti(x, cfg); }));
+          if (liste.length) kap.appendChild(G.sayfali(liste, function (x) { return belgeKarti(x, cfg); }, { n: 5 }));
           else kap.appendChild(h('p', { sinif: 'veri-yok', metin: 'Bu risk bandında kayıt yok.' }));
           govde.appendChild(kap);
         }
@@ -457,7 +456,7 @@
         var bil = o.liste.filter(function (x) { return x.gun == null; });
         if (bil.length) {
           var bk = h('div', { sinif: 'tq-liste' });
-          bk.appendChild(G.sayfali(bil, function (x) { return belgeKarti(x, cfg); }));
+          bk.appendChild(G.sayfali(bil, function (x) { return belgeKarti(x, cfg); }, { n: 3 }));
           govde.appendChild(h('section', { sinif: 'tq-bilinmiyor ust-bosluk', 'aria-label': 'Tarihi bilinmeyen kayıtlar' }, [
             h('h3', { sinif: 'bolum' }, [G.ikon('bilgi', 18), ' Tarihi bilinmiyor (' + bil.length + ')']),
             bk]));

@@ -150,7 +150,9 @@ button.y2-satir { cursor: pointer; } @media (hover: hover) { button.y2-satir:hov
 .bant.ornek.kucuk-bant { font-size: 12px; font-weight: 700; padding: 5px 12px; margin: 0 0 var(--b2); text-align: left; border-radius: var(--r-t); width: fit-content; max-width: 100%; }
 .tazelik .kaynak-etiket { display: none; }
 .daha-fazla { grid-column: 1 / -1; }
-.sekme-sira { display: flex; flex-wrap: wrap; gap: 6px; max-width: 100%; }
+.sekme-sira { display: flex; flex-wrap: nowrap; gap: 6px; max-width: 100%; white-space: nowrap; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+.sekme-sira::-webkit-scrollbar { display: none; }
+.sekme-sira > * { flex: 0 0 auto; white-space: nowrap; }
 .sekme-sira .cip.secili, .sekme-sira .sekme.secili { background: var(--vurgu); color: var(--vurgu-yazi); border-color: var(--vurgu); font-weight: 600; }
 .daha-fazla-sekme { color: var(--vurgu) !important; background: none !important; border-style: dashed !important; font-weight: 600; }
 .sekmeler:has(.sekme-sira) { overflow-x: visible; }
@@ -170,3 +172,50 @@ button.y2-satir { cursor: pointer; } @media (hover: hover) { button.y2-satir:hov
 .kismi-ayrinti > summary::-webkit-details-marker { display: none; } .kismi-ayrinti p { margin: 6px 0 0; color: var(--yazi2); }
 @media (max-width: 599px) { .kismi-ayrinti > summary { min-height: 44px; } }
 @media (max-width: 599px) { .icerik > :not(.mk-sayfa) table.tablo-siralanir tr.kisa::after, .icerik > :not(.mk-sayfa) table.tablo-siralanir tr.kisa.acik::after { content: none; display: none; } }
+
+ 
+.ozet-serit { display: grid; gap: var(--b2); margin: 0 0 var(--b3); min-width: 0; }
+.ozet-serit-ana, .ozet-serit-ek { margin: 0; }
+.ozet-serit-ek[hidden] { display: none; }
+.ozet-serit-tumu { justify-self: start; min-height: 36px; color: var(--vurgu); font-weight: 600; }
+.segment { margin: 0 0 var(--b3); }
+.segment-dugme { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: var(--r-t); border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi2); font: inherit; font-size: var(--t-s); cursor: pointer; }
+.segment-dugme:hover { background: var(--yuzey2); }
+.segment-dugme.secili { background: var(--vurgu); color: var(--vurgu-yazi); border-color: var(--vurgu); font-weight: 650; }
+.segment-dugme .cip-sayi { background: var(--yuzey3); color: var(--yazi2); } .segment-dugme.secili .cip-sayi { background: rgba(255,255,255,.22); color: inherit; }
+.arac-cubugu { margin: 0 0 var(--b3); min-width: 0; }
+.arac-ust { display: flex; align-items: center; gap: var(--b2); min-width: 0; }
+.arac-arama { flex: 1 1 auto; min-width: 0; width: 100%; min-height: 40px; padding: 0 14px; border-radius: var(--r-t); border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi); font: inherit; font-size: var(--t-m); }
+.arac-ust .cip { flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 599px) { .arac-ust .cip { padding: 0 11px; } .arac-ust > .cip:not(.arac-filtre) { max-width: 34vw; overflow: hidden; text-overflow: ellipsis; display: inline-block; line-height: 40px; } }
+.filtre-sheet { display: grid; gap: var(--b4); }
+.filtre-grup-ad { font-size: var(--t-s); color: var(--soluk); font-weight: 600; margin-bottom: 2px; }
+.filtre-grup .cip-sira { margin: var(--b1) 0 0; }
+.filtre-alt { display: flex; justify-content: space-between; align-items: center; gap: var(--b3); padding-top: var(--b2); border-top: 1px solid var(--cizgi); }
+body.sheet-acik { overflow: hidden; }
+.sheet-arka { position: fixed; inset: 0; z-index: 95; background: rgba(8, 10, 14, .45); display: flex; align-items: flex-end; justify-content: center; }
+.sheet-pano { background: var(--yuzey); color: var(--yazi); width: 100%; max-height: 85vh; max-height: 85dvh; display: flex; flex-direction: column; border-radius: var(--r-l) var(--r-l) 0 0; box-shadow: var(--golge-2); padding-bottom: env(safe-area-inset-bottom); outline: 0; animation: sheet-yukari .2s ease-out; }
+.sheet-tutamac { width: 40px; height: 4px; border-radius: 2px; background: var(--eksen); margin: 8px auto 0; flex: 0 0 auto; }
+.sheet-ust { display: flex; align-items: center; justify-content: space-between; gap: var(--b3); padding: var(--b3) var(--b4); border-bottom: 1px solid var(--cizgi); flex: 0 0 auto; }
+.sheet-baslik { font-size: var(--t-l); min-width: 0; overflow-wrap: anywhere; }
+.sheet-kapat { width: 44px; height: 44px; display: inline-grid; place-items: center; border: 0; background: none; color: var(--yazi2); border-radius: var(--r-t); cursor: pointer; margin: -8px -8px -8px 0; }
+.sheet-kapat:hover { background: var(--yuzey2); }
+.sheet-govde { padding: var(--b4); overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+@keyframes sheet-yukari { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+@keyframes sheet-saga { from { transform: translateX(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+@media (min-width: 900px) {
+  .sheet-arka { align-items: stretch; justify-content: flex-end; }
+  .sheet-pano { width: 420px; max-width: 92vw; max-height: none; height: 100%; border-radius: var(--r-l) 0 0 var(--r-l); padding-bottom: 0; animation-name: sheet-saga; }
+  .sheet-tutamac { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .sheet-pano { animation: none; } }
+.ilkn-tumu { margin-top: var(--b2); }
+.tazelik-rozet { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); color: var(--soluk); background: var(--yuzey2); border: 1px solid var(--cizgi); border-radius: var(--r-t); padding: 2px 9px; line-height: 1.5; white-space: nowrap; max-width: 100%; }
+.tazelik-rozet i { width: 7px; height: 7px; border-radius: 50%; background: var(--iyi, var(--yesil)); flex: 0 0 auto; }
+.tazelik-rozet.eski { color: var(--sari-yazi); background: var(--sari-zemin); border-color: var(--sari); } .tazelik-rozet.eski i { background: var(--sari); }
+ 
+.taze-ikincil { display: none !important; }
+.taze-birlesik { display: flex !important; flex-wrap: nowrap; align-items: center; gap: 6px; font-size: var(--t-xs) !important; margin: 0 0 var(--b2) !important; padding: 2px 9px !important; width: fit-content; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: var(--r-t) !important; }
+.taze-birlesik.bant, .taze-birlesik.veri-tarihi { display: block !important; }
+.taze-birlesik strong { font-weight: 600; }
+.taze-birlesik > span { overflow: hidden; text-overflow: ellipsis; }

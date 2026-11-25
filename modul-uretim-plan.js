@@ -62,14 +62,19 @@
       var hy = v.hat_yuku || {}, aileler = hy.aileler || [], kap = h('div');
       if (!aileler.length) { kap.appendChild(G.bos({ baslik: 'Hat yükü yok', metin: 'Hat yükü bilgisi şu an alınamıyor.' })); return kap; }
       var ciftler = aileler.filter(function (a) { return a.kac_gunluk_is != null; }).map(function (a) { return { e: a.etiket || AILE_AD[a.aile] || a.aile, d: a.kac_gunluk_is }; });
-      var k = h('div', { sinif: 'kpi-izgara' });
+      var kutular = [];
       aileler.forEach(function (a) {
-        k.appendChild(G.kpi({ baslik: a.etiket || AILE_AD[a.aile] || a.aile, deger: ondalik(a.kac_gunluk_is), birim: a.kac_gunluk_is == null ? '' : 'günlük iş', ikon: 'makine',
-          alt: 'Açık iş ' + sayiYaz(a.acik_uretim_yuku) + (a.acik_uretim_yuku == null ? '' : ' ' + birimAd(a.birim)) + ' · günlük ort. ' + sayiYaz(a.son10_ort) }));
+        kutular.push({ baslik: a.etiket || AILE_AD[a.aile] || a.aile, deger: ondalik(a.kac_gunluk_is), birim: a.kac_gunluk_is == null ? '' : 'günlük iş', ikon: 'makine',
+          alt: 'Açık iş ' + sayiYaz(a.acik_uretim_yuku) + (a.acik_uretim_yuku == null ? '' : ' ' + birimAd(a.birim)) + ' · günlük ort. ' + sayiYaz(a.son10_ort) });
       });
-      kap.appendChild(k);
+      (hy.toplam_hedefler || []).forEach(function (t) {
+        kutular.push({ baslik: (t.ad === 'spanc_toplam' ? 'Spanç toplam hedef' : metin(t.etiket)), deger: t.hedef == null ? '—' : G.say(t.hedef), birim: t.hedef == null ? '' : birimAd(t.birim),
+          ikon: 'hedef', etiket: t.hedef != null && t.hedef_durum === 'teyitsiz' ? { metin: 'Kesin değil', tur: 'tahmin' } : null,
+          alt: 'Son 10 iş günü toplamı: ' + sayiYaz(t.toplam_son10_ort) });
+      });
+      kap.appendChild(G.ozetSerit(kutular, { en: 4 }));
       kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Hat ailesi yükü', alt: 'açık işin kaç günlük olduğu', govde: ciftler.length ? G.cubuk(ciftler, { ad: 'Kaç günlük iş' }) : h('p', { sinif: 'ny-ipucu', metin: 'Hesaplanabilen hat ailesi yok.' }) })]));
-      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Hat aileleri', alt: 'son 10 iş günü ortalaması', govde: G.tablo({ sayfa: 20, bos: 'Hat ailesi yok.', satirlar: aileler, kolonlar: [
+      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Hat aileleri', alt: 'son 10 iş günü ortalaması', govde: G.tablo({ sayfa: 10, bos: 'Hat ailesi yok.', satirlar: aileler, kolonlar: [
         { k: 'etiket', ad: 'Hat ailesi', ciz: function (r) { return r.etiket || AILE_AD[r.aile] || r.aile; } },
         { k: 'acik_uretim_yuku', ad: 'Açık iş', sag: true, tur: 'sayi', ciz: function (r) { return r.acik_uretim_yuku == null ? '—' : G.say(r.acik_uretim_yuku) + ' ' + birimAd(r.birim); } },
         { k: 'son10_ort', ad: 'Günlük ort.', sag: true, tur: 'sayi', ciz: function (r) { return sayiYaz(r.son10_ort); } },
@@ -77,18 +82,11 @@
         { k: 'hedef', ad: 'Hedef', sag: true, tur: 'sayi', ciz: hedefHucre },
         { k: 'olcum_kaynagi', ad: 'Ölçüm', ciz: function (r) { return olcumAd(r.olcum_kaynagi); } }] }) })]));
       var mab = null; aileler.forEach(function (a) { if (a.aile === 'mabotex' && a.hatlar && a.hatlar.length) mab = a; });
-      if (mab) kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Mabotex hatları', alt: 'hat bazında', govde: G.tablo({ sayfa: 20, bos: 'Hat yok.', satirlar: mab.hatlar, kolonlar: [
+      if (mab) kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Mabotex hatları', alt: 'hat bazında', govde: G.tablo({ sayfa: 10, bos: 'Hat yok.', satirlar: mab.hatlar, kolonlar: [
         { k: 'hat', ad: 'Hat' },
         { k: 'acik_uretim_yuku', ad: 'Açık iş', sag: true, tur: 'sayi', ciz: function (r) { return r.acik_uretim_yuku == null ? '—' : G.say(r.acik_uretim_yuku) + ' ' + birimAd(r.birim); } },
         { k: 'son10_ort', ad: 'Günlük ort.', sag: true, tur: 'sayi', ciz: function (r) { return sayiYaz(r.son10_ort); } },
         { k: 'kac_gunluk_is', ad: 'Kaç günlük iş', sag: true, tur: 'sayi', ciz: function (r) { return ondalik(r.kac_gunluk_is); } }] }) })]));
-      (hy.toplam_hedefler || []).forEach(function (t) {
-        var kt = h('div', { sinif: 'kpi-izgara ust-bosluk' });
-        kt.appendChild(G.kpi({ baslik: (t.ad === 'spanc_toplam' ? 'Spanç toplam hedef' : metin(t.etiket)), deger: t.hedef == null ? '—' : G.say(t.hedef), birim: t.hedef == null ? '' : birimAd(t.birim),
-          ikon: 'hedef', etiket: t.hedef != null && t.hedef_durum === 'teyitsiz' ? { metin: 'Kesin değil', tur: 'tahmin' } : null,
-          alt: 'Son 10 iş günü toplamı: ' + sayiYaz(t.toplam_son10_ort) }));
-        kap.appendChild(kt);
-      });
       var es = hy.esleme;
       if (es && (es.eslenen_oran != null || es.eslenmeyen_oran != null)) kap.appendChild(h('p', { sinif: 'ny-ipucu', metin: 'Ürün eşleme: ' + yuzde(es.eslenen_oran) + ' eşlendi · ' + yuzde(es.eslenmeyen_oran) + ' Diğer hatlarda' }));
       return kap;
@@ -113,7 +111,7 @@
       k.appendChild(G.kpi({ baslik: 'Eksik olup üretimi açılmamış', deger: G.say(uretimsiz), ikon: 'makine' }));
       kap.appendChild(k);
       if (!dogr) kap.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Depo tanımı doğrulanmadı' }), ' — stok kırılımı (steril, sterilsiz, karantina) kesin olmayabilir.']));
-      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.tablo({ sayfa: 20, bos: 'Eşleşen sipariş yok.', satirlar: satirlar, kolonlar: [
+      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.tablo({ sayfa: 10, bos: 'Eşleşen sipariş yok.', satirlar: satirlar, kolonlar: [
         { k: '_sirket', ad: 'Şirket' },
         { k: 'musteri_kisa', ad: 'Müşteri', ciz: function (r) { return metin(r.musteri_kisa); } },
         { k: 'urun', ad: 'Ürün', ciz: function (r) { return metin(r.urun); } },
@@ -139,7 +137,7 @@
         etiket: s.kapasite_gunluk_koli != null && s.kapasite_durum === 'teyitsiz' ? { metin: 'Kesin değil', tur: 'tahmin' } : null }));
       k.appendChild(G.kpi({ baslik: 'Sterilizasyon kuyruğu', deger: sayiYaz(toplamKoli), birim: toplamKoli == null ? '' : 'koli', ikon: 'stok', alt: toplamPalet == null ? '' : G.say(toplamPalet) + ' palet' }));
       kap.appendChild(k);
-      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Kuyruk', alt: 'sterilizasyon bekleyen', govde: kuyruk == null ? h('p', { sinif: 'ny-ipucu', metin: 'Kuyruk hesaplanamadı.' }) : G.tablo({ sayfa: 20, bos: 'Kuyrukta ürün yok.', satirlar: kuyruk, kolonlar: [
+      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Kuyruk', alt: 'sterilizasyon bekleyen', govde: kuyruk == null ? h('p', { sinif: 'ny-ipucu', metin: 'Kuyruk hesaplanamadı.' }) : G.tablo({ sayfa: 10, bos: 'Kuyrukta ürün yok.', satirlar: kuyruk, kolonlar: [
         { k: 'urun', ad: 'Ürün', ciz: function (r) { return metin(r.urun); } },
         { k: 'koli', ad: 'Koli', sag: true, tur: 'sayi', ciz: function (r) { return sayiYaz(r.koli); } },
         { k: 'palet', ad: 'Palet', sag: true, tur: 'sayi', ciz: function (r) { return sayiYaz(r.palet); } },

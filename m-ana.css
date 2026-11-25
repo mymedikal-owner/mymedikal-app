@@ -51,3 +51,14 @@
 .kk-nokta { position: absolute; top: 8px; right: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--uyari); } .kom-kutu.ton-kritik .kk-nokta { background: var(--kritik); }
 .komuta.az .kom-kutu { padding: 18px 12px; } .komuta.az .kk-sayi { font-size: 34px; }
 @media (min-width: 900px) { .kom-izgara { grid-template-columns: repeat(4, minmax(0, 1fr)); } .komuta.az .kom-izgara { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); } }
+ 
+.kom-hero { border-radius: var(--r-m); padding: 10px 12px; margin-bottom: var(--b2); display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: var(--b3); }
+.kom-hero .kh-k { grid-column: 1; font-size: 12px; } .kom-hero .kh-b { grid-column: 1; font-size: 20px; margin: 0; }
+.kom-hero .kh-t { grid-column: 2; grid-row: 1 / span 2; gap: 6px; } .kom-hero .kh-t div { padding: 4px 8px; border-radius: 10px; font-size: 11px; text-align: center; } .kom-hero .kh-t b { font-size: 18px; }
+.komuta { margin-bottom: var(--b3); } .kom-izgara { gap: 8px; }
+.kom-kutu { border-radius: var(--r-m); padding: 8px 4px 6px; gap: 0; }
+.kk-ik { width: 30px; height: 30px; border-radius: 9px; margin-bottom: 2px; } .kk-sayi { font-size: 20px; } .kk-alt { font-size: 10px; line-height: 1.2; }
+.komuta.az .kom-kutu { padding: 12px 10px; } .komuta.az .kk-sayi { font-size: 26px; }
+.dikkat { margin-bottom: var(--b3); } .dikkat-kart { min-height: 48px; padding: 8px var(--b3); }
+.ana-ayr-dugme { margin: 0 0 var(--b3); min-height: 44px; color: var(--vurgu); font-weight: 600; } .ana-ayr-izgara[hidden] { display: none; }
+@media (max-width: 599px) { .ana-ayr-izgara { grid-template-columns: 1fr; } .ana-ayr-izgara .kpi-spark, .ana-ayr-izgara .spark { max-height: 40px; } }

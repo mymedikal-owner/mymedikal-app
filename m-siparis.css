@@ -25,5 +25,7 @@
 .tablo-siralanir th, .tablo-siralanir td { text-align: left; } .tablo-siralanir th.sag, .tablo-siralanir td.sag { text-align: right; }
 @media (max-width: 599px) { .cip, .mini-dugme { min-height: 44px; } }
 .y2-satir.tikla { min-height: 44px; }
+.sp-sayim-satir { display: flex; align-items: center; justify-content: space-between; gap: var(--b2); margin: var(--b2) 0; } .sp-sayim-satir .sp-sayim { margin: 0; }
+.sp-arama-ust { margin: var(--b1, 4px) 0 var(--b2); }
 .sp-kpi { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); } .sp-kpi .kpi-sayi { font-size: var(--t-2xl); } .sp-kpi .kpi-baslik { white-space: normal; }
 @media (max-width: 600px) { .sp-huni .y2-satir { grid-template-columns: 1fr auto; row-gap: 2px; padding-bottom: 6px; } .sp-huni .y2-yol { grid-column: 1 / -1; grid-row: 2; } }

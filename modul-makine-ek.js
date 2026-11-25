@@ -7,7 +7,7 @@
   var MM = window.MM, h = MM.h, G = MM.gr;
   var YENILE_MS = 30000, EK_MS = 5 * 60000;   
   function say(n) { return n == null ? '—' : Math.round(n).toLocaleString('tr-TR'); }
-  function bekleniyor(ad) { return h('p', { sinif: 'me-soluk', metin: ad + ': Veri bekleniyor' }); }
+  function bekleniyor(ad) { return h('p', { sinif: 'me-soluk', metin: ad + ': Kayıt yok' }); }
 
   var ESKI_MS = 3 * 60000;   
   

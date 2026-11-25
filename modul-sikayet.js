@@ -42,10 +42,11 @@
         G.kart({ baslik: 'Şikâyet türleri', alt: 'Toplam', govde: yatayTur(T, 'var(--s1)') }),
         G.kart({ baslik: 'Ürünler', alt: 'Olay sayısına göre', govde: (x.urunler || []).length ? G.yatay(x.urunler.map(function (u) { return { e: u.urun, d: u.olay, renk: 'var(--s2)', etiketDeger: G.say(u.olay) }; }), { maks: x.urunler[0].olay }) : h('p', { sinif: 'soluk', metin: '—' }) })]));
       var ol = (x.olaylar || []).slice().sort(function (a, b) { return String(b.tarih || '').localeCompare(String(a.tarih || '')); });
-      if (ol.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Olaylar', alt: 'En yeniden eskiye', govde: G.sayfali(ol, function (o) {
+      if (ol.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Olaylar', alt: 'En yeniden eskiye', govde: G.ilkN(ol, function (o) {
         return h('div', { sinif: 's41-satir' }, [h('div', { sinif: 'ad', metin: (o.turler || []).join(', ') || '—' }), h('div', { sinif: 'sag', metin: o.tarih ? S.tarihTR(o.tarih) : '—' }),
           h('div', { sinif: 'alt', metin: [(o.urunler || []).join(', '), DURUM_AD[o.durum] || null, o.oncelik, o.kapanis_tarihi ? (EN ? 'closed ' : 'kapanış ') + S.tarihTR(o.kapanis_tarihi) : null, o.iptal_tutar_tl ? (EN ? 'cancelled ' : 'iptal ') + S.para(o.iptal_tutar_tl) : null].filter(Boolean).join(' · ') })]);
       }, { n: 8 }) })]));
+       
       return f;
     }
     function ayGrafik(v) {
@@ -100,25 +101,29 @@
       }
       var d = onc.yuk.veri, L = d.olaylar, z = d.ozet || {};
       if (st.osec) { var x = L.filter(function (k) { return okey(k) === st.osec; })[0]; if (x) { f.appendChild(oncelikDetay(x)); return f; } st.osec = null; }
-      f.appendChild(h('div', { sinif: 'ml-kpi-izgara ust-bosluk' }, [kutu('Acil', G.say(z.acil), null), kutu('Yüksek', G.say(z.yuksek), null), kutu('Normal', G.say(z.normal), null), kutu('Hedefi aşan', G.say(z.hedef_asan), z.eskalasyon ? z.eskalasyon + ' olay için üst bildirim' : null)]));
-      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Öncelik sırası', alt: 'Açık olaylar; önce bakılacak olan üstte. Sıralama karar değildir, yöntem alttadır', govde: L.length ? G.sayfali(L, oncelikSatir, { n: 12 }) : G.bos({ baslik: 'Açık olay yok', metin: 'Sıralanacak açık şikâyet bulunmuyor.' }) })]));
+      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.ozetSerit([kutu('Acil', G.say(z.acil), null), kutu('Yüksek', G.say(z.yuksek), null), kutu('Normal', G.say(z.normal), null), kutu('Hedefi aşan', G.say(z.hedef_asan), z.eskalasyon ? z.eskalasyon + ' olay için üst bildirim' : null)], { en: 4 })]));
+      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Öncelik sırası', alt: 'Açık olaylar; önce bakılacak olan üstte. Sıralama karar değildir, yöntem alttadır', govde: L.length ? G.ilkN(L, oncelikSatir, { n: 10 }) : G.bos({ baslik: 'Açık olay yok', metin: 'Sıralanacak açık şikâyet bulunmuyor.' }) })]));
       var bn = d.bilgi_notu_onerileri || [];
-      if (bn.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Bilgi notu önerileri', alt: 'Son 12 ayda tekrarlayan türler', govde: h('div', null, bn.map(function (n) {
+      if (bn.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Bilgi notu önerileri', alt: 'Son 12 ayda tekrarlayan türler', govde: G.ilkN(bn, function (n) {
         return h('div', { sinif: 's41-satir' }, [h('div', { sinif: 'ad', metin: n.onerilen_baslik }), h('div', { sinif: 'sag', metin: n.olay_sayisi + ' olay' }), h('div', { sinif: 'alt', metin: n.tur + ' · ' + n.hastane_sayisi + ' hastane' })]);
-      })) })]));
+      }, { n: 3 }) })]));
       if (d.yontem && d.yontem.puan) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Puan nasıl hesaplanır', govde: h('div', null, [h('p', { metin: d.yontem.puan }), h('p', { sinif: 'soluk', metin: (d.yontem.seviye || '') + ' ' + (d.yontem.hedef_sure || '') })]) })]));
       return f;
     }
     function genel(v) {
       var f = document.createDocumentFragment(), o = v.ozet || {}, H = (v.hastaneler || []).slice().sort(function (a, b) { return (b.dikkat_skoru || 0) - (a.dikkat_skoru || 0); });
-      f.appendChild(h('div', { sinif: 'ml-kpi-izgara' }, [kutu('Son 12 ay olay', G.say(o.olay_12ay), null), kutu('Açık olay', G.say(o.acik_olay), null), kutu('Hastane sayısı', G.say(o.hastane_sayisi), null), SAHA ? null : kutu('Ceza kesintisi (toplam, MY+DAY)', tl(o.ceza_toplam_tl), null)]));
-      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.cipler([['genel', 'Genel görünüm'], ['oncelik', 'Öncelik sırası']], st.sekme, function (k) { st.sekme = k; st.osec = null; ciz(); }, 'Görünüm')]));
+      f.appendChild(G.ozetSerit([kutu('Son 12 ay olay', G.say(o.olay_12ay), null), kutu('Açık olay', G.say(o.acik_olay), null), kutu('Hastane sayısı', G.say(o.hastane_sayisi), null), SAHA ? null : kutu('Ceza kesintisi (toplam, MY+DAY)', tl(o.ceza_toplam_tl), null)].filter(Boolean), { en: 4 }));
+      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.segment([['genel', 'Genel görünüm'], ['oncelik', 'Öncelik sırası'], ['dagilim', 'Şikâyet türleri']], st.sekme, function (k) { st.sekme = k; st.osec = null; ciz(); }, { ad: 'Görünüm' })]));
       if (st.sekme === 'oncelik') { f.appendChild(oncelikGorunum()); return f; }
+      if (st.sekme === 'dagilim') { f.appendChild(dagilim(v, H)); return f; }
       var dik = H.filter(function (x) { return x.dikkat_seviye !== 'izle'; }), liste = st.filtre === 'dikkat' ? dik : H;
       f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Dikkat listesi', alt: SAHA ? 'Hastaneler dikkat skoruna göre; seviye olay sayısı ve açık kayıtla belirlenir' : 'Hastaneler dikkat skoruna göre; seviye olay sayısı, açık kayıt ve ceza kesintisiyle belirlenir',
-        govde: h('div', null, [G.cipler([['dikkat', 'Dikkat gerektirenler', dik.length], ['tum', 'Tüm hastaneler', H.length]], st.filtre, function (k) { st.filtre = k; ciz(); }, 'Liste'),
-          liste.length ? G.sayfali(liste, hastaneSatir, { n: 12 }) : G.bos({ baslik: 'Dikkat gerektiren hastane yok', metin: 'Tüm hastaneler izleme seviyesinde.' })]) })]));
-      var tur = topla(H, 'tur_dagilimi_12ay'), u10 = v.urun_ilk10 || [];
+        govde: h('div', null, [G.segment([['dikkat', 'Dikkat gerektirenler', dik.length], ['tum', 'Tüm hastaneler', H.length]], st.filtre, function (k) { st.filtre = k; ciz(); }, { ad: 'Liste' }),
+          liste.length ? G.ilkN(liste, hastaneSatir, { n: 10 }) : G.bos({ baslik: 'Dikkat gerektiren hastane yok', metin: 'Tüm hastaneler izleme seviyesinde.' })]) })]));
+      return f;
+    }
+    function dagilim(v, H) {
+      var f = document.createDocumentFragment(), tur = topla(H, 'tur_dagilimi_12ay'), u10 = v.urun_ilk10 || [];
       var ik = h('div', { sinif: 's41-ikili ust-bosluk' });
       if (sirali(tur).length) ik.appendChild(G.kart({ baslik: 'Şikâyet türü dağılımı', alt: 'Son 12 ay, olay sayısı', govde: yatayTur(tur, 'var(--s1)') }));
       if (u10.length) ik.appendChild(G.kart({ baslik: 'En çok şikâyet alan 10 ürün', alt: 'Olay sayısına göre', govde: G.yatay(u10.map(function (u) { return { e: u.urun, d: u.olay, renk: 'var(--s2)', etiketDeger: G.say(u.olay) }; }), { maks: u10[0].olay }) }));

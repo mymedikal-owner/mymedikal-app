@@ -191,3 +191,6 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-hn-iz { margin: 0; } .dm-hn-iz i { background: var(--vurgu); }
 .dm-hn-satir.yok .dm-hn-iz i { background: repeating-linear-gradient(45deg, var(--yuzey3), var(--yuzey3) 6px, var(--cizgi) 6px, var(--cizgi) 12px); }
 .dm-hn-say { font-variant-numeric: tabular-nums; } .dm-hn-satir.yok .dm-hn-say { font-size: var(--t-s); color: var(--soluk); font-weight: 500; }
+ 
+.dm-taze-satir { display: flex; align-items: center; flex-wrap: wrap; gap: var(--b1) var(--b3); margin: 0 0 var(--b2); min-width: 0; }
+.dm-ihale-izgara > .ilkn-tumu, .dm-liste > .ilkn-tumu { grid-column: 1 / -1; }

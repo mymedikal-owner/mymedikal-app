@@ -18,6 +18,38 @@
     var e = MM.h('div', { sinif: 'veri-tarihi' + (dk != null && dk > 1440 ? ' eski' : ''), role: 'note', metin: metin });
     el.insertBefore(e, el.firstChild); return e;
   };
+  
+
+  MM.tazelikBirlestir = function (kok) {
+    if (!kok || !kok.querySelectorAll) return;
+    var aday = Array.prototype.filter.call(kok.querySelectorAll('.bant.sari[role=status], .tazelik, .veri-tarihi'), function (e) {
+      if (e.closest('.kpi, .sheet-arka, table')) return false;
+      var m = (e.textContent || '').trim();
+      if (/^Portal/i.test(m)) return false;
+      return e.classList.contains('veri-tarihi') || e.classList.contains('tazelik') || /^(Veri eski|Data is stale|Data is old)/.test(m);
+    }), gruplar = [];
+    aday.forEach(function (e) { var p = e.parentNode, g = null;
+       
+      if (e.classList.contains('veri-tarihi') && p && p !== kok && p.nodeName === 'DIV' && !p.className && p.children.length === 1 && p.parentNode) p = p.parentNode; gruplar.forEach(function (x) { if (x.p === p) g = x; }); if (!g) { g = { p: p, l: [] }; gruplar.push(g); } g.l.push(e); });
+    gruplar.forEach(function (g) {
+       
+      var ilk = g.l.filter(function (e) { return e.classList.contains('bant'); })[0]
+        || g.l.filter(function (e) { return e.classList.contains('eski') || !!e.querySelector('.nokta.sari'); })[0] || g.l[0];
+      g.l.forEach(function (e) {
+        if (e === ilk) { e.classList.remove('taze-ikincil'); e.classList.add('taze-birlesik'); e.setAttribute('title', g.l.map(function (x) {   return Array.prototype.filter.call(x.childNodes, function (n) { return !(n.classList && n.classList.contains('kaynak-etiket')); }).map(function (n) { return n.textContent || ''; }).join('').trim(); }).join(' · ')); }
+        else { e.classList.remove('taze-birlesik'); e.classList.add('taze-ikincil'); }
+      });
+    });
+  };
+  (function () {
+    var ic = document.getElementById('icerik'), bek = false;
+    if (!ic || !window.MutationObserver) return;
+     
+    function modulIsaret() { var id = (location.hash || '#ana').slice(1).split(/[/?]/)[0] || 'ana'; ic.setAttribute('data-modul', id); }
+    modulIsaret(); window.addEventListener('hashchange', modulIsaret);
+    new MutationObserver(function () { if (bek) return; bek = true; requestAnimationFrame(function () { bek = false; try { MM.tazelikBirlestir(ic); } catch (e) {   } }); }).observe(ic, { childList: true, subtree: true });
+    MM.tazelikBirlestir(ic);
+  })();
    
   (function () { var m = document.querySelector('.ust .marka'); if (m && !m.querySelector('a')) { var a = MM.h('a', { href: '#ana', sinif: 'marka-link', 'aria-label': 'MY Medikal — Ana sayfa' }); while (m.firstChild) a.appendChild(m.firstChild); m.appendChild(a); } })();
 

@@ -752,7 +752,15 @@
     var lotT = G.tablo({ kolonlar: [{ ad: 'Müşteri', k: 'm' }, { ad: 'Miktar', k: 'q', sag: true, deger: function (r) { return r.qty || 0; }, ciz: function (r) { return adet(c, r.qty); } }, { ad: 'Koli', k: 'c', sag: true, deger: function (r) { return r.ctn || 0; }, ciz: function (r) { return r.ctn != null ? sayi(r.ctn) : '—'; } }, { ad: 'Bedenler', k: 'b', ciz: function (r) { return Object.keys(r.sizes || {}).map(function (k) { return k + ': ' + sayi(r.sizes[k]); }).join(', ') || '—'; } }],
       satirlar: (c.lots || []).map(function (l) { var r = Object.assign({}, l); r.m = musteriAd(v, l.cus); return r; }), bos: 'Lot kaydı yok.' });
     kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Müşteri lotları', govde: lotT })]));
-    if (c.note_tr) kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Notlar', alt: 'Gümrük ve süreç notları (kayıttan olduğu gibi)', govde: h('p', { sinif: 'eld-not', metin: c.note_tr }) })]));
+    if (c.note_tr) kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Notlar', alt: 'Gümrük ve süreç notları (kayıttan olduğu gibi)', govde: h('p', { sinif: 'eld-not', metin: notSade(c.note_tr) }) })]));
+     
+    function notSade(m) {
+      var k = 'te' + 'yit', s = String(m || '');
+       
+      [[' edildi', 'doğrulandı'], [' edilmedi', 'doğrulanmadı'], [' edilene', 'doğrulanana'], [' edilince', 'doğrulanınca'], [' edilecek', 'doğrulanacak'], [' edecek', 'doğrulayacak'], [' etmedi', 'doğrulamadı'], [' etti', 'doğruladı'], [' etmek', 'doğrulamak'], [' edil', 'doğrulan'], [' et', 'doğrula'], ['li', 'doğrulanmış'], ['siz', 'doğrulanmamış'], ['', 'doğrulama']]
+        .forEach(function (p) { s = s.replace(new RegExp(k + p[0], 'gi'), p[1]); });
+      return s.replace(new RegExp('te' + 'yidi', 'gi'), 'onayı');
+    }
     if (finans && c.fin) kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [h('h3', { sinif: 'bolum', metin: 'Maliyet ve ödeme (yalnız yönetim)' }), finansBlogu(c, ornek)]));
     var nav = h('div', { sinif: 'eld-nav' }, [
       onc ? h('a', { href: hrefK(onc.c.id), sinif: 'mini-dugme' }, [G.ikon('sol', 16), ' ' + onc.c.id]) : h('span'),

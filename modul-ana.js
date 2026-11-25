@@ -217,7 +217,16 @@
       ['hatlar', 'dokuma', 'alarm', 'eldiven', 'siparis', 'kalite', 'isg'].forEach(function (ad) { if (/^(hatlar|dokuma|alarm)$/.test(ad) && !gorur('makineler')) return; if (ad === 'alarm' && oz.fab && (oz.fab.v.alarmlar || []).length === 0) return; var k = MM.anaKpi.yap(ad, oz); if (k) { izg.appendChild(k); say++; } });
       if (!say && km.n) {   }
       else if (!say) govde.appendChild(gr.bos({ baslik: 'Gösterilecek özet yok', metin: 'Gösterilecek bölüm verisi şu an yok.', tur: 'bekle', eylem: { ad: 'Yeniden dene', fn: function () { MM.git('#ana'); } } }));
-      else { if (km.n >= 3) govde.appendChild(h('h3', { sinif: 'bolum', metin: 'Ayrıntılı özet' })); govde.appendChild(izg); }
+      else {
+         
+        if (km.n >= 3) {
+          var ayrAcik = false, ayrDg = h('button', { type: 'button', sinif: 'cip ana-ayr-dugme', 'aria-expanded': 'false' }, [MM.t ? MM.t('Ayrıntılı özet') + ' (' + say + ')' : 'Ayrıntılı özet (' + say + ')']);
+          izg.setAttribute('hidden', ''); izg.classList.add('ana-ayr-izgara');
+          ayrDg.addEventListener('click', function () { ayrAcik = !ayrAcik; if (ayrAcik) izg.removeAttribute('hidden'); else izg.setAttribute('hidden', ''); ayrDg.setAttribute('aria-expanded', String(ayrAcik)); ayrDg.textContent = ayrAcik ? (MM.t ? MM.t('Kapat') : 'Kapat') : (MM.t ? MM.t('Ayrıntılı özet') + ' (' + say + ')' : 'Ayrıntılı özet (' + say + ')'); });
+          govde.appendChild(ayrDg);
+        }
+        govde.appendChild(izg);
+      }
       Object.keys(oz.hata).forEach(function (k) { govde.appendChild(h('div', { sinif: 'bant ' + (oz.hata[k].kod === 'ayar_bekleniyor' || oz.hata[k].kod === 'giris_gerekli' ? 'gri' : 'kirmizi'), role: 'status' }, [h('strong', { metin: (BOLUM_AD[k] || 'Bir bölüm') + ' verisi alınamadı' }), ' — ' + oz.hata[k].message])); });
     });
     return function () { iptal = true; if (talkDur) talkDur(); };

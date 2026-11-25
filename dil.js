@@ -121,7 +121,9 @@
     'Son 7 gün': 'Last 7 days', 'Son 30 gün': 'Last 30 days', 'Kayıt yok.': 'No records.', 'Açık düzeltmeler': 'Open corrections',
     'Hafta': 'Week', 'Ay': 'Month', 'Hesap': 'Account', 'Dil / Language': 'Dil / Language',
      
-    'Canlı': 'Live', '{n} hatta veri gecikmeli': 'Data delayed on {n} line(s)', 'Veri gecikmeli (son: {t})': 'Data delayed (last: {t})', 'Veri gecikmeli': 'Data delayed'
+    'Canlı': 'Live', '{n} hatta veri gecikmeli': 'Data delayed on {n} line(s)', 'Veri gecikmeli (son: {t})': 'Data delayed (last: {t})', 'Veri gecikmeli': 'Data delayed',
+     
+    'Filtre': 'Filter', 'Filtreyi temizle': 'Clear filter', 'Eski veri': 'Old data', 'Görünümler': 'Views', 'Filtreler': 'Filters', 'dk': 'min', 'sa': 'h'
   };
    
   var TAM41 = {
@@ -524,7 +526,7 @@
     'Kişi seçin': 'Select people', 'Sohbet yok': 'No chats', 'Mesaj yok': 'No messages', 'Mesaj': 'Message', 'Gönder': 'Send', 'Kartı gönder': 'Send card', 'Siz': 'You', 'Okundu': 'Read',
     'Gönderildi': 'Sent', 'Gönderiliyor': 'Sending', 'Gönderilemedi': 'Not sent', 'Ulaştı': 'Delivered', 'İletildi': 'Delivered', 'Okundu': 'Read', 'Yeniden dene': 'Try again', 'Mesajın ulaştığı ve okunduğu bilgisi sohbet üyelerine gösterilir.': 'Whether a message was delivered and read is shown to the members of the chat.', 'Biri': 'Someone', 'yazıyor…': 'is typing…', 'Sesli ara': 'Voice call', 'Görüntülü ara': 'Video call', 'Aranıyor': 'Calling', 'Arama sürüyor': 'Call in progress',
     'sizi arıyor': 'is calling you', 'görüntülü': 'video', 'Sesli mesaj': 'Voice message', 'Dosya': 'File', 'Paylaşılan kart': 'Shared card', 'Dosya / fotoğraf': 'File / photo', 'Katıl': 'Join',
-    'Sohbet': 'Chat', 'Kişi bulunamadı': 'No people found', 'Yükleniyor': 'Loading', 'Mesaj kapalı': 'Messaging is off',
+    'Sohbet': 'Chat', 'Kişi bulunamadı': 'No people found', 'Yükleniyor': 'Loading', 'Yükleniyor…': 'Loading…', 'Mesaj kapalı': 'Messaging is off',
     'Mesaj girişi alınamadı': 'Could not sign in to messaging', 'Giriş geçersiz': 'Sign-in is not valid', 'Bu sohbete erişiminiz yok': 'You do not have access to this chat', 'Bulunamadı': 'Not found',
     'Geçersiz istek': 'Invalid request', 'Çok sık istek; biraz sonra deneyin': 'Too many requests; please try again shortly', 'Bağlantı yok': 'No connection', 'Sunucu hatası': 'Server error',
     'Mesaj boş': 'Message is empty', 'Mesaj çok uzun': 'Message is too long', 'Bu dosya türü gönderilemez': 'This file type cannot be sent', 'Dosya 25 MB\'tan büyük olamaz': 'File cannot be larger than 25 MB',

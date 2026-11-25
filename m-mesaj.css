@@ -343,3 +343,27 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .ms-yerel-not { align-self: center; margin: 6px 12px; padding: 4px 10px; font-size: 12.5px; text-align: center; color: var(--ms-saat); background: rgba(127, 127, 127, 0.12); border-radius: 10px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ms-m-asistan { background: #2a2650; color: #e6e3ff; } }
 :root[data-theme="dark"] .ms-m-asistan { background: #2a2650; color: #e6e3ff; }
+
+ 
+.ms-ozet { white-space: nowrap; display: block; -webkit-line-clamp: unset; line-clamp: unset; }
+.ms-sohbet { border-bottom: 1px solid var(--ms-ince); min-height: 68px; }
+.ms-sat-kap:last-child .ms-sohbet { border-bottom: 0; }
+.ms-sohbet-ust { background: var(--ms-arama-zemin); }
+.ms-mesajlar { overscroll-behavior: contain; }
+.ms-alt { background: var(--ms-arama-zemin); align-items: center; padding-top: 8px; }
+.ms-yaz-kap { max-height: 140px; }
+.ms-yaz { max-height: 140px; overflow-y: auto; }
+.ms-m { max-width: 78%; }
+.ms-meta { float: none; }
+.ms-sol-bolme .ms-ust-sat { position: sticky; top: 0; z-index: 2; background: var(--yuzey, #fff); }
+.ms-sol-bolme .ms-arama-kap { position: sticky; top: 0; z-index: 1; }
+@media (min-width: 1024px) {
+  .ms-bolme > .ms-kok.ms-sol-bolme { padding: 0; gap: 0; overscroll-behavior: contain; }
+  .ms-sol-bolme > .ms-ust-sat, .ms-sol-bolme > .ms-buyuk-baslik { padding-left: 16px; padding-right: 16px; }
+  .ms-sol-bolme > .ms-arama-kap { margin: 6px 12px; }
+  .ms-sol-bolme > .ms-cipler { padding: 4px 12px 6px; }
+  .ms-sol-bolme .ms-sohbet { padding-left: 14px; padding-right: 14px; }
+  .ms-sol-bolme .ms-sat-kap.ms-secili .ms-sohbet { background: var(--ms-arama-zemin); }
+  .ms-bolme .ms-m { max-width: min(65%, 680px); }
+  .ms-bolme .ms-ekran-sohbet { overflow: hidden; }
+}

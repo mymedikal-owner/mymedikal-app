@@ -1,5 +1,13 @@
  
-#icerik .kpi-izgara { margin-bottom: var(--b3); }
+ 
+#icerik[data-modul="uretim-plan"] .kpi-izgara { margin-bottom: var(--b3); }
+@media (max-width: 599px) {
+  #icerik[data-modul="uretim-plan"] .kpi-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
+  #icerik[data-modul="uretim-plan"] .kpi-izgara .kpi-ikon { display: none; }
+  #icerik[data-modul="uretim-plan"] .kpi-izgara .kpi-ana { padding: var(--b2) var(--b3); }
+  #icerik[data-modul="uretim-plan"] .kpi-izgara .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-s); }
+  #icerik[data-modul="uretim-plan"] .kpi-izgara .kpi-sayi { font-size: 26px; }
+}
 #icerik .ny-ipucu { margin: var(--b3) 0; }
 .up-liste { display: flex; flex-direction: column; }
 .up-satir { display: flex; justify-content: space-between; align-items: center; gap: var(--b3); padding: 10px 0; border-bottom: 1px solid var(--cizgi, var(--gri-zemin)); width: 100%; text-align: left; background: none; border-left: 0; border-right: 0; border-top: 0; color: inherit; font: inherit; }

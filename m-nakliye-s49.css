@@ -31,5 +31,15 @@
 .kt-uy-sat { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--b2); padding: var(--b2) 0; border-top: 1px solid var(--cizgi); font-size: var(--t-s); }
 .kt-uy-no { overflow-wrap: anywhere; } .kt-uy-gun { font-weight: 600; color: var(--kirmizi); font-variant-numeric: tabular-nums; text-align: right; }
 .kt-uy-alt { grid-column: 1 / -1; font-size: var(--t-xs); color: var(--soluk); overflow-wrap: anywhere; }
+@media (max-width: 599px) {
+  #icerik[data-modul="nakliye"] .tq-kart { grid-template-columns: auto minmax(0, 1fr); gap: var(--b2); padding: var(--b2) var(--b3); }
+  #icerik[data-modul="nakliye"] .tq-kart-ikon { width: 28px; height: 28px; }
+  #icerik[data-modul="nakliye"] .tq-kart-sag { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 4px 8px; text-align: left; white-space: normal; }
+  #icerik[data-modul="nakliye"] .ns-cizgi { margin-top: 2px; }
+}
+.tq-liste > .ilkn-tumu { grid-column: 1 / -1; }
+.tq-liste > .ns-grup-ad { grid-column: 1 / -1; margin: var(--b2) 0 0; }
+.ns-gruplar { margin-top: var(--b3); }
+.ns-gecikmis { padding: var(--b3); }
 .ns-grup { margin-top: var(--b4); }
 .ns-grup-ad { margin: 0 0 var(--b2); font-size: var(--t-m); display: flex; align-items: center; gap: var(--b2); overflow-wrap: anywhere; }

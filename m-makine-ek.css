@@ -9,6 +9,8 @@
 .me-canli-alt { font-size: var(--t-xs); color: var(--soluk); }
 .me-canli-vard { font-size: var(--t-xs); color: var(--soluk); overflow-wrap: anywhere; }
 .me-etiket { display: inline-block; font-size: var(--t-xs); padding: 1px var(--b2); border-radius: var(--r-t); background: var(--tahmin-zemin); color: var(--tahmin); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .me-etiket { color: var(--sari-yazi); } }
+:root[data-tema="koyu"] .me-etiket { color: var(--sari-yazi); }
 .me-serit { display: grid; gap: var(--b2); }
 .me-serit-satir { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: var(--b2); align-items: center; }
 .me-serit-hat { font-size: var(--t-s); font-weight: 600; }

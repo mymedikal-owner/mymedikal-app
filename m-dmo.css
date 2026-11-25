@@ -103,6 +103,8 @@ button.dm-hs:hover { border-color: var(--vurgu); }
 .dm-halka { position: relative; flex: none; display: inline-block; }
 .dm-hk-svg { width: 100%; height: 100%; display: block; }
 .dm-hk-iz { fill: none; stroke: var(--yuzey3); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .dm-hk-iz { stroke: #444441; } }
+:root[data-tema="koyu"] .dm-hk-iz { stroke: #444441; }
 .dm-hk-dolgu { fill: none; transition: stroke-dasharray .5s ease; }
 .dm-hk-dolgu.mavi { stroke: var(--sk4); } .dm-hk-dolgu.lacivert { stroke: var(--sk6); } .dm-hk-dolgu.turuncu { stroke: var(--ciddi); }
 .dm-hk-dolgu.kirmizi { stroke: var(--kritik); } .dm-hk-dolgu.yesil { stroke: var(--iyi); } .dm-hk-dolgu.sari { stroke: var(--uyari); }
@@ -138,6 +140,8 @@ button.dm-hs:hover { border-color: var(--vurgu); }
 .dm-as-kalan { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .dm-as-say { font-size: var(--t-xl); font-variant-numeric: tabular-nums; font-weight: 750; }
 .dm-as-gec { color: var(--kritik); font-weight: 650; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .dm-as-gec { color: var(--kirmizi); } }
+:root[data-tema="koyu"] .dm-as-gec { color: var(--kirmizi); }
 .dm-as .dm-sp-orta, .dm-as .dm-sp-alt { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
 
  

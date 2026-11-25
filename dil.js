@@ -642,6 +642,110 @@
   ]));
   [['tümü', 'all'], [' · son teslim ', ' · delivery deadline '], ['Şirket: ', 'Company: '], ['Tür: ', 'Type: '], ['Müşteri: ', 'Customer: '], ['Arama: ', 'Search: '], ['Dönem: ', 'Period: '], ['Ürün grubu: ', 'Product group: '], ['İşaret: ', 'Flag: '], ['varış: ', 'arrival: '],
    ['Sıradaki varış: ', 'Next arrival: '], ['Durum: ', 'Status: '], ['Hedef tarih = kaynaktaki son teslim tarihi (ayrı bir hedef tarihi alanı yok).', 'Target date = last delivery date in the source (there is no separate target date field).']].forEach(function (p) { PARCA.push(p); });
+   
+  var TAM_D4 = {
+    'Onay': 'Approval', 'Aç': 'Open', 'Sağlık': 'Health', 'Genel görünüm': 'Overview', 'Hedefi aşan': 'Over target', 'Bilgi notu önerileri': 'Info note suggestions',
+    'Tedarikçiler': 'Suppliers', 'Yüksek risk': 'High risk', 'Orta risk': 'Medium risk', 'Düşük risk': 'Low risk', 'Az veri': 'Little data', 'az veri': 'little data', 'tedarikçi': 'supplier',
+    'adım': 'step', 'koli/gün': 'cases/day', 'Çar': 'Wed', 'Kullanılan': 'Used',
+    'Onay kutusu': 'Approval inbox', 'Onay kuralı': 'Approval rule', 'Onay durumu': 'Approval status', 'Mevcut onay akışı': 'Current approval flow', 'Yetkili onayı gerekir': 'Authorised approval required',
+    'Satınalma siparişi onayı': 'Purchase order approval', 'Onay kutusu — tek dokunuşla ONAY / RED': 'Approval inbox — approve / reject with one tap',
+    'Müşteri satış siparişi kaydı': 'Customer sales order record', 'Şirket dışı bilgilendirme maili': 'External information email',
+    'İzin bakiyem': 'My leave balance', 'İzin talebi': 'Leave request', 'İzin türü': 'Leave type', 'Bordro pusulası': 'Payslip', 'Yalnız kişinin kendisi görür': 'Visible only to the person themselves',
+    'gün kaldı': 'days left', 'İzin, bordro pusulası, duyurular': 'Leave, payslips, announcements', 'Not (isteğe bağlı)': 'Note (optional)', '1 hafta önce': '1 week ago', 'Bekleyen talep': 'Pending requests',
+    'Talep gönder (örnek)': 'Send request (sample)', 'Yöneticiye gider (örnek akış)': 'Goes to manager (sample flow)', 'Yıllık izin (örnek)': 'Annual leave (sample)', 'Örnek açıklama': 'Sample note',
+    'ÖNİZLEME — ÖRNEK VERİ: bu ekran taslaktır, rakamlar sahte, hiçbir düğme kayıt yapmaz': 'PREVIEW — SAMPLE DATA: this screen is a draft, the figures are fake and no button saves anything',
+    'ÖRNEK duyuru: yıllık izin planı': 'SAMPLE announcement: annual leave plan',
+    'Bu görünümde hastane yok': 'No hospitals in this view', 'adet gönderilecek': 'units to be dispatched', 'adedi son teslimi geçmiş': 'quantity past its last delivery date', 'tıklayınca ilgili liste açılır': 'tapping opens the related list',
+    'Riskli sipariş: cezalı süre ya da teslim işlemi bekliyor': 'At-risk orders: penalty period or delivery action pending',
+    'İtiraz edilebilir sipariş (teslim var, hastane kabulü yok)': 'Orders open to objection (delivered, no hospital acceptance)',
+    'Nakliyeci bazında gecikme': 'Delay by carrier', 'Sipariş akışı': 'Order flow', 'İl haritası': 'Province map', 'günlük adet · MY + DAY': 'daily units · MY + DAY',
+    'sevk durumu · ile dokunun, listeler o ile süzülsün': 'dispatch status · tap a province to filter the lists by it', 'Çıktı, portalda teslim yok': 'Dispatched, no delivery on the portal',
+    'İhale bazında çıktı, teslim ve DMO onayı': 'Dispatch, delivery and DMO approval by tender', 'İl bazında teslim süresi': 'Delivery time by province', 'Uyuşmazlık süzgeci': 'Mismatch filter',
+    'Çıkış siparişten fazla': 'Dispatch exceeds order', 'çıkıştan teslime ortalama gün · en yavaş üstte': 'average days from dispatch to delivery · slowest first',
+    'Bu yıl, geçen yılın aynı dönemine göre': 'This year vs the same period last year', 'Müşteri görünümü': 'Customer view',
+    'Son 12 ay müşteri faturasına göre · bir müşteriye dokununca siparişleri açılır': 'By customer invoices, last 12 months · tap a customer to open their orders',
+    'Ara toplam (türe göre)': 'Subtotal (by type)', 'Aramayı ya da süzgeçleri değiştirin.': 'Change the search or the filters.', 'Diğer:': 'Other:', 'Ara toplam — Diğer': 'Subtotal — Other',
+    'tahmin içeren gün (ölçüm değil)': 'days including estimates (not measured)',
+    'Ay sonu kapanış': 'Month-end close', 'Borç / özkaynak': 'Debt / equity', 'Muhasebe Müdürü': 'Accounting Manager', 'Yaşa göre, en eski üstte · kişi adı yerine rol': 'By age, oldest first · role instead of person name',
+    'önceki döneme göre': 'vs previous period', 'Geçen yıl': 'Last year', 'Günlük net satış': 'Daily net sales', 'ÖRNEK dönem': 'SAMPLE period',
+    'Veri gecikmeli': 'Data delayed', 'veri gecikmeli': 'data delayed', 'veri gecikmeli · artmıyor': 'data delayed · not increasing', 'Canlı fabrika panosu': 'Live factory dashboard',
+    'Pazar günü döngü yok': 'No cycle on Sunday', 'Manuel batın': 'Manual abdominal', 'Çin makineleri': 'Chinese machines', 'Sterilizasyon kuyruğu': 'Sterilization queue',
+    '— kuyruk ve öneriler stok kırılımına dayanır, kesin olmayabilir.': '— the queue and suggestions rely on the stock breakdown and may not be exact.',
+    '— stok kırılımı (steril, sterilsiz, karantina) kesin olmayabilir.': '— the stock breakdown (sterile, non-sterile, quarantine) may not be exact.',
+    'Puan nasıl hesaplanır': 'How the score is calculated', 'Son 12 ayda tekrarlayan türler': 'Recurring types in the last 12 months', 'Tüm bantlar': 'All bands', 'Diğer · MY': 'Other · MY'
+  };
+  Object.keys(TAM_D4).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_D4[k]; });
+  var AYK_D4 = [['Oca', 'Jan'], ['Şub', 'Feb'], ['Nis', 'Apr'], ['Haz', 'Jun'], ['Tem', 'Jul'], ['Eyl', 'Sep'], ['Eki', 'Oct'], ['Kas', 'Nov'], ['Ara', 'Dec']];
+  var REGEX_D4 = AYK_D4.map(function (a) { return [new RegExp('^(Brüt marj: .+? · )' + a[0] + '( \\d+)?( · FAVÖK marjı)'), '$1' + a[1] + '$2$3']; });
+  var HAKKINDA_D4 = [['Bugün', 'Today'], ['Manuel batın', 'Manual abdominal'], ['Sterilizasyon kuyruğu', 'Sterilization queue'], ['Çin makineleri', 'Chinese machines'], ['Kalite kararı bekleyen', 'Awaiting quality decision'],
+    ['Sevk geçiş deposunda', 'In dispatch transit store'], ['Yüksek risk', 'High risk'], ['Orta risk', 'Medium risk'], ['Düşük risk', 'Low risk'], ['Az veri', 'Little data']];
+  HAKKINDA_D4.forEach(function (a) { REGEX_D4.push([new RegExp('^' + a[0] + ' hakkında ayrıntı$'), 'Details: ' + a[1]]); });
+  REGEX_D4 = REGEX_D4.concat([
+    [/^Brüt marj: /, 'Gross margin: '],
+    [/^Ayrıntılı özet \((\d+)\)$/, 'Detailed summary ($1)'], [/^bu hafta (\d+) varış$/, 'this week: $1 arrivals'], [/^● (\d+) belge GİB engeli$/, '● $1 documents — GİB block'],
+    [/^(Eldiven|Batın|Spanç) payı (%[\d.,]+)$/, function (m, a, p) { return ({ 'Eldiven': 'Glove', 'Batın': 'Abdominal pad', 'Spanç': 'Gauze swab' })[a] + ' share ' + p; }],
+    [/^Güncelleme: (.+)$/, 'Updated: $1'], [/Veri: (\S+(?: \d\d:\d\d)?) itibarıyla/g, 'Data as of $1'],
+    [/^Geciken ([\d.,]+) adet \(en çok (\d+) gün\)$/, 'Late $1 units (up to $2 days)'], [/^Gönderilecek miktarın gecikmiş oranı (%[\d.,]+)$/, 'Overdue share of the quantity to be dispatched $1'],
+    [/^Teslim (%[\d.,]+), hastane kabulü (%[\d.,]+)$/, 'Delivered $1, hospital acceptance $2'], [/^Örnek veri: hastane adları, sipariş numaraları ve tutarlar gerçek değil\./, 'Sample data: hospital names, order numbers and amounts are not real.'],
+    [/^Örnek veri, gerçek değil\./, 'Sample data, not real.'], [/^Bu seçimde yok (\d+)$/, 'Not in this selection $1'], [/^(.+): bu seçimde yok$/, '$1: not in this selection'],
+    [/^Kullanılan (\d+)$/, 'Used $1'], [/^İptal hakkı (\d+), kullanılan (\d+)$/, 'Cancellation right $1, used $2'], [/^İptal hakkı \((\d+) sevk zorunlu\)$/, 'Cancellation right ($1 dispatches required)'],
+    [/^Sevke başlanmadı (\d+)$/, 'Dispatch not started $1'], [/^Sevke başlanmayan (\d+)$/, 'Not yet dispatched $1'], [/^Tamamlanmadı (\d+)$/, 'Incomplete $1'],
+    [/^Teslim belgesi eksiği \((\d+)\)$/, 'Missing delivery documents ($1)'], [/^Uyuşmazlıklar \((\d+)\)$/, 'Mismatches ($1)'], [/^Yalnız uyuşmazlıklar (\d+)$/, 'Mismatches only $1'],
+    [/^DMO onayladı (%[\d.,]+)$/, 'DMO approved $1'], [/^Çıktı (%[\d.,]+)$/, 'Dispatched $1'], [/^koli (%[\d.,]+) · gönderi (%[\d.,]+)$/, 'boxes $1 · shipments $2'],
+    [/^Çıkan: ([\d.,]+) · (\S+) · Teslim: ([\d.,]+) · Onay: ([\d.,]+)$/, 'Dispatched: $1 · $2 · Delivered: $3 · Approved: $4'],
+    [/^Sevk edildi (\d+) · Kısmi (\d+) · Sevke başlanmadı (\d+)$/, 'Dispatched $1 · Partial $2 · Not started $3'], [/^Sevk edildi (\d+), kısmi (\d+), sevke başlanmadı (\d+)$/, 'Dispatched $1, partial $2, not started $3'],
+    [/^(.+): Tamamlanmadı · (\d+) hastane · sevk (%[\d.,]+)$/, '$1: Incomplete · $2 hospitals · dispatch $3'], [/^(.+): Sevke başlanmadı · (\d+) hastane · sevk (%[\d.,]+)$/, '$1: Dispatch not started · $2 hospitals · dispatch $3'],
+    [/^Plan (\S+) → çıkış yok$/, 'Plan $1 → no dispatch'], [/^Son (\d+) gün günlük çıkan, teslim, onay$/, 'Last $1 days daily dispatched, delivered, approved'],
+    [/Veri eski — sevkiyat listesi (\d+) gün önce güncellendi\./, 'Data is stale — shipment list updated $1 days ago.'], [/^([\d.,]+) adet çıktı$/, '$1 units dispatched'], [/^([\d.,]+) adet\/gün$/, '$1 units/day'],
+    [/^(%[\d.,]+) arttı geçen yıla göre$/, '$1 up on last year'], [/^(%[\d.,]+) arttı$/, '$1 up'], [/^(%[\d.,]+) azaldı$/, '$1 down'],
+    [/^Bayi · /, 'Dealer · '], [/^İhracat · /, 'Export · '], [/^Devlet hastanesi · /, 'State hospital · '],
+    [/^(\d+) müşteri · son 12 ay müşteri faturası büyükten küçüğe$/, '$1 customers · last 12 months customer invoices, largest first'],
+    [/^(\d+) konteyner — önümüzdeki (\d+) gün içinde varış$/, '$1 containers — arriving within the next $2 days'], [/Fabrika verisi eskiSon güncelleme/, 'Factory data is stale — last updated'],
+    [/^Sürüyor (\d+)$/, 'In progress $1'], [/^önceki döneme göre (.+) → (.+)$/, 'vs previous period $1 → $2'], [/^ÖRNEK düzeltme konusu (\d+)$/, 'SAMPLE correction item $1'],
+    [/^Gecikmiş kapanış adımı: /, 'Late close step: '],
+    [/^Veri gecikmeli \(son: (\d\d:\d\d)\)$/, 'Data delayed (last: $1)'],
+    [/^([\d.,]+) koli\/döngü$/, '$1 cases/cycle'], [/^([\d.,]+) döngü\/gün$/, '$1 cycles/day'], [/^([\d.,]+) koli\/gün$/, '$1 cases/day'], [/^Cihaz kapasitesi (\d+) koli\/döngü$/, 'Machine capacity $1 cases/cycle'],
+    [/^Teslim (\S+) öncelikli$/, 'Delivery $1 priority'], [/^Tam paletli döngü \((\d+) koli\/palet\); döngü (\d+) koliyi aşmaz$/, 'Full-pallet cycle ($1 cases/pallet); a cycle does not exceed $2 cases'],
+    [/^Bitiş (.+) · Sevke hazır (.+)$/, 'Finish $1 · Ready to dispatch $2'], [/^Ürün eşleme: (%[\d.,]+) eşlendi · (%[\d.,]+) Diğer hatlarda$/, 'Product mapping: $1 mapped · $2 on other lines'],
+    [/^(\d+) olay için üst bildirim$/, '$1 incidents escalated'],
+    [/^(MY|DAY) · (\d+) kalem · zamanında (%[\d.,]+) · vadesi geçmiş açık (\d+)$/, '$1 · $2 items · on time $3 · overdue open $4'], [/^(MY|DAY) · (\d+) kalem · zamanında (%[\d.,]+)$/, '$1 · $2 items · on time $3'],
+    [/^(.+) ayında son tarihler \((\d+)\)$/, 'Deadlines in $1 ($2)'], [/^(.+ \d{4}) son tarihleri$/, 'Deadlines for $1'],
+    [/^([A-Za-zÇĞİÖŞÜçğıöşü]+ \d{4}) pusulası$/, '$1 payslip'], [/^Örnek izin bakiyesi: (\d+) günden (\d+) gün kullanıldı, (\d+) gün kaldı$/, 'Sample leave balance: $2 of $1 days used, $3 days left'],
+    [/^Satınalma · ÖRNEK tedarikçi · ÖRNEK tutar$/, 'Purchasing · SAMPLE supplier · SAMPLE amount'], [/^ÖRNEK tedarikçi · ÖRNEK tutar$/, 'SAMPLE supplier · SAMPLE amount'], [/^Satış · ÖRNEK hastane · (\d+) kalem$/, 'Sales · SAMPLE hospital · $1 items'],
+    [/^Talep no (\S+) · Satınalma$/, 'Request no. $1 · Purchasing'], [/^İletişim · ÖRNEK alıcı · taslak metin$/, 'Communication · SAMPLE recipient · draft text']
+  ]);
+  REGEX.splice.apply(REGEX, [0, 0].concat(REGEX_D4));
+  [['adım', 'step', 'steps'], ['tedarikçi', 'supplier', 'suppliers']].forEach(function (a) { say(a[0], a[1], a[2]); });
+  [['Çarşamba', 'Wednesday'], ['Perşembe', 'Thursday'], ['Pazartesi', 'Monday'], ['Cumartesi', 'Saturday'], ['Gecikmiş kapanış adımı', 'Late close step'], ['Önemli sapma', 'Significant deviation'], ['ay/ay', 'MoM'], ['yıl/yıl', 'YoY'],
+   ['Yatırım (yaklaşık)', 'Investing (approx.)'], ['Finansman (yaklaşık)', 'Financing (approx.)'], ['Net satış:', 'Net sales:'], ['Faaliyet:', 'Operating:'], ['FAVÖK:', 'EBITDA:'], ['FAVÖK marjı:', 'EBITDA margin:'],
+   ['Geçici ay (maliyet dağıtımı eksik)', 'Provisional month (cost allocation incomplete)'], ['Maliyeti tamamlanmadı', 'Cost not completed'],
+   ['Rakamlar güncel olmayabilir.', 'Figures may be out of date.'], ['Miktarlar güncel olmayabilir.', 'Quantities may be out of date.'], ['— son güncelleme ', '— last updated '],
+   ['Kime: Satış Müdürü', 'To: Sales Manager'], [' · CC: GMY (üretim ve satış)', ' · CC: Deputy GM (production and sales)']].forEach(function (p) { PARCA.push(p); });
+  [['Sevke başlanmadı', 'Not yet dispatched'], ['sevke başlanmadı', 'not yet dispatched'], [' kısmi ', ' partial '], ['hospital kabulü', 'hospital acceptance'], ['bu seçimde yok', 'none in this selection'], ['Tamamlanmadı', 'Incomplete'],
+   ['DMO onayladı', 'DMO approved'], ['DMO onayı', 'DMO approval'], ['Çıkan:', 'Dispatched:'], ['Teslim:', 'Delivered:'], ['Onay:', 'Approved:'], ['İl haritası', 'Province map'], ['sevk durumu', 'shipment status'], ['listeler o ile süzülsün', 'lists filter to that province'], ['ile dokunun', 'tap a province'],
+   ['günlük units', 'daily units'], ['İl bazında teslim süresi', 'Delivery time by province'], ['çıkıştan teslime ortalama', 'average dispatch-to-delivery'], ['en slow üstte', 'slowest first'], ['Nakliyeci bazında gecikme', 'Delay by carrier'], ['Uyuşmazlıklar', 'Discrepancies'], ['Teslim belgesi eksiği', 'Missing delivery documents'],
+   ['İhale bazında', 'By tender'], ['Order akışı', 'Order flow'], ['tıklayınca ilgili liste açılır', 'click to open the related list'], ['cezalı süre ya da teslim işlemi bekliyor', 'penalty period or delivery pending'], ['İtiraz edilebilir', 'Objectionable'], ['teslim var', 'delivered'],
+   ['Sample veri', 'Sample data'], ['numaraları ve tutarlar', 'numbers and amounts'], ['itibarıyla', 'as of'], ['Güncelleme:', 'Updated:'], ['gönderilecek', 'to be shipped'], ['adedi son teslimi geçmiş', 'units past last delivery date'],
+   ['Gönderilecek miktarın late oranı', 'Late rate of the quantity to ship'], ['Eldiven payı', 'Glove share'], ['Gauze swab payı', 'Gauze swab share'], ['Abdominal pad payı', 'Abdominal pad share'], ['(en çok', '(at most'], ['GİB block', 'GIB-blocked'], ['bu hafta varış', 'arriving this week'],
+   ['customer faturasına göre', 'by customer invoice'], ['bir müşteriye dokununca siparişleri açılır', 'tap a customer to open their orders'], ['geçen yılın aynı dönemine göre', 'vs. same period last year'], ['Customer görünümü', 'Customer view'], ['customer faturası büyükten küçüğe', 'customer invoice, largest first'],
+   ['estimate içeren', 'including estimates'], ['(ölçüm değil)', '(not measured)'], ['gecikmiş', 'overdue'], ['En eski:', 'Oldest:'], ['Factory verisi eski', 'Factory data is stale'], ['Son güncelleme', 'Last update'], ['önümüzdeki within', 'within the next'], ['days varış', 'days'],
+   ['Ay sonu kapanış', 'Month-end close'], ['SAMPLE dönem', 'SAMPLE period'], ['Sürüyor', 'In progress'], ['Yaşa göre', 'By age'], ['en eski üstte', 'oldest first'], ['kişi adı yerine rol', 'role instead of person name'], ['SAMPLE düzeltme konusu', 'SAMPLE correction topic'], ['Muhasebe Müdürü', 'Accounting Manager'],
+   ['kapanış adımı', 'close step'], ['önceki döneme göre', 'vs. previous period'], ['GL net satış', 'GL net sales'], ['FX cinsi faturalar', 'FX-denominated invoices'], ['çevrilmedi', 'not converted'], ['Yatırım (approximate)', 'Investing (approx.)'], ['Finansman (approximate)', 'Financing (approx.)'],
+   ['Yatırım ve finansman rakamları hesap grubu değişiminden türetildiği için yaklaşıktır', 'Investing and financing figures are derived from account-group changes, so they are approximate'], ['sonu itibarıyla', 'as of period end'], ['Borç / özkaynak', 'Debt / equity'],
+   ['veri gecikmeli', 'data delayed'], ['artmıyor', 'not increasing'], ['Canlı fabrika panosu', 'Live factory dashboard'], ['Product eşleme', 'Product mapping'], ['eşlendi', 'mapped'], ['Diğer hatlarda', 'On other lines'],
+   ['koli/gün', 'boxes/day'], ['koli/döngü', 'boxes/cycle'], ['döngü/gün', 'cycles/day'], ['Sevke hazır', 'Ready to ship'], ['Cihaz kapasitesi', 'Device capacity'], ['öncelikli', 'priority'], ['Tam paletli döngü', 'Full-pallet cycle'], ['koli/palet', 'boxes/pallet'], ['koliyi aşmaz', 'boxes at most'],
+   ['Pazar günü döngü yok', 'No cycle on Sunday'], ['stok kırılımına dayanır', 'rely on the stock breakdown'], ['kesin olmayabilir', 'may not be exact'], ['kuyruk ve öneriler', 'queue and recommendations'], ['stok kırılımı', 'stock breakdown'],
+   ['Genel görünüm', 'Overview'], ['Hedefi aşan', 'Over target'], ['olay için üst bildirim', 'incident(s) for escalation'], ['Bilgi notu önerileri', 'Info note suggestions'], ['ayda tekrarlayan türler', 'months: recurring types'], ['koli sayımı', 'box count'], ['tutanak ve tamamlama süreci', 'report and completion process'],
+   ['Puan nasıl hesaplanır', 'How the score is calculated'], ['Kime: Kalite', 'To: Quality'], ['İlgili birim', 'Related unit'], ['records önceliği', 'record priority'],
+   ['Tedarikçiler', 'Suppliers'], ['Yüksek risk', 'High risk'], ['Düşük risk', 'Low risk'], ['Orta risk', 'Medium risk'], ['Az veri', 'Little data'], ['zamanında teslim', 'on-time delivery'], ['zamanında', 'on time'], ['vadesi geçmiş', 'overdue'], ['mal girişi', 'goods receipt'], ['planlı tarih', 'planned date'], ['bilgisi içermez', 'contains no information'],
+   ['Tüm bantlar', 'All bands'], ['poliçe yenileme', 'policy renewal'], ['eğitim yenileme', 'training renewal'], ['modül sertifikası', 'module certificate'], ['ÜTS başvurusu', 'ÜTS application'], ['tarihsiz', 'undated'], ['yerli malı belgesi', 'domestic goods certificate'],
+   ['takvimlerinin', 'calendars'], ['birleşimidir', 'combination'], ['renkler bugünden hesaplanır', 'colors are calculated from today'], ['Diğer · MY', 'Other · MY'], ['Sample Tedarikçi', 'Sample Supplier'], ['Sample ürün', 'Sample product'], ['Sample İSG kaydı', 'Sample OHS record'], ['ayında son tarihler', 'deadlines'],
+   ['Sevk geçiş deposunda', 'In shipping transit warehouse'], ['Kalite kararı bekleyen', 'Awaiting quality decision'],
+   ['İzin bakiyem', 'My leave balance'], ['Yıllık izin', 'Annual leave'], ['gün kaldı', 'days left'], ['Kullanılan', 'Used'], ['Waiting talep', 'Pending request'], ['İzin talebi', 'Leave request'], ['Yöneticiye gider', 'Goes to manager'], ['İzin türü', 'Leave type'], ['Talep gönder', 'Submit request'],
+   ['Bordro pusulası', 'Payslip'], ['pusulası', 'payslip'], ['Yalnız kişinin kendisi görür', 'Visible only to the person'], ['hafta önce', 'weeks ago'], ['duyuru:', 'announcement:'], ['yıllık izin planı', 'annual leave plan'], ['İSG eğitimi takvimi', 'OHS training calendar'],
+   ['ÖNİZLEME', 'PREVIEW'], ['bu ekran taslaktır', 'this screen is a draft'], ['rakamlar sahte', 'figures are fake'], ['hiçbir düğme records yapmaz', 'no button records anything'], ['Sample izin bakiyesi', 'Sample leave balance'], ['kullanıldı', 'used'], ['Sample açıklama', 'Sample note'],
+   ['Onay kutusu', 'Approval inbox'], ['tek dokunuşla', 'with one tap'], ['Satınalma siparişi onayı', 'Purchase order approval'], ['Satınalma', 'Purchasing'], ['SAMPLE tedarikçi', 'SAMPLE supplier'], ['SAMPLE tutar', 'SAMPLE amount'], ['satış siparişi', 'sales order'], ['dışı bilgilendirme maili', 'external notification email']].forEach(function (p) { PARCA.push(p); });
+  Object.keys({ 'adım': 'step', 'Çar': 'Wed', 'Aç': 'Open', 'az veri': 'little data' }).forEach(function (k) { var v = { 'adım': 'step', 'Çar': 'Wed', 'Aç': 'Open', 'az veri': 'little data' }[k]; if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = v; });
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

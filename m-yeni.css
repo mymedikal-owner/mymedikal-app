@@ -151,3 +151,47 @@ tr.hz-vurgulu td { color: var(--turuncu); font-weight: 650; }
   .icerik .hz .hz-top { gap: var(--b2); } .icerik .hz .hz-top-k { padding: var(--b2) var(--b3); gap: 3px; }
   .icerik .hz .hz-sekme + div .hz-banka { gap: 2px; padding: var(--b2, 8px) var(--b3, 12px); }
   .icerik .hz .hz-sekme + div .hz-banka .hz-b-satir { font-size: var(--t-xs); }}
+ 
+@media (max-width: 599px) {
+  .icerik .hz > .hz-bant-ac { padding: 0 var(--b3); margin: 0 0 var(--b2); }
+  .icerik .hz > .hz-bant-ac > summary { cursor: pointer; font-weight: 650; min-height: 40px; display: flex; align-items: center; font-size: var(--t-s); }
+  .icerik .hz > .hz-bant-ac[open] { padding-bottom: var(--b2); }
+  .icerik .hz .ozet-serit { margin-bottom: var(--b1, 4px); }
+  .icerik .hz .ozet-serit-ana { display: flex; gap: var(--b2); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding-bottom: 2px; }
+  .icerik .hz .ozet-serit-ana::-webkit-scrollbar { display: none; }
+  .icerik .hz .ozet-serit-ana > .kpi { flex: 0 0 152px; scroll-snap-align: start; }
+  .icerik .hz .ozet-serit-ana .kpi-ana { padding: var(--b2); }
+  .icerik .hz .ozet-serit-ana .kpi-sayi { font-size: 22px; }
+  .icerik .hz .ozet-serit-tumu { min-height: 32px; padding: 0 10px; }
+  .hz-sekme .sekme-sira { flex-wrap: nowrap; overflow-x: auto; }
+  .hz-sekme .sekme-sira .sekme, .hz-sekme .sekme-sira .cip { padding: 6px 9px; font-size: 13px; min-height: 40px; }
+  .icerik .hz .hz-kirmizi-uyari { padding: var(--b2) var(--b3); } .icerik .hz .hz-kirmizi-uyari strong { font-size: var(--t-s); }
+  .icerik .hz .ozet-serit-ana .kpi-ana { gap: 2px; } .icerik .hz .ozet-serit-ana .kpi-baslik { font-size: var(--t-xs); line-height: 1.2; }
+   
+  .icerik .hz .hz-top-k { padding: 6px 10px; gap: 2px; } .icerik .hz .hz-top-l { gap: 1px; } .icerik .hz .hz-top-s { line-height: 1.25; } .icerik .hz .hz-top-s b { font-size: 15px; } .icerik .hz .hz-top-s small { font-size: 11px; }
+   
+  .icerik .hz .hz-kredi .cip-sira, .icerik .hz #hz-ay-kirilim .cip-sira { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 4px 0; }
+  .icerik .hz .hz-kredi .cip-sira::-webkit-scrollbar, .icerik .hz #hz-ay-kirilim .cip-sira::-webkit-scrollbar { display: none; }
+  .icerik .hz .hz-kredi .cip-sira > .cip, .icerik .hz #hz-ay-kirilim .cip-sira > .cip { flex: 0 0 auto; min-height: 36px; }
+   
+  .icerik .hz .iki-kolon:has(> .hz-acilir-kart + .hz-acilir-kart) { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--b2); }
+  .icerik .hz .iki-kolon > .hz-acilir-kart[open] { grid-column: 1 / -1; }
+  .icerik .hz .iki-kolon:has(> .hz-acilir-kart + .hz-acilir-kart) > .hz-acilir-kart > summary { padding: 0 var(--b3); font-size: var(--t-s); line-height: 1.2; }
+   
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) { grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr) minmax(0, .85fr); column-gap: 8px; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) td[data-et="Kredi no"] { grid-row: 2; grid-column: 1; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) td[data-et="Tür"] { grid-row: 2; grid-column: 2; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) td[data-et="Faiz"] { grid-row: 2; grid-column: 3; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) td[data-et="Kalan anapara"] { grid-row: 3; grid-column: 1 / -1; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) td[data-et="Bakiye"] { grid-row: 4; grid-column: 1 / -1; }
+  .icerik .hz .hz-sekme + div .hz-kredi table.tablo-siralanir tr:not(.acik) td .hz-dvz { flex-direction: row; align-items: baseline; gap: 8px; }
+   
+  .icerik .hz .hz-sekme + div .kart2 { padding: var(--b3); } .icerik .hz .hz-sekme + div .kart2-ust { margin-bottom: var(--b2); } .icerik .hz .hz-sekme + div .kart2-dip { margin-top: var(--b2); padding-top: 6px; }
+  .icerik .hz .hz-sekme + div .hz-xl-ust { margin: 0 0 4px; } .icerik .hz .hz-sekme + div .hz-xl-ust button { min-height: 36px; }
+  .icerik .hz .hz-sekme + div .kpi-izgara.ust-bosluk { margin-top: var(--b2); }
+  .icerik .hz .hz-sekme + div .kpi-izgara .kpi-sayi { font-size: 19px; } .icerik .hz .hz-sekme + div .kpi-izgara .kpi-ana { padding: 6px var(--b3); gap: 2px; }
+  .icerik .hz .hz-sekme + div .hz-banka .hz-logo { width: 28px; height: 28px; }
+  .icerik .hz .hz-sekme + div .hz-banka h4 { margin: 0; }
+  .icerik .hz .ozet-serit-ana .kpi-ana { padding: 6px 10px; } .icerik .hz .ozet-serit-ana > .kpi > .hz-bar { margin: 0 10px 6px; }
+  .icerik .hz .hz-sekme { margin-top: var(--b2); } .icerik .hz .hz-sekme + div .hz-kaynak { margin: 0 0 6px; }
+}

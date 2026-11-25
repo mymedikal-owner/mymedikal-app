@@ -34,6 +34,8 @@
 i.dn-il { display: inline-block; width: 12px; height: 12px; aspect-ratio: auto; vertical-align: -2px; margin-right: 5px; cursor: default; }
 .dn-il.tamam { background: var(--iyi); color: #fff; } .dn-il.kismi { background: var(--uyari); color: #1d1d1b; } .dn-il.baslanmadi { background: var(--kritik); color: #fff; } .dn-il.yok { background: var(--yuzey3); color: var(--soluk); }
 .dn-il.sec { outline: 2px solid var(--yazi); outline-offset: 1px; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .dn-il.tamam { color: var(--vurgu-yazi); } }
+:root[data-tema="koyu"] .dn-il.tamam { color: var(--vurgu-yazi); }
 .dn-lejant { display: flex; flex-wrap: wrap; gap: 4px var(--b3); margin-top: var(--b3); font-size: var(--t-xs); color: var(--yazi2); }
 .dn-il-bilgi { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b2) var(--b3); margin-top: var(--b3); padding: var(--b2) var(--b3); background: var(--yuzey2); border-radius: var(--r-s); font-size: var(--t-s); }
  
@@ -98,6 +100,8 @@ i.dn-il { display: inline-block; width: 12px; height: 12px; aspect-ratio: auto; 
 .dn-durum .cip-sira { margin: 0; gap: 6px; flex-wrap: nowrap; }
 .dn-durum .cip { min-height: 34px; padding: 0 12px; }
 .dn-ornek-et { color: var(--tahmin); font-weight: 700; letter-spacing: .03em; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .dn-ornek-et { color: var(--sari-yazi); } }
+:root[data-tema="koyu"] .dn-ornek-et { color: var(--sari-yazi); }
 .dn-oz3 { display: none; }
 .dn-gri { display: flex; flex-wrap: nowrap; align-items: baseline; gap: var(--b2); width: 100%; box-sizing: border-box; text-align: left; font: inherit; border: 1px solid var(--cizgi); background: var(--yuzey); border-radius: var(--r-s); padding: 6px var(--b3); min-height: 36px; margin: 0 0 var(--b2); cursor: pointer; color: var(--soluk); overflow: hidden; }
 .dn-gri-ad, .dn-gri-alt { white-space: nowrap; } .dn-gri-alt { overflow: hidden; text-overflow: ellipsis; min-width: 0; } .dn-gri-ok { margin-left: auto; color: var(--soluk); }

@@ -191,9 +191,6 @@ body.koyu .bant { top:50%; transform:translate(-50%,-50%); }
 
  
 .tost-alan { position:absolute; left:50%; bottom:16px; transform:translateX(-50%); z-index:40; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; max-width:92%; }
- 
-.katilim-serit { position:absolute; left:50%; top:10px; transform:translateX(-50%); z-index:41; background:#101418; color:#fff; border-radius:999px; padding:6px 16px; font-size:14px; box-shadow:0 4px 14px rgba(0,0,0,.5); pointer-events:none; max-width:92%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.katilim-serit[hidden] { display:none; }
 .tost { background:#101418; color:#fff; border-radius:8px; padding:8px 16px; box-shadow:0 4px 14px rgba(0,0,0,.5); font-size:14px; }
 
  
@@ -522,4 +519,34 @@ body.koyu .bant { top:50%; transform:translate(-50%,-50%); }
   .etiket { font-size:12px; padding:2px 8px; left:6px; bottom:6px; }
   .cubuk .ayril { width:60px; }
   .yan-ust { padding-top:calc(12px + env(safe-area-inset-top)); }
+}
+
+ 
+ 
+.tost-alan { top:10px; bottom:auto; left:10px; transform:none; align-items:flex-start; max-width:calc(100% - 76px); } .tost { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+ 
+@media (max-width:700px),(pointer:coarse) { .kisi-ekle { min-height:44px; } .plan-liste label { min-height:44px; } .plan-liste input { width:20px; height:20px; margin:12px; flex:none; } .plan-liste label { padding-left:0; gap:0; } .plan-liste label > span, .plan-liste label > :not(input) { padding-right:10px; } }
+ 
+@media (max-width: 700px), (pointer: coarse) {
+  .menu-oge, select, .msg-form input, .kisi-ara { min-height:44px; }
+  .ust-don { min-height:44px; }
+  .yuvarlak.ince, #yan-kapat { width:44px; height:44px; min-height:44px; }
+  .pin-dugme { width:44px; height:44px; min-height:44px; }
+  .serit .pin-dugme { width:30px; height:30px; min-height:30px; }
+}
+ 
+.onizleme-ad { top:12px; bottom:auto; }
+ 
+@media (min-width: 900px) {
+  .onizleme { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr); align-items:center; gap:32px; width:calc(100% - 64px); max-width:1100px; padding:24px 28px; }
+  .onizleme-kutu { max-height:56vh; }
+  .onizleme-sag { text-align:left; }
+}
+ 
+@media (hover: hover) and (pointer: fine) { #o-cevir, #b-cevir, #m-cevir { display:none !important; } }
+ 
+@media (min-width: 701px) and (min-height: 501px) {
+  .cubuk #b-el { display:inline-flex; order:7; }
+  .cubuk .acilir-kap:has(#b-uc) { order:8; } #b-ayril { order:9; }
+  #m-el { display:none; }
 }

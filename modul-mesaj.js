@@ -1515,7 +1515,11 @@
           return d;
         }
         if ((m.tur === 'dosya' || m.tur === 'ses') && m.dosya) {
-          var f = h('button', { sinif: 'ms-kart', type: 'button', metin: (m.tur === 'ses' ? T('Sesli mesaj') + ': ' : '') + m.dosya.ad });
+           
+          var dBoyut = Number(m.dosya.boyut) > 0 ? (m.dosya.boyut >= 1048576 ? (m.dosya.boyut / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(m.dosya.boyut / 1024)) + ' KB') : '';
+          var dYazi = [h('span', { sinif: 'ms-kart-ad', metin: (m.tur === 'ses' ? T('Sesli mesaj') + ': ' : '') + m.dosya.ad })];
+          if (dBoyut) dYazi.push(h('span', { sinif: 'ms-kart-boyut', metin: dBoyut }));
+          var f = h('button', { sinif: 'ms-kart ms-kart-dosya', type: 'button' }, [ikon(m.tur === 'ses' ? 'mikrofon' : 'dosyaIk', 24), h('span', { sinif: 'ms-kart-yazi' }, dYazi)]);
           f.addEventListener('click', function () {
             i.dosyaIndir(s.id, m.dosya.blob).then(function (u) { window.open(u, '_blank', 'noopener'); }, function (e) { yaz(hataYaz(e)); });
           });
@@ -1712,7 +1716,7 @@
             var soranAd = soranOid ? ((!!benOid && soranOid === benOid) ? T('Siz') : (uyeAd(soranOid) || T('Biri'))) : '';
             ic.push(h('span', { sinif: 'ms-gon ms-gon-asistan', metin: T('Asistan') + (soranAd ? ' · ' + soranAd + ' ' + T('sordu') : '') })); oncekiKim = '';
           }
-          else if (grup && !benim && m.gonderen !== oncekiKim) { var ga = uyeAd(m.gonderen) || T('Biri'); var gEl = h('button', { sinif: 'ms-gon ms-gon-dugme', type: 'button', metin: ga }); gEl.style.color = avatarRengi(m.gonderen); gEl.addEventListener('click', function () { kisiBilgiGoster(m.gonderen, ga, function () { sohbetGoster(s); }); }); ic.push(gEl); }
+          else if (grup && !benim && m.gonderen !== oncekiKim) { var ga = uyeAd(m.gonderen) || T('Biri'); var gEl = h('button', { sinif: 'ms-gon ms-gon-dugme', type: 'button', metin: ga }); gEl.style.setProperty('--gon', avatarRengi(m.gonderen));     gEl.addEventListener('click', function () { kisiBilgiGoster(m.gonderen, ga, function () { sohbetGoster(s); }); }); ic.push(gEl); }
           oncekiKim = m.gonderen;
           if (m.iletildi && !m.silindi) ic.push(h('span', { sinif: 'ms-etiket' }, [ikon('ilet', 12), h('span', { metin: T((m.iletimSayisi || 1) >= 5 ? 'Çok kez iletildi' : 'İletildi') })]));
           var yk = m.silindi ? null : yanitKutusu(m); if (yk) ic.push(yk);

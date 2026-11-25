@@ -41,3 +41,14 @@
 .sp-arama-ust { margin: var(--b1, 4px) 0 var(--b2); }
 .sp-kpi { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); } .sp-kpi .kpi-sayi { font-size: var(--t-2xl); } .sp-kpi .kpi-baslik { white-space: normal; }
 @media (max-width: 600px) { .sp-huni .y2-satir { grid-template-columns: 1fr auto; row-gap: 2px; padding-bottom: 6px; } .sp-huni .y2-yol { grid-column: 1 / -1; grid-row: 2; } }
+ 
+.sp-fat-liste { display: grid; gap: var(--b1, 4px); margin-top: var(--b1, 4px); }
+.sp-fat-satir { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b2); min-height: 28px; } .sp-fat-no { font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.sp-deg { max-width: 100%; } .sp-deg-ara { width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 var(--b3); border: 1px solid var(--cizgi); border-radius: var(--r-t); background: var(--yuzey); color: var(--yazi); font: inherit; }
+.sp-deg-liste { display: grid; gap: var(--b2); } .sp-deg-bos { padding: var(--b3) 0; }
+.sp-deg-kart { border: 1px solid var(--cizgi); border-radius: var(--r-t); background: var(--yuzey); overflow: hidden; }
+.sp-deg-satir { display: grid; gap: 2px; width: 100%; min-height: 44px; padding: var(--b2) var(--b3); border: 0; background: transparent; color: var(--yazi); font: inherit; text-align: left; cursor: pointer; box-sizing: border-box; } .sp-deg-satir:hover { background: var(--yuzey2); }
+.sp-deg-ust { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b2); } .sp-deg-hastane { overflow-wrap: anywhere; color: var(--yazi2); font-size: var(--t-s); }
+.sp-deg-kalem { list-style: none; margin: 0; padding: var(--b2) var(--b3); border-top: 1px solid var(--cizgi); display: grid; gap: var(--b2); } .sp-deg-kalem[hidden] { display: none; }
+.sp-deg-kalem li { display: flex; justify-content: space-between; gap: var(--b3); font-size: var(--t-s); } .sp-deg-urun { overflow-wrap: anywhere; min-width: 0; } .sp-deg-adet { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sp-deg-daha { min-height: 44px; width: 100%; }

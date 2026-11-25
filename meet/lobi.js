@@ -23,7 +23,8 @@
     return s && g ? { s: s, g: g } : null;
   }
 
-  function saatMetni(ms) { try { return new Date(ms).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  var LOC = (window.MeetDil && window.MeetDil.dil === 'en') ? 'en-GB' : 'tr-TR';    
+  function saatMetni(ms) { try { return new Date(ms).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
 
    
   var saatZ = null;
@@ -31,8 +32,8 @@
     var s = document.getElementById('l-saat-s'), t = document.getElementById('l-saat-t');
     if (!s || !t) return;
     var d = new Date();
-    try { s.textContent = d.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^(\d+ \S+) (\S+)$/, '$2, $1'); } catch (e) { s.textContent = ''; }
-    try { t.textContent = d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); } catch (e2) { t.textContent = ''; }
+    try { s.textContent = d.toLocaleDateString(LOC, { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^(\d+ \S+) (\S+)$/, '$2, $1').replace(/^([A-Za-z]+) (\d+ [A-Za-z]+)$/, '$1, $2'); } catch (e) { s.textContent = ''; }
+    try { t.textContent = d.toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }); } catch (e2) { t.textContent = ''; }
     var u = document.getElementById('l-saat'); if (u) u.setAttribute('datetime', d.toISOString());
   }
   function saatBaslat() { saatYenile(); if (!saatZ) saatZ = setInterval(saatYenile, 15000); }
@@ -81,7 +82,7 @@
     var d = new Date(ms), b = new Date(), yarin = new Date(b.getFullYear(), b.getMonth(), b.getDate() + 1);
     if (d.toDateString() === b.toDateString()) return 'Bugün';
     if (d.toDateString() === yarin.toDateString()) return 'Yarın';
-    return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+    return d.toLocaleDateString(LOC, { day: 'numeric', month: 'short' });
   }
    
   function zamanDurumu(ms) {

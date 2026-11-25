@@ -746,6 +746,42 @@
    ['ÖNİZLEME', 'PREVIEW'], ['bu ekran taslaktır', 'this screen is a draft'], ['rakamlar sahte', 'figures are fake'], ['hiçbir düğme records yapmaz', 'no button records anything'], ['Sample izin bakiyesi', 'Sample leave balance'], ['kullanıldı', 'used'], ['Sample açıklama', 'Sample note'],
    ['Onay kutusu', 'Approval inbox'], ['tek dokunuşla', 'with one tap'], ['Satınalma siparişi onayı', 'Purchase order approval'], ['Satınalma', 'Purchasing'], ['SAMPLE tedarikçi', 'SAMPLE supplier'], ['SAMPLE tutar', 'SAMPLE amount'], ['satış siparişi', 'sales order'], ['dışı bilgilendirme maili', 'external notification email']].forEach(function (p) { PARCA.push(p); });
   Object.keys({ 'adım': 'step', 'Çar': 'Wed', 'Aç': 'Open', 'az veri': 'little data' }).forEach(function (k) { var v = { 'adım': 'step', 'Çar': 'Wed', 'Aç': 'Open', 'az veri': 'little data' }[k]; if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = v; });
+  
+
+
+  if (!Object.prototype.hasOwnProperty.call(TAM, 'Satınalma talebi verisi yok')) TAM['Satınalma talebi verisi yok'] = 'No requisition data';
+  PARCA.push.apply(PARCA, [
+    ['bağlantı gelince gönderilecek', 'it will be sent when you are online'], ['Belge kaydedildi,', 'Document saved,'], ['Satınalma talebi', 'Purchase requisition'],
+    ['gecikmişEn eski:', 'late. Oldest:'], ["Genel Müdür'e bildir", 'Notify the General Manager'], ['GMY üretim ve satış', 'Deputy GM, production and sales'],
+    [' ayında önceki aya ya da geçen yıla göre eşiği aşan kalem (ayrıntı aşağıdaki "Önemli sapmalar" kartında).', ' items above the threshold vs. the previous month or last year (details in the "Key variances" card below).'],
+    ['ayları maliyeti kapanmadığı için (geçici) sapma hesabına katılmadı; son maliyeti kapanmış ay esas alındı.', 'were not included in the variance calculation because their costs are not closed (provisional); the last cost-closed month was used.'],
+    ['ayı maliyeti kapanmadığı için (geçici) sapma hesabına katılmadı; son maliyeti kapanmış ay esas alındı.', 'was not included in the variance calculation because its costs are not closed (provisional); the last cost-closed month was used.'],
+    ['Döviz cinsi faturalar (çevrilmedi, TL karşılığı faturalandırma dışı / GL farkı içinde kalır): ', 'FX-denominated invoices (not converted; the TL equivalent stays outside invoicing / within the GL difference): '],
+    ['Yatırım ve finansman rakamları hesap grubu değişiminden türetildiği için yaklaşıktır (alım/satış, kredi/vergi ayrılamaz).', 'Investing and financing figures are derived from account-group changes, so they are approximate (purchases/sales, loans/tax cannot be separated).'],
+    ['Soluk çubuk ve tablo, maliyet dağıtımı tamamlanmamış geçici aylar içerir: ', 'The faded bar and table include provisional months with incomplete cost allocation: '],
+    ['MY · TRY · DAY ayrı ve isteğe bağlı; bu bölümde yalnız MY vardır, toplanmaz.', 'MY · TRY · DAY is separate and optional; this section shows MY only and is not summed.']
+  ]);
+  REGEX.push([/ · FAVÖK marjı/g, ' · EBITDA margin'], [/gönderi (%[\d.,]+)/g, 'shipments $1'], [/(%[\d.,]+) teslim(?![A-Za-zÇĞİÖŞÜçğıöşü])/g, '$1 delivered'], [/^Teslim oldu (%[\d.,]+)$/, 'Delivered $1'],
+    [/^En az (\d+) hastaneye sevk zorunlu$/, 'Dispatch to at least $1 hospitals is required']);
+  REGEX.push([/(^Gross margin: .*? · )(\d+) ay(?= · EBITDA margin)/, function (m, a, n) { return a + n + (n === '1' ? ' month' : ' months'); }]);
+   
+  var TAM_A4 = {
+    'Değişim ve mal fazlası': 'Exchanges and surplus goods', 'Son 365 gün': 'Last 365 days', 'Mal fazlası': 'Surplus goods', 'Kayıt bulunamadı': 'No records found', 'Kalem kaydı yok': 'No item records',
+    'Hastane, belge no, malzeme ara…': 'Search hospital, document no. or material…', 'Hastane, belge no, malzeme ara': 'Search hospital, document no. or material',
+    'e-fatura gönderildi': 'e-invoice sent', 'e-fatura gönderilmedi': 'e-invoice not sent', 'Filtreleri değiştirin ya da aramayı temizleyin.': 'Change the filters or clear the search.',
+    'veri saati': 'data time', 'Dokuma m²': 'Weaving m²', 'Tezgah bazında': 'By loom', 'Salon süzgeci': 'Hall filter', 'tanımsız': 'not defined',
+    '{n} tezgahta m² bilgisi tanımsız (toplama katılmadı)': 'm² is not defined for {n} loom(s) (not included in the total)',
+    'Hak edilen': 'Entitled', 'Mazeret izni': 'Excuse leave', 'Ücretsiz izin': 'Unpaid leave', 'Duyurular': 'Announcements', 'PDF · örnek dosya': 'PDF · sample file',
+    'Önizleme: talep gönderilmedi. Gerçek sürümde yöneticiye iletilir.': 'Preview: the request was not sent. In the real version it goes to the manager.',
+    'Önizleme: gerçek pusula yok. Gerçek sürümde yalnız oturum açan kişinin kayıtları açılır.': 'Preview: there is no real payslip. In the real version only the signed-in person\'s records open.',
+    'Satış yetkilisi onayı gerekir': 'Sales authority approval required', 'Gönderimden önce yetkili içeriği görür': 'An authorised person sees the content before sending', 'Yetkili onayı verildi': 'Authorised approval given',
+    'Fiyat revizyonu girişi': 'Price revision entry', 'Karar sahibi onaylamadı': 'Decision owner did not approve', 'İletişim': 'Communication', 'İhale': 'Tender',
+    'Onaylanan': 'Approved', 'Reddedilen': 'Rejected', 'Konu': 'Subject', 'Karar bekliyor': 'Awaiting decision', 'Onaylandı': 'Approved', 'Reddedildi': 'Rejected', 'ONAY': 'Approve', 'RED': 'Reject',
+    'Önizleme: ONAY iletilmedi. Gerçek sürüm kodu mevcut onay akışına iletir.': 'Preview: the approval was not forwarded. The real version forwards the code to the current approval flow.', 'Önizleme: RED iletilmedi.': 'Preview: the rejection was not forwarded.',
+    'ÖRNEK alıcı · taslak metin': 'SAMPLE recipient · draft text', 'Bu durumda örnek kayıt yok.': 'No sample record in this status.', 'e-fatura gönderimi': 'e-invoice dispatch', 'ÖRNEK ihale': 'SAMPLE tender'
+  };
+  Object.keys(TAM_A4).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_A4[k]; });
+  PARCA.push.apply(PARCA, [['Talep no ÖRNEK', 'Request no. SAMPLE'], ['invoices kaydı', 'invoice records'], ['invoice kaydı', 'invoice record'], [' · Satış', ' · Sales'], [' · İletişim', ' · Communication'], [' · İhale', ' · Tender'], [' · Fatura', ' · Invoice']]);
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

@@ -32,7 +32,33 @@
     if (eskidi || !o.artar || o.c.adet == null) return { eskidi: eskidi, deger: null };
     return { eskidi: false, deger: o.c.adet + o.c.hiz_dk * (simdi - o.t0) / 60000 };
   }
-  MM.makineEkSinama = { adimSonuc: adimSonuc, ESKI_MS: ESKI_MS };
+   
+  var DK_ILK = 20;
+  function mSayi(v) { return typeof v === 'number' && isFinite(v); }
+  function m2Yaz(n) { return n.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+  function dokumaGecerli(d) {    
+    var m = d && d.dokuma_m2;
+    if (!m || typeof m !== 'object' || !Array.isArray(m.liste)) return null;
+    var l = m.liste.filter(function (x) { return x && x.no != null && x.salon != null; });
+    return l.length ? { ad: (m.donem && typeof m.donem.ad === 'string') ? m.donem.ad : '', zaman: (m.donem && m.donem.veri_zamani) || '', liste: l } : null;
+  }
+  function dokumaSalonlar(l) {    
+    var o = {}, sira = [];
+    l.forEach(function (x) { var s = String(x.salon); if (!o[s]) { o[s] = { salon: s, toplam: 0, sayi: 0, tanimsiz: 0 }; sira.push(s); } if (mSayi(x.m2)) { o[s].toplam += x.m2; o[s].sayi++; } else o[s].tanimsiz++; });
+    return sira.sort(function (a, b) { return (parseFloat(a) - parseFloat(b)) || (a < b ? -1 : 1); }).map(function (s) { return o[s]; });
+  }
+  function dokumaSirala(l, salon) {    
+    return l.filter(function (x) { return salon === 't' || String(x.salon) === salon; }).slice().sort(function (a, b) {
+      var A = mSayi(a.m2), B = mSayi(b.m2);
+      if (A && B) return (b.m2 - a.m2) || (String(a.no) < String(b.no) ? -1 : 1);
+      if (A !== B) return A ? -1 : 1;
+      return String(a.no) < String(b.no) ? -1 : 1;
+    });
+  }
+  function dokumaToplam(l) { return l.reduce(function (t, x) { return mSayi(x.m2) ? t + x.m2 : t; }, 0); }
+  var saatTr = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', hour12: false });
+  function saatYaz(iso) { var t = Date.parse(iso); return isNaN(t) ? '' : saatTr.format(new Date(t)); }
+  MM.makineEkSinama = { adimSonuc: adimSonuc, ESKI_MS: ESKI_MS, dokumaGecerli: dokumaGecerli, dokumaSalonlar: dokumaSalonlar, dokumaSirala: dokumaSirala, dokumaToplam: dokumaToplam, m2Yaz: m2Yaz };
    
   function canliCiz(kutu, liste, veriMs, durum) {
     kutu.textContent = '';
@@ -119,6 +145,36 @@
   }
 
    
+  function dokumaKart(v, durum, yeniden) {
+    var tr = window.MM.t || function (x) { return x };
+    var sal = dokumaSalonlar(v.liste), toplam = dokumaToplam(v.liste), tanim = v.liste.filter(function (x) { return !mSayi(x.m2); }).length;
+    var saat = saatYaz(v.zaman), alt = [v.ad, saat ? tr('veri saati') + ' ' + saat : ''].filter(Boolean).join(' · ');
+    var ozet = h('div', { sinif: 'me-dk-ozet' }, [h('div', { sinif: 'me-dk-kutu me-dk-toplam' }, [h('span', { sinif: 'me-soluk', metin: tr('Toplam') }), h('b', { metin: m2Yaz(toplam) + ' m²' })])]);
+    var salonlar = h('div', { sinif: 'me-dk-salonlar', style: 'grid-template-columns:repeat(' + Math.max(sal.length, 1) + ',minmax(0,1fr))' }, sal.map(function (s) {
+      return h('div', { sinif: 'me-dk-kutu' }, [h('span', { sinif: 'me-soluk', metin: tr('Salon') + ' ' + s.salon }), h('b', { metin: s.sayi ? m2Yaz(s.toplam) : '—' })]);
+    }));
+    var govde = h('div', null, [ozet, salonlar]);
+    if (tanim) govde.appendChild(h('p', { sinif: 'me-soluk', metin: tr('{n} tezgahta m² bilgisi tanımsız (toplama katılmadı)').replace('{n}', say(tanim)) }));
+    var ac = h('details', { sinif: 'acilir-bolum me-dk-ac' }, [h('summary', { metin: tr('Tezgah bazında') })]);
+    if (durum.acik) ac.setAttribute('open', '');
+    ac.addEventListener('toggle', function () { durum.acik = ac.open; });
+    var liste = h('div');
+    function listeCiz() {
+      liste.textContent = '';
+      var tum = dokumaSirala(v.liste, durum.salon), gor = tum.slice(0, durum.n);
+      liste.appendChild(G.cipler([['t', tr('Tümü')]].concat(sal.map(function (s) { return [s.salon, tr('Salon') + ' ' + s.salon]; })), durum.salon, function (id) { durum.salon = id; durum.n = DK_ILK; listeCiz(); }, tr('Salon süzgeci')));
+      liste.appendChild(h('div', { sinif: 'me-dk-izgara' }, gor.map(function (x) {
+        var sayi = mSayi(x.m2);
+        return h('div', { sinif: 'me-dk-hucre' + (sayi && x.m2 === 0 ? ' sifir' : '') + (sayi ? '' : ' tanimsiz') }, [h('span', { metin: String(x.no) }), h('b', { metin: sayi ? m2Yaz(x.m2) : tr('tanımsız') })]);
+      })));
+      if (tum.length > gor.length) liste.appendChild(h('button', { type: 'button', sinif: 'mini-dugme', metin: tr('Daha fazla göster'), onclick: function () { durum.n += DK_ILK; listeCiz(); } }));
+    }
+    listeCiz();
+    ac.appendChild(liste); govde.appendChild(ac);
+    return G.kart({ baslik: tr('Dokuma m²'), alt: alt, govde: govde });
+  }
+
+   
   function fireBolum(f) {
     var s = (f || []).filter(function (x) { return x.fire_yuzde != null; });
     if (!s.length) return bekleniyor('Fire');
@@ -176,6 +232,8 @@
     }
     hatKok.appendChild(kart('Hat adedi (canlı tahmini)', 'Son gerçek adet + adet/dk; her dakika gerçek veriyle düzelir', canliKutu));
     hatKok.appendChild(digerKok);
+    var dokumaKok = h('div', { sinif: 'me-ek' }), dokumaDurum = { salon: 't', n: DK_ILK, acik: false };
+    hatKok.appendChild(dokumaKok);
     kok.appendChild(hatKok); kok.appendChild(durusKok); kok.appendChild(gecmisKok);
     var donemKutu = h('div'), donemYuklendi = false;
     var gecmisUst = h('div', { sinif: 'me-ek' });
@@ -192,6 +250,8 @@
     function ciz(d) {   
       digerKok.textContent = ''; durusKok.textContent = '';
       digerKok.appendChild(kart('Gün sonu tahmini', 'tahmin', tahminBolum(d.tahmin)));
+      dokumaKok.textContent = '';
+      try { var dv = dokumaGecerli(d); if (dv) dokumaKok.appendChild(dokumaKart(dv, dokumaDurum)); } catch (e) { dokumaKok.textContent = ''; }    
       gecmisUst.textContent = '';
       gecmisUst.appendChild(kart('OEE kırılımı', null, oeeBolum(d.oee)));
       gecmisUst.appendChild(kart('Makine bazında fire', 'makinenin bildirdiği oran · adet', fireBolum(d.fire)));

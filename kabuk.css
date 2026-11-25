@@ -5,9 +5,12 @@
 .marka { margin-right: 0; flex: 0 0 auto; }
 .ust-sag { display: flex; gap: 6px; flex: 0 0 auto; margin-left: auto; align-items: center; }
 .dil-sec { display: inline-flex; border: 1px solid var(--cizgi, rgba(128,128,128,.35)); border-radius: 999px; overflow: hidden; flex: 0 0 auto; }
-.dil-dugme { font: inherit; font-size: 12px; font-weight: 600; line-height: 1; min-height: 34px; min-width: 34px; padding: 0 8px; border: 0; background: transparent; color: inherit; cursor: pointer; opacity: .65; }
+.dil-dugme { font: inherit; font-size: 12px; font-weight: 600; line-height: 1; min-height: 44px; min-width: 44px; padding: 0 8px; border: 0; background: transparent; color: inherit; cursor: pointer; opacity: .65; }
 .dil-dugme.secili { background: var(--vurgu, #256abf); color: #fff; opacity: 1; }
-@media (max-width: 599px) { .ust-sag { gap: 4px; } .dil-dugme.secili { display: none; } .dil-dugme { opacity: 1; padding: 0 7px; min-width: 36px; } }
+@media (max-width: 599px) { .ust-sag { gap: 4px; } .dil-dugme.secili { display: none; } .dil-dugme { opacity: 1; padding: 0 7px; min-width: 44px; } }
+ 
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .dil-dugme.secili { color: var(--vurgu-yazi); } }
+:root[data-tema="koyu"] .dil-dugme.secili { color: var(--vurgu-yazi); }
 .ikon-dugme { width: 44px; height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-t); border: 1px solid transparent; background: none; color: var(--yazi2); font-size: 18px; cursor: pointer; position: relative; transition: background var(--hiz); }
 .ikon-dugme:hover { background: var(--yuzey2); }
 .ust .ikon-dugme:last-child { margin-left: 0; }

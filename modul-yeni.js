@@ -45,7 +45,7 @@
   MM.moduller.ik = function (kok) {
     var tur = 'Yıllık izin', bas = '', bit = '';
     var halka = (function () { var W = 140, r = 56, c = 2 * Math.PI * r, k = 14 / 22; var s = gr.s('svg', { viewBox: '0 0 ' + W + ' ' + W, width: 130, height: 130, role: 'img', 'aria-label': 'Örnek izin bakiyesi: 22 günden 8 gün kullanıldı, 14 gün kaldı' });
-      s.appendChild(gr.s('circle', { cx: 70, cy: 70, r: r, fill: 'none', stroke: 'var(--yuzey3)', 'stroke-width': 14 })); s.appendChild(gr.s('circle', { cx: 70, cy: 70, r: r, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 14, 'stroke-dasharray': (c * k).toFixed(1) + ' ' + c, 'stroke-linecap': 'round', transform: 'rotate(-90 70 70)' }));
+      s.appendChild(gr.s('circle', { cx: 70, cy: 70, r: r, 'class': 'dm-hk-iz', fill: 'none', stroke: 'var(--yuzey3)', 'stroke-width': 14 })); s.appendChild(gr.s('circle', { cx: 70, cy: 70, r: r, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 14, 'stroke-dasharray': (c * k).toFixed(1) + ' ' + c, 'stroke-linecap': 'round', transform: 'rotate(-90 70 70)' }));
       s.appendChild(gr.s('text', { x: 70, y: 70, 'text-anchor': 'middle', 'font-size': 30, 'font-weight': 700, fill: 'var(--yazi)' }, ['14'])); s.appendChild(gr.s('text', { x: 70, y: 90, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--soluk)' }, ['gün kaldı'])); return s; })();
     var bakiye = gr.kart({ baslik: 'İzin bakiyem', alt: 'Yıllık izin (örnek)', eylem: ornekEt(), govde: h('div', { sinif: 'ik-bakiye' }, [halka, h('dl', { sinif: 'degerler' }, [h('dt', { metin: 'Hak edilen' }), h('dd', { metin: '22 gün' }), h('dt', { metin: 'Kullanılan' }), h('dd', { metin: '8 gün' }), h('dt', { metin: 'Bekleyen talep' }), h('dd', { metin: '0' })])]) });
     var tarih = function (ad, set) { return h('label', { sinif: 'alan' }, [h('span', { metin: ad }), h('input', { type: 'date', oninput: function (e) { set(e.target.value); } })]); };
@@ -258,6 +258,7 @@
     function acilir(baslik, adet, kart) {
       return h('details', { sinif: 'hz-acilir-kart' }, [h('summary', { metin: baslik + (adet != null ? ' (' + adet + ')' : '') }), kart]);
     }
+    function telK(baslik, adet, kart) { return matchMedia('(max-width: 599px)').matches ? acilir(baslik, adet, kart) : kart; }    
     function ayAd(k) { var p = k.split('-'); return AY[+p[1] - 1] + ' ' + p[0]; }
     function ciz() {
       kok.textContent = '';
@@ -540,7 +541,8 @@
         var govde = h('div', null, [h('p', { sinif: 'hz-oneri-satir', metin: o.kural }),
           o.giris_30gun_tl == null ? h('p', { sinif: 'hz-kaynak kucuk soluk', metin: 'Önümüzdeki 30 gün beklenen giriş: veri yok' }) : h('p', { sinif: 'hz-kaynak kucuk soluk', metin: 'Önümüzdeki 30 gün beklenen giriş: ' + mn(o.giris_30gun_tl) + ' · ' + (o.giris_kaynagi || '') }),
           (o.satirlar || []).length ? tabloX('Kredi önerisi · bu ay vadesi gelenler', { satirlar: o.satirlar, kolonlar: kol, bos: 'Kayıt yok.' }) : gr.bos({ tur: 'bekle', baslik: 'Bu ay vadesi gelen rotatif/iskonto kredisi yok', metin: '' })]);
-        return h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Kredi önerisi', eylem: h('span', { sinif: 'hz-etiket', metin: 'Öneri' }), alt: 'Bu ay vadesi gelen rotatif/iskonto krediler · ' + ayAd(o.ay), govde: govde })]);
+        var onKart = gr.kart({ baslik: 'Kredi önerisi', eylem: h('span', { sinif: 'hz-etiket', metin: 'Öneri' }), alt: 'Bu ay vadesi gelen rotatif/iskonto krediler · ' + ayAd(o.ay), govde: govde });
+        return h('div', { sinif: 'ust-bosluk' }, [matchMedia('(max-width: 599px)').matches ? acilir('Kredi önerisi', (o.satirlar || []).length, onKart) : onKart]);    
       }
        
       function cekTab() {
@@ -603,7 +605,9 @@
         if (!sat.length) return h('p', { sinif: 'hz-kaynak kucuk soluk', metin: 'DMO teslim edilmemiş sipariş açığı: veri yok' });
         var ac = sat.filter(function (x) { return x.uyari && x.teslimsiz_mn_tl > 0; });
         var kap = h('div');
-        if (ac.length) kap.appendChild(h('div', { sinif: 'bant kirmizi hz-kirmizi-uyari', role: 'alert' }, [h('strong', { metin: 'DMO siparişi teslim edilmedi: kredi vadesinde öz kaynaktan ödenecek açık' }),
+        var telU = matchMedia('(max-width: 599px)').matches;    
+        var bst = h('strong', { metin: 'DMO siparişi teslim edilmedi: kredi vadesinde öz kaynaktan ödenecek açık' });
+        if (ac.length) kap.appendChild(h(telU ? 'details' : 'div', { sinif: 'bant kirmizi hz-kirmizi-uyari' + (telU ? ' hz-kirmizi-ac' : ''), role: 'alert' }, [telU ? h('summary', null, [bst]) : bst,
           h('ul', null, ac.map(function (x) { return h('li', { metin: x.banka + ' · ₺ ' + f2(x.teslimsiz_mn_tl) + ' mn' + (x.kredi_vade ? ' · en yakın kredi son vadesi ' + trT(x.kredi_vade) + (x.sonraki_taksit ? ' · sonraki taksit ' + trT(x.sonraki_taksit) : '') : ' · kredi vadesi verisi yok') + ' · şahsi kefalete taşınacak' }); }))]));
         var kol = [{ ad: 'Banka', k: 'banka' }, { ad: 'Teslim edilmemiş sipariş (mn ₺)', k: 'teslimsiz_mn_tl', sag: true, ciz: function (r) { return f2(r.teslimsiz_mn_tl); } },
           { ad: 'En yakın kredi son vadesi', k: 'kredi_vade', ciz: function (r) { return r.kredi_vade ? trT(r.kredi_vade) : 'veri yok'; } },
@@ -620,7 +624,7 @@
       function dmoTab() {
         var k = h('div'), dm = v.dmo_odeme, kt = eski.dmo();
         k.appendChild(kaynakSatir('DMO ödeme raporu', dm && dm.uretim));
-        k.appendChild(teslimsizUyari());
+        k.appendChild(teslimsizUyari(true));
         if (kt) k.appendChild(kt); else k.appendChild(gr.bos({ tur: 'bekle', baslik: 'DMO ödeme verisi yok', metin: 'Rapor henüz üretilmedi.' }));
         if (dm && dm.sirkete_kalan && dm.sirkete_kalan.length) {
           var gun = (dm.sirkete_kalan[0].degerler || []).map(function (x) { return x.t; });
@@ -639,14 +643,14 @@
         var bt = (tm.banka_bazli || []).slice().sort(function (a, b) { return (b.tl || 0) - (a.tl || 0); }).map(function (b) { return { e: bankaAd(b.banka, b.logo, 's'), d: b.tl, renk: 'var(--s7)', etiketDeger: mn(b.tl) + ' · ' + b.adet }; });
         k.appendChild(h('div', { sinif: 'ust-bosluk' }, [acilir('Banka bazında teminat', bt.length, gr.kart({ baslik: 'Banka bazında teminat', alt: 'TL karşılığı · teminat adedi', govde: bt.length ? gr.yatay(bt) : gr.bos({ tur: 'bekle', baslik: 'Veri yok', metin: '' }) }))]));
         var kol = [{ ad: 'Banka', k: 'banka', ciz: function (r) { return bankaAd(r.banka, r.logo, 's'); } }, { ad: 'Tür', k: 'tur', ciz: function (r) { return (r.tip || '') + (r.tur ? ' · ' + r.tur : ''); } }, { ad: 'Muhatap', k: 'muhatap', ciz: function (r) { return r.muhatap || '—'; } }, { ad: 'Tutar (TL)', k: 'tl', sag: true, ciz: function (r) { return tl(r.tl); } }, { ad: 'Vade', k: 'vade', ciz: function (r) { return r.vade ? trT(r.vade) : (r.suresiz ? 'süresiz' : '—'); } }, { ad: 'Vadeye', k: 'gun', ciz: function (r) { return gunMetin(r.gun); } }];
-        if (v60.adet && v60.liste && v60.liste.length) k.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: '60 gün içinde vadesi dolanlar', alt: v60.adet + ' teminat', govde: tabloX('Teminat · 60 gün içinde vadesi dolanlar', { satirlar: v60.liste, kolonlar: kol, sira: { k: 'gun', yon: 'yukari' } }) })]));
+        if (v60.adet && v60.liste && v60.liste.length) k.appendChild(h('div', { sinif: 'ust-bosluk' }, [telK('60 gün içinde vadesi dolanlar', v60.adet, gr.kart({ baslik: '60 gün içinde vadesi dolanlar', alt: v60.adet + ' teminat', govde: tabloX('Teminat · 60 gün içinde vadesi dolanlar', { satirlar: v60.liste, kolonlar: kol, sira: { k: 'gun', yon: 'yukari' } }) }))]));
         k.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Bankalardan Alınan Teminatlar (' + (tm.liste || []).length + ')', alt: 'Bankaların bizim adımıza verdiği teminat mektupları · vadesi geçmiş olanlar işaretli', govde: tabloX('Teminat · verilen', { satirlar: tm.liste || [], kolonlar: kol, sira: { k: 'tl', yon: 'asagi' }, bos: 'Teminat yok.', satirSinif: function (r) { return r.gun != null && r.gun < 0 ? 'hz-gecmis' : ''; } }) })]));
          
         var al = tm.alinan, alKol = [{ ad: 'Tür', k: 'tur', ciz: function (r) { return r.tur || '—'; } }, { ad: 'Firma', k: 'firma', ciz: function (r) { return r.firma || '—'; } }, { ad: 'Tutar', k: 'tutar', sag: true, ciz: function (r) { return tut(r.tutar, r.pb); } }, { ad: 'Alınma', k: 'alinma', ciz: function (r) { return r.alinma ? trT(r.alinma) : '—'; } }, { ad: 'Vade', k: 'vade', ciz: function (r) { return r.vade ? trT(r.vade) : 'süresiz'; } }];
-        k.appendChild(h('div', { sinif: 'ust-bosluk' }, [al && al.liste ? gr.kart({ baslik: 'Alınan teminatlar (' + al.liste.length + ')', alt: 'Müşteri ve firmalardan aldığımız teminatlar (iade edilenler hariç)', govde: tabloX('Teminat · alınan', { satirlar: al.liste, kolonlar: alKol, sira: { k: 'tutar', yon: 'asagi' }, bos: 'Alınan teminat yok.' }) }) : gr.kart({ baslik: 'Alınan teminatlar', alt: '', govde: gr.bos({ tur: 'bekle', baslik: 'Alınan teminat verisi yok', metin: 'Kaynakta (ALINAN TEMİNAT sayfası) okunamadı.' }) })]));
+        k.appendChild(h('div', { sinif: 'ust-bosluk' }, [al && al.liste ? telK('Alınan teminatlar', al.liste.length, gr.kart({ baslik: 'Alınan teminatlar (' + al.liste.length + ')', alt: 'Müşteri ve firmalardan aldığımız teminatlar (iade edilenler hariç)', govde: tabloX('Teminat · alınan', { satirlar: al.liste, kolonlar: alKol, sira: { k: 'tutar', yon: 'asagi' }, bos: 'Alınan teminat yok.' }) })) : gr.kart({ baslik: 'Alınan teminatlar', alt: '', govde: gr.bos({ tur: 'bekle', baslik: 'Alınan teminat verisi yok', metin: 'Kaynakta (ALINAN TEMİNAT sayfası) okunamadı.' }) })]));
          
         var bct = cek.banka_cek_teminat;
-        if (bct && bct.liste && bct.liste.length) k.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Çek karşılığı ve çekle karşılanmayan tutar', alt: 'Banka düzeyi, kısmi', govde: tabloX('Teminat · çek karşılığı', { satirlar: bct.liste, sira: { k: 'cekle_karsilanmayan_tl', yon: 'asagi' }, bos: 'Veri yok.', kolonlar: [{ ad: 'Banka', k: 'banka', ciz: function (r) { return bankaAd(r.banka, r.logo, 's'); } }, { ad: 'Çek karşılıklı kredi', k: 'kredi_cek_karsiligi_tl', sag: true, ciz: function (r) { return tl(r.kredi_cek_karsiligi_tl); } }, { ad: 'Bankaya verilen çek', k: 'cek_teminati_tl', sag: true, ciz: function (r) { return tl(r.cek_teminati_tl); } }, { ad: 'Çekle karşılanmayan', k: 'cekle_karsilanmayan_tl', sag: true, ciz: function (r) { return r.cekle_karsilanmayan_tl > 0 ? tl(r.cekle_karsilanmayan_tl) : '—'; } }] }) })]));
+        if (bct && bct.liste && bct.liste.length) k.appendChild(h('div', { sinif: 'ust-bosluk' }, [telK('Çek karşılığı ve çekle karşılanmayan tutar', bct.liste.length, gr.kart({ baslik: 'Çek karşılığı ve çekle karşılanmayan tutar', alt: 'Banka düzeyi, kısmi', govde: tabloX('Teminat · çek karşılığı', { satirlar: bct.liste, sira: { k: 'cekle_karsilanmayan_tl', yon: 'asagi' }, bos: 'Veri yok.', kolonlar: [{ ad: 'Banka', k: 'banka', ciz: function (r) { return bankaAd(r.banka, r.logo, 's'); } }, { ad: 'Çek karşılıklı kredi', k: 'kredi_cek_karsiligi_tl', sag: true, ciz: function (r) { return tl(r.kredi_cek_karsiligi_tl); } }, { ad: 'Bankaya verilen çek', k: 'cek_teminati_tl', sag: true, ciz: function (r) { return tl(r.cek_teminati_tl); } }, { ad: 'Çekle karşılanmayan', k: 'cekle_karsilanmayan_tl', sag: true, ciz: function (r) { return r.cekle_karsilanmayan_tl > 0 ? tl(r.cekle_karsilanmayan_tl) : '—'; } }] }) }))]));
         return k;
       }
        
@@ -694,7 +698,7 @@
         function topl(a) { var t = 0, var_ = false; L.forEach(function (x) { if (x[a] != null) { t += x[a]; var_ = true; } }); return var_ ? t : null; }
         var T = bl.toplam || {}, tLim = T.limit_tl != null ? T.limit_tl : topl('limit_tl'), tRisk = T.risk_tl != null ? T.risk_tl : topl('risk_tl'), tBos = T.bos_tl != null ? T.bos_tl : topl('bos_tl');
         var bayatSay = L.filter(function (x) { return x.bayat === true; }).length;
-        k.appendChild(h('div', { sinif: 'kpi-izgara' }, [
+        k.appendChild(h('div', { sinif: 'kpi-izgara hz-lim-kpi' }, [
           gr.kpi({ baslik: 'Toplam limit', deger: mn(tLim), birim: L.length + ' kurum · ' + (T.limitli_kurum_adedi != null ? T.limitli_kurum_adedi : L.filter(function (x) { return x.limit_tl != null; }).length) + ' limitli', ikon: 'liste', durum: tLim == null ? 'yok' : null }),
           gr.kpi({ baslik: 'Toplam risk (kullanılan)', deger: mn(tRisk), birim: tLim ? yuzde(100 * tRisk / tLim) + ' dolu' : '', ikon: 'cubuk', durum: tRisk == null ? 'yok' : null }),
           gr.kpi({ baslik: 'Toplam boş limit', deger: mn(tBos), birim: tBos != null && tBos < 0 ? 'aşım' : 'kullanılabilir', ikon: 'tik', durum: tBos == null ? 'yok' : (tBos < 0 ? 'kritik' : 'iyi') })]));
@@ -702,7 +706,9 @@
         var S = L.slice().sort(function (a, b) { return (b.bos_tl == null ? -Infinity : b.bos_tl) - (a.bos_tl == null ? -Infinity : a.bos_tl); });
         var cub = S.filter(function (x) { return x.bos_tl != null; }).map(function (x) { var neg = x.bos_tl < 0; return { e: bankaAd(x.banka, x.logo, 's'), d: Math.abs(x.bos_tl), renk: neg ? 'var(--kritik)' : 'var(--s1)', etiketDeger: neg ? 'aşım ' + mn(Math.abs(x.bos_tl)) : mn(x.bos_tl), ipucu: [x.banka + ': ' + (neg ? 'aşım ' + mn(Math.abs(x.bos_tl)) : 'boş ' + mn(x.bos_tl)), 'Limit ' + mn(x.limit_tl) + ' · risk ' + mn(x.risk_tl)] }; });
         var neg0 = S.some(function (x) { return x.bos_tl != null && x.bos_tl < 0; });
-        k.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.kart({ baslik: 'Boş limit sıralaması', alt: 'Bankalar boş limite göre · TL karşılığı', govde: cub.length ? h('div', null, [gr.yatay(cub)].concat(neg0 ? [gr.lejant([['Boş limit', 'var(--s1)'], ['Aşım (limit üstü risk)', 'var(--kritik)']])] : [])) : gr.bos({ tur: 'bekle', baslik: 'Boş limit hesaplanamadı', metin: 'Kaynakta risk/limit alanı yok.' }) })]));
+        var telL = matchMedia('(max-width: 599px)').matches;    
+        var sirKart = gr.kart({ baslik: 'Boş limit sıralaması', alt: 'Bankalar boş limite göre · TL karşılığı', govde: cub.length ? h('div', null, [gr.yatay(cub)].concat(neg0 ? [gr.lejant([['Boş limit', 'var(--s1)'], ['Aşım (limit üstü risk)', 'var(--kritik)']])] : [])) : gr.bos({ tur: 'bekle', baslik: 'Boş limit hesaplanamadı', metin: 'Kaynakta risk/limit alanı yok.' }) });
+        k.appendChild(h('div', { sinif: 'ust-bosluk' }, [telL && cub.length ? acilir('Boş limit sıralaması', cub.length, sirKart) : sirKart]));
         function ls(a, b, c) { return h('div', { sinif: 'hz-b-satir' }, [h('span', { metin: a }), h('b', { metin: b }), c ? h('small', { metin: c }) : null]); }
         function ikili(o) { return o ? mn(o.risk_tl) + ' / ' + mn(o.limit_tl) : '—'; }
         var xLm = xDugme('Limitler', ['Banka', 'Limit (TL)', 'Risk (TL)', 'Boş limit (TL)', 'Nakdi risk (TL)', 'Nakdi limit (TL)', 'Gayrinakdi risk (TL)', 'Gayrinakdi limit (TL)', 'Bizim kredi (TL)', 'Teminat mektubu (TL)', 'Çek karşılığı (TL)', 'Revize vadesi'], S.map(function (x) { var n = x.nakdi || {}, g = x.gayrinakdi || {}; return [x.gorunen_ad || x.banka, x.limit_tl, x.risk_tl, x.bos_tl, n.risk_tl, n.limit_tl, g.risk_tl, g.limit_tl, x.bizim_kredi_tl, x.bizim_teminat_tl, x.cek_karsiligi_tl, x.revize_vadesi ? trT(x.revize_vadesi) : '']; }));
@@ -715,10 +721,11 @@
             h('div', { sinif: 'hz-lim-ust' }, [bankaLogo(x.banka, x.logo), h('h4', { metin: x.gorunen_ad || x.banka }), x.bayat === true ? h('span', { sinif: 'hz-bayat', metin: x.revize_vadesi && x.revize_vadesi < new Date().toISOString().slice(0, 10) ? 'Limit revize vadesi geçmiş — güncel değil' : '2025 revize — güncel değil' }) : null]),
             h('div', { sinif: 'hz-lim-bos' + (neg ? ' neg' : '') }, [h('small', { metin: neg ? 'Aşım' : 'Boş limit' }), h('b', { metin: x.bos_tl == null ? '—' : mn(Math.abs(x.bos_tl)) })]),
             bar, h('div', { sinif: 'hz-lim-yuzde kucuk soluk', metin: oran == null ? 'Doluluk bilinmiyor' : 'Doluluk ' + pc(Math.round(oran).toLocaleString(LOC)) + ' · risk ' + mn(x.risk_tl) + ' / limit ' + mn(x.limit_tl) }),
-            ls('Nakdi (risk / limit)', ikili(x.nakdi)), ls('Gayrinakdi (risk / limit)', ikili(x.gayrinakdi)),
-            ls('Bizim kredi', mn(x.bizim_kredi_tl), x.kredi_usd > 0 ? '$ ' + Math.round(x.kredi_usd).toLocaleString(LOC) + (x.kredi_tl_pb > 0 ? ' + ' + mn(x.kredi_tl_pb) : '') : ''), ls('Teminat mektubu', mn(x.bizim_teminat_tl)), ls('Çek karşılığı', mn(x.cek_karsiligi_tl)),
-            h('p', { sinif: 'hz-limit kucuk soluk', metin: [x.limit_kaynak ? 'Limit kaynağı: ' + x.limit_kaynak : '', x.revize_vadesi ? 'Revize vadesi ' + trT(x.revize_vadesi) : '', x.not || ''].filter(Boolean).join(' · ') || 'Limit kaynağı belirtilmemiş' })]);
-        }, { sinif: 'hz-banka-izgara', n: 10 });
+            h('details', { sinif: 'hz-lim-ayr', open: telL ? null : '' }, [h('summary', { metin: 'Ayrıntı' }),
+              ls('Nakdi (risk / limit)', ikili(x.nakdi)), ls('Gayrinakdi (risk / limit)', ikili(x.gayrinakdi)),
+              ls('Bizim kredi', mn(x.bizim_kredi_tl), x.kredi_usd > 0 ? '$ ' + Math.round(x.kredi_usd).toLocaleString(LOC) + (x.kredi_tl_pb > 0 ? ' + ' + mn(x.kredi_tl_pb) : '') : ''), ls('Teminat mektubu', mn(x.bizim_teminat_tl)), ls('Çek karşılığı', mn(x.cek_karsiligi_tl)),
+              h('p', { sinif: 'hz-limit kucuk soluk', metin: [x.limit_kaynak ? 'Limit kaynağı: ' + x.limit_kaynak : '', x.revize_vadesi ? 'Revize vadesi ' + trT(x.revize_vadesi) : '', x.not || ''].filter(Boolean).join(' · ') || 'Limit kaynağı belirtilmemiş' })])]);
+        }, { sinif: 'hz-banka-izgara', n: telL ? 3 : 10 });
         k.appendChild(h('div', { sinif: 'ust-bosluk' }, [kartlar]));
         return k;
       }

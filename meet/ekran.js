@@ -22,7 +22,7 @@
   var mq = window.matchMedia ? window.matchMedia('(max-width: 700px)') : null;
    
   var mqDar = window.matchMedia ? window.matchMedia('(max-width: 600px)') : null;
-  var ovc = 0, videoVar = new Set(), secim = [], seritZ = null;   
+  var ovc = 0, videoVar = new Set(), secim = [];   
 
   var HATA = {
     belirtec: 'Oturum alınamadı. Uygulamaya giriş yapıp bu sayfayı yenileyin.',
@@ -115,7 +115,7 @@
   function tost(metin) {
     var alan = $('tost-alan'), t = document.createElement('div'); t.className = 'tost'; t.textContent = metin;
     alan.appendChild(t);
-    while (alan.children.length > 4) alan.removeChild(alan.firstChild);
+    while (alan.children.length > 1) alan.removeChild(alan.firstChild);    
     setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 3500);
   }
   function bas(s) { return (s || '?').trim().charAt(0).toUpperCase() || '?'; }
@@ -196,12 +196,9 @@
     if (secim.join(',') !== onceki) duzenle();
   }
   function katilimSeridi(metin) {
-    var kap = $('izgara-kap'); if (!kap || !metin) return;
-    var s = $('katilim-serit');
-    if (!s) { s = document.createElement('div'); s.id = 'katilim-serit'; s.className = 'katilim-serit'; s.setAttribute('role', 'status'); s.setAttribute('aria-live', 'polite'); kap.appendChild(s); }
-    s.textContent = metin; s.hidden = false;
-    clearTimeout(seritZ);
-    seritZ = setTimeout(function () { s.hidden = true; s.textContent = ''; }, 4000);
+     
+    if (!metin || !$('tost-alan')) return;
+    tost(metin);
   }
   function duzenle() {
     var anahtarlar = Array.from(kartlar.keys());
@@ -486,7 +483,7 @@
       var li = document.createElement('li');
       var u = document.createElement('div'); u.className = 'msg-ust';
       var kim = m.gonderen === ben ? 'Siz' : (adlar[m.gonderen] || 'Kişi');
-      var z = zaman(m); var saat = z ? new Date(z).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '';
+      var z = zaman(m); var saat = z ? new Date(z).toLocaleTimeString((window.MeetDil && window.MeetDil.dil === 'en') ? 'en-GB' : 'tr-TR', { hour: '2-digit', minute: '2-digit' }) : '';
       u.textContent = kim + (saat ? ' · ' + saat : '');
       var t = document.createElement('div'); t.className = 'msg-metin';
       t.textContent = m.tur === 'metin' || !m.tur ? m.metin : ('[' + m.tur + ']' + (m.metin ? ' ' + m.metin : ''));
@@ -599,8 +596,7 @@
     kartlar.forEach(function (o) { o.kart.remove(); }); kartlar.clear(); uyeler.clear();
     ['izgara', 'ana', 'serit', 'kendi'].forEach(function (i) { $(i).textContent = ''; });
     gorunum = 'otomatik'; sabit = ''; konusan = ''; elAcik = false; ekranAcik = false; bagliOldu = false;
-    videoVar.clear(); secim = []; ovc = 0; clearTimeout(seritZ); var ks = $('katilim-serit'); if (ks) { ks.hidden = true; ks.textContent = ''; }
-    gorunumUi(); elUi(); ekranUi(); yanKapat(); acilirKapat(); davetSifirla(); $('tost-alan').textContent = '';
+    videoVar.clear(); secim = []; ovc = 0;    gorunumUi(); elUi(); ekranUi(); yanKapat(); acilirKapat(); davetSifirla(); $('tost-alan').textContent = '';
     $('toplanti-adi').textContent = toplantiAdi; $('izgara').className = 'izgara c1 r1 tek';
   }
   async function cagriyaGir(bilgi) {
@@ -1181,7 +1177,7 @@
     });
     $('o-efekt').addEventListener('click', function () { tost2('Arka plan efektleri bu görüşmede kullanılamıyor.'); });
   }
-  function tost2(m) { mesaj(m, 'bilgi'); setTimeout(function () { if ($('mesaj').textContent === m) mesaj(''); }, 3000); }
+  function tost2(m) { mesaj(m, 'bilgi'); setTimeout(function () { if ($('mesaj').textContent === m || $('mesaj').textContent === (window.MeetDil ? window.MeetDil.t(m) : m)) mesaj('');     }, 3000); }
 
    
   async function altIs(f) { try { await f(); } catch (e) { mesaj(hataMetni(e)); } }

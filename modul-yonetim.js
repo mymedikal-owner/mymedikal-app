@@ -89,7 +89,7 @@
       if (iptal) return; govde.textContent = '';
       if (oz.fab && MM.anaKpi.ORNEK(oz.fab.v)) govde.appendChild(h('div', { sinif: 'bant ornek yn-ornek', role: 'alert', metin: 'ÖRNEK VERİ — fabrika rakamları gerçek değil' }));
       var dk = MM.dikkatSeridi(oz);
-      Array.prototype.forEach.call(dk.querySelectorAll('.dikkat-kart'), function (a) { var t = (a.textContent || '').replace(/\s+/g, ' ').trim(); a.setAttribute('title', t); a.setAttribute('aria-label', t); });
+      Array.prototype.forEach.call(dk.querySelectorAll('.dikkat-kart'), function (a) { var t = Array.prototype.map.call(a.querySelectorAll('b, small'), function (x) { return (x.textContent || '').replace(/\s+/g, ' ').trim(); }).filter(Boolean).join(' · ') || (a.textContent || '').replace(/\s+/g, ' ').trim(); a.setAttribute('title', t); a.setAttribute('aria-label', t); });
       govde.appendChild(tazelikRozeti(oz)); govde.appendChild(dk);
       var kutular = []; ['hatlar', 'dokuma', 'alarm', 'eldiven', 'siparis', 'kalite', 'isg'].forEach(function (a) { var k = MM.anaKpi.yap(a, oz); if (k) kutular.push(k); });
       govde.appendChild(gr.ozetSerit(kutular, { en: 4 }));

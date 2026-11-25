@@ -69,7 +69,7 @@
     }
     function sktYaz(o) {
       if (o.kalan == null) return h('span', { sinif: 'soluk', metin: '—' });
-      if (o.kalan < 0) { var g = h('span', { sinif: 's41-skt-gecmis', metin: '⚠ SKT ' + S.tarihTR(o.skt) + ' · ' + Math.abs(o.kalan) + (EN ? ' days past' : ' gün geçti') }); g.style.color = '#c62828'; g.style.fontWeight = '700'; return g; }
+      if (o.kalan < 0) { var g = h('span', { sinif: 's41-skt-gecmis', metin: '⚠ SKT ' + S.tarihTR(o.skt) + ' · ' + Math.abs(o.kalan) + (EN ? ' days past' : ' gün geçti') }); g.style.color = 'var(--kirmizi)'; g.style.fontWeight = '700'; return g; }
       if (o.kalan <= 90) return h('span', { sinif: 's41-skt-uyari', metin: 'SKT ' + S.tarihTR(o.skt) + ' · ' + o.kalan + (EN ? ' days left' : ' gün kaldı') });
       return h('span', { metin: 'SKT ' + S.tarihTR(o.skt) });
     }
@@ -79,7 +79,7 @@
     }
     function isaretler(o, urunMu) {   
       var l = [];
-      if (o.lotHata) l.push(rozet('⚠ ' + T('Lot 10 hane değil', 'Batch is not 10 digits'), '#c62828'));
+      if (o.lotHata) l.push(rozet('⚠ ' + T('Lot 10 hane değil', 'Batch is not 10 digits'), 'var(--kirmizi)'));
       if (o.hareketsiz) l.push(rozet(T('Ürün 60+ gün hareketsiz', 'Product inactive 60+ days') + (o.hareketsizGun != null ? ' · ' + o.hareketsizGun + (EN ? ' d' : ' gün') : ''), '#7a7a7a', T('Bu parti değil, malzeme × tesis düzeyinde: ürünün son mal hareketi 60 günden eski. Ürün toplamı görünümünde de görünür.', 'Not this batch: at material × plant level the last stock movement is older than 60 days. Also shown in the Product totals view.')));
       if (o.planda) l.push(rozet('★ ' + T('Üretim planında', 'In production plan'), '#1565c0', T('Bu malzeme + lot açık üretim siparişinde hâlâ bekliyor', 'This material + batch is still pending in an open production order')));
       return l.length ? h('div', { sinif: 'alt' }, l) : null;
@@ -127,11 +127,11 @@
     }
     function urunCiz(u) {
       var miktar = h('div', { sinif: 's41-miktar' }, [h('span', { metin: 'Serbest ' + sayiYaz(u.serbest, u.birim) }), h('span', { metin: 'Kalite ' + sayiYaz(u.kalite, u.birim) }), h('span', { metin: 'Bloke ' + sayiYaz(u.bloke, u.birim) })]);
-      var skt = u.enKalan == null ? h('span', { sinif: 'soluk', metin: '—' }) : (u.enKalan < 0 ? (function () { var e = h('span', { sinif: 's41-skt-gecmis', metin: '⚠ ' + u.gecmis + T(' parti SKT geçmiş', ' batches past expiry') }); e.style.color = '#c62828'; e.style.fontWeight = '700'; return e; })() : h('span', { sinif: u.enKalan <= 90 ? 's41-skt-uyari' : '', metin: T('En yakın SKT ', 'Nearest expiry ') + u.enKalan + (EN ? ' days' : ' gün') }));
+      var skt = u.enKalan == null ? h('span', { sinif: 'soluk', metin: '—' }) : (u.enKalan < 0 ? (function () { var e = h('span', { sinif: 's41-skt-gecmis', metin: '⚠ ' + u.gecmis + T(' parti SKT geçmiş', ' batches past expiry') }); e.style.color = 'var(--kirmizi)'; e.style.fontWeight = '700'; return e; })() : h('span', { sinif: u.enKalan <= 90 ? 's41-skt-uyari' : '', metin: T('En yakın SKT ', 'Nearest expiry ') + u.enKalan + (EN ? ' days' : ' gün') }));
       var alt = [u.kod, u.sirket, u.parti + T(' parti', ' batches'), turAd(u.tur), u.ean ? 'EAN/UBB ' + u.ean : null].filter(Boolean).join(' · ');
       var el = h('div', { sinif: 's41-satir stk' }, [h('div', { sinif: 'ad', metin: (u.planda ? '★ ' : '') + (u.ad || u.kod) }), h('div', { sinif: 'sag' }, [skt]), h('div', { sinif: 'alt stk-kod', metin: alt }), h('div', { sinif: 'alt stk-mik' }, [miktar])]);
       var l = [];
-      if (u.lotHata) l.push(rozet('⚠ ' + u.lotHata + T(' partide lot 10 hane değil', ' batches not 10 digits'), '#c62828'));
+      if (u.lotHata) l.push(rozet('⚠ ' + u.lotHata + T(' partide lot 10 hane değil', ' batches not 10 digits'), 'var(--kirmizi)'));
       if (u.hareketsiz) l.push(rozet(T('60+ gün hareketsiz', '60+ days inactive'), '#b26a00'));
       if (u.planda) l.push(rozet('★ ' + u.planda + T(' parti üretim planında', ' batches in production plan'), '#1565c0'));
       if (l.length) el.appendChild(h('div', { sinif: 'alt' }, l));

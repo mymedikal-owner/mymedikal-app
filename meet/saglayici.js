@@ -43,7 +43,7 @@
     var RENK = [['#3b5b92', '#7aa2e3'], ['#8a4b6b', '#e39ab8'], ['#2f7a6a', '#7fd1be'], ['#7a5c2f', '#e3c27a']];
     var KAMERALAR = [{ id: 'kam1', ad: 'Ön kamera (taklit)', yon: 'on' }, { id: 'kam2', ad: 'Arka kamera (taklit)', yon: 'arka' }, { id: 'kam3', ad: 'Arka ultra geniş (taklit)', yon: 'arka' }];
     function kamBul(id) { return KAMERALAR.filter(function (k) { return k.id === id; })[0] || KAMERALAR[0]; }
-    function kamEtiket() { return 'Siz - ' + kamBul(secili.kamera).ad; }
+    function kamEtiket() { var t = window.MeetDil ? window.MeetDil.t : function (x) { return x; }; return t('Siz') + ' - ' + t(kamBul(secili.kamera).ad); }    
     function yerelYenile() { if (kamAcik) ev.yay('yerelVideo', { element: tuval(kamEtiket(), kamBul(secili.kamera).yon === 'on' ? 3 : 1) }); }
 
     function tuval(etiket, k, ekran) {
@@ -52,7 +52,7 @@
       var r = RENK[k % RENK.length];
       var g = x.createLinearGradient(0, 0, 640, 360); g.addColorStop(0, r[0]); g.addColorStop(1, r[1]);
       x.fillStyle = g; x.fillRect(0, 0, 640, 360);
-      if (ekran) { x.fillStyle = 'rgba(255,255,255,.9)'; x.fillRect(40, 40, 560, 280); x.fillStyle = '#233'; x.font = '28px sans-serif'; x.fillText('Paylaşılan ekran (taklit)', 150, 190); }
+      if (ekran) { x.fillStyle = 'rgba(255,255,255,.9)'; x.fillRect(40, 40, 560, 280); x.fillStyle = '#233'; x.font = '28px sans-serif'; x.fillText(window.MeetDil ? window.MeetDil.t('Paylaşılan ekran (taklit)') : 'Paylaşılan ekran (taklit)', 150, 190); }
       else { x.fillStyle = 'rgba(255,255,255,.9)'; x.font = '26px sans-serif'; x.fillText(etiket, 24, 340); }
       return c;
     }

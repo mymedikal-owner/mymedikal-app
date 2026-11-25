@@ -248,6 +248,9 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 
  
 .menu-oge[data-modul="mesaj"] { position: relative; }
+ 
+ 
+.icerik > .ms-nrozet { display: none; }
 .ms-nrozet { position: absolute; top: 4px; left: calc(50% + 4px); min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 9px; background: var(--ms-yesil); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; }
 .diger-sheet .ms-nrozet { position: static; margin-left: auto; }
 @media (min-width: 600px) and (min-height: 500px) { .ms-nrozet { position: static; margin-left: auto; } }
@@ -271,7 +274,7 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
   .ms-bolme > .ms-kok.ms-sol-bolme { order: -1; display: flex; flex: 0 0 clamp(320px, 30%, 440px); width: auto; max-width: none; margin: 0; padding: 0 14px 8px; box-sizing: border-box; overflow-y: auto; overflow-x: clip; border-right: 1px solid var(--ms-ince); background: var(--yuzey, #fff); }
   .ms-bolme > .ms-kok:not(.ms-sol-bolme) { flex: 1 1 auto; width: auto; max-width: none; margin: 0; min-width: 0; height: 100%; box-sizing: border-box; }
   .ms-bolme .ms-ekran-sohbet { position: relative; top: auto; left: auto; right: auto; bottom: auto; height: 100%; max-width: none; margin: 0; z-index: auto; }
-  .ms-bolme .ms-ekran-sohbet .ms-sohbet-ust .ms-yd-ust { display: none; }    
+  .ms-bolme .ms-ekran-sohbet .ms-sohbet-ust > .ms-yd-ust:first-child { display: none; }    
   .ms-bolme .ms-ekran-kisi, .ms-bolme .ms-ekran-bilgi { min-height: 0; height: 100%; overflow-y: auto; padding: 12px 20px; background: var(--yuzey, #fff); }
   .ms-bolme .ms-ekran-bos { display: flex; background: var(--ms-sohbet-zemin); }
   .ms-bolme .ms-mesajlar { padding: 12px clamp(16px, 5%, 72px); }
@@ -421,3 +424,42 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .ms-ben::before { clip-path: polygon(0 0, 100% 100%, 0 100%); }
 .ms-karsi + .ms-karsi::before, .ms-ben + .ms-ben::before { display: block; }
 .ms-karsi:has(+ .ms-karsi)::before, .ms-ben:has(+ .ms-ben)::before { display: none; }
+
+ 
+ 
+ 
+@media (max-width: 599px), (max-height: 499px) {
+  body:has(.ms-kok.ms-ekran-liste:not(.ms-sol-bolme)) .ust { display: none; }
+  .ms-kok.ms-ekran-liste:not(.ms-sol-bolme) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding-top: calc(env(safe-area-inset-top) + 6px); }
+  .ms-kok.ms-ekran-liste:not(.ms-sol-bolme) > * { grid-column: 1 / -1; }
+  .ms-kok.ms-ekran-liste:not(.ms-sol-bolme) > .ms-buyuk-baslik { grid-column: 1; grid-row: 1; margin: 0; font-size: 26px; }
+  .ms-kok.ms-ekran-liste:not(.ms-sol-bolme) > .ms-ust-sat { grid-column: 2; grid-row: 1; padding-top: 0; }
+  .ms-kok.ms-ekran-liste:not(.ms-sol-bolme) > .ms-ust-sat .ms-ust-sag { margin-left: 0; gap: 4px; }
+}
+ 
+.ms-gon-dugme { color: var(--gon, inherit); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .ms-gon-dugme { color: color-mix(in srgb, var(--gon, #ffffff) 45%, #ffffff); } }
+:root[data-tema="koyu"] .ms-gon-dugme { color: color-mix(in srgb, var(--gon, #ffffff) 45%, #ffffff); }
+ 
+.ms-kart-dosya { display: inline-flex; align-items: center; gap: 10px; min-width: 180px; background: rgba(127, 127, 127, .10); border-color: var(--ms-ince); }
+.ms-kart-dosya > svg { flex: none; color: var(--ms-yesil); }
+.ms-kart-yazi { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ms-kart-ad { font-weight: 600; overflow-wrap: anywhere; }
+.ms-kart-boyut { font-size: 12px; color: var(--ms-saat); }
+ 
+@media (max-width: 767px), (pointer: coarse) {
+  .ms-yd, .ms-geri, .ms-ikon { width: 44px; height: 44px; border-radius: 22px; }
+  .ms-yd { border-radius: 50%; }
+  .ms-kart { min-height: 44px; }
+  .ms-cip { min-height: 44px; padding-top: 10px; padding-bottom: 10px; border-radius: 22px; }
+  .ms-arama-kap { height: 44px; min-height: 44px; border-radius: 22px; }
+  .ms-arama { height: 44px; line-height: 44px; }
+  .ms-ara-girdi { height: 44px; }
+  .ms-yaz-kap { min-height: 44px; }
+  .ms-ikon-yazi, .ms-top-katil, .ms-bilgi-satir { min-height: 44px; }
+}
+ 
+@media (min-width: 600px) and (min-height: 500px) {
+  .ms-bolme .ms-mesajlar { padding-left: max(clamp(16px, 5%, 72px), calc((100% - 900px) / 2)); padding-right: max(clamp(16px, 5%, 72px), calc((100% - 900px) / 2)); }
+  .ms-bolme .ms-alt { padding-left: max(8px, calc((100% - 900px) / 2)); padding-right: max(8px, calc((100% - 900px) / 2)); }
+}

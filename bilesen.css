@@ -233,3 +233,7 @@ body.sheet-acik { overflow: hidden; }
 .taze-birlesik.bant, .taze-birlesik.veri-tarihi { display: block !important; }
 .taze-birlesik strong { font-weight: 600; }
 .taze-birlesik > span { overflow: hidden; text-overflow: ellipsis; }
+ 
+@media (prefers-color-scheme: dark) { :root:not([data-tema="acik"]) .bant.ornek, :root:not([data-tema="acik"]) .etiket.ornek { color: var(--vurgu-yazi); } :root:not([data-tema="acik"]) .kirinti-ayrac { color: var(--soluk2); } }
+:root[data-tema="koyu"] .bant.ornek, :root[data-tema="koyu"] .etiket.ornek { color: var(--vurgu-yazi); }
+:root[data-tema="koyu"] .kirinti-ayrac { color: var(--soluk2); }

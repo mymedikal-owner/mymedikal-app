@@ -448,10 +448,10 @@
         govde.appendChild(h('h3', { sinif: 'bolum', metin: 'İptal hakkı' }));
         govde.appendChild(h('p', { sinif: 'dm-yon' }, [h('a', { href: '#dmo/mektup', metin: 'İptal hakkı: Siparişler ekranında →' })]));
         govde.appendChild(G.ilkN(ik, function (x) {
-          var kul = x.iptal_hastane || 0;
+          var kul = x.iptal_hastane;   
           return h('div', { sinif: 'dm-sp dn-iptal' }, [
             h('div', { sinif: 'dm-sp-ust' }, [firmaRozet(x.firma), h('strong', { sinif: 'dm-ikn', metin: iknEt(x.firma, x.ikn) }), h('span', { sinif: 'soluk kucuk', metin: GRUP_AD[x.urun_grubu] || x.urun_grubu || '' })]),
-            h('div', { sinif: 'dm-sp-alt kucuk' }, [h('span', { metin: 'Hastane ' + say(x.hastane_sayisi) }), h('span', { metin: 'Kullanılan ' + say(kul) }), h('span', { metin: 'Sevke başlanmayan ' + say(x.baslanmayan_hastane) })])]);
+            h('div', { sinif: 'dm-sp-alt kucuk' }, [h('span', { metin: 'Hastane ' + say(x.hastane_sayisi) }), h('span', { metin: 'Kullanılan ' + (kul == null ? 'veri eksik' : say(kul)) }), h('span', { metin: 'Sevke başlanmayan ' + say(x.baslanmayan_hastane) })])]);
         }, { n: 10, sinif: 'dn-liste' }));
       }
       return govde;

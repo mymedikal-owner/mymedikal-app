@@ -892,6 +892,35 @@
     [/^geçmiş verisi yok \((.+) hastane\)$/, 'no past data ($1 hospitals)'],
     [/^Başvuru süresi geçen hastane: (.+)$/, 'Hospitals past the application period: $1'],
     [/^Geçmişi ölçülemeyen hastane: (.+)$/, 'Hospitals with no measurable history: $1']);
+   
+  var TAM_8036 = {
+    'Oranlar': 'Rates',
+    'İrsaliye / kargo teslim / muayene kabul oranları: veri eksik': 'Delivery note / cargo delivered / inspection acceptance rates: data missing',
+    'Açık siparişler: veri eksik': 'Open orders: data missing',
+    'Açık kalem': 'Open items',
+    'Dosya no': 'File no',
+    'Bu dosya no ile kalem yok': 'No items with this file no',
+    'Yasak sınırına yakın': 'Close to the prohibition limit',
+    'Portal bilgisi eski olabilir.': 'Portal data may be out of date.',
+    'Değerler güncel olmayabilir.': 'Values may not be current.',
+     
+    'Teslim': 'Delivery',
+    'Kabul bekleyen': 'Awaiting acceptance',
+    'Kabul / teslim': 'Accepted / delivered',
+    'Kabul / irsaliye': 'Accepted / delivery note',
+    'Sipariş tutarı': 'Order amount',
+    'Sipariş ayrıntısı': 'Order details',
+    'İrsaliye (SAP\'de kesilen)': 'Delivery note (issued in SAP)',
+    'Teslim (portalda girilen)': 'Delivery (entered in the portal)',
+    'Kabul (hastane onayı)': 'Acceptance (hospital approval)',
+    'Kabul bekleyen (teslim var, muayene yok)': 'Awaiting acceptance (delivered, not yet inspected)'
+  };
+  Object.keys(TAM_8036).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8036[k]; });
+  PARCA.push.apply(PARCA, [
+    ['Portal bilgisi eski olabilir. Değerler güncel olmayabilir. ', 'Portal data may be out of date. Values may not be current. '],
+    ['kota grubunda aşım görünüyor — kesinleşmedi', 'quota groups with an apparent overrun, not confirmed'],
+    ['grupta aşım görünüyor — kesinleşmedi', 'groups with an apparent overrun, not confirmed'],
+    ['Yasak sınırına yakın', 'Close to the prohibition limit']]);
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

@@ -253,6 +253,7 @@
      
     function turEtiket(o) {
       if (o.tur_ad === 'DMO') return o.yk ? o.yk : 'YK no yok';
+      if (o.alim_turu === 'dt') return 'Yurt İçi Sipariş';    
       if (o.tur_ad === 'Özel müşteri') return 'Özel';
       return o.yk ? o.yk : '—';
     }

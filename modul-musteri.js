@@ -26,7 +26,7 @@
   function yz(n) { return n == null || !isFinite(n) ? '—' : '%' + String(Math.round(n * 10) / 10).replace('.', ','); }
 
   MM.musteriModul = function (kok) {
-    var yuk = null, hata = null, canli = true, st = { q: '', sec: null, tip: '', sek: ilkSek() }, zam = null;
+    var yuk = null, hata = null, canli = true, st = { q: '', sec: null, tip: '', sek: ilkSek(), ac: {} }, zam = null;
     var sag = null, sagYok = false;   
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     var inp = h('input', { sinif: 's41-ara', type: 'search', autocomplete: 'off', placeholder: 'Müşteri adı veya numarası ara', 'aria-label': 'Müşteri adı veya numarası ara' });
@@ -196,10 +196,22 @@
       var ac = function () { git(m.musteri_no); }; el.addEventListener('click', ac); el.addEventListener('keydown', function (e) { if (e.key === 'Enter') ac(); });
       return el;
     }
+    function degisimSatir(v, x) { var m = musteriBul(v, x.musteri_no) || x; return musteriSatir(v, m, yuzde(x.degisim_yuzde), [x.tip, S.para(x.ciro_yil) + (EN ? ' this year' : ' bu yıl'), x.ciro_onceki_yil_ayni_donem != null ? (EN ? 'last year ' : 'geçen yıl ') + S.para(x.ciro_onceki_yil_ayni_donem) : null].filter(Boolean).join(' · ')); }
     function degisimListe(v, liste) {
       var f = h('div');
-      liste.forEach(function (x) { var m = musteriBul(v, x.musteri_no) || x; f.appendChild(musteriSatir(v, m, yuzde(x.degisim_yuzde), [x.tip, S.para(x.ciro_yil) + (EN ? ' this year' : ' bu yıl'), x.ciro_onceki_yil_ayni_donem != null ? (EN ? 'last year ' : 'geçen yıl ') + S.para(x.ciro_onceki_yil_ayni_donem) : null].filter(Boolean).join(' · '))); });
+      liste.forEach(function (x) { f.appendChild(degisimSatir(v, x)); });
       return f;
+    }
+     
+    function dar() { return !!(window.matchMedia && window.matchMedia('(max-width: 599px)').matches); }
+    function katla(anahtar, baslik, say, kart, alt) {
+      if (!dar()) return kart;
+       
+      if (kart.firstChild && kart.firstChild.tagName === 'HEADER') kart.removeChild(kart.firstChild);
+      var d = h('details', { sinif: 'acilir-bolum ms-katla' }, [h('summary', null, [h('span', { metin: baslik }), h('span', { sinif: 'ms-katla-say', metin: (alt ? alt + ' · ' : '') + G.say(say) })]), kart]);
+      if (st.ac[anahtar]) d.open = true;
+      d.addEventListener('toggle', function () { st.ac[anahtar] = d.open; });
+      return d;
     }
     function sonuc(v) {
       var q = MM.aramaNorm(st.q.trim()), p = q.split(/\s+/);
@@ -225,22 +237,22 @@
       if (st.q.trim()) return f;
       var tumu = M.slice().sort(function (a, b) { return (b.ciro_son12 || 0) - (a.ciro_son12 || 0); });
       if (tumu.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Müşteri listesi (' + G.say(tumu.length) + ')', alt: 'Son 12 ay müşteri faturasına göre · bir müşteriye dokununca siparişleri açılır',
-        govde: G.sayfali(tumu, function (m) { return musteriSatir(v, m, tl(m.ciro_son12), [m.tip, m.sehir, m.acik_siparis_adedi ? m.acik_siparis_adedi + (EN ? ' open orders' : ' açık sipariş') : null].filter(Boolean).join(' · ')); }, { n: 15 }) })]));
+        govde: G.sayfali(tumu, function (m) { return musteriSatir(v, m, tl(m.ciro_son12), [m.tip, m.sehir, m.acik_siparis_adedi ? m.acik_siparis_adedi + (EN ? ' open orders' : ' açık sipariş') : null].filter(Boolean).join(' · ')); }, { n: 8 }) })]));
       var ts = {}; M.forEach(function (m) { ts[m.tip] = (ts[m.tip] || 0) + (m.ciro_son12 > 0 ? m.ciro_son12 : 0); });
       var tipler = TIP_SIRA.filter(function (t) { return ts[t] > 0; });
       var toplam = tipler.reduce(function (a, t) { return a + ts[t]; }, 0), say = o.tip_dagilimi || {};
-      if (tipler.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Müşteri türüne göre müşteri faturası', alt: 'Son 12 ay', govde: h('div', null, [G.yatay(tipler.map(function (t) { return { e: t, d: ts[t], renk: TIP_RENK[t], etiketDeger: S.para(ts[t]) + ' · ' + S.pct(ts[t] / toplam * 100) + (say[t] ? ' · ' + say[t] + (EN ? ' customers' : ' müşteri') : '') }; }), { maks: Math.max.apply(null, tipler.map(function (t) { return ts[t]; })) })]) })]));
+      if (tipler.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [katla('tur', 'Müşteri türüne göre müşteri faturası', tipler.length, G.kart({ baslik: 'Müşteri türüne göre müşteri faturası', alt: 'Son 12 ay', govde: h('div', null, [G.yatay(tipler.map(function (t) { return { e: t, d: ts[t], renk: TIP_RENK[t], etiketDeger: S.para(ts[t]) + ' · ' + S.pct(ts[t] / toplam * 100) + (say[t] ? ' · ' + say[t] + (EN ? ' customers' : ' müşteri') : '') }; }), { maks: Math.max.apply(null, tipler.map(function (t) { return ts[t]; })) })]) }), 'Son 12 ay')]));
       var ilk = ((v.ust_listeler || {}).ilk20_ciro || []);
-      if (ilk.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'İlk 20 müşteri', alt: 'Son 12 ay müşteri faturasına göre', govde: G.yatay(ilk.map(function (x) { return { e: x.musteri, d: x.ciro_son12, renk: TIP_RENK[x.tip] || 'var(--s1)', etiketDeger: S.para(x.ciro_son12), alt: x.tip, tikla: function () { git(x.musteri_no); } }; }), { maks: ilk[0].ciro_son12 }) })]));
+      if (ilk.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [katla('ilk20', 'İlk 20 müşteri', ilk.length, G.kart({ baslik: 'İlk 20 müşteri', alt: 'Son 12 ay müşteri faturasına göre', govde: G.yatay(ilk.map(function (x) { return { e: x.musteri, d: x.ciro_son12, renk: TIP_RENK[x.tip] || 'var(--s1)', etiketDeger: S.para(x.ciro_son12), alt: x.tip, tikla: function () { git(x.musteri_no); } }; }), { maks: ilk[0].ciro_son12 }) }), 'Son 12 ay müşteri faturasına göre')]));
       var UL = v.ust_listeler || [];
       var buy = UL.en_hizli_buyuyen10 || [], dus = UL.en_hizli_dusen10 || [];
       var ikili = h('div', { sinif: 's41-ikili ust-bosluk' });
-      if (buy.length) ikili.appendChild(G.kart({ baslik: 'En hızlı büyüyen 10', alt: 'Bu yıl, geçen yılın aynı dönemine göre', govde: degisimListe(v, buy) }));
-      if (dus.length) ikili.appendChild(G.kart({ baslik: 'En hızlı düşen 10', alt: 'Bu yıl, geçen yılın aynı dönemine göre', govde: degisimListe(v, dus) }));
+      if (buy.length) ikili.appendChild(G.kart({ baslik: 'En hızlı büyüyen 10', alt: 'Bu yıl, geçen yılın aynı dönemine göre', govde: G.ilkN(buy, function (x) { return degisimSatir(v, x); }, { n: 5 }) }));
+      if (dus.length) ikili.appendChild(G.kart({ baslik: 'En hızlı düşen 10', alt: 'Bu yıl, geçen yılın aynı dönemine göre', govde: G.ilkN(dus, function (x) { return degisimSatir(v, x); }, { n: 5 }) }));
       if (ikili.childNodes.length) f.appendChild(ikili);
       var yok = UL['sipariş_vermeyen_90_gun'] || [], yokTop = UL['sipariş_vermeyen_90_gun_toplam'];
       if (yok.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: '90 gündür sipariş vermeyen müşteriler', alt: (yokTop ? G.say(yokTop) + (EN ? ' customers' : ' müşteri') + ' · ' : '') + 'son 12 ay müşteri faturası büyükten küçüğe',
-        govde: G.sayfali(yok, function (x) { var m = musteriBul(v, x.musteri_no) || x; return musteriSatir(v, m, x.gun + (EN ? ' days' : ' gün'), [x.tip, x.son_siparis_tarihi ? (EN ? 'last order ' : 'son sipariş ') + S.tarihTR(x.son_siparis_tarihi) : null, S.para(x.ciro_son12) + (EN ? ' in 12 months' : ' (12 ay)')].filter(Boolean).join(' · ')); }, { n: 15 }) })]));
+        govde: G.sayfali(yok, function (x) { var m = musteriBul(v, x.musteri_no) || x; return musteriSatir(v, m, x.gun + (EN ? ' days' : ' gün'), [x.tip, x.son_siparis_tarihi ? (EN ? 'last order ' : 'son sipariş ') + S.tarihTR(x.son_siparis_tarihi) : null, S.para(x.ciro_son12) + (EN ? ' in 12 months' : ' (12 ay)')].filter(Boolean).join(' · ')); }, { n: 8 }) })]));
       return f;
     }
     function ciz() {

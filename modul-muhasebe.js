@@ -73,19 +73,31 @@
     } else kok.appendChild(G.bos({ tur: 'bekle', baslik: 'Fatura verisi yok', metin: 'Fatura verisi henüz gelmedi.' }));
 
     if (gib) {
-      var f = '';
+      var f = '', grupAcik = false;
       var kart = h('div'), liste = h('div');
       var ciz = function () {
         liste.textContent = '';
         var l = gib.kararlar.filter(function (k) { return !f || k.karar === f; });
         if (!l.length) liste.appendChild(h('p', { sinif: 'veri-yok', metin: 'Bu kararda belge yok.' }));
-        l.forEach(function (k) {
-          var ok = k.karar === 'GÖNDERİLEBİLİR';
-          liste.appendChild(h('div', { sinif: 'mh-satir', style: '--isaret:' + (ok ? 'var(--iyi)' : 'var(--kritik)') }, [
+        var okMu = function (k) { return k.karar === 'GÖNDERİLEBİLİR'; };
+        var satirYap = function (k) {
+          var ok = okMu(k);
+          return h('div', { sinif: 'mh-satir', style: '--isaret:' + (ok ? 'var(--iyi)' : 'var(--kritik)') }, [
             h('div', { sinif: 'mh-satir-ust' }, [h('b', { metin: k.belge }), h('span', { sinif: 'soluk kucuk', metin: k.tur })]),
             rozet(ok ? 'Gönderilebilir' : 'Gönderilemez', ok ? 'yesil' : 'kirmizi', ok ? 'tik' : 'uyari'),
-            k.gerekce ? h('p', { sinif: 'mh-not', metin: 'Gerekçe: ' + k.gerekce }) : null]));
-        });
+            k.gerekce ? h('p', { sinif: 'mh-not', metin: 'Gerekçe: ' + k.gerekce }) : null]);
+        };
+        if (f) { l.forEach(function (k) { liste.appendChild(satirYap(k)); }); return; }
+         
+        var tonlu = l.filter(function (k) { return !okMu(k); }), tonsuz = l.filter(okMu);
+        tonlu.forEach(function (k) { liste.appendChild(satirYap(k)); });
+        if (tonsuz.length) {
+          var grup = h('details', { sinif: 'acilir-bolum ms-katla', open: grupAcik ? '' : null }, [
+            h('summary', null, [h('span', { metin: 'Gönderilebilir' }), h('span', { sinif: 'ms-katla-say', metin: String(tonsuz.length) })]),
+            h('div', { sinif: 'mh-liste' }, tonsuz.map(satirYap))]);
+          grup.addEventListener('toggle', function () { grupAcik = grup.open; });
+          liste.appendChild(grup);
+        }
       };
       var cip = function () {
         kart.textContent = '';
@@ -164,19 +176,32 @@
   function duzeltme(v) {
     var d = v.duzeltme;
     if (!d) return G.bos({ tur: 'bekle', baslik: 'Düzeltme defteri okunamadı', metin: 'Düzeltme listesi şu an yok.' });
-    var f = '', govde = h('div'), liste = h('div', { sinif: 'mh-liste' });
+    var f = '', grupAcik = false, govde = h('div'), liste = h('div', { sinif: 'mh-liste' });
     function ciz() {
       govde.textContent = '';
       govde.appendChild(G.cipler([['', 'Tümü', d.kayitlar.length], ['acik', 'Açık', d.acik], ['cevap', 'Cevap geldi', d.cevap], ['kapandi', 'Kapandı', d.kapandi]], f, function (x) { f = x; ciz(); }, 'Durum filtresi'));
       liste.textContent = '';
       var l = d.kayitlar.filter(function (k) { return !f || k.durum === f; });
       if (!l.length) liste.appendChild(h('p', { sinif: 'veri-yok', metin: 'Bu durumda kayıt yok.' }));
-      l.forEach(function (k) {
+      var satirYap = function (k) {
         var st = D_DURUM[k.durum] || D_DURUM.acik, isaret = { acik: 'var(--kritik)', cevap: 'var(--uyari)', kapandi: 'var(--iyi)' }[k.durum];
-        liste.appendChild(h('div', { sinif: 'mh-satir', style: '--isaret:' + isaret }, [
+        return h('div', { sinif: 'mh-satir', style: '--isaret:' + isaret }, [
           h('div', { sinif: 'mh-satir-ust' }, [h('b', { metin: k.sahip_rol }), h('span', { sinif: 'soluk kucuk', metin: 'açıldı ' + tarihTR(k.acildi) + ' · son kontrol ' + tarihTR(k.son_kontrol) })]),
-          rozet(st[0], st[1], st[2]), h('p', { sinif: 'mh-not', metin: k.konu })]));
-      });
+          rozet(st[0], st[1], st[2]), h('p', { sinif: 'mh-not', metin: k.konu })]);
+      };
+      if (f) l.forEach(function (k) { liste.appendChild(satirYap(k)); });
+      else {
+         
+        var kapali = l.filter(function (k) { return k.durum === 'kapandi'; });
+        l.filter(function (k) { return k.durum !== 'kapandi'; }).forEach(function (k) { liste.appendChild(satirYap(k)); });
+        if (kapali.length) {
+          var grup = h('details', { sinif: 'acilir-bolum ms-katla', open: grupAcik ? '' : null }, [
+            h('summary', null, [h('span', { metin: 'Kapandı' }), h('span', { sinif: 'ms-katla-say', metin: String(kapali.length) })]),
+            h('div', { sinif: 'mh-liste' }, kapali.map(satirYap))]);
+          grup.addEventListener('toggle', function () { grupAcik = grup.open; });
+          liste.appendChild(grup);
+        }
+      }
       govde.appendChild(liste);
     }
     ciz();

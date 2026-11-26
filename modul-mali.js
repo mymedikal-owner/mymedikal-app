@@ -77,6 +77,18 @@
   var SAPMA_ESLE = { vergi_oncesi_kar: 'net_kar' };
   function tam(n) { return n == null || !isFinite(n) ? '—' : (n < 0 ? '−' : '') + '₺ ' + G.say(Math.abs(n)); }
   function pyz(n) { if (n == null || !isFinite(n)) return '—'; var t = G.say(Math.abs(n), 1); return (n > 0 ? '+' : (n < 0 ? '−' : '')) + (EN ? t + '%' : '%' + t); }
+  
+
+  function dar() { return !!(window.matchMedia && window.matchMedia('(max-width: 599px)').matches); }
+  function katla(st, anahtar, k, ad, say, zorunlu) {
+    if (!dar() || !k) return k;
+    if (k.firstChild && k.firstChild.tagName === 'HEADER') k.removeChild(k.firstChild);
+    if (!st.acik) st.acik = {};
+    var d = h('details', { sinif: 'acilir-bolum ms-katla' }, [h('summary', null, [h('span', { metin: ad }), say ? h('span', { sinif: 'ms-katla-say', metin: say }) : null]), k]);
+    if (zorunlu || st.acik[anahtar]) d.open = true;
+    d.addEventListener('toggle', function () { if (!zorunlu) st.acik[anahtar] = d.open; });
+    return d;
+  }
   function analizOku() {
     return window.MMVeri.oku('muhasebe', 'analiz').then(function (r) { var v = r && r.veri; return v && typeof v === 'object' && !Array.isArray(v) ? v : null; }).catch(function () { return null; });
   }
@@ -145,10 +157,11 @@
           return h('tr', null, [h('td', null, [m.malzeme_tanimi || m.malzeme_kodu, h('small', { metin: m.malzeme_kodu })]), h('td', { metin: para(m.etki) }), h('td', { sinif: 'on', metin: para(m.fiyat) }), h('td', { sinif: 'on', metin: para(m.miktar_karisim) }), h('td', { sinif: 'on', metin: para(m.yeni) }), h('td', { sinif: 'on', metin: para(m.biten) })]);
         }))])]));
     }
-    return G.kart({ baslik: 'Ciro köprüsü', alt: donemMetni(c.donem0) + ' → ' + donemMetni(c.donem1) + ' · GL net satış (MY)', govde: h('div', null, f), dip: 'Köprü GL net satıştan başlar ve GL net satışta kapanır; son satır, faturalandırma dışı kayıtların GL farkındaki değişimini taşır.' });
+    var kAlt = donemMetni(c.donem0) + ' → ' + donemMetni(c.donem1) + ' · GL net satış (MY)', kapanmiyor = c.kapanis_farki != null && Math.abs(c.kapanis_farki) > 1;
+    return katla(st, 'kopru', G.kart({ baslik: 'Ciro köprüsü', alt: kAlt, govde: h('div', null, f), dip: 'Köprü GL net satıştan başlar ve GL net satışta kapanır; son satır, faturalandırma dışı kayıtların GL farkındaki değişimini taşır.' }), 'Ciro köprüsü', kAlt, kapanmiyor);   
   }
 
-  function nakitKarti(an) {
+  function nakitKarti(an, st) {
     var n = an && an.nakit_akis, ay = n && Array.isArray(n.aylar) ? n.aylar.filter(function (a) { return a.faaliyet_nakdi != null; }).slice(-12) : [];
     if (!ay.length) return null;
     var oge = [];
@@ -164,9 +177,11 @@
       h('thead', null, [h('tr', null, [h('th', { scope: 'col', metin: 'Kalem' })].concat(KOL.map(function (x) { return h('th', { scope: 'col', metin: x[1] }); })))]),
       h('tbody', null, SAT.map(function (s) { return h('tr', { sinif: s[1] === 'nakit_degisimi_hesaplanan' ? 'vurgu' : '' }, [h('td', { metin: s[0] })].concat(KOL.map(function (x) { return h('td', { metin: para(pn[x[0]][s[1]]) }); }))); }))])]);
     var geciciAy = ay.filter(function (a) { return a.gecici; }).map(function (a) { return ayAd(a.ay, true); });
-    return G.kart({ baslik: 'Nakit akışı', alt: 'Dolaylı yöntem, aylık · yatırım ve finansman yaklaşık', govde: h('div', null, [bar(oge, { ad: 'Aylık nakit akışı', yukseklik: 200 }),
+    var nAlt = 'Dolaylı yöntem, aylık · yatırım ve finansman yaklaşık';
+     
+    return katla(st, 'nakit', G.kart({ baslik: 'Nakit akışı', alt: nAlt, govde: h('div', null, [bar(oge, { ad: 'Aylık nakit akışı', yukseklik: 200 }),
       G.lejant([['Faaliyet', 'var(--s1)'], ['Yatırım (yaklaşık)', 'var(--s2)'], ['Finansman (yaklaşık)', 'var(--turuncu)']]), h('div', { style: 'margin-top:8px' }, [tab])]),
-      dip: 'Yatırım ve finansman rakamları hesap grubu değişiminden türetildiği için yaklaşıktır (alım/satış, kredi/vergi ayrılamaz).' + (geciciAy.length ? ' Soluk çubuk ve tablo, maliyet dağıtımı tamamlanmamış geçici aylar içerir: ' + geciciAy.join(', ') + '.' : '') });
+      dip: 'Yatırım ve finansman rakamları hesap grubu değişiminden türetildiği için yaklaşıktır (alım/satış, kredi/vergi ayrılamaz).' + (geciciAy.length ? ' Soluk çubuk ve tablo, maliyet dağıtımı tamamlanmamış geçici aylar içerir: ' + geciciAy.join(', ') + '.' : '') }), 'Nakit akışı', nAlt, geciciAy.length > 0);
   }
 
    
@@ -180,12 +195,15 @@
       return h('tr', { sinif: sinif }, [ilk].concat(degerler));
     });
   }
-  function tfrsTablo(baslik, alt, kolonAd, kolonlar, sat) {
+   
+  function tfrsTablo(baslik, alt, kolonAd, kolonlar, sat, kat, ek) {
     var t = h('table', { sinif: 'ml-tablo' }, [h('thead', null, [h('tr', null, [h('th', { scope: 'col', metin: 'Kalem' })].concat(kolonAd.map(function (a) { return h('th', { scope: 'col', metin: a }); })))]), h('tbody', null, tfrsSatirlar(sat, kolonlar))]);
-    return G.kart({ baslik: baslik, alt: alt, govde: h('div', { sinif: 'tablo-kaydir' }, [t]) });
+    var kaydir = h('div', { sinif: 'tablo-kaydir' }, [t]);
+    var k = G.kart({ baslik: baslik, alt: alt, govde: ek && ek.length ? h('div', null, [kaydir].concat(ek)) : kaydir });
+    return kat ? katla(kat.st, kat.k, k, baslik, alt + ' · ' + sat.length + (EN ? ' rows' : ' satır')) : k;
   }
   MM.tfrsTab = function (kok) {
-    var an = undefined, canli = true, ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
+    var an = undefined, canli = true, ust = h('div'), govde = h('div', { 'aria-live': 'polite' }), st = { acik: {} };   
     kok.appendChild(ust); kok.appendChild(govde);
     function ciz() {
       ust.textContent = ''; govde.textContent = '';
@@ -207,19 +225,19 @@
       }
       if (kz) {
         if (kz.uygun) {
-          var gecici = (kz.gecici_aylar || []).concat(kz.onceki_gecici_aylar || []);
-          govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [tfrsTablo('Kâr veya zarar tablosu (fonksiyon esaslı)', ayAd(kz.baslangic, true) + ' – ' + ayAd(kz.bitis, true) + ' · karşılaştırma: ' + ayAd(kz.onceki_baslangic, true) + ' – ' + ayAd(kz.onceki_bitis, true) + ' (TMS 1)', [ayKisa(kz.baslangic) + ' – ' + ayAd(kz.bitis), ayKisa(kz.onceki_baslangic) + ' – ' + ayAd(kz.onceki_bitis)], [function (r) { return r.deger; }, function (r) { return r.onceki; }], kz.satirlar || [])]));
-          var notlar = []; if (kz.kur_farki_siniflamasi) notlar.push('Kur farkı sınıflaması: ' + kz.kur_farki_siniflamasi + '.'); if (gecici.length) notlar.push('Maliyeti tamamlanmamış (geçici) aylar: ' + gecici.map(function (a) { return ayAd(a, true); }).join(', ') + '.');
+          var gecici = (kz.gecici_aylar || []).concat(kz.onceki_gecici_aylar || []), kzDar = dar();
+          govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [tfrsTablo('Kâr veya zarar tablosu (fonksiyon esaslı)', ayAd(kz.baslangic, true) + ' – ' + ayAd(kz.bitis, true) + ' · karşılaştırma: ' + ayAd(kz.onceki_baslangic, true) + ' – ' + ayAd(kz.onceki_bitis, true) + ' (TMS 1)', [ayKisa(kz.baslangic) + ' – ' + ayAd(kz.bitis), ayKisa(kz.onceki_baslangic) + ' – ' + ayAd(kz.onceki_bitis)], [function (r) { return r.deger; }, function (r) { return r.onceki; }], kz.satirlar || [], { st: st, k: 'kz' }, kzDar && kz.kur_farki_siniflamasi ? [h('p', { sinif: 'soluk kucuk', metin: 'Kur farkı sınıflaması: ' + kz.kur_farki_siniflamasi + '.' })] : null)]));
+          var notlar = []; if (kz.kur_farki_siniflamasi && !kzDar) notlar.push('Kur farkı sınıflaması: ' + kz.kur_farki_siniflamasi + '.'); if (gecici.length) notlar.push('Maliyeti tamamlanmamış (geçici) aylar: ' + gecici.map(function (a) { return ayAd(a, true); }).join(', ') + '.');   
           if (notlar.length) govde.appendChild(h('p', { sinif: 'soluk kucuk', metin: notlar.join(' ') }));
         } else govde.appendChild(h('div', { sinif: 'bant gri', role: 'status', metin: 'Kâr veya zarar tablosu üretilemedi.' }));
       }
       if (na) {
         if (na.uygun) {
-          var dn = (na.donemler || []).filter(function (d) { return na.satirlar && na.satirlar.length; });
+          var naDar = dar(), dn = (na.donemler || []).filter(function (d) { return na.satirlar && na.satirlar.length; });
           govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [tfrsTablo('Nakit akış tablosu', (na.standart || 'TMS 7 (dolaylı yöntem)') + ' · yatırım ve finansman yaklaşık', dn.map(function (d) { return d.ad + ' (' + ayAd(d.baslangic) + ' – ' + ayAd(d.bitis) + ')'; }),
-            dn.map(function (d) { return function (r) { return r.degerler ? r.degerler[d.id] : null; }; }), na.satirlar || [])]));
+            dn.map(function (d) { return function (r) { return r.degerler ? r.degerler[d.id] : null; }; }), na.satirlar || [], { st: st, k: 'na' }, naDar && (na.notlar || []).length ? [h('p', { sinif: 'soluk kucuk', metin: na.notlar.join(' ') })] : null)]));
           var ngec = []; (na.donemler || []).forEach(function (d) { (d.gecici_aylar || []).forEach(function (a) { if (ngec.indexOf(a) < 0) ngec.push(a); }); });
-          var nn = (na.notlar || []).slice(); if (ngec.length) nn.push('Maliyeti tamamlanmamış (geçici) aylar: ' + ngec.map(function (a) { return ayAd(a, true); }).join(', ') + '.');
+          var nn = naDar ? [] : (na.notlar || []).slice(); if (ngec.length) nn.push('Maliyeti tamamlanmamış (geçici) aylar: ' + ngec.map(function (a) { return ayAd(a, true); }).join(', ') + '.');
           if (nn.length) govde.appendChild(h('p', { sinif: 'soluk kucuk', metin: nn.join(' ') }));
         } else govde.appendChild(h('div', { sinif: 'bant gri', role: 'status', metin: 'Nakit akış tablosu üretilemedi.' }));
       }
@@ -273,12 +291,15 @@
         { ad: 'Brüt marj', renk: 'var(--s1)', d: seri.map(function (a) { return eksikAy(a) ? null : a.brut_marj; }) },
         { ad: 'FAVÖK marjı', renk: 'var(--s2)', d: seri.map(function (a) { return eksikAy(a) ? null : a.favok_marj; }) }], etk, { sifirdan: false, ad: 'Marj eğilimi', ondalik: 1, birim: '%' });
       var seciliLej = !d.yil && seri.some(pencereDisi) ? [['Seçili dönem', 'var(--s1)'], ['Önceki aylar', 'var(--s1)', 'soluk-lej']] : null;
-      kok2.appendChild(G.kart({ baslik: 'Aylık net satış', alt: ayAd(seri[0].ay, true) + ' – ' + ayAd(seri[seri.length - 1].ay, true), govde: h('div', null, [satis, seciliLej ? G.lejant(seciliLej) : null]) }));
+      var satisAlt = ayAd(seri[0].ay, true) + ' – ' + ayAd(seri[seri.length - 1].ay, true);
+      kok2.appendChild(katla(st, 'satis', G.kart({ baslik: 'Aylık net satış', alt: satisAlt, govde: h('div', null, [satis, seciliLej ? G.lejant(seciliLej) : null]) }), 'Aylık net satış', satisAlt));
       var eksikVar = seri.some(eksikAy);
       kok2.appendChild(G.kart({ baslik: 'Aylık FAVÖK', alt: 'Amortisman öncesi faaliyet kârı', govde: h('div', null, [favok, G.lejant(eksikVar ? [['Maliyeti kapanmış ay', 'var(--s2)'], ['Maliyeti tamamlanmamış ay', 'var(--turuncu)']] : [['FAVÖK', 'var(--s2)']])]) }));
       var marjKart = G.kart({ baslik: 'Marj eğilimi', alt: 'Brüt marj ve FAVÖK marjı, % olarak', govde: h('div', null, [marj, G.lejant([['Brüt marj', 'var(--s1)'], ['FAVÖK marjı', 'var(--s2)']])]) });
       marjKart.classList.add('ml-tam');
-      kok2.appendChild(marjKart);
+      var marjOge = katla(st, 'marj', marjKart, 'Marj eğilimi', 'Brüt marj ve FAVÖK marjı, % olarak');
+      if (marjOge !== marjKart) marjOge.classList.add('ml-tam');   
+      kok2.appendChild(marjOge);
       return kok2;
     }
     function bilancoKart(d) {
@@ -286,16 +307,18 @@
       if (b && b.toplam_varlik > 0) {
         var T = b.toplam_varlik, pay = function (v) { return pct(v / T * 100); };
         var yat = function (liste, renk) { return G.yatay(liste.map(function (x) { return { e: x[0], d: Math.max(x[1] || 0, 0), renk: renk, etiketDeger: para(x[1]) + ' · ' + pay(x[1] || 0), alt: x[2] || undefined }; }), { maks: T }); };
-        f.push(G.kart({ baslik: 'Bilanço özeti', alt: ayAd(b.ay, true) + ' sonu · toplam varlık ' + para(T), govde: h('div', { sinif: 's41-ikili' }, [
+        var bAlt = ayAd(b.ay, true) + ' sonu · toplam varlık ' + para(T);
+        f.push(katla(st, 'bilanco', G.kart({ baslik: 'Bilanço özeti', alt: bAlt, govde: h('div', { sinif: 's41-ikili' }, [
           h('div', null, [h('h4', { sinif: 'ml-alt-baslik', metin: 'Varlıklar' }), yat([['Nakit ve benzeri', b.nakit_ve_benzeri], ['Ticari alacaklar', b.ticari_alacak], ['Stoklar', b.stok, 'değerleme farkı düşülmüş'], ['Diğer dönen varlıklar', b.diger_donen_varlik], ['Duran varlıklar', b.duran_varlik]], 'var(--s1)')]),
-          h('div', null, [h('h4', { sinif: 'ml-alt-baslik', metin: 'Kaynaklar' }), yat([['Kısa vadeli borçlar', b.kv_yabanci_kaynak], ['Uzun vadeli borçlar', b.uv_yabanci_kaynak], ['Özkaynak', b.ozkaynak]], 'var(--s2)')])]) }));
+          h('div', null, [h('h4', { sinif: 'ml-alt-baslik', metin: 'Kaynaklar' }), yat([['Kısa vadeli borçlar', b.kv_yabanci_kaynak], ['Uzun vadeli borçlar', b.uv_yabanci_kaynak], ['Özkaynak', b.ozkaynak]], 'var(--s2)')])]) }), 'Bilanço özeti', bAlt));
       }
       if (o) {
         var g = function (ad, v, b2) { return h('div', { sinif: 'ml-oran' }, [h('small', { metin: ad }), h('b', { metin: v == null ? '—' : G.say(v, b2 == null ? 2 : b2) + (b2 === 0 ? ' ' + (EN ? 'days' : 'gün') : '') })]); };
         var gun = function (v) { return v == null ? null : Math.round(v); };
-        f.push(G.kart({ baslik: 'Finansal oranlar', alt: b ? ayAd(b.ay, true) + ' sonu itibarıyla' : null, govde: h('div', { sinif: 'ml-oranlar' }, [
+        var oAlt = b ? ayAd(b.ay, true) + ' sonu itibarıyla' : null;
+        f.push(katla(st, 'oranlar', G.kart({ baslik: 'Finansal oranlar', alt: oAlt, govde: h('div', { sinif: 'ml-oranlar' }, [
           g('Cari oran', o.cari_oran), g('Likidite oranı', o.likidite_orani), g('Nakit oranı', o.nakit_orani), g('Borç / özkaynak', o.borc_ozkaynak),
-          g('Alacak tahsil süresi', gun(o.alacak_gun_dso), 0), g('Stokta kalma süresi', gun(o.stok_gun_dio), 0), g('Borç ödeme süresi', gun(o.borc_gun_dpo), 0), g('Nakit döngüsü', gun(o.nakit_dongusu_gun), 0)]) }));
+          g('Alacak tahsil süresi', gun(o.alacak_gun_dso), 0), g('Stokta kalma süresi', gun(o.stok_gun_dio), 0), g('Borç ödeme süresi', gun(o.borc_gun_dpo), 0), g('Nakit döngüsü', gun(o.nakit_dongusu_gun), 0)]) }), 'Finansal oranlar', oAlt));
       }
       return f;
     }
@@ -330,7 +353,7 @@
       govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Gelir tablosu', alt: ayAd(p.baslangic, true) + ' – ' + ayAd(p.bitis, true), govde: gelirTablosu(d, onc) })]));
       var gr = grafikler(s, d); if (gr) govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr]));
       if (st.sirket === 'MY' && an) {   
-        [function () { return sapmaKarti(an); }, function () { return kopruKarti(an, st, ciz); }, function () { return nakitKarti(an); }].forEach(function (yap) {
+        [function () { return sapmaKarti(an); }, function () { return kopruKarti(an, st, ciz); }, function () { return nakitKarti(an, st); }].forEach(function (yap) {
           var k = null; try { k = yap(); } catch (e) { k = null; }
           if (k) govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [k]));
         });

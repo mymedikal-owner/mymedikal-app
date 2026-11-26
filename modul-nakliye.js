@@ -478,6 +478,7 @@
       var gec = liste.filter(function (x) { return x.kova === 'gecikmis'; }).sort(function (a, b) { return b.gec - a.gec; });
       var digeri = durum === 'gecikmis' ? [] : liste.filter(function (x) { return x.kova !== 'gecikmis'; });
       if (gec.length) {
+         
         var gk = G.ilkN(gec, kart, { n: Math.min(3, gec.length), sinif: 'tq-liste' });
         alan.appendChild(h('section', { sinif: 'ns-gecikmis ust-bosluk', 'aria-label': T('Gecikmiş sevkiyatlar') }, [h('h3', { sinif: 'bolum' }, [G.ikon('uyari', 18), ' ' + T('Gecikmiş sevkiyatlar') + ' (' + gec.length + ')']),
           h('p', { sinif: 'kucuk soluk', metin: T('En çok geciken en üstte.') }), gk]));
@@ -488,12 +489,20 @@
       sirali.sort(function (a, b) { return gruplar[b].length - gruplar[a].length || (a < b ? -1 : 1); });
       var kap = h('div', { sinif: 'ns-gruplar' }), ent = [];
       sirali.forEach(function (a) { var l = gruplar[a]; l.forEach(function (x, i) { ent.push({ x: x, bas: i === 0 ? a : null, say: l.length }); }); });
-       
-      if (ent.length) kap.appendChild(G.ilkN(ent, function (e) {
+      function entCiz(e) {
         var f = document.createDocumentFragment();
         if (e.bas) f.appendChild(h('h4', { sinif: 'ns-grup-ad', 'aria-label': e.bas }, [e.bas, h('span', { sinif: 'cip-sayi', metin: String(e.say) })]));
         f.appendChild(kart(e.x)); return f;
-      }, { n: Math.max(2, 5 - Math.min(3, gec.length)), sinif: 'tq-liste' }));
+      }
+       
+      var darL = window.matchMedia && window.matchMedia('(max-width: 899px)').matches, tonluE = [], tonsuzE = [];
+      if (darL) { sirali.forEach(function (a) { var t = gruplar[a].filter(function (x) { return x.kova !== 'cikti'; }), s = gruplar[a].filter(function (x) { return x.kova === 'cikti'; }); t.forEach(function (x, i) { tonluE.push({ x: x, bas: i === 0 ? a : null, say: t.length }); }); s.forEach(function (x, i) { tonsuzE.push({ x: x, bas: i === 0 ? a : null, say: s.length }); }); }); }
+      if (darL && ent.length) {
+        if (tonluE.length) { var tk = h('div', { sinif: 'tq-liste' }); tonluE.forEach(function (e) { tk.appendChild(entCiz(e)); }); kap.appendChild(tk); }
+        if (tonsuzE.length) kap.appendChild(G.ilkN(tonsuzE, entCiz, { n: 3, sinif: 'tq-liste' }));
+      }
+       
+      else if (ent.length) kap.appendChild(G.ilkN(ent, entCiz, { n: Math.max(2, 5 - Math.min(3, gec.length)), sinif: 'tq-liste' }));
       else if (!gec.length) kap.appendChild(h('p', { sinif: 'veri-yok', metin: 'Bu filtrede sevkiyat yok.' }));
       alan.appendChild(kap);
        

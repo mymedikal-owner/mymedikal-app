@@ -674,6 +674,12 @@
     }
     function riskliHastaneler() { return (yuk.v['dmo-ihaleler'].hastaneler || []).filter(function (x) { return (x.riskli_siparis || 0) > 0; }).sort(hastaneSirala); }
      
+     
+    function hsKimlik(s) {
+      var yk = s.siparis_no ? String(s.siparis_no) : '', dn = s.dosya_no != null && s.dosya_no !== '' ? String(s.dosya_no) : '';
+      var m = [yk, dn ? 'Dosya ' + dn : ''].filter(Boolean).join(' · ') || 'Sipariş no ' + sipNo(s);
+      return { sinif: 'dm-hs-kimlik', metin: m, title: m };
+    }
     function hastaneSiparisleri(x) {
       var ad = x.hastane || 'Hastane';
       G.sheet(ad, function (g) {
@@ -684,7 +690,7 @@
           g.appendChild(sayiSatiri(l.length + ' sipariş kalemi', ad, x.firma, [sutun('Sipariş no', function (s) { return sipNo(s); }), sutun('Risk', function (s) { return s.risk ? (RISK_AD[s.risk] || s.risk) : ''; }), sutun('Teslim durumu', function (s) { return TESLIM_AD[s.teslim_durum] || ''; }),
             sutun('Son teslim', function (s) { return s.son_teslim; }), sutun('Miktar', function (s) { return s.miktar; }), sutun('Teslim edilen', function (s) { return s.teslim_edilen_miktar; })], l));
           g.appendChild(G.ilkN(l, function (s) {
-            return h('div', { sinif: 'dm-hs-sat' }, [h('div', { sinif: 'dm-sp-ust' }, [h('strong', { metin: 'Sipariş no ' + sipNo(s) }), s.risk ? etiket(s.risk) : null]),
+            return h('div', { sinif: 'dm-hs-sat' }, [h('div', { sinif: 'dm-sp-ust' }, [h('strong', hsKimlik(s)), s.risk ? etiket(s.risk) : null]),
               h('div', { sinif: 'kucuk soluk', metin: (TESLIM_AD[s.teslim_durum] || 'Teslim durumu yok') + ' · son teslim ' + tarihTR(s.son_teslim) + ' · teslim ' + say(s.teslim_edilen_miktar) + ' / ' + say(s.miktar) })]);
           }, { n: 10 }));
         }

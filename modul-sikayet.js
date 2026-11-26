@@ -142,7 +142,7 @@
           var arac = G.aracCubugu({
             arama: { deger: st.q, yerTutucu: 'Hastane ara', degisti: function (q) { clearTimeout(zaman); zaman = setTimeout(function () { st.q = q; listeYaz(); }, 120); } },
             filtre: { baslik: 'Filtre', gruplar: [{ ad: 'Liste', secenekler: [['dikkat', 'Dikkat gerektirenler', dik.length], ['tum', 'Tüm hastaneler', H.length]], secili: st.filtre, varsayilan: 'dikkat', sec: function (k) { st.filtre = k; liste = k === 'dikkat' ? dik : H; listeYaz(); } },
-              { ad: 'Şirket', secenekler: [['', 'MY + DAY', H.length], ['MY', 'MY', H.filter(function (x) { return (x.sirketler || []).indexOf('MY') >= 0; }).length], ['DAY', 'DAY', H.filter(function (x) { return (x.sirketler || []).indexOf('DAY') >= 0; }).length]], secili: st.sirket, sec: function (d) { st.sirket = d || ''; listeYaz(); } }], temizle: function () { st.filtre = 'dikkat'; st.sirket = ''; liste = dik; listeYaz(); } }
+              { ad: 'Şirket', secenekler: [['', 'Tümü', H.length], ['MY', 'MY', H.filter(function (x) { return (x.sirketler || []).indexOf('MY') >= 0; }).length], ['DAY', 'DAY', H.filter(function (x) { return (x.sirketler || []).indexOf('DAY') >= 0; }).length]], secili: st.sirket, sec: function (d) { st.sirket = d || ''; listeYaz(); } }], temizle: function () { st.filtre = 'dikkat'; st.sirket = ''; liste = dik; listeYaz(); } }
           });
           return h('div', null, [arac, alan]);
         })() })]));

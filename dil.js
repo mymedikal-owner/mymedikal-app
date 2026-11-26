@@ -832,6 +832,15 @@
     [/^Hastaneler \((\d+)\)$/, 'Hospitals ($1)'],
     [/^Açık kaleminde risk etiketi olan hastane: (\d+) \(bugünkü durum; geçmiş teslimat puanı değil\)$/, 'Hospitals with a risk label on an open item: $1 (current status; not a past delivery score)'],
     [/^Ek süre başvurusu gereken hastane \(başvuru süresi içinde\): (\d+)$/, 'Hospitals needing an extension request (within the application period): $1']);
+   
+  var TAM_8033 = {
+    'İrsaliye / kargo teslim / muayene kabul oranları: veri yok': 'Delivery note / cargo delivered / inspection acceptance rates: no data',
+    'Geçmiş teslimata göre riskli hastane: veri yok': 'Hospitals at risk by past deliveries: no data',
+    'Sayılar IKN toplamıdır, bu siparişe özel değildir.': 'Counts are IKN totals, not specific to this order.',
+    'Ek süre başvurusu': 'Extension request'
+  };
+  Object.keys(TAM_8033).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8033[k]; });
+  REGEX.unshift([/^Dikkat gereken IKN: (\d+)$/, 'IKNs needing attention: $1']);
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

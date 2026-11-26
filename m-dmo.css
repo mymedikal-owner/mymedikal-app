@@ -273,4 +273,15 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-mk-hs { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--b2); width: 100%; text-align: left; font: inherit; color: var(--yazi); background: var(--yuzey); border: 1px solid var(--cizgi); border-left: 4px solid var(--cizgi); border-radius: var(--r-s); padding: var(--b2) var(--b3); min-height: 44px; cursor: pointer; overflow-wrap: anywhere; }
 .dm-mk-hs.uyari { border-left-color: var(--turuncu); background: var(--turuncu-zemin); }
 .dm-mk-hs:hover { border-color: var(--vurgu); }
+ 
+.dm-mk-iknk { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; font: inherit; color: var(--yazi); background: var(--yuzey); border: 1px solid var(--cizgi); border-left: 4px solid var(--cizgi); border-radius: var(--r-s); padding: var(--b2) var(--b3); min-height: 44px; cursor: pointer; overflow-wrap: anywhere; }
+.dm-mk-iknk.uyari { border-left-color: var(--turuncu); background: var(--turuncu-zemin); }
+.dm-mk-iknk:hover { border-color: var(--vurgu); }
+.dm-mk-iknk-ust { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--b2); }
+.dm-mk-iknk-ad { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: var(--t-s); }
+.dm-mk-iknk-et { display: flex; flex-wrap: wrap; gap: var(--b2); font-size: var(--t-xs); }
+.dm-mk-say { margin: 0; }
+.dm-mk-say.uyari { color: var(--turuncu); font-weight: 700; }
+.dm-mk-et { font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; background: var(--turuncu-zemin); color: var(--turuncu); }
+.dm-mk-iknl .ilkn-tumu, .dm-mk-riskli .ilkn-tumu { color: var(--turuncu); border-color: var(--turuncu); background: var(--turuncu-zemin); }
 .dm-mk-gecis { width: 100%; margin: var(--b3) 0; border: 1px solid var(--cizgi); border-radius: var(--r-s); }

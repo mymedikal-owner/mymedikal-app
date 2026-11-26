@@ -1467,13 +1467,13 @@
       araKapat.addEventListener('click', function () { araKutu.value = ''; filtre = ''; araCubuk.hidden = true; ciz(); });
       var msj = h('div', { sinif: 'ms-mesajlar' }); kap.appendChild(msj);
        
-      var yeniSay = 0, altaZorla = false;
+      var yeniSay = 0, altaZorla = false, ALTA_ESIK = 120;
       var asagiSayi = h('span', { sinif: 'ms-asagi-n', hidden: true });
       var asagiDugme = h('button', { sinif: 'ms-asagi', type: 'button', 'aria-label': T('En alta in'), hidden: true }, [ikon('asagi', 22), asagiSayi]);
       var asagiKap = h('div', { sinif: 'ms-asagi-kap' }, [asagiDugme]);
       function altaMesafe() { return msj.scrollHeight - msj.scrollTop - msj.clientHeight; }
       function asagiGuncelle() {
-        var uzak = altaMesafe() > 200; if (!uzak) yeniSay = 0;
+        var uzak = altaMesafe() > ALTA_ESIK; if (!uzak) yeniSay = 0;   
         asagiDugme.hidden = !uzak; asagiSayi.hidden = !(yeniSay > 0); asagiSayi.textContent = yeniSay > 99 ? '99+' : String(yeniSay);
       }
       msj.addEventListener('scroll', asagiGuncelle, { passive: true });
@@ -1702,8 +1702,8 @@
       }
       function menuBagla(el, m) {   
         el.addEventListener('contextmenu', function (ev) { ev.preventDefault(); mesajMenusu(m); });
-        var zmn = null, bas = null, uzun = 0;
-        el.addEventListener('touchstart', function (ev) { var t = ev.touches && ev.touches[0]; bas = t ? { x: t.clientX, y: t.clientY } : null; clearTimeout(zmn); zmn = setTimeout(function () { zmn = null; uzun = Date.now(); mesajMenusu(m); }, 480); }, { passive: true });
+        var zmn = null, bas = null, uzun = 0, menuAcildi = false;
+        el.addEventListener('touchstart', function (ev) { var t = ev.touches && ev.touches[0]; bas = t ? { x: t.clientX, y: t.clientY } : null; menuAcildi = false; clearTimeout(zmn); zmn = setTimeout(function () { zmn = null; menuAcildi = true; uzun = Date.now(); mesajMenusu(m); }, 480); }, { passive: true });
         var kay = 0, kayHazir = false;   
         el.addEventListener('touchmove', function (ev) {
           var t = ev.touches && ev.touches[0]; if (!t || !bas) return;
@@ -1711,11 +1711,12 @@
           if (zmn && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) { clearTimeout(zmn); zmn = null; }
           if (kay === 0 && Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) kay = -1;   
           if (kay === -1) return;
-          if (dx > 12 && dx > Math.abs(dy) * 1.5) { kay = 1; var g = Math.min(64, dx * 0.6); el.style.transform = 'translateX(' + g + 'px)'; kayHazir = dx >= 70; }
+          if (menuAcildi) return;   
+          if (dx > 12 && dx > Math.abs(dy) * 1.5) { if (zmn) { clearTimeout(zmn); zmn = null; } kay = 1; var g = Math.min(64, dx * 0.6); el.style.transform = 'translateX(' + g + 'px)'; kayHazir = dx >= 70; }
         }, { passive: true });
         ['touchend', 'touchcancel'].forEach(function (o) { el.addEventListener(o, function () {
           clearTimeout(zmn); zmn = null;
-          if (kay === 1) { el.style.transform = ''; if (o === 'touchend' && kayHazir) { uzun = Date.now(); yanitlaBaslat(m); } }
+          if (kay === 1) { el.style.transform = ''; if (o === 'touchend' && kayHazir && !menuAcildi) { uzun = Date.now(); yanitlaBaslat(m); } }
           kay = 0; kayHazir = false;
         }, { passive: true }); });
         el.addEventListener('click', function (ev) { if (uzun && Date.now() - uzun < 700) { ev.preventDefault(); ev.stopPropagation(); } }, true);   
@@ -1790,7 +1791,7 @@
       function ekle(m, eslemeYok) {
         var b = eslemeYok ? null : bekleyenEsle(m); if (b) bekleyenKaldir(b);   
         if (mesajlar.some(function (x) { return x.id === m.id || (m.istemciId && x.istemciId === m.istemciId); })) { ciz(); return; }
-        var yukarda = !!msj.firstChild && altaMesafe() > 120, benimM = !!benOid && m.gonderen === benOid;
+        var yukarda = !!msj.firstChild && altaMesafe() > ALTA_ESIK, benimM = !!benOid && m.gonderen === benOid;
         if (benimM) altaZorla = true;   
         mesajlar.push(m); mesajlar = sirala(mesajlar); ciz(); sonOkundu();
         if (yukarda && !benimM && !m.yerel && !eslemeYok) { yeniSay++; asagiGuncelle(); }

@@ -147,7 +147,7 @@
     var durumSek = h('div', null, [h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Teslim durumu', govde: h('div', { sinif: 'dn-kargo' }, par) })])]);
     sek.push(['durum', 'Teslim durumu', durumSek]);
      
-    var tas = kg.tasiyici || {}, tk2 = h('div', { sinif: 'kt-tas' });
+    var tas = kg.tasiyici || {}, tk2 = h('div', { sinif: 'kt-tas' }), tasTonsuz = [];
     Object.keys(tas).forEach(function (t) {
       var x = tas[t] || {}, kisa = x.kapsam && x.kapsam !== 'TAM', p = [];
       if (!x.veri) p.push(h('p', { sinif: 'veri-yok', metin: 'Veri yok' }));
@@ -157,8 +157,15 @@
         if (x.negatif_gun_kayit) p.push(h('p', { sinif: 'kucuk soluk', metin: x.negatif_gun_kayit + ' kayıtta teslim tarihi çıkıştan önce görünüyor; süre ortalamasına alınmadı.' }));
       }
       if (kisa) p.push(h('div', { sinif: 'bant sari kucuk-bant', role: 'status', metin: 'Bu taşıyıcının bilgileri eksik geliyor; oranlar eksik olabilir.' }));
-      tk2.appendChild(G.kart({ baslik: TAS_AD[t] || t, alt: x.son_basari ? 'Son başarılı okuma ' + MM.yasMetin(MM.yasDk(x.son_basari)) : 'Son okuma zamanı yok', govde: h('div', { sinif: 'dn-kargo' }, p) }));
+      var tkart = G.kart({ baslik: TAS_AD[t] || t, alt: x.son_basari ? 'Son başarılı okuma ' + MM.yasMetin(MM.yasDk(x.son_basari)) : 'Son okuma zamanı yok', govde: h('div', { sinif: 'dn-kargo' }, p) });
+       
+      if (x.veri && !kisa) tasTonsuz.push(tkart); else tk2.appendChild(tkart);
     });
+    var darKt = window.matchMedia && window.matchMedia('(max-width: 899px)').matches;
+    if (darKt && tasTonsuz.length >= 2) {
+      var tkKat = h('div', { sinif: 'kt-tas' }); tasTonsuz.forEach(function (c) { tkKat.appendChild(c); });
+      tk2.appendChild(h('details', { sinif: 'acilir-bolum nk-katla' }, [h('summary', null, [h('span', { metin: 'Taşıyıcı ayrıntıları' }), h('span', { sinif: 'nk-katla-say', metin: '(' + tasTonsuz.length + ')' })]), tkKat]));
+    } else tasTonsuz.forEach(function (c) { tk2.appendChild(c); });
     if (tk2.childNodes.length) durumSek.appendChild(h('div', { sinif: 'ust-bosluk' }, [tk2]));
      
     var s30 = kg.son_30_gun || [];
@@ -228,10 +235,13 @@
       kap.appendChild(G.kart({ baslik: 'Aylık sevkiyat', alt: 'Her ay çıkışı yapılan teslimat, satır ve miktar', govde: ik,
         eylem: ekExcel('Aylık sevkiyat', ['Ay', 'Teslimat', 'Satır', 'Ürün çeşidi', 'Miktar', 'Koli'].map(function (a, i) { return { ad: a, k: i }; }), ay.map(function (a) { return [ayAd(a.ay), a.sevk_teslimat, a.sevk_satir, a.urun_cesidi, miktarMetin(a.adet_birim), a.koli]; })) }));
     }
+     
+    var darOz = window.matchMedia && window.matchMedia('(max-width: 899px)').matches, katOz = h('div', { sinif: 'ust-bosluk' }), katSay = 0;
+    function ekOz(el) { if (darOz) { katOz.appendChild(el); katSay++; } else kap.appendChild(el); }
     var g = s.gunluk_30 || [];
     if (g.length) {
       var et = g.map(function (x) { return kisaTarih(x.tarih); });
-      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Son 30 gün sevkiyat', alt: 'Günlük çıkışı yapılan teslimat sayısı · günlük ortalama koli ' + (s.gunluk_ort_koli == null ? '—' : say(s.gunluk_ort_koli)) + koliOranMetin(g.reduce(function (t, x) { var o = koliOran(x); return o ? [(t ? t[0] : 0) + o[0], (t ? t[1] : 0) + o[1]] : t; }, null)),
+      ekOz(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Son 30 gün sevkiyat', alt: 'Günlük çıkışı yapılan teslimat sayısı · günlük ortalama koli ' + (s.gunluk_ort_koli == null ? '—' : say(s.gunluk_ort_koli)) + koliOranMetin(g.reduce(function (t, x) { var o = koliOran(x); return o ? [(t ? t[0] : 0) + o[0], (t ? t[1] : 0) + o[1]] : t; }, null)),
         govde: h('div', null, [G.cizgi([{ ad: 'Teslimat', d: g.map(function (x) { return x.sevk_teslimat; }), renk: 'var(--vurgu)' }], et, { yukseklik: 190, ad: 'Son 30 gün günlük sevkiyat teslimat sayısı', birim: 'teslimat' }), G.lejant([['Teslimat', 'var(--vurgu)']])]),
         tablo: { kolonlar: ['Gün', 'Teslimat', 'Satır', 'Miktar'], satirlar: g.map(function (x) { return [kisaTarih(x.tarih), x.sevk_teslimat, x.sevk_satir, miktarMetin(x.adet_birim)]; }) },
         eylem: ekExcel('Son 30 gün sevkiyat', ['Gün', 'Teslimat', 'Satır', 'Miktar', 'Koli'].map(function (a, i) { return { ad: a, k: i }; }), g.map(function (x) { return [td(x.tarih), x.sevk_teslimat, x.sevk_satir, miktarMetin(x.adet_birim), x.koli]; })) })]));
@@ -239,10 +249,11 @@
     var tp = s.top10_urun || [];
     if (tp.length) {
       var mx = Math.max.apply(null, tp.map(function (x) { return x.sevk_satir || 0; }).concat([1]));
-      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'En çok sevk edilen 10 ürün', alt: 'Sevk satırı sayısına göre; miktar kendi biriminde' + (s.urun_cesidi_60g != null ? ' · son 60 günde ' + say(s.urun_cesidi_60g) + ' ürün çeşidi' : ''),
+      ekOz(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'En çok sevk edilen 10 ürün', alt: 'Sevk satırı sayısına göre; miktar kendi biriminde' + (s.urun_cesidi_60g != null ? ' · son 60 günde ' + say(s.urun_cesidi_60g) + ' ürün çeşidi' : ''),
         govde: G.yatay(tp.map(function (x) { return { e: x.malzeme || x.urun_kodu, alt: dolu(x.urun_kodu) + ' · ' + miktarMetin(x.adet_birim), d: x.sevk_satir, etiketDeger: say(x.sevk_satir) + ' satır', renk: 'var(--vurgu)' }; }), { maks: mx, ad: 'En çok sevk edilen 10 ürün' }),
         eylem: ekExcel('En çok sevk edilen 10 ürün', ['Ürün kodu', 'Ürün', 'Sevk satırı', 'Miktar'].map(function (a, i) { return { ad: a, k: i }; }), tp.map(function (x) { return [x.urun_kodu, x.malzeme, x.sevk_satir, miktarMetin(x.adet_birim)]; })) })]));
     }
+    if (katSay) kap.appendChild(h('details', { sinif: 'acilir-bolum nk-katla' }, [h('summary', null, [h('span', { metin: 'Ayrıntı kartları' }), h('span', { sinif: 'nk-katla-say', metin: '(' + katSay + ')' })]), katOz]));
     return kap;
   }
   function araKutu(deger, yaz) {

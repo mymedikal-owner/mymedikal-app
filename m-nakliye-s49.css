@@ -70,5 +70,8 @@
 .nk-sekme .sekme-sira { gap: 4px; padding-bottom: 0; }
 .nk-sekme .segment-dugme { padding: 0 9px; min-height: 40px; }
 @media (max-width: 599px) { .nk-sekme .segment-dugme { font-size: 13px; } }
+#icerik[data-modul="nakliye"] .nk-katla { margin: var(--b2) 0 0; }
+#icerik[data-modul="nakliye"] .nk-katla > summary { display: flex; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: center; gap: var(--b2); min-height: 44px; }
+#icerik[data-modul="nakliye"] .nk-katla-say { font-weight: 400; font-size: var(--t-xs); color: var(--soluk); }
 .nk-xl-yer { flex: 0 0 auto; }
 .nk-xl-yer .excel-dugme { font-size: 0; gap: 0; padding: 0 10px; margin-left: 0; }

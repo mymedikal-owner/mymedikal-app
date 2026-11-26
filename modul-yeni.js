@@ -804,7 +804,7 @@
        
       function yukleDugme(tur, kayit) {
         var V = window.MMVeri;
-        if (!V || typeof V.finansYukle !== 'function' || typeof V.finansYukleAcik !== 'function' || !V.finansYukleAcik().acik) return null;
+        if (!V || typeof V.finansYukle !== 'function' || typeof V.finansYukleAcik !== 'function' || !V.finansYukleAcik(tur).acik) return null;
         var inp = h('input', { type: 'file', accept: 'application/pdf,image/*', sinif: 'ny-gizli', tabindex: '-1', 'aria-hidden': 'true' });
         var msj = h('span', { sinif: 'kucuk soluk', role: 'status' });
         inp.addEventListener('change', function () {
@@ -812,7 +812,7 @@
           msj.textContent = 'Gönderiliyor…';
           V.finansYukle({ tur: tur, kayit: kayit || null, dosya: f }).then(function () { msj.textContent = 'Gönderildi'; }).catch(function () { msj.textContent = 'Gönderilemedi'; });
         });
-        return h('span', null, [inp, h('button', { type: 'button', sinif: 'mini-dugme', onclick: function () { inp.click(); } }, ['PDF/fotoğraf ekle']), msj]);
+        return h('span', null, [inp, h('button', { type: 'button', sinif: 'mini-dugme', onclick: function () { inp.click(); } }, ['PDF/fotoğraf ekle']), msj, h('small', { sinif: 'kucuk soluk', metin: ' Yalnız çek ve sözleşme. Kimlik, bordro, sağlık belgesi yüklemeyin.' })]);
       }
        
       function kartTab() {

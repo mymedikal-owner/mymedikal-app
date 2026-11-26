@@ -266,7 +266,7 @@
         h('label', { sinif: 'alan' }, [h('span', { metin: 'Bölüm' }), bolS]),
         h('label', { sinif: 'alan' }, [h('span', { metin: 'Neden' }), nedS]),
         baglanti,
-        h('p', { sinif: 'soluk', metin: 'Posta uygulaması açılmadıysa ' + ((window.MM && MM.talimatPosta) || 'AI asistan adresine') + ' adresine yazın.' }),
+        h('p', { sinif: 'soluk', metin: 'Posta uygulaması açılmadıysa ' + ((window.MM && MM.talimatPosta) || 'AI asistan') + ' adresine yazın.' }),
         h('button', { type: 'button', sinif: 'dugme ikincil tam', onclick: erisimKapat }, [h('span', { metin: 'Kapat' })])
       ])
     ]);

@@ -324,6 +324,63 @@
     if (r.ok) return 'tamam';
     return (r.status === 401 || r.status === 403) ? 'yetki' : 'hata';
   }
+  
+
+  var FIN_TURLER = { cek: 'cek', 'cek-verilen': 'cek', 'cek-alinan': 'cek', sozlesme: 'sozlesme' };
+  var FIN_AZAMI = 15 * 1024 * 1024;
+  function finansGruplar() {
+    var k = A().finansYukleGrup, d = Array.isArray(k) ? k : [k];
+    return d.map(function (x) { return String(x || '').trim().toLowerCase(); }).filter(Boolean);
+  }
+  function finansYukleAcik(tur) {
+    if (DEMO || modAl() !== 'graph') return { acik: false, neden: 'kapali' };
+    if (tur !== undefined && tur !== null && !Object.prototype.hasOwnProperty.call(FIN_TURLER, tur)) return { acik: false, neden: 'tur' };
+    var g = finansGruplar();
+    if (!String(A().finansYukleDriveId || '').trim() || !g.length) return { acik: false, neden: 'kapali' };
+    var gr = A().girisGruplar;
+    if (!Array.isArray(gr) || !g.some(function (x) { return gr.indexOf(x) >= 0; })) return { acik: false, neden: 'yetki' };
+    return { acik: true, neden: '' };
+  }
+  async function finansBicim(dosya) {   
+    var b = new Uint8Array(await dosya.slice(0, 8).arrayBuffer());
+    var pdf = b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46;
+    var jpg = b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF;
+    var png = b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47;
+    if (pdf) return { blob: dosya.slice(0, dosya.size, 'application/pdf'), tur: 'application/pdf', uzanti: 'pdf' };
+    if (!jpg && !png) throw hata('bicim', 'Yalnız JPEG, PNG ya da PDF');
+    var bmp = await createImageBitmap(dosya, { imageOrientation: 'from-image' }), c = document.createElement('canvas');
+    c.width = bmp.width; c.height = bmp.height; c.getContext('2d').drawImage(bmp, 0, 0);
+    var mime = png ? 'image/png' : 'image/jpeg';
+    var k = await new Promise(function (ok) { c.toBlob(ok, mime, 0.92); });
+    if (!k) throw hata('bicim', 'Görüntü işlenemedi');
+    return { blob: k, tur: mime, uzanti: png ? 'png' : 'jpg' };
+  }
+  async function finansYukle(g) {
+    g = g || {};
+    var ak = finansYukleAcik(g.tur);
+    if (!ak.acik) throw hata('ayar_bekleniyor', 'Finans yükleme kapalı (' + ak.neden + ')');   
+    var dosya = g.dosya;
+    if (!dosya || typeof dosya.size !== 'number') throw hata('bicim', 'Dosya yok');
+    if (dosya.size <= 0 || dosya.size > FIN_AZAMI) throw hata('bicim', 'Dosya 15 MB sınırını aşıyor');
+    var f = await finansBicim(dosya);
+    if (f.blob.size > FIN_AZAMI) throw hata('bicim', 'Dosya 15 MB sınırını aşıyor');
+    var kayit = String(g.kayit || '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 24) || 'kayitsiz';
+    var n = Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+    var ad = FIN_TURLER[g.tur] + '-' + kayit + '-' + n + '.' + f.uzanti;   
+    var yol = FIN_TURLER[g.tur] + '/' + ad;
+    if (yol.indexOf('..') >= 0 || yol.indexOf(FIN_TURLER[g.tur] + '/') !== 0) throw hata('giris_gerekli', 'Hedef klasör dışı');
+    if (typeof MMVeri.tokenSaglayici !== 'function') throw hata('giris_gerekli', 'Giriş yok');
+    var token = await MMVeri.tokenSaglayici();
+    if (!token) throw hata('giris_gerekli', 'Giriş yenilenmeli');
+    var adres = 'https://graph.microsoft.com/v1.0/drives/' + encodeURIComponent(String(A().finansYukleDriveId).trim()) + '/root:/' + yol.split('/').map(encodeURIComponent).join('/') + ':/content?@microsoft.graph.conflictBehavior=rename';
+    var ham = window.CapacitorWebFetch || window.fetch, r;
+    try { r = await ham.call(window, adres, { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': f.tur }, body: f.blob, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' }); }
+    catch (e) { throw hata('ag', 'Bağlantı yok'); }
+    if (r.status === 401 || r.status === 403) throw hata('giris_gerekli', 'Yazma yetkisi yok (' + r.status + ')');
+    if (r.status === 429 || r.status >= 500) throw hata('ag', 'Sunucu meşgul (' + r.status + ')');
+    if (!r.ok) throw hata('bicim', 'Reddedildi (' + r.status + ')');
+    return { ad: ad };
+  }
    
 
    
@@ -681,6 +738,8 @@
     demoAc: function () { DEMO = true; },
     demoKapat: function () { DEMO = false; demoTemizle(); },
     kaliteAcik: kaliteAcik,
+    finansYukle: finansYukle,
+    finansYukleAcik: finansYukleAcik,
     kaliteGorur: kaliteGorur,
     kaliteKaydet: kaliteKaydet,
     cihazBelirteciYaz: cihazBelirteciYaz,

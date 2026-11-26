@@ -94,8 +94,8 @@
   function mesaj(metin, tur) {
     var m = $('mesaj');
     if (!metin) { m.hidden = true; m.textContent = ''; m.className = 'bant'; return; }
-    m.textContent = metin; m.className = 'bant' + (tur === 'bilgi' ? ' bilgi' : tur === 'ag' ? ' ag' : ''); m.hidden = false;    
-    m.setAttribute('role', tur === 'bilgi' || tur === 'ag' ? 'status' : 'alert');
+    m.textContent = metin; m.className = 'bant' + (tur === 'bilgi' ? ' bilgi' : ''); m.hidden = false;
+    m.setAttribute('role', tur === 'bilgi' ? 'status' : 'alert');
   }
   function durumYaz(d) { $('durum').setAttribute('data-durum', d); $('durum-metin').textContent = 'Çağrı durumu: ' + d; }
   function katilimciYaz(n) {
@@ -261,26 +261,24 @@
   }
 
    
-   
-  function etYaz(dugme, metin) { var e = dugme && dugme.querySelector('.et'); if (e && e.textContent !== metin) e.textContent = metin; }
   function mikUi(dugme, acik) {
     dugme.setAttribute('aria-pressed', acik ? 'true' : 'false');
-    var t = acik ? 'Mikrofonu kapat' : 'Mikrofonu aç'; dugme.setAttribute('aria-label', t); dugme.setAttribute('title', dugme.id === 'b-mik' ? t + ' (Alt+A)' : t);
-    dugme.classList.toggle('kapali', !acik); ikonDegistir(dugme, acik ? 'mik' : 'mikkapali'); etYaz(dugme, acik ? 'Sessize al' : 'Sesi aç');
+    var t = acik ? 'Mikrofonu kapat' : 'Mikrofonu aç'; dugme.setAttribute('aria-label', t); dugme.setAttribute('title', t);
+    dugme.classList.toggle('kapali', !acik); ikonDegistir(dugme, acik ? 'mik' : 'mikkapali');
   }
   function kamUi(dugme, acik) {
     dugme.setAttribute('aria-pressed', acik ? 'true' : 'false');
-    var t = acik ? 'Kamerayı kapat' : 'Kamerayı aç'; dugme.setAttribute('aria-label', t); dugme.setAttribute('title', dugme.id === 'b-kam' ? t + ' (Alt+V)' : t);
-    dugme.classList.toggle('kapali', !acik); ikonDegistir(dugme, acik ? 'kam' : 'kamkapali'); etYaz(dugme, acik ? 'Video kapat' : 'Video aç');
+    var t = acik ? 'Kamerayı kapat' : 'Kamerayı aç'; dugme.setAttribute('aria-label', t); dugme.setAttribute('title', t);
+    dugme.classList.toggle('kapali', !acik); ikonDegistir(dugme, acik ? 'kam' : 'kamkapali');
   }
   function elUi() {
     var b = $('b-el'); b.setAttribute('aria-pressed', elAcik ? 'true' : 'false'); b.classList.toggle('aktif', elAcik);
-    var t = elAcik ? 'Elini indir' : 'Elini kaldır'; b.setAttribute('aria-label', t); b.setAttribute('title', t + ' (Alt+H)'); etYaz(b, elAcik ? 'El indir' : 'El kaldır');
+    var t = elAcik ? 'Elini indir' : 'Elini kaldır'; b.setAttribute('aria-label', t); b.setAttribute('title', t);
     $('m-el').lastChild.textContent = t;
   }
   function ekranUi() {
     var b = $('b-ekran'); b.setAttribute('aria-pressed', ekranAcik ? 'true' : 'false'); b.classList.toggle('aktif', ekranAcik);
-    var t = ekranAcik ? 'Paylaşımı durdur' : 'Ekranı paylaş'; b.setAttribute('aria-label', t); b.setAttribute('title', t + ' (Alt+S)'); etYaz(b, ekranAcik ? 'Durdur' : 'Paylaş');
+    var t = ekranAcik ? 'Paylaşımı durdur' : 'Ekranı paylaş'; b.setAttribute('aria-label', t); b.setAttribute('title', t);
     $('m-ekran').lastChild.textContent = t;
   }
   function gorunumUi() {
@@ -543,8 +541,8 @@
     sag =window.MeetSaglayici.olustur(taklit ? 'taklit' : 'acs');
     sag.dinle('durum', function (v) {
       durumYaz(v.durum);
-      if (v.durum === 'Connecting') { if (bagliOldu) mesaj('Yeniden bağlanıyor…', 'ag'); else if (!(zil && !zil.cevap)) mesaj('Bağlanıyor…', 'bilgi'); }   
-      else if (v.durum === 'Connected') { var yenidenBagli = bagliOldu && $('mesaj').classList.contains('ag'); bagliOldu = true; if ($('mesaj').classList.contains('bilgi') || $('mesaj').classList.contains('ag')) mesaj(''); if (yenidenBagli) tost('Bağlantı yeniden kuruldu'); }
+      if (v.durum === 'Connecting') { if (!(zil && !zil.cevap)) mesaj('Bağlanıyor…', 'bilgi'); }   
+      else if (v.durum === 'Connected') { bagliOldu = true; if ($('mesaj').classList.contains('bilgi')) mesaj(''); }
     });
     sag.dinle('katilimci', function (v) { katilimciYaz(v.sayi); zilKatilimci(Number(v.sayi) || 0); });
     sag.dinle('katilimciEkle', function (v) {
@@ -1257,19 +1255,6 @@
       mesaj(''); katilimciYaz(0); if (sag) { try { sag.temizle(); } catch (e0) {   } } sag = null; ac().catch(function (e) { mesaj(hataMetni(e)); }); });
 
     document.addEventListener('click', function (e) { if (!e.target.closest || !e.target.closest('.acilir-kap')) { acilirKapat(); } });
-     
-    var KISAYOL = { KeyA: 'b-mik', KeyV: 'b-kam', KeyS: 'b-ekran', KeyH: 'b-el', KeyC: 'b-sohbet', KeyU: 'b-kisiler' };
-    document.addEventListener('keydown', function (e) {
-      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || !KISAYOL[e.code] || $('sahne').hidden || !$('ayar').hidden) return;
-      var t = e.target, tag = t && t.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
-      var d = $(KISAYOL[e.code]); if (!d || d.hidden || d.disabled) return;
-      e.preventDefault(); d.click();
-    });
-     
-    var agYok = false;
-    window.addEventListener('offline', function () { if ($('sahne').hidden) return; agYok = true; mesaj('Bağlantınız koptu. Yeniden bağlanılıyor…', 'ag'); });
-    window.addEventListener('online', function () { if (!agYok) return; agYok = false; if ($('mesaj').classList.contains('ag')) mesaj(''); if (!$('sahne').hidden) tost('Bağlantı yeniden kuruldu'); });
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
       if (!$('panel-lobi').hidden && !$('l-kod-form').hidden) { lobiKodAc(false); return; }

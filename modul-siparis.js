@@ -62,6 +62,7 @@
     var secili = qs.get('ssekme') || 'acik', sirket = '', tur = '', yas = '', kanit = '', q = '', gor = 'liste', yuk = null, hata = null, canli = true;
     var iadeSekme = 'suren', iadeQ = '', iadeN = IADE_ILK, iadeAcik = {};    
     var alim = '';    
+    var dosyaH = null;    
     var urun = '', musF = '', hasF = '';    
     function urunGrubu(o) {    
       if (o._urun) return o._urun;
@@ -105,7 +106,7 @@
       if (kanit === 'fat' && !o.fatura_no.length) return false;   
       if (yas) { var b = YAS.filter(function (y) { return y[0] === yas; })[0]; if (!o.gecikme_gun || o.gecikme_gun < b[2] || o.gecikme_gun > b[3]) return false; }
       if (q) {
-        var m = o._ara || (o._ara = [o.no, o.yk, o.musteri, o.teslim_alan].concat(o.irsaliye, o.fatura_no, o.kalemler.map(function (k) { return k.malzeme + ' ' + k.tanim; })).join(' ').toLocaleLowerCase('tr'));   
+        var m = o._ara || (o._ara = [o.no, o.yk, o.musteri, o.teslim_alan, dosyaH && dosyaH[o.yk]].concat(o.irsaliye, o.fatura_no, o.kalemler.map(function (k) { return k.malzeme + ' ' + k.tanim; })).join(' ').toLocaleLowerCase('tr'));   
         return MM.aramaNorm(m).indexOf(MM.aramaNorm(q)) >= 0;   
       }
       return true;
@@ -506,7 +507,19 @@
       if (!liste.length) { govde.appendChild(G.bos({ baslik: 'Bu görünümde sipariş yok', metin: 'Filtreleri değiştirin ya da aramayı temizleyin.' })); return; }
       govde.appendChild(G.kart({ govde: gor === 'liste' ? siparisTablosu(liste) : (gor === 'musteri' ? grupTablosu(liste, function (o) { return o.musteri; }, 'Müşteri') : grupTablosu(liste, function (o) { return o.teslim_alan; }, 'Hastane / teslim yeri')), baslik: gor === 'liste' ? 'Sipariş listesi' : (gor === 'musteri' ? 'Müşteri bazında' : 'Hastane / teslim yeri bazında'), alt: sayimMetin, eylem: eylemKap }));
     }
-    function yenile() { hata = null; yuk = null; ciz(); yukle().then(function (y) { yuk = y; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
+    function dosyaHaritasi() {    
+      try {
+        if (window.MMVeri.mod() === 'graph' && !window.MMVeri.ozelErisim('dmo')) return;
+        window.MMVeri.oku('dmo', 'dmo-siparisler').then(function (r) {
+          var s = ((r && r.veri) || {}).siparisler || [], m = {};
+          s.forEach(function (d) { if (d && d.siparis_no && !m[d.siparis_no]) m[d.siparis_no] = (d.dosya_no || '') + ' ' + (d.ikn || ''); });
+          dosyaH = m;
+          if (yuk && yuk.r && yuk.r.veri) (yuk.r.veri.siparisler || []).forEach(function (o) { delete o._ara; });
+          if (canli && q) ciz();
+        }).catch(function () { });
+      } catch (e) { }
+    }
+    function yenile() { hata = null; yuk = null; ciz(); yukle().then(function (y) { yuk = y; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); dosyaHaritasi(); }
     yenile();
     return function () { canli = false; if (musTemiz) musTemiz(); };
   };

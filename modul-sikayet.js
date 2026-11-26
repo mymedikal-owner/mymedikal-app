@@ -3,17 +3,9 @@
 (function () {
   'use strict';
   var MM = window.MM, h = MM.h, G = MM.gr, S = MM.s41, EN = window.MM_LOC === 'en-GB', ESKI_DK = 36 * 60;
-  var SEV_AD = { 'yüksek': 'Yüksek', 'yuksek': 'Yüksek', 'orta': 'Orta', 'izle': 'İzleme' }, SEV_SINIF = { 'yüksek': 'yuksek', 'yuksek': 'yuksek', 'orta': 'orta', 'izle': 'dusuk' };
+  var SEV_AD = { 'yüksek': 'Yüksek', 'orta': 'Orta', 'izle': 'İzleme' }, SEV_SINIF = { 'yüksek': 'yuksek', 'orta': 'orta', 'izle': 'dusuk' };
   var DURUM_AD = { acik: 'Açık', kapali: 'Kapalı' };
 
-   
-  function tonluAc(L, tonluMu, min) {
-    var secili = [], rest = [], ilk = [], sayac = 0;
-    L.forEach(function (x) { if (tonluMu(x)) { ilk.push(x); sayac++; } });
-    var eksik = Math.max(0, min - sayac);
-    L.forEach(function (x) { if (tonluMu(x)) secili.push(x); else if (eksik > 0) { secili.push(x); eksik--; } else rest.push(x); });
-    return { sira: secili.concat(rest), n: secili.length };
-  }
   function topla(liste, alan) { var o = {}; liste.forEach(function (x) { var d = x[alan] || {}; Object.keys(d).forEach(function (k) { o[k] = (o[k] || 0) + d[k]; }); }); return o; }
   function sirali(o) { return Object.keys(o).filter(function (k) { return o[k] > 0; }).sort(function (a, b) { return o[b] - o[a]; }); }
   function baskin(x) { var t = x.tur_dagilimi_toplam || {}, k = sirali(t); return k.length ? k[0] : null; }
@@ -21,9 +13,7 @@
 
   MM.moduller.sikayet = function (kok) {
     var qsSek = ''; try { qsSek = new URLSearchParams(location.search).get('sksekme') || ''; } catch (e) { qsSek = ''; }
-    var SEK_ANAHTAR = 'mm.sikayet.sekme', kayitSek = ''; try { kayitSek = localStorage.getItem(SEK_ANAHTAR) || ''; } catch (e) { kayitSek = ''; }
-    var sekIlk = qsSek === 'oncelik' ? 'oncelik' : (['genel', 'oncelik', 'dagilim'].indexOf(kayitSek) >= 0 ? kayitSek : 'genel');
-    var yuk = null, hata = null, canli = true, st = { sec: null, q: '', filtre: 'dikkat', sirket: '', sekme: sekIlk, osec: null };
+    var yuk = null, hata = null, canli = true, st = { sec: null, q: '', filtre: 'dikkat', sirket: '', sekme: qsSek === 'oncelik' ? 'oncelik' : 'genel', osec: null };
     var onc = { yuk: null, hata: null };   
     var SAHA = !!(window.MMVeri && window.MMVeri.sahaKip && window.MMVeri.sahaKip());   
     kok.appendChild(G.sayfaBasi({ baslik: 'Şikâyetler', alt: 'Hastane şikâyetleri ve teslimat sorunları', kirinti: [['Şikâyetler']] }));
@@ -120,7 +110,7 @@
       var d = onc.yuk.veri, L = d.olaylar, z = d.ozet || {};
       if (st.osec) { var x = L.filter(function (k) { return okey(k) === st.osec; })[0]; if (x) { f.appendChild(oncelikDetay(x)); return f; } st.osec = null; }
       f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.ozetSerit([kutu('Acil', G.say(z.acil), null), kutu('Yüksek', G.say(z.yuksek), null), kutu('Normal', G.say(z.normal), null), kutu('Hedefi aşan', G.say(z.hedef_asan), z.eskalasyon ? z.eskalasyon + ' olay için üst bildirim' : null)], { en: 4 })]));
-      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Öncelik sırası', alt: 'Açık olaylar; önce bakılacak olan üstte. Sıralama karar değildir, yöntem alttadır', eylem: L.length ? xlSatir('Şikâyet öncelik sırası', 'Açık olaylar', ONC_KOL, L) : null, govde: L.length ? (function () { var t = tonluAc(L, function (x) { return x.seviye === 'Acil' || x.seviye === 'Yüksek' || !!x.hedef_asildi; }, 6); return G.ilkN(t.sira, oncelikSatir, { n: t.n }); })() : G.bos({ baslik: 'Açık olay yok', metin: 'Sıralanacak açık şikâyet bulunmuyor.' }) })]));
+      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Öncelik sırası', alt: 'Açık olaylar; önce bakılacak olan üstte. Sıralama karar değildir, yöntem alttadır', eylem: L.length ? xlSatir('Şikâyet öncelik sırası', 'Açık olaylar', ONC_KOL, L) : null, govde: L.length ? G.ilkN(L, oncelikSatir, { n: 10 }) : G.bos({ baslik: 'Açık olay yok', metin: 'Sıralanacak açık şikâyet bulunmuyor.' }) })]));
       var bn = d.bilgi_notu_onerileri || [];
       if (bn.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Bilgi notu önerileri', alt: 'Son 12 ayda tekrarlayan türler', govde: G.ilkN(bn, function (n) {
         return h('div', { sinif: 's41-satir' }, [h('div', { sinif: 'ad', metin: n.onerilen_baslik }), h('div', { sinif: 'sag', metin: n.olay_sayisi + ' olay' }), h('div', { sinif: 'alt', metin: n.tur + ' · ' + n.hastane_sayisi + ' hastane' })]);
@@ -131,8 +121,7 @@
     function genel(v) {
       var f = document.createDocumentFragment(), o = v.ozet || {}, H = (v.hastaneler || []).slice().sort(function (a, b) { return (b.dikkat_skoru || 0) - (a.dikkat_skoru || 0); });
       f.appendChild(h('div', { sinif: 'skk-ozet' }, [G.ozetSerit([kutu('Son 12 ay olay', G.say(o.olay_12ay), null), kutu('Açık olay', G.say(o.acik_olay), null), kutu('Hastane sayısı', G.say(o.hastane_sayisi), null), SAHA ? null : kutu('Ceza kesintisi (toplam, MY+DAY)', tl(o.ceza_toplam_tl), null)].filter(Boolean), { en: 4 })]));
-      var dikSay = H.filter(function (x) { return x.dikkat_seviye !== 'izle'; }).length, oncZ = onc.yuk && onc.yuk.veri && onc.yuk.veri.ozet, oncSay = oncZ ? (oncZ.acil || 0) + (oncZ.yuksek || 0) : null;
-      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.segment([['genel', 'Genel görünüm', dikSay || null], ['oncelik', 'Öncelik sırası', oncSay || null], ['dagilim', 'Şikâyet türleri']], st.sekme, function (k) { st.sekme = k; st.osec = null; try { localStorage.setItem(SEK_ANAHTAR, k); } catch (e) {   } ciz(); }, { ad: 'Görünüm' })]));
+      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.segment([['genel', 'Genel görünüm'], ['oncelik', 'Öncelik sırası'], ['dagilim', 'Şikâyet türleri']], st.sekme, function (k) { st.sekme = k; st.osec = null; ciz(); }, { ad: 'Görünüm' })]));
       if (st.sekme === 'oncelik') { f.appendChild(oncelikGorunum()); return f; }
       if (st.sekme === 'dagilim') { f.appendChild(dagilim(v, H)); return f; }
       var dik = H.filter(function (x) { return x.dikkat_seviye !== 'izle'; }), liste = st.filtre === 'dikkat' ? dik : H;
@@ -147,7 +136,7 @@
             var sat = h('div', { sinif: 'soluk kucuk', style: 'display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:20px' }, [h('span', { metin: G.say(gor.length) + (EN ? ' hospitals' : ' hastane') }), xl]);
             if (xl) xl.style.cssText = 'min-height:28px;margin:-6px 0;padding:0 8px;font-size:12px';
             alan.appendChild(sat);
-            alan.appendChild(gor.length ? (function () { var t = tonluAc(gor, function (x) { return x.dikkat_seviye && x.dikkat_seviye !== 'izle'; }, 6); return G.ilkN(t.sira, hastaneSatir, { n: t.n }); })() : G.bos({ baslik: st.q ? 'Eşleşen hastane yok' : 'Dikkat gerektiren hastane yok', metin: st.q ? 'Aramayı ya da süzgeci değiştirin.' : 'Tüm hastaneler izleme seviyesinde.' }));
+            alan.appendChild(gor.length ? G.ilkN(gor, hastaneSatir, { n: 10 }) : G.bos({ baslik: st.q ? 'Eşleşen hastane yok' : 'Dikkat gerektiren hastane yok', metin: st.q ? 'Aramayı ya da süzgeci değiştirin.' : 'Tüm hastaneler izleme seviyesinde.' }));
           }
           listeYaz();
           var arac = G.aracCubugu({

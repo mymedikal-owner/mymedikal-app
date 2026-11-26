@@ -495,14 +495,8 @@
         f.appendChild(kart(e.x)); return f;
       }
        
-      var darL = window.matchMedia && window.matchMedia('(max-width: 899px)').matches, tonluE = [], tonsuzE = [];
-      if (darL) { sirali.forEach(function (a) { var t = gruplar[a].filter(function (x) { return x.kova !== 'cikti'; }), s = gruplar[a].filter(function (x) { return x.kova === 'cikti'; }); t.forEach(function (x, i) { tonluE.push({ x: x, bas: i === 0 ? a : null, say: t.length }); }); s.forEach(function (x, i) { tonsuzE.push({ x: x, bas: i === 0 ? a : null, say: s.length }); }); }); }
-      if (darL && ent.length) {
-        if (tonluE.length) { var tk = h('div', { sinif: 'tq-liste' }); tonluE.forEach(function (e) { tk.appendChild(entCiz(e)); }); kap.appendChild(tk); }
-        if (tonsuzE.length) kap.appendChild(G.ilkN(tonsuzE, entCiz, { n: 3, sinif: 'tq-liste' }));
-      }
        
-      else if (ent.length) kap.appendChild(G.ilkN(ent, entCiz, { n: Math.max(2, 5 - Math.min(3, gec.length)), sinif: 'tq-liste' }));
+      if (ent.length) kap.appendChild(G.ilkN(ent, entCiz, { n: Math.max(2, 5 - Math.min(3, gec.length)), sinif: 'tq-liste' }));
       else if (!gec.length) kap.appendChild(h('p', { sinif: 'veri-yok', metin: 'Bu filtrede sevkiyat yok.' }));
       alan.appendChild(kap);
        

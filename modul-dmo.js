@@ -926,11 +926,11 @@
         return (a.uyari === b.uyari ? 0 : (a.uyari ? -1 : 1)) || String(a.x.firma).localeCompare(String(b.x.firma)) || String(a.x.dosya_no).localeCompare(String(b.x.dosya_no), 'tr', { numeric: true });
       });
     }
-    function mektupGrupSatiri(g) {
+    function mektupGrupSatiri(g, ortak) {
       var m = (g.grup_adi || turAdi(g.urun_turu)) + ': kullanılan ' + say(g.kullanilan_iptal_hastane) + ' / hak ' + say(g.iptal_hakki_hastane) + ' · kalan ' + say(g.kalan_hak) + (g.yasak_asim_teyitsiz === true ? ' · kota aşıldı' : '');
-      return h('div', { sinif: 'dm-mk-grup' }, [h('div', { sinif: 'dm-mk-grup-ust' + (g.yasak_durumu != null && g.yasak_durumu !== 'yesil' ? ' ' + g.yasak_durumu : ''), metin: m }), g.uyari ? h('p', { sinif: 'dm-mk-uyari', metin: g.uyari }) : null]);
+      return h('div', { sinif: 'dm-mk-grup' }, [h('div', { sinif: 'dm-mk-grup-ust' + (g.yasak_durumu != null && g.yasak_durumu !== 'yesil' ? ' ' + g.yasak_durumu : ''), metin: m }), g.uyari && g.uyari !== ortak ? h('p', { sinif: 'dm-mk-uyari', metin: g.uyari }) : null]);
     }
-    function mektupKart(o) {
+    function mektupKart(o, ortak) {
       var x = o.x, bilgi = [];
       if (x.ikn_sayisi != null) bilgi.push('IKN ' + say(x.ikn_sayisi));
       if (x.hastane_sayisi_pencere != null) bilgi.push('Hastane ' + say(x.hastane_sayisi_pencere) + ' (son 90 gün)');
@@ -939,14 +939,27 @@
       return h('button', { type: 'button', sinif: 'dm-mk-kart' + (o.uyari ? ' uyari' : '') + ton, onclick: function () { git('#dmo/mektup/' + encodeURIComponent(x.firma) + '/' + encodeURIComponent(x.dosya_no)); } }, [
         h('div', { sinif: 'dm-mk-ust' }, [firmaRozet(x.firma), h('strong', { metin: 'Sipariş no ' + sipNo(x) }), h('span', { sinif: 'dm-mk-ton' + (o.uyari ? ' uyari' : ''), metin: o.uyari ? 'Uyarı' : 'Normal' })]),
         bilgi.length ? h('div', { sinif: 'dm-mk-bilgi kucuk', metin: bilgi.join(' · ') }) : null,
-        o.gr.length ? h('div', { sinif: 'dm-mk-gruplar' }, o.gr.map(mektupGrupSatiri)) : h('p', { sinif: 'dm-mk-yok kucuk soluk', metin: 'İptal hakkı: veri yok' }),
-        x.uyari ? h('p', { sinif: 'dm-mk-uyari', metin: x.uyari }) : null]);
+        o.gr.length ? h('div', { sinif: 'dm-mk-gruplar' }, o.gr.map(function (g) { return mektupGrupSatiri(g, ortak); })) : h('p', { sinif: 'dm-mk-yok kucuk soluk', metin: 'İptal hakkı: veri yok' }),
+        x.uyari && x.uyari !== ortak ? h('p', { sinif: 'dm-mk-uyari', metin: x.uyari }) : null]);
+    }
+    function mektupOrtakNot(liste) {   
+      if (liste.length < 2) return null;
+      var tek = null, cok = false, hepsi = true;
+      liste.forEach(function (o) {
+        var m = [];
+        if (o.x.uyari) m.push(o.x.uyari);
+        o.gr.forEach(function (g) { if (g.uyari) m.push(g.uyari); });
+        if (!m.length) hepsi = false;
+        m.forEach(function (t) { if (tek === null) tek = t; else if (t !== tek) cok = true; });
+      });
+      return tek !== null && !cok && hepsi ? tek : null;
     }
     function mektupEkrani() {
       govde.appendChild(aracKur([FIRMA_GRUP]));
-      var liste = mektupListesi();
+      var liste = mektupListesi(), ortak = mektupOrtakNot(liste);
       govde.appendChild(h('p', { sinif: 'kucuk soluk', metin: liste.length + ' sipariş' }));
-      govde.appendChild(liste.length ? G.ilkN(liste, mektupKart, { n: 50, sinif: 'dm-liste' }) : G.bos({ baslik: 'Bu görünümde sipariş yok' }));
+      if (ortak) govde.appendChild(h('p', { sinif: 'dm-mk-uyari dm-mk-ortak', metin: ortak }));
+      govde.appendChild(liste.length ? G.ilkN(liste, function (o) { return mektupKart(o, ortak); }, { n: 50, sinif: 'dm-liste' }) : G.bos({ baslik: 'Bu görünümde sipariş yok' }));
     }
      
     function mektupSiparisleri(cb) {
@@ -975,7 +988,7 @@
       return G.kart({ baslik: 'IKN\'ler (' + ikns.length + ')', govde: h('div', null, [
         h('p', { sinif: 'kucuk dm-mk-say' + (uy.length > 0 ? ' uyari' : ''), metin: 'Dikkat gereken IKN: ' + uy.length }),
         h('p', { sinif: 'dm-mk-yok kucuk soluk', metin: 'Sayılar IKN toplamıdır, bu siparişe özel değildir.' }),
-        ikns.length ? G.ilkN(sirali, mektupIknSatiri, { n: 5, sinif: 'dm-liste dm-mk-iknl' }) : G.bos({ baslik: 'IKN yok' })]) });
+        ikns.length ? G.ilkN(sirali, mektupIknSatiri, { n: 5, sinif: 'dm-liste dm-mk-iknl' + (uy.length > 5 ? ' dm-mk-gizli-uyari' : '') }) : G.bos({ baslik: 'IKN yok' })]) });
     }
     function mektupHastaneKarti(firma, no, satirlar) {   
       var gor = {}, hs = [];
@@ -1023,7 +1036,8 @@
       hsKap.appendChild(h('p', { sinif: 'kucuk soluk', metin: 'Hastane listesi yükleniyor' }));
       mektupSiparisleri(function (tum) {
         if (!canli || !hsKap.isConnected) return;
-        iknKap.textContent = ''; hsKap.textContent = '';
+        hsKap.textContent = '';
+        if (!gr.length) iknKap.textContent = '';   
         if (!tum) {
           if (!gr.length) iknKap.appendChild(G.bos({ baslik: 'Sipariş verisi şu an yok' }));
           hsKap.appendChild(G.bos({ baslik: 'Sipariş verisi şu an yok' })); return;
@@ -1033,7 +1047,7 @@
           var g2 = {}, l2 = [];
           sat.forEach(function (s) { if (s.ikn != null && !g2[s.ikn]) { g2[s.ikn] = 1; l2.push(s.ikn); } });
           iknKap.appendChild(mektupIknKarti(x.firma, l2));
-        } else iknKap.appendChild(mektupIknKarti(x.firma, ikns));
+        }
         hsKap.appendChild(mektupHastaneKarti(x.firma, x.dosya_no, sat));
       });
     }

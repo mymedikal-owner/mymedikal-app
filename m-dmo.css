@@ -265,6 +265,7 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-mk-grup-ust { font-size: var(--t-s); color: var(--yazi); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .dm-mk-grup-ust.sari { color: var(--sari-yazi); } .dm-mk-grup-ust.kirmizi { color: var(--kirmizi); }
 .dm-mk-uyari { margin: 0; font-size: var(--t-xs); color: var(--soluk); overflow-wrap: anywhere; }
+.dm-mk-ortak { margin: 0 0 var(--b2); }
 .dm-mk-yok { margin: 0; }
 .dm-mk-baslik { display: flex; align-items: center; gap: var(--b2); margin: var(--b3) 0; font-size: var(--t-l); }
  
@@ -283,5 +284,5 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-mk-say { margin: 0; }
 .dm-mk-say.uyari { color: var(--turuncu); font-weight: 700; }
 .dm-mk-et { font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; background: var(--turuncu-zemin); color: var(--turuncu); }
-.dm-mk-iknl .ilkn-tumu, .dm-mk-riskli .ilkn-tumu { color: var(--turuncu); border-color: var(--turuncu); background: var(--turuncu-zemin); }
+.dm-mk-iknl.dm-mk-gizli-uyari .ilkn-tumu, .dm-mk-riskli .ilkn-tumu { color: var(--turuncu); border-color: var(--turuncu); background: var(--turuncu-zemin); }
 .dm-mk-gecis { width: 100%; margin: var(--b3) 0; border: 1px solid var(--cizgi); border-radius: var(--r-s); }

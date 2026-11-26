@@ -456,7 +456,8 @@
         var kart = r[2](); if (!kart) return null;
         return h('button', { type: 'button', sinif: 'dm-ayr dm-ayr-tek', onclick: function () { G.sheet(r[0], function (g) { g.appendChild(kart); }).ac(); } }, [h('strong', { metin: r[0] }), h('span', { sinif: 'soluk kucuk', metin: r[1] })]);
       }).filter(function (x) { return x; });
-      if (ayrSatirlar.length) govde.appendChild(h('div', { sinif: 'dm-ayr-liste' }, ayrSatirlar));
+       
+      if (ayrSatirlar.length) govde.appendChild(h('details', { sinif: 'dm-ayr-det' }, [h('summary', { sinif: 'dm-ayr-det-ozet' }, [h('span', { metin: 'Ayrıntı kartları' }), ' (' + ayrSatirlar.length + ')']), h('div', { sinif: 'dm-ayr-liste' }, ayrSatirlar)]));
       var liste = riskliHastaneler();
       govde.appendChild(h('h3', { sinif: 'bolum', metin: 'Riskli hastaneler (' + liste.length + ' İKN×hastane satırı)' }));
       var rBos = liste.length ? null : G.bos({ baslik: 'Riskli hastane etiketi yok', metin: 'Riskli, süresi geçmiş ya da teslim edilmemiş etiketli hastane yok.' });

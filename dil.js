@@ -57,7 +57,7 @@
     'DMO Nakliyat →': 'DMO Freight →', '← DMO': '← DMO', '← Nakliye': '← Logistics', 'Bölüm geçişi': 'Section links',
     'Ana sayfa': 'Home', 'Makineler': 'Machines', 'Eldiven': 'Gloves', 'Siparişler': 'Orders', 'DMO': 'DMO', 'Stok': 'Stock', 'Kalite': 'Quality', 'İSG': 'OHS', 'Nakliye': 'Logistics',
     'Sürüm': 'Version', 'Rol: ': 'Role: ', 'Oturumunuzun yenilenmesi gerekiyor — alttaki kırmızı “Oturumu yenile” düğmesine dokunun': 'Your session needs to be renewed — tap the red “Renew session” button below',
-    'İK': 'HR', 'Onaylar': 'Approvals', 'Asistan': 'Assistant', 'Yönetim': 'Management', 'Finans': 'Finance', 'Muhasebe': 'Accounting', 'Diğer': 'More', 'Yakında': 'Coming soon',
+    'İK': 'HR', 'Onaylar': 'Approvals', 'Asistan': 'Assistant', 'Yönetim': 'Management', 'Finans': 'Finance', 'Muhasebe': 'Accounting', 'Diğer': 'More', 'Ayrıntı kartları': 'Detail cards', 'Yakında': 'Coming soon',
     'Diğer modüller': 'More sections', 'Yakında gelecek modüller': 'Sections coming soon', 'Modüller': 'Sections', 'Modül': 'Section', 'Eylem': 'Action', 'Eylemler': 'Actions',
     'Menüyü aç / daralt': 'Open / collapse menu', 'Bildirimler': 'Notifications', 'Temayı değiştir': 'Change theme', 'Açık / koyu tema': 'Light / dark theme',
     'Açık temaya geç': 'Switch to light theme', 'Koyu temaya geç': 'Switch to dark theme', 'Ara…': 'Search…', 'Ara': 'Search', 'Kapat': 'Close', 'Sonuçlar': 'Results', 'Ara ve git': 'Search and go',

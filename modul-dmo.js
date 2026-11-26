@@ -282,7 +282,13 @@
       });
       if (od0 && od0.kalan_gun <= 7) satirlar.push(h('div', { sinif: 'dm-bg-satir bilgi' }, [h('strong', { sinif: 'dm-bg-say', metin: od0.kalan_gun + ' gün' }), h('span', { metin: 'DMO ödeme günü ' + tarihTR(od0.odeme_gunu) })]));
       if (!bilinen.length) return null;   
-      var govdeEl = (satirlar.length ? h('div', { sinif: 'dm-bg-liste' }, satirlar) : h('p', { sinif: 'dm-yok', metin: 'Bugün için açık iş görünmüyor.' }));
+       
+      var tonlu = satirlar.filter(function (e) { return e.classList.contains('kritik'); }), tonsuz = satirlar.filter(function (e) { return !e.classList.contains('kritik'); });
+      var govdeEl;
+      if (!satirlar.length) govdeEl = h('p', { sinif: 'dm-yok', metin: 'Bugün için açık iş görünmüyor.' });
+      else if (tonsuz.length >= 2) {
+        govdeEl = h('div', { sinif: 'dm-bg-liste' }, tonlu.concat([h('details', { sinif: 'dm-bg-diger' }, [h('summary', { sinif: 'dm-bg-diger-ozet' }, [h('span', { metin: 'Diğer' }), ' (' + tonsuz.length + ')']), h('div', { sinif: 'dm-bg-liste' }, tonsuz)])]));
+      } else govdeEl = h('div', { sinif: 'dm-bg-liste' }, satirlar);
       return G.kart({ baslik: 'Bugün yapılacak', govde: govdeEl });   
     }
     function odemeKarti() {
@@ -554,7 +560,7 @@
         var uy = sat.filter(function (m) { return mkTonlu(m); }), dg = sat.filter(function (m) { return !mkTonlu(m); });
         kap.appendChild(mkOlcuBasligi(fa));
         if (uy.length) kap.appendChild(h('div', { sinif: 'dm-liste dm-mk-ozet-liste' }, uy.map(mkOzetSatiri)));
-        if (dg.length) kap.appendChild(G.ilkN(dg, mkOzetSatiri, { n: 4, sinif: 'dm-liste dm-mk-ozet-liste' }));
+        if (dg.length) kap.appendChild(G.ilkN(dg, mkOzetSatiri, { n: 2, sinif: 'dm-liste dm-mk-ozet-liste' }));
       });
       return kap;
     }

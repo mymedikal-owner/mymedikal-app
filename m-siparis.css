@@ -83,6 +83,16 @@
 .sp-deg-daha { min-height: 44px; width: 100%; }
  
 .sp-dt { font-size: 12px; color: var(--soluk); margin: 2px 0 0; overflow-wrap: anywhere; }
+ 
+.sp-kart-mus { display: none; }
+@media (max-width: 599px) {
+  .icerik .sp-liste.sp-liste table.tablo-siralanir td:first-child::before { content: none; display: none; }
+  .sp-liste .sp-kart { width: 100%; min-width: 0; }
+  .sp-liste .sp-kart-ust { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; width: 100%; min-width: 0; }
+  .sp-liste .sp-kart-mus { display: block; flex: 1 1 auto; min-width: 0; font-weight: 650; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sp-liste .sp-kart-ust .sp-no { flex: 0 0 auto; }
+  .sp-liste .sp-kart .sp-dt { text-align: right; }
+}
 .sp-deg-satir:not([aria-expanded]) { cursor: default; } .sp-deg-satir:not([aria-expanded]):hover { background: transparent; }
 .sp-iade-serit { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: var(--b2); padding: 0 var(--b3) var(--b2); }
 .sp-iade-serit > .sp-iade-adim, .sp-iade-serit > .sp-iade-adim:not(:last-child) { display: grid; grid-template-columns: none; gap: 2px; padding: 0; align-content: start; min-width: 0; }

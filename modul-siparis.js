@@ -261,7 +261,7 @@
     function belgeNo(a) { return a.length ? (a.length > 1 ? a[0] + ' +' + (a.length - 1) : a[0]) : 'kayıt yok'; }    
     function siparisTablosu(liste) {
       var kol = [
-        { ad: 'Sipariş', k: 'no', ciz: function (o) { var a = h('a', { href: '#siparis/siparis/' + encodeURIComponent(o.no), sinif: 'sp-no', metin: o.no, onclick: function (e) { e.stopPropagation(); } }), dt = dtMetin(o); return dt ? h('div', null, [a, h('div', { sinif: 'sp-dt', metin: dt })]) : a; }, csv: function (o) { return o.no; } },
+        { ad: 'Sipariş', k: 'no', ciz: function (o) { var a = h('a', { href: '#siparis/siparis/' + encodeURIComponent(o.no), sinif: 'sp-no', metin: o.no, onclick: function (e) { e.stopPropagation(); } }), dt = dtMetin(o); var ust = h('div', { sinif: 'sp-kart-ust' }, [o.musteri ? h('span', { sinif: 'sp-kart-mus', metin: o.musteri }) : null, a]); return h('div', { sinif: 'sp-kart' }, [ust, dt ? h('div', { sinif: 'sp-dt', metin: dt }) : null]); }, csv: function (o) { return o.no; } },
         { ad: 'YK no / Özel', k: 'turetiket', ciz: turEtiket, csv: turEtiket, deger: turEtiket },
         { ad: 'Durum', k: 'durum', deger: function (o) { return o.gecikme_gun ? 'a' + (1000 - o.gecikme_gun) : (o.durum === 'acik' ? 'b' : o.durum === 'tamam' ? 'c' : 'd'); }, ciz: rozet },
         { ad: 'Gecikme (gün)', k: 'gecikme', sag: true, deger: function (o) { return o.gecikme_gun || 0; }, ciz: function (o) { return o.gecikme_gun ? String(o.gecikme_gun) : '—'; } },
@@ -276,7 +276,9 @@
         { ad: 'Fatura', k: 'fat', sag: true, deger: function (o) { return o.fatura_no.length; }, ciz: function (o) { return belgeNo(o.fatura_no); }, csv: function (o) { return o.fatura_no.join(' '); } }];
       if (yuk.tutar) kol.push({ ad: 'Tutar (ÖRNEK)', k: 'tutar', sag: true, deger: function (o) { return o.tutar == null ? null : o.tutar; }, ciz: function (o) { return o.tutar == null ? '—' : sayi(o.tutar, 2) + ' ' + (o.para || ''); } });
       siparisKol = kol; xlKaynak = { ad: 'Siparişler', kolonlar: kol, satirlar: liste };
-      return G.tablo({ kolonlar: kol, satirlar: liste, sayfa: 10, sira: secili === 'gecikmis' ? { k: 'gecikme', yon: 'asagi' } : { k: 'tarih', yon: 'asagi' }, satirTikla: function (o) { location.hash = '#siparis/siparis/' + encodeURIComponent(o.no); }, satirSinif: function (o) { return o.gecikme_gun ? 'kirmizi' : ''; }, bos: 'Bu görünümde sipariş yok.' });
+      var spTab = G.tablo({ kolonlar: kol, satirlar: liste, sayfa: 10, sira: secili === 'gecikmis' ? { k: 'gecikme', yon: 'asagi' } : { k: 'tarih', yon: 'asagi' }, satirTikla: function (o) { location.hash = '#siparis/siparis/' + encodeURIComponent(o.no); }, satirSinif: function (o) { return o.gecikme_gun ? 'kirmizi' : ''; }, bos: 'Bu görünümde sipariş yok.' });
+      spTab.classList.add('sp-liste');
+      return spTab;
     }
 
      

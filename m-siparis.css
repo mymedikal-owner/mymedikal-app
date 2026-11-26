@@ -39,6 +39,14 @@
   #icerik[data-modul="siparis"] .sp-no,
   #icerik[data-modul="siparis"] .kirinti a { display: inline-flex; align-items: center; }
 }
+ 
+@media (max-width: 899px) {
+  #icerik[data-modul="muhasebe"] .mh-satir { padding: 8px 10px; gap: 4px 8px; }
+  #icerik[data-modul="muhasebe"] .mh-satir-ust { display: contents; }
+  #icerik[data-modul="muhasebe"] .mh-satir-ust b { grid-column: 1 / -1; font-size: 13.5px; line-height: 1.3; }
+  #icerik[data-modul="muhasebe"] .mh-satir-ust .soluk { grid-column: 1; grid-row: 2; align-self: center; }
+  #icerik[data-modul="muhasebe"] .mh-satir > .tq-rozet { grid-column: 2; grid-row: 2; align-self: center; }
+}
 @media (max-width: 599px) {
   #icerik[data-modul="siparis"] .ozet-serit-ana { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ikon { display: none; }

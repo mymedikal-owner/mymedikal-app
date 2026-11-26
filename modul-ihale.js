@@ -28,11 +28,39 @@
     return s || 'Açık';
   }
   function ilgili(k) { return k && k.ilgi === 'ilgili'; }
+  
+
+  var YAVAS_FARK_GUN = 1;
+  
+  function ilAnahtar(s) { return String(s == null ? '' : s).toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ').trim(); }   
+  function yavasIlTablosu(kg) {
+    var liste = kg && Array.isArray(kg.il) ? kg.il : null, vals = [], map = {};
+    if (!liste) return null;
+    liste.forEach(function (x) { if (x && typeof x.il === 'string' && typeof x.teslim_gun_ort === 'number' && isFinite(x.teslim_gun_ort)) { vals.push(x.teslim_gun_ort); map[ilAnahtar(x.il)] = x.teslim_gun_ort; } });
+    if (!vals.length) return null;
+    vals.sort(function (a, b) { return a - b; });
+    var n = vals.length, med = n % 2 ? vals[(n - 1) / 2] : (vals[n / 2 - 1] + vals[n / 2]) / 2;
+    return { map: map, esik: med + YAVAS_FARK_GUN };
+  }
+  
+  function ihaleIli(ih, tablo) {
+    var d = ih && (ih.il || ih.sehir);
+    if (typeof d === 'string' && tablo.map[ilAnahtar(d)] != null) return ilAnahtar(d);
+    var bul = {}, say = 0;
+    ilAnahtar(ih && ih.kurum).split(/[^a-zçğıöşüâîû]+/).forEach(function (t) { if (t && tablo.map[t] != null && !bul[t]) { bul[t] = 1; say++; } });
+    return say === 1 ? Object.keys(bul)[0] : null;
+  }
+  function yavasIlGun(ih, tablo) {
+    if (!tablo) return null;
+    var il = ihaleIli(ih, tablo);
+    return il != null && tablo.map[il] >= tablo.esik ? tablo.map[il] : null;
+  }
+  
   function kisalt(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1).trim() + '…' : s; }
 
   MM.moduller.ihale = function (kok) {
     var yuk = null, hata = null, canli = true;
-    var bantDmo = null, maliyet = null;
+    var bantDmo = null, maliyet = null, yavasTablo = null, yavasIstendi = false;
     var SAHA = !!(window.MMVeri && window.MMVeri.sahaKip && window.MMVeri.sahaKip());   
     var durum = { sekme: 'dmo', ilgiliYalniz: true, grup: 'hepsi', q: '', fiyat: {} };
     var secili = {};   
@@ -169,8 +197,18 @@
     }
     function detayAc(ih) {
       G.sheet(kisalt(ih.kurum || ih.id, 60), function (g) {
-        function kur() { g.textContent = ''; g.appendChild(kalemListesi(ih, kur)); }
+        function kur() {
+          g.textContent = '';
+          var yg = null; try { yg = yavasIlGun(ih, yavasTablo); } catch (e) { yg = null; }
+          if (yg != null) g.appendChild(h('p', { sinif: 'ih-uyari', metin: 'Teslim: bu ile kargo ortalaması ' + sayiYaz(yg, 1) + ' gün (yavaş il)' }));
+          g.appendChild(kalemListesi(ih, kur));
+        }
         kur();
+        
+        if (!yavasIstendi) {
+          yavasIstendi = true;
+          try { window.MMVeri.oku('nakliye', 'nakliye').then(function (r) { yavasTablo = yavasIlTablosu(r && r.veri && r.veri.kargo_teslim); if (yavasTablo && g.isConnected) kur(); }, function () { yavasTablo = null; }); } catch (e) { yavasTablo = null; }
+        }
       }).ac();
     }
 
@@ -253,6 +291,7 @@
         return Promise.all(js);
       }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); });
     }
+    
     yenile();
     return function () { canli = false; };
   };

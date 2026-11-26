@@ -87,6 +87,7 @@
 .sp-kart-mus { display: none; }
 @media (max-width: 599px) {
   .icerik .sp-liste.sp-liste table.tablo-siralanir td:first-child::before { content: none; display: none; }
+  .icerik .sp-liste.sp-liste table.tablo-siralanir td:first-child { min-width: 0; max-width: 100%; overflow: hidden; }    
   .sp-liste .sp-kart { width: 100%; min-width: 0; }
   .sp-liste .sp-kart-ust { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; width: 100%; min-width: 0; }
   .sp-liste .sp-kart-mus { display: block; flex: 1 1 auto; min-width: 0; font-weight: 650; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -286,3 +286,37 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-mk-et { font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; background: var(--turuncu-zemin); color: var(--turuncu); }
 .dm-mk-iknl.dm-mk-gizli-uyari .ilkn-tumu, .dm-mk-riskli .ilkn-tumu { color: var(--turuncu); border-color: var(--turuncu); background: var(--turuncu-zemin); }
 .dm-mk-gecis { width: 100%; margin: var(--b3) 0; border: 1px solid var(--cizgi); border-radius: var(--r-s); }
+ 
+.dm-mk-acik { margin: var(--b3) 0; }
+.dm-mk-firma-baslik { display: flex; align-items: center; gap: var(--b2); margin: var(--b2) 0; }
+.dm-mk-ozet-liste { display: flex; flex-direction: column; gap: var(--b2); }
+.dm-mk-ozet-satir { display: flex; flex-direction: column; gap: var(--b1); width: 100%; min-width: 0; text-align: left; font: inherit; color: var(--yazi); background: var(--yuzey); border: 1px solid var(--cizgi); border-left: 4px solid var(--cizgi); border-radius: var(--r-s); padding: var(--b2) var(--b3); min-height: 44px; cursor: pointer; overflow-wrap: anywhere; }
+.dm-mk-ozet-satir:hover { border-color: var(--vurgu); }
+.dm-mk-ozet-satir { padding: 6px var(--b2); gap: 2px; overflow-wrap: normal; }
+.dm-mk-ozet-satir .dm-mk-ust { flex-wrap: nowrap; justify-content: space-between; gap: 0 var(--b2); min-width: 0; line-height: 1.3; }
+.dm-mk-ozet-satir .dm-mk-ust > strong { display: flex; flex: 1 1 0; min-width: 0; gap: 0 4px; white-space: nowrap; font-size: var(--t-s); }
+.dm-mk-ozet-no-ad { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dm-mk-ozet-no-d { flex: none; }
+.dm-mk-ozet-oranlar { display: inline-flex; flex: none; flex-wrap: nowrap; white-space: nowrap; gap: 0 6px; font-size: var(--t-xs); font-variant-numeric: tabular-nums; }
+.dm-mk-ozet-alt { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 var(--b2); min-width: 0; line-height: 1.3; font-size: var(--t-xs); color: var(--yazi2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dm-mk-ozet-alt > span { flex: none; }
+.dm-mk-ozet-alt > span + span::before { content: '· '; }
+.dm-mk-ozet-alt > .dm-mk-ozet-urun { flex: 1 1 0; min-width: 3em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dm-mk-ozet-alt > .dm-mk-ozet-rozet::before { content: none; }
+.dm-mk-ozet-rozet { font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 0 8px; background: var(--yuzey2); color: var(--sari-yazi); border: 1px solid var(--sari-yazi); white-space: nowrap; }
+.dm-mk-ozet-satir.sari { border-left-color: var(--sari-yazi); }
+.dm-mk-ozet-satir.uyari { border-left-color: var(--turuncu); background: var(--turuncu-zemin); }
+.dm-mk-oranlar { display: flex; flex-wrap: wrap; gap: var(--b1) var(--b3); font-size: var(--t-s); font-variant-numeric: tabular-nums; }
+.dm-mk-oran { white-space: nowrap; }
+.dm-mk-eksik { color: var(--soluk); }
+.dm-mk-iptal { font-size: var(--t-s); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.dm-mk-teyitsiz { display: inline-block; margin-left: var(--b2); font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; background: var(--yuzey2); color: var(--sari-yazi); border: 1px solid var(--sari-yazi); }
+.dm-mk-risk { color: var(--yazi2); overflow-wrap: anywhere; }
+.dm-mk-tanim { margin: var(--b1) 0 0; overflow-wrap: anywhere; }
+.dm-mk-say-satir { display: flex; flex-wrap: wrap; gap: var(--b2); margin-bottom: var(--b2); }
+.dm-mk-say-dg { font: inherit; color: var(--yazi); background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-s); padding: var(--b2) var(--b3); min-height: 44px; cursor: pointer; }
+.dm-mk-say-dg.uyari { border-color: var(--turuncu); color: var(--turuncu); }
+.dm-mk-say-dg.secili { background: var(--turuncu-zemin); border-width: 2px; }
+.dm-mk-hs-sat { display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--cizgi); border-left: 4px solid var(--cizgi); border-radius: var(--r-s); padding: var(--b2) var(--b3); overflow-wrap: anywhere; }
+.dm-mk-hs-sat.uyari { border-left-color: var(--turuncu); background: var(--turuncu-zemin); }
+.dm-mk-alt-baslik { margin: var(--b3) 0 var(--b2); font-size: var(--t-s); color: var(--soluk); }

@@ -324,7 +324,7 @@
     ['Eldiven görünümleri', 'Glove views'], ['Konteyner', 'Container'], ['konteyner', 'container'], ['Tarihler forwarder/Excel listesinden; canlı takip yok', 'Dates come from the forwarder/Excel list; no live tracking'], ['Tarihlere göre tahmini ilerleme', 'Estimated progress by dates'],
     ['Örnek Hastane', 'Sample Hospital'], ['Örnek Bayi', 'Sample Dealer'], ['Örnek Müşteri', 'Sample Customer'], ['Örnek belge', 'Sample document'], ['Örnek reçete', 'Sample recipe'], ['Örnek duruş', 'Sample stoppage'], ['ÖRNEK-ÜRÜN', 'SAMPLE-PRODUCT'], ['ÖRNEK-', 'SAMPLE-'],
      
-    ['İhale, sipariş ve ceza takibi', 'Tender, order and penalty tracking'], ['ÖRNEK VERİ — hastane adları, sipariş numaraları ve tutarlar gerçek değil', 'SAMPLE DATA — hospital names, order numbers and amounts are not real'], ['Portal verisi: ', 'Portal data: '],
+    ['İhale, sipariş ve ceza takibi', 'Tender, order and penalty tracking'], ['ÖRNEK VERİ — hastane adları, sipariş numaraları ve tutarlar gerçek değil', 'SAMPLE DATA — hospital names, order numbers and amounts are not real'], ['Portal: ', 'Portal data: '],
     [' penceresi', ' window'], ['tutarlar KDV hariç, para birimi TL', 'amounts exclude VAT, currency TRY'], ['Siparişler / risk', 'Orders / risk'], ['Riskli sipariş oranı', 'At-risk order rate'], ['Riskli sipariş', 'At-risk orders'], ['Cezalı sürede oranı', 'In-penalty-period rate'],
     ['Cezalı sürede (son teslim geçti)', 'In penalty period (delivery deadline passed)'], ['Cezalı sürede', 'In penalty period'], ['Açık sipariş', 'Open orders'], ['Riskli hastaneler', 'At-risk hospitals'], ['Riskli hastane etiketi yok', 'No at-risk hospital label'], ['Riskli hastane', 'At-risk hospital'],
     ['Son teslim yakın', 'Delivery deadline near'], ['Cezalı süresi geçmiş', 'Penalty period passed'], ['İptale düştü (süre doldu)', 'Cancelled (time expired)'], ['Ek süre istenecek', 'Extra time to be requested'], ['İtiraz adayı', 'Objection candidate'],
@@ -841,6 +841,57 @@
   };
   Object.keys(TAM_8033).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8033[k]; });
   REGEX.unshift([/^Dikkat gereken IKN: (\d+)$/, 'IKNs needing attention: $1']);
+   
+  var TAM_8035 = {
+    'Açık siparişler': 'Open orders',
+    'Açık siparişler: veri bekleniyor': 'Open orders: waiting for data',
+    'Açık sipariş yok': 'No open orders',
+    'Sipariş no': 'Order no',
+    'İrsaliye': 'Delivery note',
+    'Kabul': 'Acceptance',
+    'irsaliye kaydı eksik': 'delivery note record missing',
+    'veri eksik': 'data missing',
+    'İptal: kullanılan': 'Cancellations: used',
+    '/ hak': '/ allowance',
+    'grup · en dar grupta kalan': 'groups · remaining in tightest group',
+    'kota aşılmış görünüyor — kesinleşmedi': 'quota appears exceeded — not confirmed',
+    'kesinleşmedi': 'not confirmed',
+    'Riskli hastane': 'At-risk hospitals',
+    'Riskli': 'At-risk',
+    'portal saati yok': 'no portal time',
+    'geçmiş verisi yok': 'no past data',
+    'Başvuru son günü': 'Application deadline',
+    'İptal hakkı: Siparişler ekranında →': 'Cancellation allowance: on the Orders screen →',
+    'Sipariş tutarı (KDV hariç)': 'Order amount (excl. VAT)',
+    'İrsaliyesi kesilen tutar': 'Amount with delivery note',
+    'Teslim edilen tutar': 'Delivered amount',
+    'Kabul edilen tutar': 'Accepted amount',
+    'TL tutarları: veri eksik': 'TL amounts: data missing',
+    'Teslimat riski': 'Delivery risk',
+    'geçmiş teslimata göre': 'based on past deliveries',
+    'Bu süzgeçte hastane yok': 'No hospital in this filter',
+    'Başvuru süresi geçen hastane': 'Hospitals past the application period',
+    'Geçmişi ölçülemeyen hastane': 'Hospitals with no measurable history',
+    'hastane ortalaması': 'hospital average',
+    'il ortalaması': 'province average',
+    'il ortalaması (kargo)': 'province average (cargo)',
+    'İrsaliye: irsaliyesi kesilmiş kalemlerin tutarı; kısmi sevk ayrılmaz. İptal kalemler hariç.': 'Delivery note: amount of items with a delivery note issued; partial shipments are not split. Cancelled items excluded.',
+    'Teslim: portaldaki teslim kaydı (hastanenin teslim aldığı miktar × birim fiyat). Kargo firması kaydı ayrı sayılmaz.': 'Delivered: delivery record in the portal (quantity received by the hospital × unit price). Carrier records are not counted separately.',
+    'Kabul: muayenesi olumlu çıkan teslim edilmiş kalemlerin tutarı.': 'Accepted: amount of delivered items whose inspection was positive.',
+    'İptal hakkı: sipariş ve ürün kodunda hastane sayısının %10\'u, en az 3.': 'Cancellation allowance: 10% of the number of hospitals per order and product code, at least 3.',
+    'Geçmişe göre riskli: hastanenin (yoksa ilin) geçmiş irsaliye–teslim süresine göre teslimi geç kalacak görünen hastane.': 'At risk by history: hospital whose delivery looks late based on its own (or its province\'s) past delivery-note-to-delivery time.',
+    'Siparişin bir bölümü portal listesinin dışındaysa oranlar "veri eksik" yazılır; boş değer sıfır sayılmaz.': 'If part of the order is outside the portal list, rates show "data missing"; an empty value is not counted as zero.'
+  };
+  Object.keys(TAM_8035).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8035[k]; });
+  REGEX.unshift([/^veri eksik: (.+) itibarıyla, siparişin bir bölümü portal listesinin dışında$/, function (m, z) { return 'data missing: as of ' + cevir(z) + ', part of the order is outside the portal list'; }],
+    [/^(.+): kullanılan (veri yok|\S+) \/ hak (veri yok|\S+) · kalan (veri yok|\S+) · kota aşılmış görünüyor — kesinleşmedi$/, function (m, ad, k, hk, kl) { return cevir(ad) + ': used ' + k + ' / allowance ' + hk + ' · remaining ' + kl + ' · quota appears exceeded — not confirmed'; }],
+    [/^Portal: MY (.+) · DAY (.+)$/, function (m, a, b) { return 'Portal data: MY ' + cevir(a) + ' · DAY ' + cevir(b); }],
+    [/^geçmiş teslim (.+) gün \((.+)\)$/, function (m, g, k) { return 'past delivery ' + g + ' days (' + cevir(k) + ')'; }],
+    [/^geçmiş teslim (.+) gün$/, 'past delivery $1 days'],
+    [/^Başvuru son günü (.+)$/, 'Application deadline $1'],
+    [/^geçmiş verisi yok \((.+) hastane\)$/, 'no past data ($1 hospitals)'],
+    [/^Başvuru süresi geçen hastane: (.+)$/, 'Hospitals past the application period: $1'],
+    [/^Geçmişi ölçülemeyen hastane: (.+)$/, 'Hospitals with no measurable history: $1']);
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

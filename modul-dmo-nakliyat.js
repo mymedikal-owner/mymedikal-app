@@ -443,16 +443,15 @@
        
       var ik = (v.iptal_kotasi || []).filter(function (x) { return firmaEsles(x) && grpEsles(x); });
       if (ik.length) {
-        var zor = ik.filter(function (x) { return x.zorunlu_sevk > 0; }).length;
+         
         ik = ik.slice().sort(function (a, b) { return (b.zorunlu_sevk || 0) - (a.zorunlu_sevk || 0) || (b.baslanmayan_hastane || 0) - (a.baslanmayan_hastane || 0); });
-        govde.appendChild(h('h3', { sinif: 'bolum', metin: 'İptal hakkı (' + zor + ' sevk zorunlu)' }));
+        govde.appendChild(h('h3', { sinif: 'bolum', metin: 'İptal hakkı' }));
+        govde.appendChild(h('p', { sinif: 'dm-yon' }, [h('a', { href: '#dmo/mektup', metin: 'İptal hakkı: Siparişler ekranında →' })]));
         govde.appendChild(G.ilkN(ik, function (x) {
-          var hak = x.hak || 0, kul = x.iptal_hastane || 0, pay = hak > 0 ? Math.min(100, kul / hak * 100) : (kul > 0 ? 100 : 0);
-          return h('div', { sinif: 'dm-sp dn-iptal' + (x.zorunlu_sevk > 0 ? ' zorunlu' : '') }, [
+          var kul = x.iptal_hastane || 0;
+          return h('div', { sinif: 'dm-sp dn-iptal' }, [
             h('div', { sinif: 'dm-sp-ust' }, [firmaRozet(x.firma), h('strong', { sinif: 'dm-ikn', metin: iknEt(x.firma, x.ikn) }), h('span', { sinif: 'soluk kucuk', metin: GRUP_AD[x.urun_grubu] || x.urun_grubu || '' })]),
-            x.zorunlu_sevk > 0 ? h('div', { sinif: 'dn-zorunlu', metin: 'En az ' + say(x.zorunlu_sevk) + ' hastaneye sevk zorunlu' }) : null,
-            h('span', { sinif: 'dn-bar-iz', role: 'img', 'aria-label': 'İptal hakkı ' + say(hak) + ', kullanılan ' + say(kul) }, [pay ? h('i', { style: 'width:' + pay.toFixed(1) + '%;background:' + (kul > hak ? 'var(--kritik)' : 'var(--ciddi)') }) : null]),
-            h('div', { sinif: 'dm-sp-alt kucuk' }, [h('span', { metin: 'Hastane ' + say(x.hastane_sayisi) }), h('span', { metin: 'Hak ' + say(hak) }), h('span', { metin: 'Kullanılan ' + say(kul) }), h('span', { metin: 'Kalan hak ' + say(x.kalan_hak) }), h('span', { metin: 'Sevke başlanmayan ' + say(x.baslanmayan_hastane) })])]);
+            h('div', { sinif: 'dm-sp-alt kucuk' }, [h('span', { metin: 'Hastane ' + say(x.hastane_sayisi) }), h('span', { metin: 'Kullanılan ' + say(kul) }), h('span', { metin: 'Sevke başlanmayan ' + say(x.baslanmayan_hastane) })])]);
         }, { n: 10, sinif: 'dn-liste' }));
       }
       return govde;

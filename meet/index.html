@@ -215,8 +215,8 @@
           <span id="toplanti-adi" class="toplanti-adi">Mumu Meet</span>
         </div>
         <div class="cubuk-orta">
-          <button id="b-mik" class="yuvarlak" type="button" aria-pressed="true" aria-label="Mikrofonu kapat" title="Mikrofonu kapat"><span class="ikon" data-ikon="mik"></span></button>
-          <button id="b-kam" class="yuvarlak" type="button" aria-pressed="false" aria-label="Kamerayı aç" title="Kamerayı aç"><span class="ikon" data-ikon="kam"></span></button>
+          <button id="b-mik" class="yuvarlak" type="button" aria-pressed="true" aria-keyshortcuts="Alt+A" aria-label="Mikrofonu kapat" title="Mikrofonu kapat (Alt+A)"><span class="ikon" data-ikon="mik"></span><span class="et" aria-hidden="true">Sessize al</span></button>
+          <button id="b-kam" class="yuvarlak" type="button" aria-pressed="false" aria-keyshortcuts="Alt+V" aria-label="Kamerayı aç" title="Kamerayı aç (Alt+V)"><span class="ikon" data-ikon="kam"></span><span class="et" aria-hidden="true">Video aç</span></button>
           <button id="b-cevir" class="yuvarlak" type="button" aria-label="Kamerayı çevir (ön/arka)" title="Kamerayı çevir (ön/arka)" hidden><span class="ikon" data-ikon="cevir"></span></button>
           <button id="b-altyazi" class="yuvarlak ikincil" type="button" aria-label="Altyazı (yakında)" title="Altyazı (yakında)"><span class="ikon" data-ikon="altyazi"></span></button>
           <div class="acilir-kap">
@@ -230,10 +230,10 @@
               <button type="button" class="emoji-dugme" role="menuitem" data-tepki="applause" data-emoji="🎉" aria-label="Kutlama">🎉</button>
             </div>
           </div>
-          <button id="b-ekran" class="yuvarlak ikincil" type="button" aria-pressed="false" aria-label="Ekranı paylaş" title="Ekranı paylaş"><span class="ikon" data-ikon="ekran"></span></button>
-          <button id="b-el" class="yuvarlak ikincil" type="button" aria-pressed="false" aria-label="Elini kaldır" title="Elini kaldır"><span class="ikon" data-ikon="el"></span></button>
+          <button id="b-ekran" class="yuvarlak ikincil" type="button" aria-pressed="false" aria-keyshortcuts="Alt+S" aria-label="Ekranı paylaş" title="Ekranı paylaş (Alt+S)"><span class="ikon" data-ikon="ekran"></span><span class="et" aria-hidden="true">Paylaş</span></button>
+          <button id="b-el" class="yuvarlak ikincil" type="button" aria-pressed="false" aria-keyshortcuts="Alt+H" aria-label="Elini kaldır" title="Elini kaldır (Alt+H)"><span class="ikon" data-ikon="el"></span><span class="et" aria-hidden="true">El kaldır</span></button>
           <div class="acilir-kap">
-            <button id="b-uc" class="yuvarlak" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Diğer seçenekler" title="Diğer seçenekler"><span class="ikon" data-ikon="uc"></span></button>
+            <button id="b-uc" class="yuvarlak" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Diğer seçenekler" title="Diğer seçenekler"><span class="ikon" data-ikon="uc"></span><span class="et" aria-hidden="true">Diğer</span></button>
             <div id="menu" class="acilir menu" role="menu" hidden>
               <p class="menu-baslik">Düzeni değiştir</p>
               <button id="m-otomatik" type="button" class="menu-oge" role="menuitemradio" aria-checked="true"><span class="ikon" data-ikon="otomatik"></span>Otomatik</button>
@@ -259,12 +259,12 @@
               </div>
             </div>
           </div>
-          <button id="b-ayril" class="yuvarlak ayril" type="button" aria-label="Toplantıdan ayrıl" title="Toplantıdan ayrıl"><span class="ikon" data-ikon="ayril"></span></button>
+          <button id="b-ayril" class="yuvarlak ayril" type="button" aria-label="Toplantıdan ayrıl" title="Toplantıdan ayrıl"><span class="ikon" data-ikon="ayril"></span><span class="et" aria-hidden="true">Ayrıl</span></button>
         </div>
         <div class="cubuk-sag">
           <button id="b-bilgi" class="yuvarlak ikincil" type="button" aria-pressed="false" aria-label="Toplantı bilgisi" title="Toplantı bilgisi"><span class="ikon" data-ikon="bilgi"></span></button>
-          <button id="b-kisiler" class="yuvarlak" type="button" aria-pressed="false" aria-label="Katılımcılar" title="Katılımcılar"><span class="ikon" data-ikon="kisi"></span><span id="kisi-sayi" class="sayi-rozet">1</span></button>
-          <button id="b-sohbet" class="yuvarlak" type="button" aria-pressed="false" aria-label="Toplantı içi sohbet" title="Toplantı içi sohbet"><span class="ikon" data-ikon="sohbet"></span><span id="sohbet-rozet" class="sayi-rozet yeni" hidden>1</span></button>
+          <button id="b-kisiler" class="yuvarlak" type="button" aria-pressed="false" aria-keyshortcuts="Alt+U" aria-label="Katılımcılar" title="Katılımcılar (Alt+U)"><span class="ikon" data-ikon="kisi"></span><span id="kisi-sayi" class="sayi-rozet">1</span><span class="et" aria-hidden="true">Katılımcılar</span></button>
+          <button id="b-sohbet" class="yuvarlak" type="button" aria-pressed="false" aria-keyshortcuts="Alt+C" aria-label="Toplantı içi sohbet" title="Toplantı içi sohbet (Alt+C)"><span class="ikon" data-ikon="sohbet"></span><span id="sohbet-rozet" class="sayi-rozet yeni" hidden>1</span><span class="et" aria-hidden="true">Sohbet</span></button>
         </div>
       </nav>
 
@@ -274,6 +274,7 @@
           <label class="alan">Kamera<select id="a-kamera-sec"></select></label>
           <label class="alan">Mikrofon<select id="a-mik-sec"></select></label>
           <label class="alan">Hoparlör<select id="a-hop-sec"></select></label>
+          <p class="kucuk kisayol-not">Kısayollar: Alt+A mikrofon, Alt+V kamera, Alt+S ekran paylaş, Alt+H el, Alt+C sohbet, Alt+U katılımcılar</p>
         </div>
       </div>
     </section>

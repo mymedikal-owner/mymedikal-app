@@ -470,3 +470,28 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
   .ms-bolme .ms-mesajlar { padding-left: max(clamp(16px, 5%, 72px), calc((100% - 900px) / 2)); padding-right: max(clamp(16px, 5%, 72px), calc((100% - 900px) / 2)); }
   .ms-bolme .ms-alt { padding-left: max(8px, calc((100% - 900px) / 2)); padding-right: max(8px, calc((100% - 900px) / 2)); }
 }
+
+ 
+ 
+.ms-alt { align-items: flex-end; }
+.ms-yaz-kap { align-items: flex-end; }
+.ms-yaz { padding: 11px 4px 11px 14px; }
+.ms-yaz-kap .ms-ikon { flex: none; width: 40px; height: 44px; border-radius: 0; color: var(--ms-saat); }
+.ms-yaz-kap .ms-ikon:last-of-type { width: 44px; }
+.ms-yaz-kap .ms-ikon[hidden] { display: none; }
+.ms-gonder.ms-gon-bos { opacity: .55; }
+.ms-gonder:active { transform: scale(.94); }
+ 
+.ms-asagi-kap { position: sticky; bottom: 6px; flex: none; align-self: stretch; height: 0; overflow: visible; z-index: 3; pointer-events: none; }
+.ms-asagi { position: absolute; right: 4px; bottom: 0; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 50%; background: var(--ms-karsi-zemin); color: var(--ms-saat); box-shadow: 0 1px 4px rgba(0, 0, 0, .3); display: inline-flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; }
+.ms-asagi[hidden], .ms-asagi-n[hidden] { display: none; }
+.ms-asagi-n { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); min-width: 20px; height: 20px; box-sizing: border-box; padding: 0 5px; border-radius: 10px; background: var(--ms-yesil); color: #fff; font-size: 11px; font-weight: 700; line-height: 20px; text-align: center; }
+ 
+.ms-m { touch-action: pan-y; }
+.ms-m > .ms-metin:has(+ .ms-meta)::after { content: ""; display: inline-block; width: 40px; height: 1px; }
+.ms-ben > .ms-metin:has(+ .ms-meta)::after { width: 62px; }
+.ms-m:has(.ms-meta .ms-etiket-duz) > .ms-metin:has(+ .ms-meta)::after { width: 100px; }
+.ms-m > .ms-metin + .ms-meta { float: right; margin: -16px 0 0 6px; position: relative; }
+ 
+.ms-satir-alt { align-items: center; }
+@media (max-width: 599px) { .ms-asagi { right: 2px; } }

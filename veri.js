@@ -338,12 +338,12 @@
   }
   var SOHBET_KLASORLERI = ['dmo', 'dmo-fiyat-gor', 'dmo-maliyet', 'eldiven', 'fabrika', 'finans', 'ihale', 'isg', 'kalite', 'muhasebe', 'nakliye', 'saha', 'sikayet', 'siparisler', 'siparisler-yonetim', 'sterilizasyon', 'stok'];
   
-  var nabizOnbellek = { t: 0, acik: false };
+  var nabizOnbellek = { t: 0, acik: false, ek: false };   
   async function sohbetKapi(zorla) {
     var ac = sohbetAcik();
     if (!ac.acik) return ac;
     if (zorla !== true && Date.now() - nabizOnbellek.t < 60000) return nabizOnbellek.acik ? { acik: true, neden: '' } : { acik: false, neden: 'nabiz' };
-    var acik = false, hedef = String(A().sohbetDriveId || '').trim();
+    var acik = false, ekBayrak = false, hedef = String(A().sohbetDriveId || '').trim();
     try {
       var token = await sohbetJetonu(), yol = sohbetOid() + '/nabiz.json';
       var bilgi = await jsonGetir('https://graph.microsoft.com/v1.0/drives/' + encodeURIComponent(hedef) + '/root:/' + yol.split('/').map(encodeURIComponent).join('/'), { headers: { Authorization: 'Bearer ' + token }, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
@@ -352,11 +352,11 @@
         var r = await fetch(indir, { cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
         if (r.ok) {
           var j = await r.json(), z = Date.parse(j && j.zaman);
-          if (isFinite(z)) { var fark = Date.now() - z; acik = fark <= 15 * 60000 && fark >= -5 * 60000; }
+          if (isFinite(z)) { var fark = Date.now() - z; acik = fark <= 15 * 60000 && fark >= -5 * 60000; ekBayrak = acik && j.ek === 1; }
         }
       }
-    } catch (e) { acik = false; }
-    nabizOnbellek = { t: Date.now(), acik: acik };
+    } catch (e) { acik = false; ekBayrak = false; }
+    nabizOnbellek = { t: Date.now(), acik: acik, ek: ekBayrak };
     return acik ? { acik: true, neden: '' } : { acik: false, neden: 'nabiz' };
   }
   async function sohbetJetonu() {
@@ -388,17 +388,79 @@
   }
   function sekizHex() { var b = new Uint8Array(4); (window.crypto || {}).getRandomValues(b); var s = ''; for (var i = 0; i < 4; i++) s += (b[i] < 16 ? '0' : '') + b[i].toString(16); return s; }
   
-  async function sohbetSor(soru, grup) {
+  
+  var EK_AZAMI_ADET = 3, EK_AZAMI_BAYT = 10 * 1024 * 1024;
+  function sohbetEkAcik() { return nabizOnbellek.ek === true && sohbetAcik().acik; }
+  async function jpegYenidenKodla(blob) {   
+    try {
+      var bmp = await createImageBitmap(blob), olcek = Math.min(1, 3000 / Math.max(bmp.width, bmp.height));
+      var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(bmp.width * olcek)); c.height = Math.max(1, Math.round(bmp.height * olcek));
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      var k = await new Promise(function (ok) { c.toBlob(ok, 'image/jpeg', 0.9); });
+      return k && k.size > 0 ? k : null;
+    } catch (e) { return null; }
+  }
+  
+  async function sohbetEkHazirla(dosya) {
+    var buf = await dosya.arrayBuffer(), t = turBul(new Uint8Array(buf));
+    if (!t) throw hata('bicim', 'Yalnız fotoğraf (JPEG/PNG) ve PDF eklenebilir');
+    var blob;
+    if (t.tur === 'application/pdf') blob = new Blob([buf], { type: 'application/pdf' });
+    else { blob = await jpegYenidenKodla(new Blob([buf], { type: t.tur })); if (!blob) throw hata('bicim', 'Fotoğraf işlenemedi'); }
+    if (blob.size > EK_AZAMI_BAYT) throw hata('bicim', 'Ek 10 MB’dan büyük olamaz');
+    var ham = await blob.arrayBuffer();
+    return { blob: blob, tur: t.tur === 'application/pdf' ? 'pdf' : 'jpg', boyut: blob.size, sha: await shaHex(ham) };
+  }
+  function sohbetEkYolu(soruId, n, tur) {
+    if (!/^[0-9a-f]{8}$/.test(String(soruId)) || !(n >= 1 && n <= EK_AZAMI_ADET) || (tur !== 'jpg' && tur !== 'pdf')) throw hata('bicim', 'Ek yolu geçersiz');
+    var oid = sohbetOid(); if (!oid) throw hata('giris_gerekli', 'Giriş yok');
+    var yol = oid + '/ek-' + soruId + '-' + n + '.' + tur;
+    if (yol.indexOf('..') >= 0) throw hata('bicim', 'Ek yolu geçersiz');
+    return yol;
+  }
+  function sohbetEkAdres(yol) { return 'https://graph.microsoft.com/v1.0/drives/' + encodeURIComponent(String(A().sohbetDriveId || '').trim()) + '/root:/' + yol.split('/').map(encodeURIComponent).join('/') + ':/content'; }
+  async function sohbetEkKoy(soruId, n, blob, tur) {
+    if (!String(A().sohbetDriveId || '').trim() || modAl() !== 'graph') throw hata('ayar_bekleniyor', 'Sohbet kapalı');
+    var yol = sohbetEkYolu(soruId, n, tur), token = await sohbetJetonu();
+    var ham = window.CapacitorWebFetch || window.fetch, r;   
+    try { r = await ham.call(window, sohbetEkAdres(yol) + '?@microsoft.graph.conflictBehavior=fail', { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': tur === 'pdf' ? 'application/pdf' : 'image/jpeg' }, body: blob, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' }); }
+    catch (e) { throw hata('ag', 'Bağlantı yok'); }
+    if (r.status === 401 || r.status === 403) throw hata('giris_gerekli', 'Yazma yetkisi yok (' + r.status + ')');
+    if (r.status === 429 || r.status >= 500) throw hata('ag', 'Sunucu meşgul (' + r.status + ')');
+    if (!r.ok) throw hata('bicim', 'Reddedildi (' + r.status + ')');
+  }
+  async function sohbetEkSil(soruId, n, tur) {
+    var yol = sohbetEkYolu(soruId, n, tur), token = await sohbetJetonu();
+    var ham = window.CapacitorWebFetch || window.fetch, r;
+    try { r = await ham.call(window, sohbetEkAdres(yol).replace(/:\/content$/, ''), { method: 'DELETE', headers: { Authorization: 'Bearer ' + token }, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' }); }
+    catch (e) { throw hata('ag', 'Bağlantı yok'); }
+    if (!(r.ok || r.status === 404)) throw hata('bicim', 'Silinemedi (' + r.status + ')');
+  }
+  async function sohbetSor(soru, grup, ekler) {
     var hedef = String(A().sohbetDriveId || '').trim(), ac = await sohbetKapi();
     if (!ac.acik) throw hata('ayar_bekleniyor', 'Sohbet şu an kapalı');
     soru = String(soru || '').trim().slice(0, 1000);
     if (!soru) throw hata('bicim', 'Soru boş');
+    var grupVar = !!(grup && typeof grup.sohbet === 'string' && typeof grup.mid === 'string' && grup.sohbet && grup.mid);
+    ekler = Array.isArray(ekler) ? ekler : [];
+    if (ekler.length && (grupVar || !sohbetEkAcik() || ekler.length > EK_AZAMI_ADET)) throw hata('bicim', 'Ek şu an eklenemez');   
     var token = await sohbetJetonu(), anahtarlar = await sohbetAnahtarlari();
     var id = sekizHex(), d = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; };
     var zaman = d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate()) + 'T' + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds());
     var yol = sohbetOid() + '/soru-' + zaman + '-' + id + '.json';
     var kayit = { id: id, zaman: d.toISOString(), soru: soru, anahtarlar: anahtarlar, surum: 1 };
-    if (grup && typeof grup.sohbet === 'string' && typeof grup.mid === 'string' && grup.sohbet && grup.mid) kayit.grup = { sohbet: grup.sohbet, mid: grup.mid };   
+    if (grupVar) kayit.grup = { sohbet: grup.sohbet, mid: grup.mid };   
+    if (ekler.length) {   
+      var yuklenen = [];
+      try {
+        for (var i = 0; i < ekler.length; i++) { await sohbetEkKoy(id, i + 1, ekler[i].blob, ekler[i].tur); yuklenen.push(i + 1); }
+      } catch (e) {
+        for (var k = 0; k < yuklenen.length; k++) { try { await sohbetEkSil(id, yuklenen[k], ekler[yuklenen[k] - 1].tur); } catch (e2) {   } }
+        throw e;
+      }
+      kayit.surum = 2;
+      kayit.ek = ekler.map(function (e, j) { return { n: j + 1, tur: e.tur, boyut: e.boyut, sha: e.sha }; });   
+    }
     var govde = JSON.stringify(kayit);
     var adres = 'https://graph.microsoft.com/v1.0/drives/' + encodeURIComponent(hedef) + '/root:/' + yol.split('/').map(encodeURIComponent).join('/') + ':/content?@microsoft.graph.conflictBehavior=fail';
     var ham = window.CapacitorWebFetch || window.fetch, r;
@@ -627,6 +689,9 @@
     sohbetAcik: sohbetAcik,
     sohbetKapi: sohbetKapi,
     sohbetSor: sohbetSor,
+    sohbetEkAcik: sohbetEkAcik,
+    sohbetEkHazirla: sohbetEkHazirla,
+    sohbetEkSil: sohbetEkSil,
     sohbetCevap: sohbetCevap,
     yuklemeIsle: yuklemeIsle,
     yuklemeKuyruk: yuklemeKuyruk,

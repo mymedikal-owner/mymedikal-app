@@ -92,13 +92,26 @@
   var AS_KLASOR_AD = {};
   function asBalon(o) {
     var kaynaklar = o.klasorler;
-    var m = h('div', { sinif: 'mesaj ' + o.k }, [h('div', { sinif: 'balon' }, [h('p', { metin: o.metin }), kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: Tt('Dayandığı bilgiler:') })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), AS_KLASOR_AD[k] || k]); }))) : null])]);
+    var ekSatir = null;
+    if (o.k === 'kullanici' && o.ekBilgi && o.ekBilgi.length) {   
+      ekSatir = h('div', { sinif: 'kaynak-satir as-ek-satir' }, o.ekBilgi.map(function (e) {
+        var sil = h('button', { type: 'button', sinif: 'as-ek-sil', metin: Tt('Sil') });
+        sil.addEventListener('click', async function () {
+          if (!o.soruId || sil.disabled) return;
+          sil.disabled = true;
+          try { await window.MMVeri.sohbetEkSil(o.soruId, e.n, e.tur); sil.parentNode.classList.add('as-ek-silindi'); sil.parentNode.querySelector('.as-ek-ad').textContent = Tt('Ek silindi'); sil.remove(); }
+          catch (err) { sil.disabled = false; sil.textContent = Tt('Silinemedi, tekrar dene'); }
+        });
+        return h('span', { sinif: 'as-ek-cip' }, [h('span', { sinif: 'as-ek-ad', metin: e.ad + ' · ' + Math.max(1, Math.round(e.boyut / 1024)) + ' KB' }), sil]);
+      }));
+    }
+    var m = h('div', { sinif: 'mesaj ' + o.k }, [h('div', { sinif: 'balon' }, [h('p', { metin: o.metin }), ekSatir, kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: Tt('Dayandığı bilgiler:') })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), AS_KLASOR_AD[k] || k]); }))) : null])]);
     return m;
   }
   function asMailHref(govde) { var p = window.MM.talimatPosta || ''; if (!p) return ''; return 'mailto:' + p + '?subject=' + encodeURIComponent('[Talimat] App asistan sorusu') + (govde ? '&body=' + encodeURIComponent(govde) : ''); }
   function asEylemSatiri(o) {   
     var ic = [];
-    if (o.hata) { var yd = h('button', { type: 'button', sinif: 'dugme ikincil', metin: Tt('Yeniden dene') }); yd.addEventListener('click', function () { asGonder(o.soru, true); }); ic.push(yd); }
+    if (o.hata) { var yd = h('button', { type: 'button', sinif: 'dugme ikincil', metin: Tt('Yeniden dene') }); yd.addEventListener('click', function () { asGonder(o.soru, true, o.ekler); }); ic.push(yd); }
     ic.push(h('a', { sinif: 'dugme ikincil', href: asMailHref(o.soru), hidden: !asMailHref(o.soru), metin: Tt('İş olarak ilet') }));
     return h('div', { sinif: 'kaynak-satir' }, ic);
   }
@@ -126,13 +139,15 @@
       asYokla(id, soru, gecen, Math.min(15000, bekle + 2500));
     }, bekle);
   }
-  async function asGonder(soru, tekrar) {
+  async function asGonder(soru, tekrar, ekler) {
     soru = String(soru || '').trim().slice(0, 1000);
     if (!soru || AS.bekleyen) return false;
     AS.bekleyen = true;
-    if (!tekrar) asEkle({ k: 'kullanici', metin: soru }); else asUiGuncelle();
-    try { var s = await window.MMVeri.sohbetSor(soru); asYokla(s.id, soru, 0, 5000); }
-    catch (err) { asBitir({ k: 'asistan', metin: Tt('Soru iletilemedi') + ' (' + (err && err.message ? err.message : Tt('hata')) + ').', soru: soru, hata: true }); }
+    ekler = Array.isArray(ekler) ? ekler : [];
+    var km = { k: 'kullanici', metin: soru, ekBilgi: ekler.map(function (e, i) { return { n: i + 1, tur: e.tur, boyut: e.boyut, ad: e.ad || (e.tur === 'pdf' ? 'belge.pdf' : 'fotoğraf.jpg') }; }) };
+    if (!tekrar) asEkle(km); else asUiGuncelle();
+    try { var s = await window.MMVeri.sohbetSor(soru, null, ekler); km.soruId = s.id; asYokla(s.id, soru, 0, 5000); }
+    catch (err) { asBitir({ k: 'asistan', metin: Tt('Soru iletilemedi') + ' (' + (err && err.message ? err.message : Tt('hata')) + ').', soru: soru, hata: true, ekler: ekler }); }
     return true;
   }
   MM.asistanSohbet = function () {
@@ -155,14 +170,43 @@
       var giriKutu = h('input', { type: 'text', maxlength: '1000', placeholder: Tt('Sorunuzu yazın…'), 'aria-label': Tt('Sorunuz'), autocomplete: 'off' });
       var gonderDugme = h('button', { type: 'submit', sinif: 'dugme', 'aria-label': Tt('Gönder') }, [gr.ikon('gonder', 18)]);
       ui.dugme = gonderDugme;
+      
+      var ekler = [], ekPanel = h('div', { sinif: 'as-ek-panel', hidden: true }), ekDugme = null, ekGirdi = null, ekHata = '';
+      function ekCiz() {
+        ekPanel.textContent = '';
+        ekPanel.hidden = !ekler.length;
+        if (!ekler.length) return;
+        ekPanel.appendChild(h('p', { sinif: 'as-ek-uyari', metin: Tt('Yalnız ürün, ambalaj, etiket ve belge ekleyin. Hasta, hasta yakını, sağlık personeli yüzü, hasta bilekliği ya da dosyası, kimlik ve reçete eklemeyin. Ekler yalnız sizin klasörünüzde 30 gün saklanır, sonra silinir. Asistan ek içeriğini görmez.') }));
+        ekler.forEach(function (e, i) {
+          var kaldir = h('button', { type: 'button', sinif: 'as-ek-sil', metin: Tt('Kaldır') });
+          kaldir.addEventListener('click', function () { ekler.splice(i, 1); ekCiz(); });
+          ekPanel.appendChild(h('span', { sinif: 'as-ek-cip' }, [h('span', { sinif: 'as-ek-ad', metin: e.ad + ' · ' + Math.max(1, Math.round(e.boyut / 1024)) + ' KB' }), kaldir]));
+        });
+        if (ekDugme) ekDugme.disabled = ekler.length >= 3;
+      }
+      if (window.MMVeri.sohbetEkAcik && window.MMVeri.sohbetEkAcik()) {
+        ekGirdi = h('input', { type: 'file', accept: 'image/jpeg,image/png,application/pdf', multiple: true, hidden: true });
+        ekDugme = h('button', { type: 'button', sinif: 'dugme ikincil as-ek-dugme', 'aria-label': Tt('Ek ekle'), metin: Tt('Ek') });
+        ekDugme.addEventListener('click', function () { if (ekler.length < 3) ekGirdi.click(); });
+        ekGirdi.addEventListener('change', async function () {
+          var secilen = Array.prototype.slice.call(ekGirdi.files || []); ekGirdi.value = '';
+          for (var i = 0; i < secilen.length && ekler.length < 3; i++) {
+            try { var e = await window.MMVeri.sohbetEkHazirla(secilen[i]); e.ad = (e.tur === 'pdf' ? 'belge-' : 'foto-') + (ekler.length + 1) + '.' + e.tur; ekler.push(e); }
+            catch (err) { ekHata = (err && err.kod === 'bicim' && err.ayrinti) || 'Ek eklenemedi'; }
+          }
+          ekCiz();
+          if (ekHata) { ekPanel.hidden = false; ekPanel.appendChild(h('p', { sinif: 'as-ek-uyari', role: 'alert', metin: Tt(ekHata) })); ekHata = ''; }
+        });
+      }
       var giris = h('form', { sinif: 'sohbet-giris', onsubmit: function (e) {
         e.preventDefault();
         var soru = giriKutu.value.trim().slice(0, 1000);
         if (!soru || AS.bekleyen) return;
         giriKutu.value = '';
-        asGonder(soru, false);
-      } }, [giriKutu, gonderDugme]);
-      [akis, giris, h('p', { sinif: 'soluk kucuk', metin: Tt('Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.') })].forEach(function (x) { sohbetGovde.appendChild(x); });
+        var gidecek = ekler.slice(); ekler = []; ekCiz();
+        asGonder(soru, false, gidecek);
+      } }, [ekDugme, ekGirdi, giriKutu, gonderDugme]);
+      [akis, ekPanel, giris, h('p', { sinif: 'soluk kucuk', metin: Tt('Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.') })].forEach(function (x) { sohbetGovde.appendChild(x); });
       AS.gecmis.forEach(function (o) { akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') akis.appendChild(asEylemSatiri(o)); });   
       if (!AS.gecmis.length) {   
         var ORNEK = { siparis: 'Açık siparişlerin durumu nedir?', makineler: 'Bugün hangi makinelerde duruş var?', stok: 'Kritik stok seviyesindeki ürünler hangileri?', eldiven: 'Eldiven konteynerlerinin durumu nedir?' };

@@ -41,6 +41,16 @@
 .kaynak-satir { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; } .kaynak-rozet { display: inline-flex; align-items: center; gap: 5px; font-size: var(--t-xs); padding: 3px 10px; border-radius: var(--r-t); background: var(--vurgu-zemin); color: var(--vurgu); border: 1px solid var(--vurgu); }
 .kaynak-rozet.kilitli { background: var(--gri-zemin); color: var(--soluk); border-color: var(--cizgi); text-decoration: line-through; }
 .sohbet-giris { display: flex; gap: var(--b2); } .sohbet-giris input { flex: 1 1 auto; min-width: 0; width: 100%; min-height: 44px; border: 1px solid var(--cizgi); border-radius: var(--r-t); padding: 0 16px; background: var(--yuzey2); color: var(--yazi); font: inherit; } .sohbet-giris .dugme[disabled] { opacity: .45; cursor: not-allowed; }
+ 
+.sohbet-giris .dugme.as-ek-dugme, .asistan-ms .sohbet-giris .dugme.as-ek-dugme { flex: none; width: auto; min-width: 44px; height: 44px; min-height: 44px; padding: 0 12px; border-radius: 22px; background: var(--yuzey2, #f1f1f4); color: var(--yazi, #222); border: 1px solid var(--cizgi, #ccc); font-size: 14px; }
+.as-ek-panel { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; margin: 0 8px; border: 1px solid var(--cizgi, #ccc); border-radius: 12px; background: var(--yuzey2, #f6f6f8); order: 1; }
+.as-ek-panel[hidden] { display: none; }
+.as-ek-uyari { margin: 0; font-size: 13px; line-height: 1.35; color: var(--yazi, #222); }
+.as-ek-cip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; font-size: 13px; }
+.as-ek-ad { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.as-ek-sil { flex: none; min-height: 32px; padding: 0 10px; border: 1px solid var(--cizgi, #ccc); border-radius: 16px; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.as-ek-satir { margin-top: 6px; }
+.as-ek-silindi .as-ek-ad { opacity: .6; }
 
  
 .asistan-ms .sohbet > a.dugme-mail { display: flex; justify-content: center; align-items: center; text-align: center; text-decoration: none; }

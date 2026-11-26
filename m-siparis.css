@@ -25,6 +25,20 @@
 .tablo-siralanir th, .tablo-siralanir td { text-align: left; } .tablo-siralanir th.sag, .tablo-siralanir td.sag { text-align: right; }
 @media (max-width: 599px) { .cip, .mini-dugme { min-height: 44px; } }
 .y2-satir.tikla { min-height: 44px; }
+ 
+@media (max-width: 600px) {
+  #icerik[data-modul="siparis"] .th-dugme,
+  #icerik[data-modul="siparis"] .sp-no,
+  #icerik[data-modul="siparis"] .kirinti a,
+  #icerik[data-modul="siparis"] .sp-son .cip,
+  #icerik[data-modul="siparis"] .sp-eylem .mini-dugme,
+  #icerik[data-modul="siparis"] .sp-eylem .excel-dugme,
+  #icerik[data-modul="siparis"] button,
+  #icerik[data-modul="siparis"] summary { min-height: 40px; }
+  #icerik[data-modul="siparis"] .th-dugme { padding-top: 0; padding-bottom: 0; }
+  #icerik[data-modul="siparis"] .sp-no,
+  #icerik[data-modul="siparis"] .kirinti a { display: inline-flex; align-items: center; }
+}
 @media (max-width: 599px) {
   #icerik[data-modul="siparis"] .ozet-serit-ana { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2); }
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ikon { display: none; }

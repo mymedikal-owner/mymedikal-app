@@ -55,7 +55,10 @@
       kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Dönem karşılaştırması', alt: 'Geçen yılın aynı tarih aralığıyla · boş ciro hariç ayrıca', govde: G.duzTablo(['Dönem', 'Net satış', 'Geçen yıl', 'Değişim', 'Boş ciro hariç'], dsat) })]));
       var ogeler = v.gunluk.map(function (g) { return { e: String(+g.t.slice(8)), d: g.net, ipucu: [tarihTR(g.t), g.net == null ? 'kayıt yok (hafta sonu / henüz işlenmedi)' : 'Net satış: ' + para(g.net), g.bos_ciro ? 'Boş ciro dahil: ' + para(g.bos_ciro) : ''] }; });
       var satirlar = v.gunluk.map(function (g) { return [tarihTR(g.t), g.net == null ? 'veri yok' : para(g.net), g.bos_ciro == null ? '—' : para(g.bos_ciro)]; }).reverse();
-      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Bu ay günlük ciro', alt: tarihTR(ay.bas) + ' – ' + tarihTR(ay.bit) + ' · net satış, ' + (v.sirket || 'MY'), govde: G.cubuk(ogeler, { ad: 'Günlük net satış', yukseklik: 200 }), tablo: { kolonlar: ['Gün', 'Net satış', 'Bunun içinde boş ciro'], satirlar: satirlar } })]));
+       
+      var dkolon = ['Gün', 'Net satış', 'Bunun içinde boş ciro'], dar = window.matchMedia && window.matchMedia('(max-width: 899px)').matches, kisalt = dar && satirlar.length > 7;
+      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Bu ay günlük ciro', alt: tarihTR(ay.bas) + ' – ' + tarihTR(ay.bit) + ' · net satış, ' + (v.sirket || 'MY'), govde: G.cubuk(ogeler, { ad: 'Günlük net satış', yukseklik: 200 }), tablo: { kolonlar: dkolon, satirlar: kisalt ? satirlar.slice(0, 7) : satirlar } }),
+        kisalt ? h('details', { sinif: 'acilir-bolum ms-katla' }, [h('summary', null, [h('span', { metin: 'Tümü (' + satirlar.length + ')' })]), G.duzTablo(dkolon, satirlar)]) : null]));
       kok.appendChild(h('p', { sinif: 'soluk kucuk', metin: 'Net satış = yurtiçi + yurtdışı + diğer satış − iade − iskonto − diğer indirim (yalnız MY). "Boş ciro" grup şirketiyle sıfır marjlı al-sat; ayrıca gösterilir. Yalnız gerçekleşen kayıtlar; kapanışı yapılmamış ayda rakam değişebilir.' }));
     }
     function yenile() { hata = null; yuk = null; ciz(); window.MMVeri.oku('muhasebe', 'ciro_anlik').then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
@@ -360,7 +363,16 @@
 
   function ozetGovde(v, git) {
     var kok = h('div', { sinif: 'yigin' });
-    [kapanisKutusu(v), duzeltmeKutusu(v, git), yaslandirmaKutusu(v)].forEach(function (k) { if (k) kok.appendChild(k); });   
+    var dar = window.matchMedia && window.matchMedia('(max-width: 899px)').matches;
+    if (!dar) { [kapanisKutusu(v), duzeltmeKutusu(v, git), yaslandirmaKutusu(v)].forEach(function (k) { if (k) kok.appendChild(k); }); return kok; }   
+     
+    var kap = kapanisKutusu(v), yas = yaslandirmaKutusu(v), duz = duzeltmeKutusu(v, git), y = v.cari_yaslandirma;
+    var kapTonlu = !!(v.kapanis && v.kapanis.gorevler.some(function (g) { return g.durum === 'gecikti'; }));
+    var yasTonlu = !!(y && y.sirketler && y.sirketler.some(function (s) { return s.kovalar.some(function (k) { return k.ad === YAS_KOVA[5][0] && (k.tl || 0) > 0; }); }));
+    var katli = [];
+    [[kap, kapTonlu], [yas, yasTonlu]].forEach(function (x) { if (!x[0]) return; if (x[1]) kok.appendChild(x[0]); else katli.push(x[0]); });
+    if (duz) kok.appendChild(duz);
+    if (katli.length) kok.appendChild(h('details', { sinif: 'acilir-bolum ms-katla' }, [h('summary', null, [h('span', { metin: 'Ayrıntı kartları' }), h('span', { sinif: 'ms-katla-say', metin: '(' + katli.length + ')' })]), h('div', { sinif: 'yigin' }, katli)]));
     return kok;
   }
 

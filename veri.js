@@ -464,11 +464,16 @@
     var govde = JSON.stringify(kayit);
     var adres = 'https://graph.microsoft.com/v1.0/drives/' + encodeURIComponent(hedef) + '/root:/' + yol.split('/').map(encodeURIComponent).join('/') + ':/content?@microsoft.graph.conflictBehavior=fail';
     var ham = window.CapacitorWebFetch || window.fetch, r;
-    try { r = await ham.call(window, adres, { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: govde, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' }); }
-    catch (e) { throw hata('ag', 'Bağlantı yok'); }
-    if (r.status === 401 || r.status === 403) throw hata('giris_gerekli', 'Yazma yetkisi yok (' + r.status + ')');
-    if (r.status === 429 || r.status >= 500) throw hata('ag', 'Sunucu meşgul (' + r.status + ')');
-    if (!r.ok) throw hata('bicim', 'Reddedildi (' + r.status + ')');
+    try {
+      try { r = await ham.call(window, adres, { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: govde, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' }); }
+      catch (e) { throw hata('ag', 'Bağlantı yok'); }
+      if (r.status === 401 || r.status === 403) throw hata('giris_gerekli', 'Yazma yetkisi yok (' + r.status + ')');
+      if (r.status === 429 || r.status >= 500) throw hata('ag', 'Sunucu meşgul (' + r.status + ')');
+      if (!r.ok) throw hata('bicim', 'Reddedildi (' + r.status + ')');
+    } catch (e3) {   
+      for (var q = 0; q < ekler.length; q++) { try { await sohbetEkSil(id, q + 1, ekler[q].tur); } catch (e4) {   } }
+      throw e3;
+    }
     return { id: id };
   }
   

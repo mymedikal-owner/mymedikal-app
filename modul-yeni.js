@@ -111,7 +111,7 @@
   function asMailHref(govde) { var p = window.MM.talimatPosta || ''; if (!p) return ''; return 'mailto:' + p + '?subject=' + encodeURIComponent('[Talimat] App asistan sorusu') + (govde ? '&body=' + encodeURIComponent(govde) : ''); }
   function asEylemSatiri(o) {   
     var ic = [];
-    if (o.hata) { var yd = h('button', { type: 'button', sinif: 'dugme ikincil', metin: Tt('Yeniden dene') }); yd.addEventListener('click', function () { asGonder(o.soru, true, o.ekler); }); ic.push(yd); }
+    if (o.hata) { var yd = h('button', { type: 'button', sinif: 'dugme ikincil', metin: Tt('Yeniden dene') }); yd.addEventListener('click', function () { asGonder(o.soru, true, o.ekler, o.km); }); ic.push(yd); }
     ic.push(h('a', { sinif: 'dugme ikincil', href: asMailHref(o.soru), hidden: !asMailHref(o.soru), metin: Tt('İş olarak ilet') }));
     return h('div', { sinif: 'kaynak-satir' }, ic);
   }
@@ -139,15 +139,16 @@
       asYokla(id, soru, gecen, Math.min(15000, bekle + 2500));
     }, bekle);
   }
-  async function asGonder(soru, tekrar, ekler) {
+  async function asGonder(soru, tekrar, ekler, eskiKm) {
     soru = String(soru || '').trim().slice(0, 1000);
     if (!soru || AS.bekleyen) return false;
     AS.bekleyen = true;
     ekler = Array.isArray(ekler) ? ekler : [];
     var km = { k: 'kullanici', metin: soru, ekBilgi: ekler.map(function (e, i) { return { n: i + 1, tur: e.tur, boyut: e.boyut, ad: e.ad || (e.tur === 'pdf' ? 'belge.pdf' : 'fotoğraf.jpg') }; }) };
+    if (tekrar && eskiKm) km = eskiKm;   
     if (!tekrar) asEkle(km); else asUiGuncelle();
     try { var s = await window.MMVeri.sohbetSor(soru, null, ekler); km.soruId = s.id; asYokla(s.id, soru, 0, 5000); }
-    catch (err) { asBitir({ k: 'asistan', metin: Tt('Soru iletilemedi') + ' (' + (err && err.message ? err.message : Tt('hata')) + ').', soru: soru, hata: true, ekler: ekler }); }
+    catch (err) { asBitir({ k: 'asistan', metin: Tt('Soru iletilemedi') + ' (' + (err && err.message ? err.message : Tt('hata')) + ').', soru: soru, hata: true, ekler: ekler, km: km }); }
     return true;
   }
   MM.asistanSohbet = function () {

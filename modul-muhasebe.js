@@ -335,12 +335,16 @@
       var etGecici = eksikAy ? { metin: 'eksik ay', tur: 'kismi' } : (vBekl && c.favok == null ? { metin: 'veri yok', tur: 'kismi' } : (c.gecici ? { metin: c.kismi ? 'kısmi' : 'geçici', tur: c.kismi ? 'kismi' : 'tahmin' } : null));
       function kutu(baslik, alan, ikon, etiket, alt) {
         var dl = h('div', { sinif: 'ms-delta' }, [G.delta(c[alan], onc && onc[alan], { etiket: onEt, iyi: 'yukari' }), G.delta(c[alan], gy && gy[alan], { etiket: gyEt, iyi: 'yukari' })]);
-        return h('div', { sinif: 'ms-fk' }, [G.kpi({ baslik: baslik, deger: G.say(c[alan] == null ? null : c[alan] / 1e6, 1), birim: 'mn ₺', ikon: ikon, etiket: etiket, alt: alt }), dl]);
+        var kk = G.kpi({ baslik: baslik, deger: G.say(c[alan] == null ? null : c[alan] / 1e6, 1), birim: 'mn ₺', ikon: ikon, etiket: etiket, alt: alt });
+        if (darPerf) { karsilar.push(h('div', { sinif: 'ms-fk' }, [h('b', { sinif: 'ms-alt-baslik', metin: baslik }), dl])); return h('div', { sinif: 'ms-fk' }, [kk]); }   
+        return h('div', { sinif: 'ms-fk' }, [kk, dl]);
       }
+      var darPerf = false, karsilar = [];    
       var kpiler = h('div', { sinif: 'kpi-izgara tq-kpi' }, [
         kutu('Ciro (MY)', 'net_satis', 'para', c.gecici && (aylik ? c.gecici_neden === 'ay devam ediyor' : c.kismi) ? { metin: 'kısmi', tur: 'kismi' } : null, null),
         kutu('Brüt kâr', 'brut_kar', 'para', etGecici, null),
         kutu('FAVÖK (EBITDA)', 'favok', 'para', etGecici, c.favok_marj == null ? null : 'ciroya oranı %' + G.say(c.favok_marj, 1))]);
+      var karsiBolum = karsilar.length ? h('details', { sinif: 'acilir-bolum ms-katla' }, [h('summary', null, [h('span', { metin: 'Önceki dönemle karşılaştırma' }), h('span', { sinif: 'ms-katla-say', metin: '(' + karsilar.length + ')' })]), h('div', { sinif: 'yigin' }, karsilar)]) : null;
       var son = liste.slice(aylik ? -12 : -8);
       var grafik = favokCubuk(son, c, aylik, function (x) { st.idx = liste.indexOf(x); ciz(); });
       var notlar = [];
@@ -354,7 +358,7 @@
       var ac = h('details', { sinif: 'acilir-bolum ms-katla' }, [
         h('summary', null, [h('span', { metin: 'FAVÖK grafiği ve notlar' }), h('span', { sinif: 'ms-katla-say', metin: son.length + (aylik ? ' ay' : ' çeyrek') + (negSay ? ' · ' + negSay + ' negatif' : '') })]),
         h('div', { sinif: 'yigin' }, [grafik, h('p', { sinif: 'soluk kucuk', metin: notlar.join(' ') })])]);
-      kapsa.appendChild(G.kart({ baslik: 'Finansal performans', alt: 'MY Medikal · milyon ₺ · ' + (aylik ? 'aylık' : 'çeyreklik'), govde: h('div', { sinif: 'yigin' }, [ust, kpiler, uyarilar.length ? h('p', { sinif: 'soluk kucuk', metin: uyarilar.join(' ') }) : null, ac]) }));
+      kapsa.appendChild(G.kart({ baslik: 'Finansal performans', alt: 'MY Medikal · milyon ₺ · ' + (aylik ? 'aylık' : 'çeyreklik'), govde: h('div', { sinif: 'yigin' }, [ust, kpiler, uyarilar.length ? h('p', { sinif: 'soluk kucuk', metin: uyarilar.join(' ') }) : null, karsiBolum, ac]) }));
     }
     function yenile() { yuk = null; hata = null; ciz(); window.MMVeri.oku('muhasebe', 'ebitda').then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
     yenile();

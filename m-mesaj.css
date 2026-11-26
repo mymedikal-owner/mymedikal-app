@@ -109,12 +109,13 @@ body.ms-tam .icerik { padding: 0; }
 body.ms-tam .icerik::after { display: none; }
 html:has(.ms-ekran-sohbet), body:has(.ms-ekran-sohbet) { overflow: hidden; overscroll-behavior: none; }
 body.ms-tam .kabuk { min-height: 0; }
-.ms-ekran-kisi, .ms-ekran-bilgi { padding: calc(8px + env(safe-area-inset-top)) 14px calc(8px + env(safe-area-inset-bottom)); min-height: 100dvh; }
-.ms-ekran-bilgi { box-sizing: border-box; height: 100dvh; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.ms-ekran-kisi, .ms-ekran-bilgi { box-sizing: border-box; padding: calc(8px + env(safe-area-inset-top)) 14px calc(8px + env(safe-area-inset-bottom)); min-height: 100vh; min-height: 100dvh; }
+.ms-ekran-bilgi { box-sizing: border-box; height: 100vh; height: 100dvh; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .ms-ekran-liste { padding-top: 0; }
 
  
-.ms-ekran-sohbet { gap: 0; padding: 0; position: fixed; left: 0; right: 0; top: var(--ms-ust, 0px); height: var(--ms-vh, 100dvh); max-width: 640px; margin: 0 auto; z-index: 5; background: var(--ms-sohbet-zemin, inherit); }
+.ms-ekran-sohbet { gap: 0; padding: 0; position: fixed; left: 0; right: 0; top: var(--ms-ust, 0px); height: var(--ms-vh, 100vh); max-width: 640px; margin: 0 auto; z-index: 5; overflow-x: clip; background: var(--ms-sohbet-zemin, inherit); }
+@supports (height: 100dvh) { .ms-ekran-sohbet { height: var(--ms-vh, 100dvh); } }
 .ms-sohbet-ust { flex: none; padding: calc(6px + env(safe-area-inset-top)) 8px 6px 4px; background: var(--yuzey, #fff); border-bottom: 1px solid var(--ms-ince); }
 .ms-baslik-pill { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; padding: 2px 4px; border: 0; background: transparent; color: inherit; text-align: left; }
 .ms-baslik-kutu { display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1 1 auto; }
@@ -155,12 +156,18 @@ body.ms-tam .kabuk { min-height: 0; }
  
  
 @media (max-width: 599px) {
-  .asistan-sayfa.ms-ekran-sohbet { top: var(--ms-ust, 0px); bottom: auto; height: var(--ms-vh, 100dvh); z-index: 7; display: flex; flex-direction: column; }
+  .asistan-sayfa.ms-ekran-sohbet { top: var(--ms-ust, 0px); bottom: auto; height: var(--ms-vh, 100vh); z-index: 7; overflow-x: clip; max-width: 100%; display: flex; flex-direction: column; }
+  @supports (height: 100dvh) { .asistan-sayfa.ms-ekran-sohbet { height: var(--ms-vh, 100dvh); } }
   .asistan-sayfa .ms-sohbet-ust { padding-top: calc(6px + env(safe-area-inset-top)); }
   body:has(.asistan-sayfa) .ust, body:has(.asistan-sayfa) .menu { visibility: hidden; }    
 }
 html:has(.asistan-ms), body:has(.asistan-ms) { background: var(--ms-sohbet-zemin); }
 .asistan-ms { display: flex; flex-direction: column; min-height: 0; overflow: hidden; box-sizing: border-box; }
+ 
+.ms-kok, .asistan-ms { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.ms-kok input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), .ms-kok textarea, .ms-kok select,
+.asistan-ms input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), .asistan-ms textarea, .asistan-ms select { font-size: max(16px, 1em); }
+.ms-mesajlar, .asistan-ms .sohbet-akis { overscroll-behavior: contain; }
 .asistan-ms .sohbet-giris { padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
 body.ms-klavye .asistan-ms .sohbet-giris { padding-bottom: 6px; }
  
@@ -325,7 +332,7 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .ms-bahis-liste { flex: none; display: flex; flex-direction: column; max-height: 240px; overflow-y: auto; background: var(--ms-karsi-zemin); color: var(--ms-karsi-yazi); border-top: 1px solid var(--ms-ince); }
 .ms-bahis-oge { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 14px; text-align: left; font-size: 16px; border: 0; background: transparent; color: inherit; }
 .ms-bahis-oge:active, .ms-bahis-oge:hover { background: var(--ms-arama-zemin); }
-.ms-ilet-liste, .ms-bilgi-liste { max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; }
+.ms-ilet-liste, .ms-bilgi-liste { max-height: 50vh; max-height: 50dvh; overflow-y: auto; display: flex; flex-direction: column; }
 .ms-ilet-satir { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 14px; text-align: left; font-size: 16px; border: 0; border-radius: 8px; background: transparent; color: inherit; }
 .ms-isaret-kutu { flex: none; width: 22px; height: 22px; box-sizing: border-box; border: 2px solid var(--ms-saat); border-radius: 50%; }
 .ms-ilet-sec .ms-isaret-kutu { border-color: var(--ms-yesil); background: var(--ms-yesil); box-shadow: inset 0 0 0 3px var(--ms-karsi-zemin); }

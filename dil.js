@@ -806,6 +806,32 @@
   Object.keys(TAM_8029).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8029[k]; });
   REGEX.unshift([/^— (.+)$/, function (m, r) { return '— ' + cevir(r); }],
     [/^(Hastane \/ müşteri|Sipariş|Teslimat \/ irsaliye|Konteyner|Ürün|Tedarikçi|Belge|İhale|Makine) \((\d+)\)$/, function (m, a, n) { return cevir(a) + ' (' + n + ')'; }]);
+   
+  var TAM_8032 = {
+    'Kalemler / risk': 'Items / risk', 'Siparişler': 'Orders', '← Siparişler': '← Orders', 'Sipariş bulunamadı': 'Order not found', 'Bu görünümde sipariş yok': 'No orders in this view',
+    'Uyarı': 'Warning', 'Normal': 'Normal', 'Hastane': 'Hospital', 'İptal hakkı: veri yok': 'Cancellation allowance: no data', 'İptal hakkı': 'Cancellation allowance', 'Oranlar (TL)': 'Rates (TL)',
+    'İrsaliye / kargo teslim / muayene kabul oranları: veri bekleniyor': 'Delivery note / cargo delivered / inspection acceptance rates: awaiting data',
+    'Yüzdeler IKN toplamıdır, bu siparişe özel değildir.': 'Percentages are IKN totals, not specific to this order.', 'IKN listesi yükleniyor': 'IKN list is loading', 'IKN yok': 'No IKN',
+    'Siparişler (sipariş bazlı görünüm)': 'Orders (order-based view)', 'Hastane listesi yükleniyor': 'Hospital list is loading', 'Sipariş verisi şu an yok': 'Order data is not available right now',
+    'Bu siparişte hastane yok': 'No hospitals in this order',
+    'Geçmiş teslimata göre riskli hastane: veri bekleniyor': 'Hospitals at risk by past deliveries: awaiting data',
+    'Panoyu büyüt': 'Enlarge board', 'Panoyu küçült': 'Shrink board', 'Büyüt': 'Enlarge',
+    'Cezalı süre sonu (en yakın)': 'Penalty period end (nearest)', 'Ek süre': 'Extension', 'Temlik eşiği aşıldı': 'Assignment threshold exceeded'
+  };
+  Object.keys(TAM_8032).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8032[k]; });
+  REGEX.unshift([/^(\d+) sipariş$/, '$1 orders'],
+    [/^(\d+) sipariş · (\d+) uyarılı$/, '$1 orders · $2 flagged'],
+    [/İptal olan hastane (\d+) \(son 90 gün\)/g, 'Hospitals cancelled $1 (last 90 days)'],
+    [/Hastane (\d+) \(son 90 gün\)/g, 'Hospitals $1 (last 90 days)'],
+    [/^(.+): kullanılan (veri yok|\S+) \/ hak (veri yok|\S+) · kalan (veri yok|\S+)( · kota aşıldı)?$/, function (m, ad, k, hk, kl, t) { return cevir(ad) + ': used ' + k + ' / allowance ' + hk + ' · remaining ' + kl + (t ? ' · quota exceeded' : ''); }],
+    [/^Hastane (\d+|veri yok) \((.+)\)$/, function (m, n, k) { return 'Hospitals ' + n + ' (' + (k === 'siparişin tamamı' ? 'whole order' : k === '90 gün' ? '90 days' : k) + ')'; }],
+    [/^İptal hakkı: sipariş ve ürün kodunda hastane sayısının %10'u, en az 3\.$/, 'Cancellation allowance: 10% of the hospitals per order and product code, minimum 3.'],
+    [/^IKN'ler \((\d+)\)$/, 'IKNs ($1)'],
+    [/^bu IKN (\d+) siparişte geçiyor$/, 'this IKN appears in $1 orders'],
+    [/^IKN (.+): ihale satırı yok$/, 'IKN $1: no tender row'],
+    [/^Hastaneler \((\d+)\)$/, 'Hospitals ($1)'],
+    [/^Açık kaleminde risk etiketi olan hastane: (\d+) \(bugünkü durum; geçmiş teslimat puanı değil\)$/, 'Hospitals with a risk label on an open item: $1 (current status; not a past delivery score)'],
+    [/^Ek süre başvurusu gereken hastane \(başvuru süresi içinde\): (\d+)$/, 'Hospitals needing an extension request (within the application period): $1']);
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

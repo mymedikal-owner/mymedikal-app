@@ -802,7 +802,9 @@
       var klavye = v.height > 120 && v.height < window.innerHeight - 80;   
       if (klavye) { kap.style.setProperty('--ms-vh', Math.round(v.height) + 'px'); kap.style.setProperty('--ms-ust', Math.round(v.offsetTop) + 'px'); }
       else { kap.style.removeProperty('--ms-vh'); kap.style.removeProperty('--ms-ust'); }
+      var onceKlavye = document.body.classList.contains('ms-klavye');
       document.body.classList.toggle('ms-klavye', klavye);
+      if (onceKlavye && !klavye && (window.pageYOffset || window.pageXOffset)) { try { window.scrollTo(0, 0); } catch (eS) {   } }   
       if (ml && enAlt) ml.scrollTop = ml.scrollHeight;
     }
     if (window.visualViewport) { window.visualViewport.addEventListener('resize', vvDegisti); window.visualViewport.addEventListener('scroll', vvDegisti); }
@@ -1537,7 +1539,7 @@
       function mesajaKay(mid) {
         var kid = Array.prototype.filter.call(msj.children, function (e) { return e.getAttribute('data-mid') === mid; })[0];
         if (!kid) return;
-        if (kid.scrollIntoView) kid.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        try { var kr = kid.getBoundingClientRect(), mr = msj.getBoundingClientRect(); msj.scrollTo({ top: msj.scrollTop + (kr.top - mr.top) - (msj.clientHeight - kr.height) / 2, behavior: 'smooth' }); } catch (eK) {   }   
         kid.classList.add('ms-flash'); setTimeout(function () { kid.classList.remove('ms-flash'); }, 1400);
       }
       function yanitKutusu(m) {   
@@ -1975,7 +1977,9 @@
     if (D.kisiler === null) kisiYukle().then(null, function () {   });
     return function () {
       canli = false; cozucu.forEach(function (f) { f(); }); abonelik.forEach(function (f) { f(); });
+      var tamdiK = document.body.classList.contains('ms-tam') || document.body.classList.contains('ms-klavye');
       document.body.classList.remove('ms-tam'); document.body.classList.remove('ms-klavye'); kap.style.removeProperty('--ms-vh'); kap.style.removeProperty('--ms-ust');
+      if (tamdiK && (window.pageYOffset || window.pageXOffset)) { try { window.scrollTo(0, 0); } catch (eS2) {   } }   
       if (window.visualViewport) { window.visualViewport.removeEventListener('resize', vvDegisti); window.visualViewport.removeEventListener('scroll', vvDegisti); }
       document.removeEventListener('focusin', vvGecikmeli); document.removeEventListener('focusout', vvGecikmeli);
       D.acikId = ''; D.ac = null; D.asEkran = null; MM.asistanDegisti = null; var ix = D.dinleyen.indexOf(durumDegisti); if (ix >= 0) D.dinleyen.splice(ix, 1);   

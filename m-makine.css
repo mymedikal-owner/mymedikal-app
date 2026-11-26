@@ -19,3 +19,17 @@
 .mk-pano-f.bekleyen { position: absolute; top: 0; left: 0; opacity: 0; pointer-events: none; }
 .mk-pano > .bant, .mk-pano > .iskelet-kap { margin: var(--b3) var(--b4); }
 @media (min-width: 800px) { .mk-pano { margin: 0 -28px -40px; height: calc(100vh - 190px); height: calc(100dvh - 190px); } }
+ 
+.icerik.mk-pano-ac > .ara-kutu { display: none; }
+#icerik.mk-pano-ac { padding-top: 4px; }
+.mk-pano-ac .segment { margin-bottom: 4px; }
+.mk-pano-dugme { display: none; }
+@media (max-width: 599px) {
+  .mk-pano-ac .mk-pano { animation: none; z-index: 0; height: calc(100vh - 132px - var(--alt-yukseklik, 56px) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px)); height: calc(100dvh - 132px - var(--alt-yukseklik, 56px) - env(safe-area-inset-bottom, 0px) - env(safe-area-inset-top, 0px)); }
+  .mk-pano-ac .mk-pano-dugme { display: inline-flex; align-items: center; justify-content: center; position: absolute; left: 8px; bottom: 72px; z-index: 21; gap: 6px; height: 44px; min-width: 44px; max-width: 110px; box-sizing: border-box; padding: 0 12px; border-radius: var(--r-t); white-space: nowrap; border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi2); font: inherit; font-size: 20px; line-height: 1; cursor: pointer; box-shadow: var(--golge-1); }
+  .mk-pano-ac .mk-pano-dugme:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; }
+  .mk-pano-ac .mk-pano-yazi { font-size: 14px; }
+  .mk-pano-tam .mk-pano { position: fixed; top: 0; right: 0; bottom: 0; left: 0; margin: 0; height: auto; min-height: 0; box-sizing: border-box; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); background: var(--yuzey); z-index: 20; }
+  .mk-pano-tam .mk-pano-dugme { position: fixed; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); left: calc(8px + env(safe-area-inset-left, 0px)); width: 44px; padding: 0; }
+  .mk-pano-tam .mk-pano-f { height: 100%; }
+}

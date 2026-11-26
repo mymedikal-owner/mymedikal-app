@@ -251,6 +251,17 @@ table.tablo { border-collapse: collapse; width: 100%; font-size: 13px; font-vari
  
 .gizli { display: none !important; }
 .menu-grup { background: none; border: 0; font: inherit; cursor: pointer; }
+ 
+.menu .erisim-iste { background: none; border: 0; font: inherit; cursor: pointer; }
+@media (max-width: 599px) { .menu .ei-yan { display: none; } }
+@media (min-width: 600px) { .menu .ei-yan { margin-top: auto; flex: none; } }
+.ei-kap { position: fixed; inset: 0; z-index: 90; display: flex; justify-content: center; align-items: center; padding: 16px; }
+.ei-perde { position: absolute; inset: 0; background: rgba(8, 10, 14, .5); }
+.ei-kutu { position: relative; width: min(420px, 100%); max-height: 100%; overflow-y: auto; background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.25); padding: 16px; display: grid; gap: 12px; }
+.ei-kutu h2 { font-size: 18px; margin: 0; }
+.ei-kutu .alan select { min-height: 44px; border: 1px solid var(--cizgi); border-radius: 8px; background: var(--yuzey); color: var(--yazi); font: inherit; padding: 0 12px; }
+.ei-kutu .dugme { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; border: 1px solid var(--vurgu); border-radius: 8px; }
+.ei-kutu .dugme[aria-disabled="true"] { opacity: .5; pointer-events: none; }
 .sheet-grup { font-size: var(--t-xs); letter-spacing: 0; text-transform: none; color: var(--soluk); padding: 8px 12px 2px; }
 @media (max-width: 599px) { .menu .menu-grup { display: none; } }
 @media (min-width: 600px) { .menu .menu-grup { color: var(--soluk); } .menu .menu-grup[aria-expanded="true"] { color: var(--vurgu); } }

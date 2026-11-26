@@ -74,6 +74,7 @@
     toplanti: 'M3 7h12v10H3zM15 10.5l6-3.5v10l-6-3.5',
     mesaj: 'M4 5h16v11H9l-5 4zM8 9h8M8 12h5',
     gizlilik: 'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4',
+    erisim: 'M8 11V8a4 4 0 018 0v3M6 11h12v9H6zM12 15v2',
     siparis: 'M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10',
     finans: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6',
     muhasebe: 'M5 4h12a2 2 0 012 2v14H7a2 2 0 01-2-2zM5 18a2 2 0 012-2h12M9 8h6M9 12h6',
@@ -220,6 +221,64 @@
   sheet.addEventListener('scroll', kayarIpucu);
   digerDugme.addEventListener('click', function () { sheet.hidden = !sheet.hidden; digerDugme.setAttribute('aria-expanded', String(!sheet.hidden)); if (!sheet.hidden) { sheet.scrollTop = 0; kayarIpucu(); } });
   function yakindaGoster(ac) { yakindaAcik = ac; Array.prototype.forEach.call(menu.querySelectorAll('.menu-oge.onizleme'), function (e) { e.classList.toggle('gizli', !ac); }); if (yakindaDugme) yakindaDugme.setAttribute('aria-expanded', String(ac)); }
+  
+
+
+
+  var ERISIM_HARIC = ['ana', 'yonetim', 'sikayet', 'kalite-yukle'];   
+  var ERISIM_NEDEN = [['gorev', 'İşim bu bölümü gerektiriyor'], ['ekip', 'Ekibim ya da yöneticim istedi'], ['gecici', 'Belirli bir iş için, geçici']];
+  function erisimBolumleri() {
+    return MODULLER_TUM.filter(function (m) {
+      if (m.nakliyeci || m.erisimYok || m.gizlilik || m.onizleme || m.mesaj || ERISIM_HARIC.indexOf(m.id) >= 0) return false;
+      if (!modAcik(m.id) || KAPALI.indexOf(m.id) >= 0) return false;
+      if (YUKLENDI && !window.MM.moduller[m.id]) return false;
+      return !MODULLER.some(function (x) { return x.id === m.id; });
+    }).map(function (m) { return { id: m.id, ad: m.ad }; });
+  }
+  window.MM.erisimBolumleri = erisimBolumleri;
+  function erisimUygun() {
+    var V = window.MMVeri; if (!V || V.demo() || V.kisitli()) return false;
+    if (V.mod() === 'graph') return !!window.MM_AYAR.girisUpn && !window.MM_AYAR.girisMisafir;   
+    return true;   
+  }
+  var erisimKat = null;
+  function erisimKapat() { if (!erisimKat) return; var o = erisimKat.onOdak; erisimKat.kok.remove(); erisimKat = null; if (o && o.focus) o.focus(); }
+  function erisimAc() {
+    if (erisimKat) return;
+    var liste = erisimBolumleri(); if (!liste.length) return;
+    var bolS = h('select', { 'aria-label': 'Bölüm' }), nedS = h('select', { 'aria-label': 'Neden' });
+    liste.forEach(function (b) { bolS.appendChild(h('option', { value: b.id, metin: b.ad })); });
+    ERISIM_NEDEN.forEach(function (n) { nedS.appendChild(h('option', { value: n[0], metin: n[1] })); });
+    var baglanti = h('a', { sinif: 'dugme tam', role: 'button' }, [h('span', { metin: 'Erişim isteğini hazırla' })]);
+    function guncelle() {
+      var p = window.MM.talimatPosta || '', b = liste.filter(function (x) { return x.id === bolS.value; })[0] || liste[0];
+      if (!p) { baglanti.removeAttribute('href'); baglanti.setAttribute('aria-disabled', 'true'); return; }
+      var govde = 'Merhaba,\n\nAşağıdaki bölüm için erişim talep ederim.\n\nBölüm: ' + b.id + '\nNeden: ' + nedS.value + '\nSürüm: ' + (window.MM_AYAR.surum || '') + '\n\n(MY Medikal App · Erişim isteği)';
+      baglanti.setAttribute('href', 'mailto:' + p + '?subject=' + encodeURIComponent('[App] Erişim isteği: ' + b.ad) + '&body=' + encodeURIComponent(govde));
+      baglanti.removeAttribute('aria-disabled');
+    }
+    bolS.addEventListener('change', guncelle); nedS.addEventListener('change', guncelle); guncelle();
+    var kok = h('div', { sinif: 'ei-kap', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Erişim iste' }, [
+      h('div', { sinif: 'ei-perde', onclick: erisimKapat }),
+      h('div', { sinif: 'ei-kutu' }, [
+        h('h2', { metin: 'Erişim iste' }),
+        h('p', { sinif: 'soluk', metin: 'İstek yöneticiye iletilir; karar verilene kadar erişiminiz değişmez.' }),
+        h('label', { sinif: 'alan' }, [h('span', { metin: 'Bölüm' }), bolS]),
+        h('label', { sinif: 'alan' }, [h('span', { metin: 'Neden' }), nedS]),
+        baglanti,
+        h('p', { sinif: 'soluk', metin: 'Posta uygulaması açılmadıysa ' + ((window.MM && MM.talimatPosta) || 'AI asistan adresine') + ' adresine yazın.' }),
+        h('button', { type: 'button', sinif: 'dugme ikincil tam', onclick: erisimKapat }, [h('span', { metin: 'Kapat' })])
+      ])
+    ]);
+    kok.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); erisimKapat(); } });
+    baglanti.addEventListener('click', function () { setTimeout(erisimKapat, 400); });
+    erisimKat = { kok: kok, onOdak: document.activeElement };
+    document.body.appendChild(kok); bolS.focus();
+  }
+  function erisimDugme(yan) {   
+    if (!erisimUygun() || !erisimBolumleri().length) return null;
+    return h('button', { type: 'button', sinif: 'menu-oge erisim-iste' + (yan ? ' ei-yan' : ''), role: yan ? null : 'menuitem', onclick: function () { sheet.hidden = true; digerDugme.setAttribute('aria-expanded', 'false'); erisimAc(); } }, [ikon('erisim'), h('span', { sinif: 'ad', metin: 'Erişim iste' })]);
+  }
   function menuKur() {   
   menu.textContent = ''; sheet.textContent = ''; sheet.hidden = true; if (sheet.parentNode) sheet.parentNode.removeChild(sheet);
   YAKINDA_ILK = -1; yakindaDugme = null; yakindaAcik = false;
@@ -237,8 +296,10 @@
     var k = menuOge(m, false); k.classList.remove('onizleme'); k.setAttribute('role', 'menuitem'); k.addEventListener('click', function () { sheet.hidden = true; }); sheet.appendChild(k);
   });
   if (window.MM.yukle) sheet.appendChild(window.MM.yukle.dugme());   
+  var eiDugme = erisimDugme(); if (eiDugme) sheet.appendChild(eiDugme);   
   sheet.appendChild(h('div', { sinif: 'diger-surum', role: 'presentation', metin: 'Sürüm ' + (window.MM_AYAR.surum || '') }));   
   if (MODULLER.length > ILK || MODULLER.length) { menu.appendChild(digerDugme); document.body.appendChild(sheet); }
+  var eiYan = erisimDugme(true); if (eiYan) menu.appendChild(eiYan);
   if (window.MM.mesaj) { if (window.MM.mesaj.arkaBaslat) window.MM.mesaj.arkaBaslat(); if (window.MM.mesaj.rozetUygula) window.MM.mesaj.rozetUygula(); }   
   }
   menuKur(); kurulu = true;

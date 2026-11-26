@@ -915,7 +915,7 @@
     'Kabul (hastane onayı)': 'Acceptance (hospital approval)',
     'Kabul bekleyen (teslim var, muayene yok)': 'Awaiting acceptance (delivered, not yet inspected)',
      
-    'Muayene olumsuz': 'Inspection failed'
+    'Olumlu değil': 'Not accepted'
   };
   Object.keys(TAM_8036).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8036[k]; });
   PARCA.push.apply(PARCA, [

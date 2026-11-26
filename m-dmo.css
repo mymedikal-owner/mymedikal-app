@@ -56,6 +56,7 @@
 .dm-oge-izgara { display: grid; gap: var(--b2) var(--b4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
 .dm-oge { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--b2); border-bottom: 1px solid var(--cizgi); padding: 6px 0; font-size: var(--t-s); } .dm-oge-ad { color: var(--soluk); } .dm-oge-deger { font-variant-numeric: tabular-nums; text-align: right; }
 .dm-oge.kritik .dm-oge-deger { color: var(--turuncu); }
+.dm-oge.sari { background: var(--sari-zemin); } .dm-oge.sari .dm-oge-deger { color: var(--sari-yazi); }
 .dm-detay-kart + .dm-detay-kart, .kart2 + .kart2 { margin-top: var(--b3); }
 
  
@@ -286,7 +287,7 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-mk-et { font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; background: var(--turuncu-zemin); color: var(--turuncu); }
 .dm-mk-iknl.dm-mk-gizli-uyari .ilkn-tumu, .dm-mk-riskli .ilkn-tumu { color: var(--turuncu); border-color: var(--turuncu); background: var(--turuncu-zemin); }
 .dm-mk-gecis { width: 100%; margin: var(--b2) 0; border: 1px solid var(--cizgi); border-radius: var(--r-s); }    
-.dm-ayr-tek strong { flex: none; } .dm-ayr-tek span { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }    
+.dm-ayr-tek strong { flex: none; } .dm-ayr-tek span { flex: 1 1 0; min-width: 0; white-space: normal; overflow-wrap: anywhere; }    
  
 .dm-mk-acik { margin: var(--b2) 0; }
 .dm-mk-firma-baslik { display: flex; align-items: center; gap: var(--b2); margin: 4px 0 2px; }    
@@ -343,7 +344,7 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
   #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr:last-child:nth-child(odd) { grid-column: 1 / -1; }
   #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr strong, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; flex: none; }
   #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.acik, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr[open], #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.uyari, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.kirmizi, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.sari { grid-column: 1 / -1; }
-  #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.acik strong, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.acik span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr[open] span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.uyari strong, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.uyari span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.kirmizi span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.sari span { white-space: normal; overflow: visible; text-overflow: clip; }
+  #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.acik strong, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.acik span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr[open] span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.uyari strong, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.uyari span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.kirmizi strong, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.kirmizi span, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.sari strong, #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr.sari span { white-space: normal; overflow: visible; text-overflow: clip; }
   #icerik[data-modul="dmo"] .bos-durum.dm-bos-kisa { padding: 10px 12px; gap: 2px; justify-items: start; text-align: left; }
   #icerik[data-modul="dmo"] .bos-durum.dm-bos-kisa .bos-ikon { display: none; }
   #icerik[data-modul="dmo"] .bos-durum.dm-bos-kisa h3 { font-size: var(--t-s); margin: 0; }

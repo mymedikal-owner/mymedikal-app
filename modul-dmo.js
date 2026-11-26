@@ -507,7 +507,7 @@
           var yzd = x[1] === 'irsaliye_yuzde' && o.irsaliye_eksik === true ? '—' : yz(o[x[1]]);
           return ikiSatir(ad[x[1]], (fg ? (r ? tlTam(r[x[2]]) : '—') + ' = ' : '') + yzd);
         });
-        if (o.muayene_olumsuz_var === true) sat.push(ikiSatir('Muayene olumsuz', (fg ? (r ? tlTam(r.muayene_olumsuz_tutar_kdv_haric_tl) : '—') + ' = ' : '') + yz(o.muayene_olumsuz_yuzde), 'kritik'));   
+        if (o.muayene_olumsuz_var === true) sat.push(ikiSatir('Olumlu değil',(fg ? (r ? tlTam(r.muayene_olumsuz_tutar_kdv_haric_tl) : '—') + ' = ' : '') + yz(o.muayene_olumsuz_yuzde), 'sari'));   
         sat.push(ikiSatir('Kabul / teslim', yz(o.kabul_teslim_yuzde)), ikiSatir('Kabul / irsaliye', yz(o.kabul_irsaliye_yuzde)));
         if (fg) sat.unshift(ikiSatir('Sipariş tutarı', r ? tlTam(r.tutar_kdv_haric_tl) : '—'));
         kap.appendChild(h('div', { sinif: 'dm-oge-izgara' }, sat));

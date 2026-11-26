@@ -680,6 +680,14 @@
       var m = [yk, dn ? 'Dosya ' + dn : ''].filter(Boolean).join(' · ') || 'Sipariş no ' + sipNo(s);
       return { sinif: 'dm-hs-kimlik', metin: m, title: m };
     }
+     
+    function hsDurum(s) {
+      var o = s.ikn ? iknBul(s.firma, s.ikn) : null, ur = o && o.urun ? String(o.urun) : '';
+      var kisa = ur.length > 18 ? ur.slice(0, 17) + '…' : ur;
+      var son = (TESLIM_AD[s.teslim_durum] || 'Teslim durumu yok') + ' · son teslim ' + tarihTR(s.son_teslim) + ' · teslim ' + say(s.teslim_edilen_miktar) + ' / ' + say(s.miktar);
+      var tam = (ur ? ur + ' · ' : '') + son;
+      return h('div', { sinif: 'kucuk soluk dm-hs-d2', title: tam }, [kisa ? h('span', { sinif: 'dm-hs-urun', metin: kisa }) : null, h('span', { sinif: 'dm-hs-dur', metin: (kisa ? ' · ' : '') + son })]);
+    }
     function hastaneSiparisleri(x) {
       var ad = x.hastane || 'Hastane';
       G.sheet(ad, function (g) {
@@ -687,11 +695,11 @@
           var l = tum.filter(function (s) { return s.firma === x.firma && s.hastane_no != null && s.hastane_no === x.hastane_no; }).sort(function (a, b) { return String(a.son_teslim || '').localeCompare(String(b.son_teslim || '')); });
           g.textContent = '';
           if (!l.length) { g.appendChild(G.bos({ baslik: 'Bu hastanede sipariş kalemi yok' })); return; }
-          g.appendChild(sayiSatiri(l.length + ' sipariş kalemi', ad, x.firma, [sutun('Sipariş no', function (s) { return sipNo(s); }), sutun('Risk', function (s) { return s.risk ? (RISK_AD[s.risk] || s.risk) : ''; }), sutun('Teslim durumu', function (s) { return TESLIM_AD[s.teslim_durum] || ''; }),
+          g.appendChild(sayiSatiri(l.length + ' sipariş kalemi', ad, x.firma, [sutun('YK no', function (s) { return s.siparis_no; }), sutun('Dosya no', function (s) { return sipNo(s); }), sutun('Risk', function (s) { return s.risk ? (RISK_AD[s.risk] || s.risk) : ''; }), sutun('Teslim durumu', function (s) { return TESLIM_AD[s.teslim_durum] || ''; }),
             sutun('Son teslim', function (s) { return s.son_teslim; }), sutun('Miktar', function (s) { return s.miktar; }), sutun('Teslim edilen', function (s) { return s.teslim_edilen_miktar; })], l));
           g.appendChild(G.ilkN(l, function (s) {
             return h('div', { sinif: 'dm-hs-sat' }, [h('div', { sinif: 'dm-sp-ust' }, [h('strong', hsKimlik(s)), s.risk ? etiket(s.risk) : null]),
-              h('div', { sinif: 'kucuk soluk', metin: (TESLIM_AD[s.teslim_durum] || 'Teslim durumu yok') + ' · son teslim ' + tarihTR(s.son_teslim) + ' · teslim ' + say(s.teslim_edilen_miktar) + ' / ' + say(s.miktar) })]);
+              hsDurum(s)]);
           }, { n: 10 }));
         }
         if (yuk && yuk.v && yuk.v['dmo-siparisler']) { yaz(yuk.v['dmo-siparisler'].siparisler || []); return; }

@@ -210,6 +210,8 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-hs-sat .dm-sp-ust { flex-wrap: nowrap; overflow: hidden; }
 .dm-hs-sat .dm-sp-ust strong.dm-hs-kimlik { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: max(11px, var(--t-s)); }
 .dm-hs-sat .dm-sp-ust > :not(strong) { flex: 0 0 auto; white-space: nowrap; }
+.dm-hs-d2 { font-size: max(11px, var(--t-xs)); overflow-wrap: anywhere; }
+.dm-hs-d2 .dm-hs-urun { display: inline-block; max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 .dm-hs-sat { display: flex; flex-direction: column; gap: var(--b1); padding: var(--b2) 0; border-bottom: 1px solid var(--cizgi); overflow-wrap: anywhere; }
  
 @media (max-width: 599px) {

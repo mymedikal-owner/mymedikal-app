@@ -271,7 +271,7 @@
     k.gorevler.forEach(function (g) { say[g.durum]++; });
     var seg = [['tamam', 'Tamamlanan', 'var(--iyi)'], ['suruyor', 'Sürüyor', 'var(--s1)'], ['bekliyor', 'Bekliyor', 'var(--eksen)'], ['gecikti', 'Gecikti', 'var(--kritik)']];
     var cubuk = h('div', { sinif: 'ms-kapanis', role: 'img', 'aria-label': 'Kapanış ilerlemesi: ' + say.tamam + ' / ' + k.gorevler.length + ' tamam, ' + say.gecikti + ' gecikti' }, seg.map(function (x) { return say[x[0]] ? h('i', { style: 'width:' + (100 * say[x[0]] / n) + '%;background:' + x[2], title: x[1] + ' ' + say[x[0]] }) : null; }));
-    return G.kart({ baslik: 'Ay sonu kapanış', alt: k.donem, govde: h('div', null, [cubuk, G.lejant(seg.map(function (x) { return [x[1] + ' ' + say[x[0]], x[2]]; }))]) });
+    return G.kart({ baslik: 'Ay sonu kapanış · ' + k.donem, govde: h('div', null, [cubuk, G.lejant(seg.map(function (x) { return [x[1] + ' ' + say[x[0]], x[2]]; }))]) });
   }
 
   function duzeltmeKutusu(v, git) {
@@ -281,7 +281,7 @@
     l.sort(function (a, b) { return (b.g == null ? -1 : b.g) - (a.g == null ? -1 : a.g); });
     var govde = h('div', { sinif: 'mh-liste' });
     if (!l.length) govde.appendChild(h('p', { sinif: 'veri-yok', metin: 'Açık düzeltme ricası yok.' }));
-    var gosterN = Math.min(6, Math.max(3, l.filter(function (x) { return x.g != null && x.g > 3; }).length));   
+    var gosterN = Math.max(3, l.filter(function (x) { return x.g != null && x.g > 3; }).length);   
     l.slice(0, gosterN).forEach(function (x) {
       var ton = x.g == null ? 'gri' : (x.g > 7 ? 'kirmizi' : (x.g > 3 ? 'turuncu' : 'yesil'));
       govde.appendChild(h('div', { sinif: 'mh-satir', style: '--isaret:' + (TON[ton] || TON.gri)[0] }, [
@@ -289,7 +289,7 @@
         rozet(x.g == null ? '—' : x.g + ' gün', ton, 'saat')]));
     });
     if (l.length > gosterN) govde.appendChild(h('button', { type: 'button', sinif: 'mini-dugme ms-tumu', onclick: function () { git('duzeltme'); }, metin: 'Tümü (' + l.length + ')' }));
-    return G.kart({ baslik: 'Açık düzeltme ricaları', alt: 'Yaşa göre, en eski üstte · kişi adı yerine rol', govde: govde });
+    return G.kart({ baslik: 'Açık düzeltme ricaları', govde: govde });
   }
 
   var YAS_KOVA = [['Vadesi gelmemiş', 'var(--eksen)'], ['0–30 gün gecikmiş', 'var(--s1)'], ['31–60 gün', 'var(--s1)'], ['61–90 gün', 'var(--uyari)'], ['91–180 gün', 'var(--uyari)'], ['180+ gün', 'var(--kritik)']];

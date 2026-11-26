@@ -42,10 +42,11 @@
  
 @media (max-width: 899px) {
   #icerik[data-modul="muhasebe"] .mh-satir { padding: 8px 10px; gap: 4px 8px; }
-  #icerik[data-modul="muhasebe"] .mh-satir-ust { display: contents; }
-  #icerik[data-modul="muhasebe"] .mh-satir-ust b { grid-column: 1 / -1; font-size: 13.5px; line-height: 1.3; }
-  #icerik[data-modul="muhasebe"] .mh-satir-ust .soluk { grid-column: 1; grid-row: 2; align-self: center; }
-  #icerik[data-modul="muhasebe"] .mh-satir > .tq-rozet { grid-column: 2; grid-row: 2; align-self: center; }
+  #icerik[data-modul="muhasebe"] .mh-satir { align-items: center; padding: 5px 10px; gap: 0 8px; }
+  #icerik[data-modul="muhasebe"] .mh-satir-ust { display: grid; gap: 0; }
+  #icerik[data-modul="muhasebe"] .mh-satir-ust b { font-size: 13.5px; line-height: 1.25; }
+  #icerik[data-modul="muhasebe"] .mh-satir-ust .soluk { line-height: 1.2; }
+  #icerik[data-modul="muhasebe"] .mh-satir > .tq-rozet { grid-column: 2; grid-row: 1; align-self: center; }
 }
  
 @media (max-width: 899px) {

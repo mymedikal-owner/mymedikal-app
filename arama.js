@@ -162,10 +162,10 @@
     var kok = String(k.r || '').split('#')[1] || ''; kok = kok.split('/')[0];
     return (HYA_BOLUM[b] || [b]).indexOf(kok) >= 0;
   }
-  function hyaAra(q) {
+  function hyaAra(q, tumu) {
     var j = q.split(' ').filter(Boolean), sonuc = [];
     (hyaDurum.dizin || []).forEach(function (k) {
-      if (!hyaKapsamda(k)) return;
+      if (!tumu && !hyaKapsamda(k)) return;
       var puan = 0;
       for (var i = 0; i < j.length; i++) {
         if (k.n.indexOf(j[i]) < 0) return;
@@ -220,6 +220,7 @@
     if (!odaksiz && d.sonOdak && d.sonOdak.focus) { try { d.sonOdak.focus(); } catch (e) { } }
   }
   function hyaAc(sorgu, bolum) {
+    if (MM.araAc && MM.araAc(typeof sorgu === 'string' ? sorgu : '') === true) return;   
     if (hyaDurum.kap || !MM.gr) return;
     var h = MM.gr.h, d = hyaDurum; d.bolum = (typeof bolum === 'string' && /^[a-z][a-z0-9-]*$/.test(bolum) && bolum !== 'ana') ? bolum : '';
     d.sonOdak = document.activeElement; d.eskiTasma = document.body.style.overflow; document.body.style.overflow = 'hidden';
@@ -248,7 +249,15 @@
     hyaCiz(); d.girdi.focus();
     hyaYukle().then(function () { if (hyaDurum.kap) hyaCiz(); }, function () { hyaDurum.dizin = hyaDurum.dizin || []; if (hyaDurum.kap) hyaCiz(); });
   }
-  MM.herYerdeAra = { ac: hyaAc, kapat: hyaKapat };
+   
+  var hyaBirlesik = {
+    hazir: function () { return !!hyaDurum.dizin; },
+    yukle: function () { return hyaYukle().then(function (d) { return d; }, function () { hyaDurum.dizin = hyaDurum.dizin || []; return hyaDurum.dizin; }); },
+    ara: function (q) { var n = norm(q).trim().replace(/\s+/g, ' '); return n ? hyaAra(n, true) : []; },
+    tur: function (t) { for (var i = 0; i < HYA_TUR.length; i++) if (HYA_TUR[i][0] === t) return HYA_TUR[i][1]; return String(t || ''); },
+    git: hyaGit
+  };
+  MM.herYerdeAra = { ac: hyaAc, kapat: hyaKapat, birlesik: hyaBirlesik };
 
   function hyaDugmeKoy() {
     var kok = document.getElementById('icerik'); if (!kok) return;
@@ -264,7 +273,9 @@
       if (!(e.ctrlKey || e.metaKey) || (e.key !== 'k' && e.key !== 'K')) return;
       var asistan = rotaAnahtar().split('/')[0] === '#asistan';
       if (!e.shiftKey && !asistan) return;   
-      e.preventDefault(); e.stopImmediatePropagation(); hyaDurum.kap ? hyaKapat() : hyaAc();
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (MM.araAcik && MM.araAcik()) { MM.araKapat(); return; }   
+      hyaDurum.kap ? hyaKapat() : hyaAc();
     }, true);
     var ic = document.getElementById('icerik');
     if (ic && window.MutationObserver) { var gz = false; new MutationObserver(function () { if (gz) return; gz = true; (window.requestAnimationFrame || setTimeout)(function () { gz = false; hyaDugmeKoy(); }); }).observe(ic, { childList: true, subtree: true }); }

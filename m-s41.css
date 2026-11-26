@@ -49,7 +49,7 @@
 .s41-geri { margin-bottom: var(--b2); }
 .s41-segment { display: inline-flex; border: 1px solid var(--cizgi); border-radius: var(--r-t, 999px); overflow: hidden; margin-bottom: var(--b3); }
 .s41-segment button { padding: 8px 16px; border: 0; background: transparent; color: var(--yazi2); font: inherit; cursor: pointer; }
-.s41-segment button[aria-pressed="true"] { background: var(--vurgu); color: #fff; }
+.s41-segment button[aria-pressed="true"] { background: var(--vurgu); color: var(--vurgu-yazi); }
 .s41-dikkat { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: var(--t-xs); font-weight: 600; }
 .s41-dikkat.yuksek { background: var(--kirmizi-zemin); color: var(--kirmizi); }
 .s41-dikkat.orta { background: var(--sari-zemin); color: var(--turuncu); }

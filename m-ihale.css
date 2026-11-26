@@ -26,7 +26,7 @@
 .ih-kalem-no { font-size: var(--t-xs); color: var(--soluk); }
 .ih-kalem-tanim { overflow-wrap: anywhere; }
 .ih-kalem-miktar { font-size: var(--t-s); color: var(--yazi2); font-variant-numeric: tabular-nums; }
-.ih-rozet-grup { flex: none; font-size: 11px; font-weight: 700; border-radius: var(--r-s); padding: 2px 8px; background: var(--vurgu-zemin); color: var(--vurgu); border: 1px solid var(--vurgu); }
+.ih-rozet-grup { flex: none; font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-s); padding: 2px 8px; background: var(--vurgu-zemin); color: var(--vurgu); border: 1px solid var(--vurgu); }
 .ih-eylem { display: flex; flex-wrap: wrap; gap: var(--b2); margin-top: var(--b2); }
 .ih-eylem .dugme { text-decoration: none; justify-content: center; flex: 1 1 140px; }
 .ih-mail-dugme { background: var(--yuzey) !important; color: var(--yazi) !important; border-color: var(--cizgi) !important; }

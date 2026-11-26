@@ -251,6 +251,6 @@ table.tablo { border-collapse: collapse; width: 100%; font-size: 13px; font-vari
  
 .gizli { display: none !important; }
 .menu-grup { background: none; border: 0; font: inherit; cursor: pointer; }
-.sheet-grup { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--soluk); padding: 8px 12px 2px; }
+.sheet-grup { font-size: var(--t-xs); letter-spacing: 0; text-transform: none; color: var(--soluk); padding: 8px 12px 2px; }
 @media (max-width: 599px) { .menu .menu-grup { display: none; } }
 @media (min-width: 600px) { .menu .menu-grup { color: var(--soluk); } .menu .menu-grup[aria-expanded="true"] { color: var(--vurgu); } }

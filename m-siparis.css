@@ -30,7 +30,7 @@
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ikon { display: none; }
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ana { padding: var(--b2) var(--b3); gap: 4px; }
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-s); }
-  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-sayi { font-size: 26px; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-sayi { font-size: var(--t-2xl); }
   #icerik[data-modul="siparis"] .ozet-serit { margin-bottom: var(--b2); }
 }
 .sp-segment > .segment { margin: 0 0 var(--b2); }

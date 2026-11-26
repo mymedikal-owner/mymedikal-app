@@ -29,8 +29,8 @@
 .dm-ad { font-size: var(--t-s); color: var(--yazi2); overflow-wrap: anywhere; }
 .dm-ih-alt { display: flex; flex-wrap: wrap; gap: var(--b1) var(--b4); font-size: var(--t-s); color: var(--yazi2); } .dm-ih-alt strong { color: var(--yazi); font-variant-numeric: tabular-nums; }
 .dm-ih-risk, .dm-ih-risk strong { color: var(--turuncu); }
-.dm-temlik { font-size: 11px; font-weight: 700; background: var(--yesil-zemin); color: var(--yesil); border-radius: var(--r-t); padding: 1px 8px; }
-.dm-yasak-et { font-size: 11px; font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; }
+.dm-temlik { font-size: var(--t-xs); font-weight: 700; background: var(--yesil-zemin); color: var(--yesil); border-radius: var(--r-t); padding: 1px 8px; }
+.dm-yasak-et { font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; }
 .dm-yasak-et.sari { background: var(--sari-zemin); color: var(--sari-yazi); } .dm-yasak-et.kirmizi { background: var(--kirmizi-zemin); color: var(--kirmizi); }
 
  
@@ -39,7 +39,7 @@
 .dm-iz i { position: absolute; left: 0; top: 0; bottom: 0; display: block; }
 .dm-teslim { background: var(--sk2); } .dm-kabul { background: var(--sk5); }
 .dm-esik { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--yazi); }
-.dm-esik em { position: absolute; top: 20px; left: 0; transform: translateX(-50%); font-style: normal; font-size: 10.5px; color: var(--yazi2); white-space: nowrap; }
+.dm-esik em { position: absolute; top: 20px; left: 0; transform: translateX(-50%); font-style: normal; font-size: var(--t-xs); color: var(--yazi2); white-space: nowrap; }
 .dm-cubuk.ince { margin-bottom: var(--b3); } .dm-cubuk.ince .dm-iz { height: 10px; }
 .dm-yasak-dolgu.yesil { background: var(--iyi); } .dm-yasak-dolgu.sari { background: var(--uyari); } .dm-yasak-dolgu.kirmizi { background: var(--kritik); }
 
@@ -75,7 +75,7 @@
 .dm-sp-orta, .dm-sp-alt { display: flex; flex-wrap: wrap; gap: 2px var(--b4); font-size: var(--t-s); color: var(--yazi2); } .dm-sp strong { font-variant-numeric: tabular-nums; } .dm-sp-orta strong, .dm-sp-alt strong { color: var(--yazi); }
 .dm-sp-alt .kritik { color: var(--kirmizi); font-weight: 650; }
 .dm-sp-not { margin: 4px 0 0; font-size: var(--t-s); background: var(--yuzey2); border-radius: var(--r-s); padding: 6px var(--b3); }
-.dm-risk { font-size: 11px; font-weight: 700; border-radius: var(--r-t); padding: 1px 9px; }
+.dm-risk { font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 9px; }
 .dm-risk.riskli { background: var(--turuncu-zemin); color: var(--turuncu); } .dm-risk.sure_gecti { background: var(--kirmizi-zemin); color: var(--kirmizi); }
 .dm-risk.ek_sure_iste { background: var(--sari-zemin); color: var(--sari-yazi); } .dm-risk.itiraz { background: var(--tahmin-zemin); color: var(--tahmin); }
 .dm-ceza-tl { margin-left: auto; font-variant-numeric: tabular-nums; }
@@ -179,7 +179,7 @@ button.dm-hs:hover { border-color: var(--vurgu); }
 button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color: var(--vurgu); }
 .dm-bg-satir.kritik { background: var(--turuncu-zemin); } .dm-bg-satir.kritik .dm-bg-say { color: var(--turuncu); }
 .dm-bg-say { font-size: var(--t-l); font-variant-numeric: tabular-nums; min-width: 3.2em; }
-.dm-kural-etiket { display: inline-block; font-size: 11px; font-weight: 700; background: var(--sari-zemin); color: var(--sari-yazi); border-radius: var(--r-t); padding: 2px 8px; margin-bottom: var(--b2); }
+.dm-kural-etiket { display: inline-block; font-size: var(--t-xs); font-weight: 700; background: var(--sari-zemin); color: var(--sari-yazi); border-radius: var(--r-t); padding: 2px 8px; margin-bottom: var(--b2); }
 .dm-od-liste, .dm-ot-liste, .dm-kt-liste, .dm-hn { display: flex; flex-direction: column; gap: var(--b3); }
 .dm-od-ust, .dm-ot-ust, .dm-kt-ust { display: flex; flex-wrap: wrap; align-items: center; gap: var(--b2); }
 .dm-od-alt, .dm-ot-alt, .dm-kt-alt { display: flex; flex-wrap: wrap; gap: var(--b1) var(--b3); color: var(--yazi2); } .dm-od-alt strong, .dm-ot-alt strong, .dm-kt-alt strong { color: var(--yazi); font-variant-numeric: tabular-nums; }

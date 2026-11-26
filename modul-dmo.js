@@ -640,7 +640,7 @@
         ikiSatir('Teslim bekleyen', say(i.teslim_bekleyen_hastane) + ' hastane'), ikiSatir('İptal siparişi', say(i.iptal_siparis_sayisi) + ' sipariş'),
         ikiSatir('Açık sipariş', say(i.acik_siparis) + ' sipariş'), ikiSatir('Riskli sipariş', say(i.riskli_toplam_siparis), (i.riskli_toplam_siparis || 0) > 0 ? 'kritik' : ''), ikiSatir('Cezalı sürede (son teslim geçti)', say(i.cezali_surede_siparis), (i.cezali_surede_siparis || 0) > 0 ? 'kritik' : ''),
         ikiSatir('Teslim edilmedi (irsaliye)', say(i.teslim_alinmadi_siparis)), ikiSatir('Son teslim yakın', say(i.son_teslim_yakin_siparis)),
-        ikiSatir('Temlik uyarısı (sipariş)', say(i.temlik_uyari_siparis)), ikiSatir('Lojistik firması', i.lojistik_firmalari ? i.lojistik_firmalari.join(', ') : 'veri yok (irsaliyede yok)')]), dip: 'Teslim edilen ve bekleyen hastane kalem bazlıdır; bir hastane iki grupta da olabilir.' }));
+        ikiSatir('Temlik uyarısı (sipariş)', say(i.temlik_uyari_siparis)), ikiSatir('Lojistik firması', i.lojistik_firmalari ? i.lojistik_firmalari.join(', ') : 'Lojistik firması henüz eşleşmedi')]), dip: 'Teslim edilen ve bekleyen hastane kalem bazlıdır; bir hastane iki grupta da olabilir.' }));
       var hs = (yuk.v['dmo-ihaleler'].hastaneler || []).filter(function (x) { return x.firma === i.firma && x.ikn === i.ikn; }).sort(hastaneSirala);
       govde.appendChild(h('h3', { sinif: 'bolum', metin: 'Hastane bazında (' + hs.length + ')' }));
       govde.appendChild(hs.length ? G.ilkN(hs, hastaneSatiri, { n: 8, sinif: 'dm-liste' }) : G.bos({ baslik: 'Bu ihalede hastane satırı yok' }));
@@ -731,7 +731,7 @@
         h('span', {}, ['Teslim oranı (sipariş, DMO tamamlandı) ', h('strong', { metin: yuzde(oranEl) })]),
         s.siparis_tamamlandi ? h('span', { sinif: 'dm-temlik', metin: 'Sipariş tamamlandı (%100)' }) : null,
          
-        s.lojistik_firma ? h('span', {}, ['Lojistik ', h('strong', { metin: s.lojistik_firma + (s.lojistik_no ? ' · ' + s.lojistik_no : '') })]) : h('span', { sinif: 'soluk', metin: 'Lojistik: veri yok' }),
+        s.lojistik_firma ? h('span', {}, ['Lojistik ', h('strong', { metin: s.lojistik_firma + (s.lojistik_no ? ' · ' + s.lojistik_no : '') }), s.lojistik_kaynak === 'kargo_portal' ? h('span', { sinif: 'soluk kucuk', metin: ' (kargo portalı)' }) : null]) : h('span', { sinif: 'soluk', metin: 'Lojistik firması henüz eşleşmedi' }),
         fiyatGor() ? h('span', {}, ['Birim fiyat ', h('strong', { metin: tl(fSip(s).birim_fiyat_kdv_haric_tl) }), ' · tutar (KDV hariç) ', h('strong', { metin: tl(fSip(s).tutar_kdv_haric_tl) })]) : null]));
       if (s.uyari_metni) satir.push(h('p', { sinif: 'dm-sp-not uyari', metin: s.uyari_metni + (s.irsaliye_tarihi ? ' (irsaliye ' + tarihTR(s.irsaliye_tarihi) + ')' : '') }));
       if (r === 'ek_sure_iste') satir.push(h('p', { sinif: 'dm-sp-not', metin: 'Ek süre başvurusu son gün ' + tarihTR(s.ek_sure_basvuru_son_gun) + ' (' + kalanMetin(s.ek_sure_basvuru_kalan_gun) + ').' }));

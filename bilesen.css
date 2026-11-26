@@ -21,7 +21,7 @@
 .sayfa-basi { margin-bottom: var(--b3); }
 .kirinti { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: var(--t-s); color: var(--soluk); margin-bottom: 4px; }
 .kirinti a { color: var(--soluk); text-decoration: none; padding: 6px 0; } .kirinti a:hover { color: var(--vurgu); text-decoration: underline; }
-.kirinti [aria-current] { color: var(--yazi2); font-weight: 600; overflow-wrap: anywhere; } .kirinti-ayrac { color: var(--eksen); }
+.kirinti [aria-current] { color: var(--yazi2); font-weight: 600; overflow-wrap: anywhere; } .kirinti-ayrac { color: var(--soluk); }
 .modul-gecis { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 var(--b3); }
 .modul-gecis-bag { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; text-decoration: none; font-weight: 600; color: var(--vurgu); background: var(--vurgu-zemin); border: 1px solid var(--vurgu); border-radius: var(--r-m); max-width: 100%; }
 .baslik-satir h2 { font-size: var(--t-xl); letter-spacing: -.01em; }
@@ -196,7 +196,7 @@ button.y2-satir { cursor: pointer; } @media (hover: hover) { button.y2-satir:hov
 .segment-dugme { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: var(--r-t); border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi2); font: inherit; font-size: var(--t-s); cursor: pointer; }
 .segment-dugme:hover { background: var(--yuzey2); }
 .segment-dugme.secili { background: var(--vurgu); color: var(--vurgu-yazi); border-color: var(--vurgu); font-weight: 650; }
-.segment-dugme .cip-sayi { background: var(--yuzey3); color: var(--yazi2); } .segment-dugme.secili .cip-sayi { background: rgba(255,255,255,.22); color: inherit; }
+.segment-dugme .cip-sayi { background: var(--yuzey3); color: var(--yazi2); } .segment-dugme.secili .cip-sayi { background: var(--vurgu-sert); color: var(--vurgu-yazi); }
 .arac-cubugu { margin: 0 0 var(--b3); min-width: 0; }
 .arac-ust { display: flex; align-items: center; gap: var(--b2); min-width: 0; }
 .arac-arama { flex: 1 1 auto; min-width: 0; width: 100%; min-height: 40px; padding: 0 14px; border-radius: var(--r-t); border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi); font: inherit; font-size: var(--t-m); }

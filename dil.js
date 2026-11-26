@@ -796,6 +796,15 @@
     [/^aynı hastanede doğrudan temin siparişi: teslim edildi$/, 'direct procurement order at the same hospital: delivered'],
     [/^(\d+) gündür bu adımda$/, function (m, n) { return n + (n === '1' ? ' day' : ' days') + ' at this step'; }],
     [/^Alım türü · (\d+) belgede bilinmiyor$/, function (m, n) { return 'Procurement type · unknown for ' + n + (n === '1' ? ' order' : ' orders'); }]);
+   
+  var TAM_8029 = {
+    'Bir bölüm verisi alınamadı': 'A section’s data could not be loaded', 'Bir bölümün verisi alınamadı': 'A section’s data could not be loaded',
+    'Bugün ne değişti': 'What changed today',
+    'Hastane / müşteri': 'Hospital / customer', 'Teslimat / irsaliye': 'Delivery / waybill', 'Tedarikçi': 'Supplier', 'Konteyner': 'Container', 'Makine': 'Machine'
+  };
+  Object.keys(TAM_8029).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8029[k]; });
+  REGEX.unshift([/^— (.+)$/, function (m, r) { return '— ' + cevir(r); }],
+    [/^(Hastane \/ müşteri|Sipariş|Teslimat \/ irsaliye|Konteyner|Ürün|Tedarikçi|Belge|İhale|Makine) \((\d+)\)$/, function (m, a, n) { return cevir(a) + ' (' + n + ')'; }]);
   PARCA.sort(function (a, b) { return b[0].length - a[0].length; });
   var onbellek = {};
   function cevir(m) {

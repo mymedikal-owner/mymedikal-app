@@ -5,7 +5,7 @@
   #icerik[data-modul="sterilizasyon"] .ozet-serit-ana .kpi-ikon, #icerik[data-modul="sterilizasyon"] .ozet-serit-ana .kpi-alt { display: none; }
   #icerik[data-modul="sterilizasyon"] .ozet-serit-ana .kpi-ana { padding: var(--b2); }
   #icerik[data-modul="sterilizasyon"] .ozet-serit-ana .kpi-sayi { font-size: 24px; }
-  #icerik[data-modul="sterilizasyon"] .ozet-serit-ana .kpi-baslik { white-space: normal; line-height: 1.25; font-size: 11.5px; overflow-wrap: normal; }
+  #icerik[data-modul="sterilizasyon"] .ozet-serit-ana .kpi-baslik { white-space: normal; line-height: 1.25; font-size: var(--t-xs); overflow-wrap: normal; }
   #icerik[data-modul="sterilizasyon"] .ozet-serit-ana .kpi-ust { padding-right: 20px; gap: 4px; }
 }
 .s41-liste { display: grid; gap: var(--b2); }

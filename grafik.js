@@ -23,7 +23,7 @@
   }
   var nf = new Intl.NumberFormat(window.MM_LOC || 'tr-TR');
   function say(n, o) { if (n == null || isNaN(n)) return '—'; return o ? new Intl.NumberFormat(window.MM_LOC || 'tr-TR', { maximumFractionDigits: o }).format(n) : nf.format(Math.round(n)); }
-  function kisa(n) { if (n == null || isNaN(n)) return '—'; var a = Math.abs(n); if (a >= 1e6) return say(n / 1e6, 1) + ' mn'; if (a >= 1e4) return say(n / 1e3, 0) + ' b'; if (a >= 1e3) return say(n / 1e3, 1) + ' b'; return say(n); }
+  function kisa(n) { if (n == null || isNaN(n)) return '—'; var a = Math.abs(n); if (a >= 1e6) return say(n / 1e6, 1) + ' mn'; var bin = window.MM_LOC === 'en-GB' ? ' k' : ' b';   if (a >= 1e4) return say(n / 1e3, 0) + bin; if (a >= 1e3) return say(n / 1e3, 1) + bin; return say(n); }
 
    
   var IK = {

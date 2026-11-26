@@ -913,7 +913,9 @@
     'İrsaliye (SAP\'de kesilen)': 'Delivery note (issued in SAP)',
     'Teslim (portalda girilen)': 'Delivery (entered in the portal)',
     'Kabul (hastane onayı)': 'Acceptance (hospital approval)',
-    'Kabul bekleyen (teslim var, muayene yok)': 'Awaiting acceptance (delivered, not yet inspected)'
+    'Kabul bekleyen (teslim var, muayene yok)': 'Awaiting acceptance (delivered, not yet inspected)',
+     
+    'Muayene olumsuz': 'Inspection failed'
   };
   Object.keys(TAM_8036).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8036[k]; });
   PARCA.push.apply(PARCA, [

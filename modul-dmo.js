@@ -283,7 +283,7 @@
       if (od0 && od0.kalan_gun <= 7) satirlar.push(h('div', { sinif: 'dm-bg-satir bilgi' }, [h('strong', { sinif: 'dm-bg-say', metin: od0.kalan_gun + ' gün' }), h('span', { metin: 'DMO ödeme günü ' + tarihTR(od0.odeme_gunu) })]));
       if (!bilinen.length) return null;   
       var govdeEl = (satirlar.length ? h('div', { sinif: 'dm-bg-liste' }, satirlar) : h('p', { sinif: 'dm-yok', metin: 'Bugün için açık iş görünmüyor.' }));
-      return G.kart({ baslik: 'Bugün yapılacak', alt: 'tıklayınca ilgili liste açılır', govde: govdeEl });
+      return G.kart({ baslik: 'Bugün yapılacak', govde: govdeEl });   
     }
     function odemeKarti() {
       var oc = yuk.s49 && yuk.s49.odeme_cizelgesi, fg = fiyatGor();
@@ -337,7 +337,7 @@
       liste = liste.filter(function (g) { return (g.kullanilan_iptal_hastane || 0) > 0; }).sort(function (a, b) { return doluluk(b) - doluluk(a); });
       var ilk = liste.slice(0, 6);
       return G.kart({ baslik: 'Ceza ve iptal kotası (%10, en az 3)', alt: 'iptal hakkı: %10, en az 3 (hastane azsa hastane sayısı kadar) · çizgi = hak sınırı', govde: ilk.length ? h('div', null, [h('div', { sinif: 'dm-kt-liste' }, ilk.map(function (g) {
-        var p = doluluk(g), asim = p > 100, tey = g.yasak_asim_teyitsiz === true, renk = tey ? 'sari' : (asim ? 'kirmizi' : (g.yasak_durumu === 'sari' || p >= 80 ? 'sari' : 'yesil'));   
+        var p = doluluk(g), tey = g.yasak_asim_teyitsiz === true, renk = tey ? 'sari' : (g.yasak_durumu === 'kirmizi' ? 'kirmizi' : (g.yasak_durumu === 'sari' || p >= 80 ? 'sari' : 'yesil'));   
         return h('div', { sinif: 'dm-kt-satir' }, [h('div', { sinif: 'dm-kt-ust' }, [firmaRozet(g.firma), h('strong', { metin: 'Dosya ' + say(g.dosya_no) + ' · ' + turAdi(g.urun_turu, g.grup_adi) })]),
           h('div', { sinif: 'dm-kt-iz', role: 'img', 'aria-label': 'İptal hakkı: ' + say(g.kullanilan_iptal_hastane) + ' kullanıldı, hak ' + say(g.iptal_hakki_hastane) }, [h('i', { sinif: renk, style: 'width:' + Math.min(100, p).toFixed(1) + '%' }), h('span', { sinif: 'dm-kt-sinir' })]),
           h('div', { sinif: 'dm-kt-alt kucuk' }, [h('strong', { metin: say(g.kullanilan_iptal_hastane) + ' / ' + say(g.iptal_hakki_hastane) }), h('span', { metin: ' hastane iptal · toplam ' + say(g.hastane_sayisi_toplam != null ? g.hastane_sayisi_toplam : g.hastane_sayisi_pencere) + ' hastane' + (tey ? ' · kota aşılmış görünüyor — kesinleşmedi' : (renk === 'kirmizi' ? ' · kota aşıldı' : (renk === 'sari' ? ' · sınıra yakın' : ''))) })])]);
@@ -439,7 +439,7 @@
       govde.appendChild(acikSiparisBolumu());   
        
       var mkListe = mektupListesi();
-      govde.appendChild(h('button', { type: 'button', sinif: 'dm-ayr dm-mk-gecis', onclick: function () { git('#dmo/mektup'); } }, [h('strong', { metin: 'Siparişler (sipariş bazlı görünüm)' }), h('span', { sinif: 'soluk kucuk', metin: mkListe.length + ' sipariş · ' + mkListe.filter(function (o) { return o.uyari; }).length + ' uyarılı' })]));
+      govde.appendChild(h('button', { type: 'button', sinif: 'dm-ayr dm-ayr-tek dm-mk-gecis', onclick: function () { git('#dmo/mektup'); } }, [h('strong', { metin: 'Siparişler (sipariş bazlı görünüm)' }), h('span', { sinif: 'soluk kucuk', metin: mkListe.length + ' sipariş · ' + mkListe.filter(function (o) { return o.uyari; }).length + ' uyarılı' })]));
       var bugun = bugunKarti();
       if (bugun) govde.appendChild(bugun);
        
@@ -448,12 +448,14 @@
         ['Hastane OTIF, en riskli 5', 'zamanında ve tam teslim', otifKarti], ['Ceza ve iptal kotası', 'iptal hakkı doluluğu', kotaKarti], ['Aylara göre ihale', 'sipariş ayına göre sayı', ayGrafigi]];
       var ayrSatirlar = ayr.map(function (r) {
         var kart = r[2](); if (!kart) return null;
-        return h('button', { type: 'button', sinif: 'dm-ayr', onclick: function () { G.sheet(r[0], function (g) { g.appendChild(kart); }).ac(); } }, [h('strong', { metin: r[0] }), h('span', { sinif: 'soluk kucuk', metin: r[1] })]);
+        return h('button', { type: 'button', sinif: 'dm-ayr dm-ayr-tek', onclick: function () { G.sheet(r[0], function (g) { g.appendChild(kart); }).ac(); } }, [h('strong', { metin: r[0] }), h('span', { sinif: 'soluk kucuk', metin: r[1] })]);
       }).filter(function (x) { return x; });
       if (ayrSatirlar.length) govde.appendChild(h('div', { sinif: 'dm-ayr-liste' }, ayrSatirlar));
       var liste = riskliHastaneler();
       govde.appendChild(h('h3', { sinif: 'bolum', metin: 'Riskli hastaneler (' + liste.length + ' İKN×hastane satırı)' }));
-      govde.appendChild(liste.length ? G.ilkN(liste, hastaneSatiri, { n: 3, sinif: 'dm-liste' }) : G.bos({ baslik: 'Riskli hastane etiketi yok', metin: 'Riskli, süresi geçmiş ya da teslim edilmemiş etiketli hastane yok.' }));
+      var rBos = liste.length ? null : G.bos({ baslik: 'Riskli hastane etiketi yok', metin: 'Riskli, süresi geçmiş ya da teslim edilmemiş etiketli hastane yok.' });
+      if (rBos) rBos.classList.add('dm-bos-kisa');   
+      govde.appendChild(liste.length ? G.ilkN(liste, hastaneSatiri, { n: 3, sinif: 'dm-liste' }) : rBos);
       govde.appendChild(h('p', { sinif: 'dm-yon', }, [h('a', { href: '#dmo/hastaneler', metin: 'Hastane bazında bütün detay →' })]));
     }
 
@@ -485,8 +487,8 @@
     function mkFiyat(m) { return fiyatGor() && yuk && yuk.fy ? (yuk.fy.mektup || {})[m.firma + '|' + m.dosya_no] || null : null; }
     function tlKisa(n) { return sayi(n) == null ? '—' : G.kisa(Number(n)); }   
     function tlTam(n) { var s = sayi(n); return s == null ? '—' : s + ' TL'; }
-    function mkOlcuBasligi() {
-      return h('div', { sinif: 'dm-mk-olcu dm-mk-olcu-bas kucuk' }, [h('span', { metin: 'Sipariş no' })].concat(MK_OLCU.map(function (x) { return h('span', { metin: x[0] }); })));
+    function mkOlcuBasligi(fa) {   
+      return h('div', { sinif: 'dm-mk-olcu dm-mk-olcu-bas kucuk' }, [h('span', { sinif: 'dm-mk-olcu-firma' }, [h('strong', {}, [firmaRozet(fa)])])].concat(MK_OLCU.map(function (x) { return h('span', { metin: x[0] }); })));
     }
     function mkOlcuHucreleri(m) {   
       var k = m.kapsam || {}, o = m.oran || {}, r = mkFiyat(m), fg = fiyatGor();
@@ -505,6 +507,7 @@
           var yzd = x[1] === 'irsaliye_yuzde' && o.irsaliye_eksik === true ? '—' : yz(o[x[1]]);
           return ikiSatir(ad[x[1]], (fg ? (r ? tlTam(r[x[2]]) : '—') + ' = ' : '') + yzd);
         });
+        if (o.muayene_olumsuz_var === true) sat.push(ikiSatir('Muayene olumsuz', (fg ? (r ? tlTam(r.muayene_olumsuz_tutar_kdv_haric_tl) : '—') + ' = ' : '') + yz(o.muayene_olumsuz_yuzde), 'kritik'));   
         sat.push(ikiSatir('Kabul / teslim', yz(o.kabul_teslim_yuzde)), ikiSatir('Kabul / irsaliye', yz(o.kabul_irsaliye_yuzde)));
         if (fg) sat.unshift(ikiSatir('Sipariş tutarı', r ? tlTam(r.tutar_kdv_haric_tl) : '—'));
         kap.appendChild(h('div', { sinif: 'dm-oge-izgara' }, sat));
@@ -549,8 +552,7 @@
         var sat = acik.filter(function (m) { return m.firma === fa; });
         if (!sat.length) return;
         var uy = sat.filter(function (m) { return mkTonlu(m); }), dg = sat.filter(function (m) { return !mkTonlu(m); });
-        kap.appendChild(h('div', { sinif: 'dm-mk-firma-baslik' }, [firmaRozet(fa)]));
-        kap.appendChild(mkOlcuBasligi());
+        kap.appendChild(mkOlcuBasligi(fa));
         if (uy.length) kap.appendChild(h('div', { sinif: 'dm-liste dm-mk-ozet-liste' }, uy.map(mkOzetSatiri)));
         if (dg.length) kap.appendChild(G.ilkN(dg, mkOzetSatiri, { n: 5, sinif: 'dm-liste dm-mk-ozet-liste' }));
       });
@@ -918,17 +920,22 @@
       if (f.risk && RISK_ACIK[f.risk]) govde.appendChild(h('p', { sinif: 'dm-aciklama', metin: RISK_ACIK[f.risk] }));
       var liste = tum.filter(function (s) { return (!f.firma || s.firma === f.firma) && (f.risk === 'acik' ? s.siparis_durum === 'acik' : (f.risk ? etiketVar(s, f.risk) : !!s.risk)); });   
       liste.sort(function (a, b) { var ra = a.risk ? RISK_SIRA.indexOf(a.risk) : 9, rb = b.risk ? RISK_SIRA.indexOf(b.risk) : 9; return ra - rb || (a.cezali_sure_kalan_gun == null ? 1e9 : a.cezali_sure_kalan_gun) - (b.cezali_sure_kalan_gun == null ? 1e9 : b.cezali_sure_kalan_gun); });
-      govde.appendChild(sayiSatiri(liste.length + ' sipariş kalemi (özet kartları tekil sipariş sayar; bir sipariş birden çok kalem olabilir)', 'DMO siparişler', firmaFiltre() + ' · ' + (f.risk ? (RISK_AD[f.risk] || f.risk) : 'Tüm etiketliler'),
-        [sutun('Firma', function (s) { return s.firma; }), sutun('Hastane', function (s) { return s.hastane; }), sutun('İl', function (s) { return s.il; }), sutun('Sipariş no', function (s) { return sipNo(s); }),
-          sutun('Risk', function (s) { return s.risk ? (RISK_AD[s.risk] || s.risk) : ''; }), sutun('Teslim durumu', function (s) { return TESLIM_AD[s.teslim_durum] || ''; }), sutun('Son teslim', function (s) { return s.son_teslim; }),
-          sutun('Cezalı süre sonu', function (s) { return s.cezali_sure_sonu; }), sutun('Miktar', function (s) { return s.miktar; }), sutun('Teslim edilen', function (s) { return s.teslim_edilen_miktar; })], liste));
+      var sk = h('div', { sinif: 'dm-sp-sk' });   
+      function sayiCiz(ls) {
+        sk.textContent = '';
+        sk.appendChild(sayiSatiri(ls.length + ' sipariş kalemi (özet kartları tekil sipariş sayar; bir sipariş birden çok kalem olabilir)', 'DMO siparişler', firmaFiltre() + ' · ' + (f.risk ? (RISK_AD[f.risk] || f.risk) : 'Tüm etiketliler'),
+          [sutun('Firma', function (s) { return s.firma; }), sutun('Hastane', function (s) { return s.hastane; }), sutun('İl', function (s) { return s.il; }), sutun('Sipariş no', function (s) { return sipNo(s); }),
+            sutun('Risk', function (s) { return s.risk ? (RISK_AD[s.risk] || s.risk) : ''; }), sutun('Teslim durumu', function (s) { return TESLIM_AD[s.teslim_durum] || ''; }), sutun('Son teslim', function (s) { return s.son_teslim; }),
+            sutun('Cezalı süre sonu', function (s) { return s.cezali_sure_sonu; }), sutun('Miktar', function (s) { return s.miktar; }), sutun('Teslim edilen', function (s) { return s.teslim_edilen_miktar; })], ls));
+      }
       function listeCiz() {   
         lk.textContent = '';
         var q = f.dno ? String(f.dno).toLowerCase() : '', ls = q ? liste.filter(function (s) { return String(sipNo(s)).toLowerCase().indexOf(q) >= 0; }) : liste;
+        sayiCiz(ls);
         if (!ls.length) { lk.appendChild(G.bos({ baslik: q ? 'Bu dosya no ile kalem yok' : 'Bu görünümde kalem yok' })); return; }
         lk.appendChild(G.ilkN(ls, siparisSatiri, { n: 10, sinif: 'dm-liste' }));
       }
-      govde.appendChild(lk); listeCiz();
+      govde.appendChild(sk); govde.appendChild(lk); listeCiz();
     }
 
      

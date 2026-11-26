@@ -554,7 +554,7 @@
         var uy = sat.filter(function (m) { return mkTonlu(m); }), dg = sat.filter(function (m) { return !mkTonlu(m); });
         kap.appendChild(mkOlcuBasligi(fa));
         if (uy.length) kap.appendChild(h('div', { sinif: 'dm-liste dm-mk-ozet-liste' }, uy.map(mkOzetSatiri)));
-        if (dg.length) kap.appendChild(G.ilkN(dg, mkOzetSatiri, { n: 5, sinif: 'dm-liste dm-mk-ozet-liste' }));
+        if (dg.length) kap.appendChild(G.ilkN(dg, mkOzetSatiri, { n: 4, sinif: 'dm-liste dm-mk-ozet-liste' }));
       });
       return kap;
     }

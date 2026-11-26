@@ -350,4 +350,23 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
   #icerik[data-modul="dmo"] .bos-durum.dm-bos-kisa h3 { font-size: var(--t-s); margin: 0; }
   #icerik[data-modul="dmo"] .bos-durum.dm-bos-kisa p { font-size: var(--t-xs); margin: 0; max-width: none; }
 }
+ 
+@media (max-width: 599px) {
+  #icerik[data-modul="dmo"] .ozet-serit { margin-bottom: var(--b2); }
+  #icerik[data-modul="dmo"] .ozet-serit-tumu { min-height: 40px; padding-block: 2px; margin-top: -2px; }
+  #icerik[data-modul="dmo"] .dm-mk-acik { margin: 2px 0; }
+  #icerik[data-modul="dmo"] .dm-mk-gecis { margin: 4px 0; min-height: 40px; padding-block: 2px; }
+  #icerik[data-modul="dmo"] .dm-mk-ozet-liste { gap: 3px; }
+  #icerik[data-modul="dmo"] .dm-mk-ozet-satir { padding-block: 4px; min-height: 40px; }
+  #icerik[data-modul="dmo"] .dm-ayr-liste { margin: var(--b2) 0; gap: 4px; }
+  #icerik[data-modul="dmo"] .dm-ayr-liste > .dm-ayr { min-height: 40px; padding-block: 2px; }
+  #icerik[data-modul="dmo"] .dm-bg-liste { gap: 3px; }
+  #icerik[data-modul="dmo"] .dm-bg-satir { min-height: 40px; padding-block: 2px; }
+  #icerik[data-modul="dmo"] .dm-yon { margin: 0 0 var(--b2); }
+  #icerik[data-modul="dmo"] .dm-yon a, #icerik[data-modul="dmo"] .kirinti a { display: inline-flex; align-items: center; min-height: 40px; }
+  #icerik[data-modul="dmo"] .dm-eylem-dg { min-height: 40px; }
+  #icerik[data-modul="dmo"] .kirinti { margin-bottom: 0; }    
+  #icerik[data-modul="dmo"] .sayfa-basi { margin-bottom: 2px; }
+  #icerik[data-modul="dmo"] .dm-liste > .ilkn-tumu { margin-top: 2px; min-height: 40px; }
+}
 .arac-cubugu .arac-arama.eld-arama { margin: 0; min-height: 40px; }    

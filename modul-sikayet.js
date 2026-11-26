@@ -13,7 +13,7 @@
 
   MM.moduller.sikayet = function (kok) {
     var qsSek = ''; try { qsSek = new URLSearchParams(location.search).get('sksekme') || ''; } catch (e) { qsSek = ''; }
-    var yuk = null, hata = null, canli = true, st = { sec: null, q: '', filtre: 'dikkat', sekme: qsSek === 'oncelik' ? 'oncelik' : 'genel', osec: null };
+    var yuk = null, hata = null, canli = true, st = { sec: null, q: '', filtre: 'dikkat', sirket: '', sekme: qsSek === 'oncelik' ? 'oncelik' : 'genel', osec: null };
     var onc = { yuk: null, hata: null };   
     var SAHA = !!(window.MMVeri && window.MMVeri.sahaKip && window.MMVeri.sahaKip());   
     kok.appendChild(G.sayfaBasi({ baslik: 'Şikâyetler', alt: 'Hastane şikâyetleri ve teslimat sorunları', kirinti: [['Şikâyetler']] }));
@@ -130,7 +130,7 @@
           var alan = h('div'), zaman = null;
           function listeYaz() {
             var qn = MM.aramaNorm(st.q.trim()), p = qn ? qn.split(/\s+/) : [];
-            var gor = liste.filter(function (x) { var a = MM.aramaNorm(x.ad || ''); for (var i = 0; i < p.length; i++) if (a.indexOf(p[i]) < 0) return false; return true; });
+            var gor = liste.filter(function (x) { if (st.sirket && (x.sirketler || []).indexOf(st.sirket) < 0) return false; var a = MM.aramaNorm(x.ad || ''); for (var i = 0; i < p.length; i++) if (a.indexOf(p[i]) < 0) return false; return true; });
             alan.textContent = '';
             var xl = xlSatir('Şikâyet dikkat listesi', (st.filtre === 'dikkat' ? 'Dikkat gerektirenler' : 'Tüm hastaneler') + (st.q ? ' · Arama: ' + st.q : ''), HAS_KOL, gor);
             var sat = h('div', { sinif: 'soluk kucuk', style: 'display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:20px' }, [h('span', { metin: G.say(gor.length) + (EN ? ' hospitals' : ' hastane') }), xl]);
@@ -141,7 +141,8 @@
           listeYaz();
           var arac = G.aracCubugu({
             arama: { deger: st.q, yerTutucu: 'Hastane ara', degisti: function (q) { clearTimeout(zaman); zaman = setTimeout(function () { st.q = q; listeYaz(); }, 120); } },
-            filtre: { baslik: 'Filtre', gruplar: [{ ad: 'Liste', secenekler: [['dikkat', 'Dikkat gerektirenler', dik.length], ['tum', 'Tüm hastaneler', H.length]], secili: st.filtre, varsayilan: 'dikkat', sec: function (k) { st.filtre = k; liste = k === 'dikkat' ? dik : H; listeYaz(); } }], temizle: function () { st.filtre = 'dikkat'; liste = dik; listeYaz(); } }
+            filtre: { baslik: 'Filtre', gruplar: [{ ad: 'Liste', secenekler: [['dikkat', 'Dikkat gerektirenler', dik.length], ['tum', 'Tüm hastaneler', H.length]], secili: st.filtre, varsayilan: 'dikkat', sec: function (k) { st.filtre = k; liste = k === 'dikkat' ? dik : H; listeYaz(); } },
+              { ad: 'Şirket', secenekler: [['', 'MY + DAY', H.length], ['MY', 'MY', H.filter(function (x) { return (x.sirketler || []).indexOf('MY') >= 0; }).length], ['DAY', 'DAY', H.filter(function (x) { return (x.sirketler || []).indexOf('DAY') >= 0; }).length]], secili: st.sirket, sec: function (d) { st.sirket = d || ''; listeYaz(); } }], temizle: function () { st.filtre = 'dikkat'; st.sirket = ''; liste = dik; listeYaz(); } }
           });
           return h('div', null, [arac, alan]);
         })() })]));

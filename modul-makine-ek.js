@@ -60,9 +60,18 @@
   function saatYaz(iso) { var t = Date.parse(iso); return isNaN(t) ? '' : saatTr.format(new Date(t)); }
   MM.makineEkSinama = { adimSonuc: adimSonuc, ESKI_MS: ESKI_MS, dokumaGecerli: dokumaGecerli, dokumaSalonlar: dokumaSalonlar, dokumaSirala: dokumaSirala, dokumaToplam: dokumaToplam, m2Yaz: m2Yaz };
    
+   
+  var acikDurum = { canli: false, tahmin: false };
+  function acilir(anahtar, ozet, icerik) {
+    var ac = h('details', { sinif: 'acilir-bolum me-ac' }, [ozet, icerik]);
+    if (acikDurum[anahtar]) ac.setAttribute('open', '');
+    ac.addEventListener('toggle', function () { acikDurum[anahtar] = ac.open; });
+    return ac;
+  }
   function canliCiz(kutu, liste, veriMs, durum) {
     kutu.textContent = '';
-    var ogeler = [], simdi = Date.now();
+    var ogeler = [], simdi = Date.now(), uyarili = [], calisan = [];
+    var dar = !!(window.matchMedia && window.matchMedia('(max-width: 599px)').matches);
     liste.forEach(function (c) {
       var eski = (simdi - veriMs + (c.veri_yas_sn || 0) * 1000) > ESKI_MS;
       var sayi = h('div', { sinif: 'me-canli-sayi', metin: say(c.adet) });
@@ -71,9 +80,14 @@
       var k = h('div', { sinif: 'me-canli-kutu' + (artar ? '' : ' dur') }, [h('div', { sinif: 'me-canli-hat', metin: 'Hat ' + c.hat }), sayi, alt,
         h('div', { sinif: 'me-canli-vard', 'data-hat': c.hat }),
         eski ? h('span', { sinif: 'me-etiket', metin: 'veri gecikmeli' }) : (c.calisiyor ? h('span', { sinif: 'me-etiket', metin: c.adet_tahmin ? 'canlı tahmini · adet tahmin' : 'canlı tahmini' }) : null)]);
-      kutu.appendChild(k);
+      (artar && dar ? calisan : uyarili).push(k);   
       ogeler.push({ c: c, sayi: sayi, alt: alt, k: k, t0: simdi, artar: artar, veriMs: veriMs });
     });
+    uyarili.forEach(function (k) { kutu.appendChild(k); });
+    if (calisan.length) {
+      var trc = window.MM.t || function (x) { return x };
+      kutu.appendChild(acilir('canli', h('summary', { metin: trc('Çalışan hatlar') + ' (' + calisan.length + ')' }), h('div', { sinif: 'me-canli-ic' }, calisan)));
+    }
     durum.canli = ogeler;
   }
 
@@ -141,7 +155,8 @@
     var s = (t || []).filter(function (x) { return x.tahmin != null; });
     if (!s.length) return bekleniyor('Gün sonu tahmini');
     var og = s.map(function (x) { return { e: 'Hat ' + x.hat, d: x.tahmin, alt: x.gun_hedef ? 'hedef ' + say(x.gun_hedef) : '', etiketDeger: say(x.tahmin) + ' (tahmin)', renk: 'var(--tahmin)' }; });
-    return h('div', null, [G.yatay(og, {}), h('p', { sinif: 'me-soluk', metin: 'Tahmin: bugünkü üretim + bugünkü ortalama hız × kalan planlı süre. Ölçüm değildir.' })]);
+    var trt = window.MM.t || function (x) { return x };   
+    return h('div', null, [acilir('tahmin', h('summary', { metin: trt('Hat bazında tahmin') + ' (' + s.length + ')' }), G.yatay(og, {})), h('p', { sinif: 'me-soluk', metin: 'Tahmin: bugünkü üretim + bugünkü ortalama hız × kalan planlı süre. Ölçüm değildir.' })]);
   }
 
    
@@ -268,6 +283,15 @@
         if (s.eskidi) {   
           o.artar = false; o.k.className = 'me-canli-kutu dur'; o.alt.textContent = 'veri gecikmeli · artmıyor';
           var et = o.k.querySelector('.me-etiket'); if (et) et.textContent = 'veri gecikmeli'; else o.k.appendChild(h('span', { sinif: 'me-etiket', metin: 'veri gecikmeli' }));
+          var ic = o.k.parentNode;   
+          if (ic && ic.classList && ic.classList.contains('me-canli-ic')) {
+            var grup = ic.parentNode, izgara = grup && grup.parentNode;
+            if (izgara) {
+              izgara.insertBefore(o.k, grup);
+              var kalan = ic.querySelectorAll('.me-canli-kutu').length, ozet = grup.querySelector('summary'), trc = window.MM.t || function (x) { return x };
+              if (!kalan) izgara.removeChild(grup); else if (ozet) ozet.textContent = trc('Çalışan hatlar') + ' (' + kalan + ')';
+            }
+          }
         }
         if (s.deger != null) o.sayi.textContent = say(s.deger);
       });

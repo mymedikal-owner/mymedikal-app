@@ -770,6 +770,7 @@
     'Hastane, belge no, malzeme ara…': 'Search hospital, document no. or material…', 'Hastane, belge no, malzeme ara': 'Search hospital, document no. or material',
     'e-fatura gönderildi': 'e-invoice sent', 'e-fatura gönderilmedi': 'e-invoice not sent', 'Filtreleri değiştirin ya da aramayı temizleyin.': 'Change the filters or clear the search.',
     'veri saati': 'data time', 'Dokuma m²': 'Weaving m²', 'Tezgah bazında': 'By loom', 'Salon süzgeci': 'Hall filter', 'tanımsız': 'not defined',
+    'Çalışan hatlar': 'Running lines', 'Hat bazında tahmin': 'Forecast by line',
     '{n} tezgahta m² bilgisi tanımsız (toplama katılmadı)': 'm² is not defined for {n} loom(s) (not included in the total)',
     'Hak edilen': 'Entitled', 'Mazeret izni': 'Excuse leave', 'Ücretsiz izin': 'Unpaid leave', 'Duyurular': 'Announcements', 'PDF · örnek dosya': 'PDF · sample file',
     'Önizleme: talep gönderilmedi. Gerçek sürümde yöneticiye iletilir.': 'Preview: the request was not sent. In the real version it goes to the manager.',

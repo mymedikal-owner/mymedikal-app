@@ -253,13 +253,14 @@
     l.sort(function (a, b) { return (b.g == null ? -1 : b.g) - (a.g == null ? -1 : a.g); });
     var govde = h('div', { sinif: 'mh-liste' });
     if (!l.length) govde.appendChild(h('p', { sinif: 'veri-yok', metin: 'Açık düzeltme ricası yok.' }));
-    l.slice(0, 6).forEach(function (x) {
+    var gosterN = Math.min(6, Math.max(3, l.filter(function (x) { return x.g != null && x.g > 3; }).length));   
+    l.slice(0, gosterN).forEach(function (x) {
       var ton = x.g == null ? 'gri' : (x.g > 7 ? 'kirmizi' : (x.g > 3 ? 'turuncu' : 'yesil'));
       govde.appendChild(h('div', { sinif: 'mh-satir', style: '--isaret:' + (TON[ton] || TON.gri)[0] }, [
         h('div', { sinif: 'mh-satir-ust' }, [h('b', { metin: x.k.konu }), h('span', { sinif: 'soluk kucuk', metin: x.k.sahip_rol })]),
         rozet(x.g == null ? '—' : x.g + ' gün', ton, 'saat')]));
     });
-    if (l.length > 6) govde.appendChild(h('button', { type: 'button', sinif: 'mini-dugme ms-tumu', onclick: function () { git('duzeltme'); }, metin: 'Tümü (' + l.length + ')' }));
+    if (l.length > gosterN) govde.appendChild(h('button', { type: 'button', sinif: 'mini-dugme ms-tumu', onclick: function () { git('duzeltme'); }, metin: 'Tümü (' + l.length + ')' }));
     return G.kart({ baslik: 'Açık düzeltme ricaları', alt: 'Yaşa göre, en eski üstte · kişi adı yerine rol', govde: govde });
   }
 
@@ -267,12 +268,18 @@
   function yaslandirmaKutusu(v) {
     var y = v.cari_yaslandirma;
     if (!y || !y.sirketler || !y.sirketler.length) return null;
-    var govde = h('div', { sinif: 'yigin' });
+    var govde = h('div', { sinif: 'yigin' }), toplamlar = h('div', null), kovaYigin = h('div', { sinif: 'yigin' }), kovaSay = 0, gecmis = 0, kritikKova = 0, kritikKalem = 0;
     y.sirketler.forEach(function (s) {
       var mx = Math.max.apply(null, s.kovalar.map(function (k) { return k.tl || 0; }).concat([1]));
       var oge = s.kovalar.map(function (k, i) { var r = (YAS_KOVA.filter(function (z) { return z[0] === k.ad; })[0] || ['', 'var(--s1)'])[1]; return { e: k.ad, alt: (k.adet != null ? G.say(k.adet) + ' kalem' : null), d: k.tl, renk: r, etiketDeger: mn(k.tl) }; });
-      govde.appendChild(h('div', null, [h('h4', { sinif: 'ms-alt-baslik', metin: s.sirket + ' · toplam ' + mn(s.toplam_tl) }), G.yatay(oge, { maks: mx })]));
+      s.kovalar.forEach(function (k) { kovaSay++; if (k.ad !== YAS_KOVA[0][0] && (k.tl || 0) > 0) gecmis++; if (k.ad === YAS_KOVA[5][0] && (k.tl || 0) > 0) { kritikKova++; kritikKalem += (k.adet || 0); } });
+      toplamlar.appendChild(h('h4', { sinif: 'ms-alt-baslik', metin: s.sirket + ' · toplam ' + mn(s.toplam_tl) }));   
+      kovaYigin.appendChild(h('div', null, [h('h4', { sinif: 'ms-alt-baslik', metin: s.sirket }), G.yatay(oge, { maks: mx })]));
     });
+    govde.appendChild(toplamlar);
+    govde.appendChild(h('details', { sinif: 'acilir-bolum ms-katla' }, [
+      h('summary', null, [h('span', { metin: 'Vade kovaları' }), h('span', { sinif: 'ms-katla-say', metin: y.sirketler.length + ' şirket · ' + kovaSay + ' kova' + (gecmis ? ' · ' + gecmis + ' vadesi geçmiş' : '') + (kritikKova ? ' · 180+ gün: ' + (kritikKalem ? G.say(kritikKalem) + ' kalem' : kritikKova + ' şirkette') : '') })]),
+      kovaYigin]));
     return G.kart({ baslik: 'Cari yaşlandırma', alt: 'Açık alacak, vade gününe göre' + (y.tarih_itibariyle ? ' · ' + tarihTR(y.tarih_itibariyle) + ' itibarıyla' : '') + ' · MY ve DAY ayrı gösterilir', govde: govde });
   }
 
@@ -311,9 +318,15 @@
       var notlar = [];
       if (c.veri_uyari) notlar.push(c.veri_uyari + '.');
       if (c.gecici) notlar.push('Geçici: ' + (c.gecici_neden || 'dönem kapanmadı') + '. Maliyet dağıtımı tamamlanınca değişebilir.');
+      var uyarilar = notlar.slice();   
+      notlar = [];
       if (son.some(function (x) { return x.favok != null && x.favok < 0; })) notlar.push('Negatif FAVÖK çubuğu sıfır çizgisinin altına çizilir.');
       notlar.push('FAVÖK = esas faaliyet kârı + amortisman; finansman gideri ve kur farkı dışarıda. Yalnız MY.');
-      kapsa.appendChild(G.kart({ baslik: 'Finansal performans', alt: 'MY Medikal · milyon ₺ · ' + (aylik ? 'aylık' : 'çeyreklik'), govde: h('div', { sinif: 'yigin' }, [ust, kpiler, grafik, h('p', { sinif: 'soluk kucuk', metin: notlar.join(' ') })]) }));
+      var negSay = son.filter(function (x) { return x.favok != null && x.favok < 0; }).length;
+      var ac = h('details', { sinif: 'acilir-bolum ms-katla' }, [
+        h('summary', null, [h('span', { metin: 'FAVÖK grafiği ve notlar' }), h('span', { sinif: 'ms-katla-say', metin: son.length + (aylik ? ' ay' : ' çeyrek') + (negSay ? ' · ' + negSay + ' negatif' : '') })]),
+        h('div', { sinif: 'yigin' }, [grafik, h('p', { sinif: 'soluk kucuk', metin: notlar.join(' ') })])]);
+      kapsa.appendChild(G.kart({ baslik: 'Finansal performans', alt: 'MY Medikal · milyon ₺ · ' + (aylik ? 'aylık' : 'çeyreklik'), govde: h('div', { sinif: 'yigin' }, [ust, kpiler, uyarilar.length ? h('p', { sinif: 'soluk kucuk', metin: uyarilar.join(' ') }) : null, ac]) }));
     }
     function yenile() { yuk = null; hata = null; ciz(); window.MMVeri.oku('muhasebe', 'ebitda').then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
     yenile();

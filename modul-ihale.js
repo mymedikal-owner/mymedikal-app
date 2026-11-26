@@ -227,7 +227,8 @@
         });
         liste.sort(function (a, b) { var ga = kalanGun(a.son_tarih), gb = kalanGun(b.son_tarih); if (ga == null) ga = 99999; if (gb == null) gb = 99999; return ga - gb; });
         if (!liste.length) { liste2.appendChild(G.bos({ baslik: 'İhale yok', metin: durum.ilgiliYalniz || durum.grup !== 'hepsi' || n ? 'Bu filtreyle eşleşen ihale yok.' : 'Şu an açık ihale görünmüyor.' })); return; }
-        liste2.appendChild(G.ilkN(liste, kart, { n: 10, sinif: 'ih-liste' }));
+        var kritikSayisi = liste.filter(function (x) { var g = kalanGun(x.son_tarih); return g != null && g <= 7; }).length;
+        liste2.appendChild(G.ilkN(liste, kart, { n: Math.min(10, Math.max(5, kritikSayisi)), sinif: 'ih-liste' }));
       }
       var zm = null;
       var aracKutu = G.aracCubugu({

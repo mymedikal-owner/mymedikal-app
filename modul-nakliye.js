@@ -383,6 +383,8 @@
   MM.moduller.nakliye = function (kok) {
     var loj = { d: '', tarih: '', durum: '', sirket: '', ara: '' }, gun = { mod: 'gun', bas: '', bit: '', sirket: '', ara: '' };
     var yuk = null, hata = null, canli = true, durum = '', musteri = '', sirket = '', zaman = '', gorunum = 'sevk', kdurum = '', turF = '', ara = '', altSek = 'liste', kSek = '';
+    var SEK_ANAHTAR = 'mm.nakliye.gorunum';
+    try { var kg0 = localStorage.getItem(SEK_ANAHTAR); if (['sevk', 'loj', 'gunluk', 'kargo'].indexOf(kg0) >= 0) gorunum = kg0; } catch (e) {   }
     kok.appendChild(G.sayfaBasi({ baslik: 'Nakliye', alt: 'Yurtiçi sevkiyatlar: çıkış durumu ve gecikmeler', kirinti: [['Nakliye']] }));
     var gor0 = MM.modulListe || [], gcL = [['nakliye', 'Genel sevkiyat'], ['dmo-nakliyat', 'DMO Nakliyat']].filter(function (p) { return p[0] === 'nakliye' || gor0.some(function (m) { return m.id === p[0]; }); });
     if (gcL.length > 1) kok.appendChild(h('div', { sinif: 'nk-bolum' }, [G.segment(gcL, 'nakliye', function (d) { if (d !== 'nakliye') location.hash = '#' + d; }, { ad: 'Bölüm' })]));
@@ -395,9 +397,10 @@
       var v = yuk.veri, dk = MM.yasDk(v.asof), eski = dk == null || dk > ESKI_DK, o = ozet(turSuz(v, turF));
       if (v.ornek === true) ust.appendChild(h('div', { sinif: 'bant ornek kucuk-bant', role: 'alert', metin: 'ÖRNEK VERİ — gerçek değil' }));
       if (eski) ust.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Veri eski' }), ' — sevkiyat listesi ' + MM.yasMetin(dk) + ' güncellendi.']));
-      ust.appendChild(h('div', { sinif: 'tazelik' }, [h('span', { sinif: 'nokta ' + (eski ? 'sari' : 'yesil'), 'aria-hidden': 'true' }), h('span', { metin: MM.yasMetin(dk) + ' güncellendi' }), h('span', { sinif: 'kaynak-etiket', metin: yuk.kaynak === 'graph' ? 'OneDrive' : 'yerel kopya' })]));
-      ust.appendChild(veriSatiri(v.asof));
-      ust.appendChild(h('div', { sinif: 'ust-bosluk nk-sekme' }, [G.sekmeler([['sevk', 'Sevkiyat'], ['loj', 'Lojistik'], ['gunluk', 'Günlük rapor'], ['kargo', 'Kargo teslim']], gorunum, function (d) { gorunum = d || 'sevk'; ciz(); }, { ad: 'Ekran bölümü', sinif: 'segment-dugme', goster: 3 })]));
+       
+      var vs = veriSatiri(v.asof).textContent;
+      ust.appendChild(h('div', { sinif: 'tazelik' }, [h('span', { sinif: 'nokta ' + (eski ? 'sari' : 'yesil'), 'aria-hidden': 'true' }), h('span', { metin: MM.yasMetin(dk) + ' güncellendi · ' + vs }), h('span', { sinif: 'kaynak-etiket', metin: yuk.kaynak === 'graph' ? 'OneDrive' : 'yerel kopya' })]));
+      ust.appendChild(h('div', { sinif: 'ust-bosluk nk-sekme' }, [G.sekmeler([['sevk', 'Sevkiyat', !eski && o.gecikmis ? h('span', { sinif: 'cip-sayi', metin: o.gecikmis + ' gecikmiş' }) : null], ['loj', 'Lojistik'], ['gunluk', 'Günlük rapor'], ['kargo', 'Kargo teslim']], gorunum, function (d) { gorunum = d || 'sevk'; try { localStorage.setItem(SEK_ANAHTAR, gorunum); } catch (e) {   } ciz(); }, { ad: 'Ekran bölümü', sinif: 'segment-dugme', goster: 3 })]));
       var turGr = { ad: 'Tür', secenekler: [['', 'Özel + DMO'], ['dmo', 'DMO'], ['ozel', 'Özel (doğrudan temin dahil)']], secili: turF, varsayilan: '', sec: function (d) { turF = d || ''; ciz(); } };
       function turTem() { turF = ''; }
       if (gorunum === 'loj') { govde.appendChild(lojistikGorunum(turSuz(v, turF), loj, ciz, turGr, turTem)); return; }
@@ -481,7 +484,7 @@
          
         var gk = G.ilkN(gec, kart, { n: Math.min(3, gec.length), sinif: 'tq-liste' });
         alan.appendChild(h('section', { sinif: 'ns-gecikmis ust-bosluk', 'aria-label': T('Gecikmiş sevkiyatlar') }, [h('h3', { sinif: 'bolum' }, [G.ikon('uyari', 18), ' ' + T('Gecikmiş sevkiyatlar') + ' (' + gec.length + ')']),
-          h('p', { sinif: 'kucuk soluk', metin: T('En çok geciken en üstte.') }), gk]));
+          gk]));
       }
        
       var gruplar = {}, sirali = [];

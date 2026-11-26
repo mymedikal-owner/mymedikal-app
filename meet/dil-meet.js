@@ -44,6 +44,9 @@
     'Gönderiliyor…': 'Sending…', 'Çalıyor…': 'Ringing…', 'Davet gönderildi': 'Invite sent', 'Cevap yok': 'No answer', 'Yeniden çağır': 'Call again', 'Yeniden davet et': 'Invite again',
     'Eşleşen kişi yok.': 'No matching people.', 'Çağrılacak kişi yok.': 'No one to invite.', 'Çağrı şu an gönderilemedi. Bağlantıyı paylaşın.': 'The invite could not be sent right now. Share the link instead.',
     'Mesajlar alınamadı': 'Messages could not be loaded', 'Merhaba, sesim geliyor mu?': 'Hello, can you hear me?', 'Toplantıya katılın (taklit bağlantı)': 'Join the meeting (demo link)',
+    'Sessize al': 'Mute', 'Sesi aç': 'Unmute', 'Video kapat': 'Stop video', 'Video aç': 'Start video', 'Paylaş': 'Share', 'Durdur': 'Stop', 'El kaldır': 'Raise hand', 'El indir': 'Lower hand', 'Diğer': 'More', 'Ayrıl': 'Leave',
+    'Kısayollar: Alt+A mikrofon, Alt+V kamera, Alt+S ekran paylaş, Alt+H el, Alt+C sohbet, Alt+U katılımcılar': 'Shortcuts: Alt+A microphone, Alt+V camera, Alt+S share screen, Alt+H hand, Alt+C chat, Alt+U participants',
+    'Yeniden bağlanıyor…': 'Reconnecting…', 'Bağlantınız koptu. Yeniden bağlanılıyor…': 'You are offline. Reconnecting…', 'Bağlantı yeniden kuruldu': 'Connection restored',
     'Bağlanıyor…': 'Connecting…', 'Aranıyor/Çalıyor': 'Calling/Ringing', 'Aranıyor…': 'Calling…', 'Ekranınızı paylaşıyorsunuz': 'You are sharing your screen', 'Ekran paylaşımı durdu': 'Screen sharing stopped',
     'Elini kaldırdı': 'Hand raised', 'Mikrofon kapalı': 'Microphone off', 'Mikrofon açık': 'Microphone on', 'Sabitlemeyi kaldır': 'Unpin', 'Sabitle': 'Pin',
     'Kamera yok': 'No camera', 'Mikrofon yok': 'No microphone', 'Hoparlör yok': 'No speaker', 'Katılmaya hazır mısınız?': 'Ready to join?',
@@ -83,6 +86,7 @@
   };
    
   var KALIP = [
+    [/^(.+) \((Alt\+[A-Z])\)$/, function (m, a, k) { var c = cevir(a); return c + ' (' + k + ')'; }],    
     [/^(\d+) dakika$/, '$1 minutes'], [/^Katılımcı (\d+)$/, 'Participant $1'], [/\bKatılımcı (\d+)\b/g, 'Participant $1'], [/^Deneme Kişi (\d+)$/, 'Test person $1'],
     [/^(.*) katıldı$/, '$1 joined'], [/^(.*) ayrıldı$/, '$1 left'], [/^(.*) elini kaldırdı$/, '$1 raised a hand'], [/^(.*) ekranını paylaşıyor$/, '$1 is sharing their screen'],
     [/^(.*) \(Siz\)$/, '$1 (You)'], [/^Siz - (.*)$/, 'You - $1'], [/^(.*) kişisini çağır$/, 'Invite $1'], [/^(.*) toplantısına katıl$/, 'Join $1'], [/^(\d+) katılımcı$/, '$1 participants'],

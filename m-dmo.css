@@ -316,6 +316,7 @@ button.dm-bg-satir { cursor: pointer; } button.dm-bg-satir:hover { border-color:
 .dm-mk-ozet-satir.uyari { border-left-color: var(--turuncu); background: var(--turuncu-zemin); }
 .dm-mk-oranlar { display: flex; flex-wrap: wrap; gap: var(--b1) var(--b3); font-size: var(--t-s); font-variant-numeric: tabular-nums; }
 .dm-mk-oran { white-space: nowrap; }
+.dm-irs-es { font-size: var(--t-xs); color: var(--soluk, inherit); border: 1px solid var(--cizgi); border-radius: var(--r-t); padding: 0 6px; white-space: nowrap; }    
 .dm-mk-eksik { color: var(--soluk); }
 .dm-mk-iptal { font-size: var(--t-s); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .dm-mk-teyitsiz { display: inline-block; margin-left: var(--b2); font-size: var(--t-xs); font-weight: 700; border-radius: var(--r-t); padding: 1px 8px; background: var(--yuzey2); color: var(--sari-yazi); border: 1px solid var(--sari-yazi); }

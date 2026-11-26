@@ -590,7 +590,7 @@
     'Kurum, İKN veya kalem ara': 'Search institution, tender no. or item', 'Depodaki lot': 'Lot in warehouse', 'Eşleşen lot yok': 'No matching lot', 'Aramayı değiştirin.': 'Try a different search.',
      
     'Siparişleri gör': 'View orders', 'Veri yok: bu ihalenin sevk satırı kaynakta yok': 'No data: this tender has no dispatch lines in the source', 'Ortalama çıkıştan teslime': 'Average dispatch-to-delivery', 'İlk son teslim tarihi': 'First delivery deadline',
-    'DMO onayladı': 'DMO approved', 'İKN': 'Tender no.', 'Çıktı %': 'Dispatched %', 'Çıktı': 'Dispatched', 'tümü': 'all', 'Eşleşmeyen teslim belgeleri': 'Unmatched delivery documents', 'Tüm firmalar': 'All companies',
+    'DMO onayladı': 'DMO approved', 'İKN': 'Tender no.', 'Çıktı %': 'Dispatched %', 'Çıktı': 'Dispatched', 'tümü': 'all', 'Eşleşmeyen teslim belgeleri': 'Unmatched delivery documents', 'Tüm firmalar': 'All companies', 'Tüm ürünler': 'All products',
     'Firmaya göre kırılım': 'Breakdown by company', 'MY ve DAY ayrı ayrı': 'MY and DAY separately', 'ödenmemiş DMO faturaları': 'unpaid DMO invoices', 'aktif, siparişli, teslimi başlayan': 'active, with orders, delivery started',
     'zamanında ve tam teslim': 'on-time and complete delivery', 'iptal hakkı doluluğu': 'cancellation allowance used', 'DMO Nakliyat ihale bazında': 'DMO Logistics by tender', 'Teslim kanıtı yok, ayrıntı': 'No delivery evidence, details',
     'Teslim kanıtı yok, teslim edilmedi demek değildir; yalnız belge kaydı bulunamadı demektir.': 'No delivery evidence does not mean not delivered; it only means no document record was found.', 'Örnek veri, gerçek değil. ': 'Sample data, not real. ',

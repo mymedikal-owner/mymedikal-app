@@ -198,7 +198,7 @@
     k.appendChild(h('span', { sinif: 'eld-r5', metin: (c.vessels ? 'Gemi: ' + c.vessels.split(' · ')[0] : 'Gemi bilgisi yok') + (c.bl ? ' · BL ' + c.bl : '') }));
     return k;
   }
-  function listeIzgara(v, liste, now) { return G.sayfali(liste, function (x) { return kartSatir(v, x, now); }, { sinif: 'eld-liste-izgara' }); }   
+  function listeIzgara(v, liste, now, n) { return G.sayfali(liste, function (x) { return kartSatir(v, x, now); }, { sinif: 'eld-liste-izgara', n: n || 20 }); }   
 
    
   function kpiSeridi(hz, git) {
@@ -218,14 +218,16 @@
     var bilgili = l.filter(function (x) { return x.d.kalanSerbest != null; }).sort(function (a, b) { return a.d.kalanSerbest - b.d.kalanSerbest; });
     var bilgisiz = l.filter(function (x) { return x.d.kalanSerbest == null; });
     var kap = h('div', { sinif: 'eld-risk' });
-    bilgili.forEach(function (x) {
+     
+    var riskTonlu = bilgili.filter(function (x) { return serbestBand(x.d.kalanSerbest).sinif !== 'iyi'; }).length;
+    if (bilgili.length) kap.appendChild(G.ilkN(bilgili, function (x) {
       var b = serbestBand(x.d.kalanSerbest), oran = Math.min(1, x.d.gun / (x.d.serbest || 1));
-      kap.appendChild(h('a', { href: hrefK(x.c.id), sinif: 'eld-risk-satir ' + b.sinif, style: '--band:' + b.renk }, [
+      return h('a', { href: hrefK(x.c.id), sinif: 'eld-risk-satir ' + b.sinif, style: '--band:' + b.renk }, [
         h('span', { sinif: 'rk-band' }, [G.ikon(b.ikon, 16), h('b', { metin: b.ad })]),
         h('span', { sinif: 'rk-ad' }, [h('b', { metin: x.c.id }), h('small', { metin: limanAd(x.c.at) + ' · ' + musteriMetni(v, x.c) })]),
         h('span', { sinif: 'rk-yol', title: x.d.gun + ' / ' + x.d.serbest + ' gün' }, [h('i', { style: 'width:' + Math.round(oran * 100) + '%' })]),
-        h('span', { sinif: 'rk-metin' }, [h('b', { metin: b.metin }), h('small', { metin: x.d.gun + '/' + x.d.serbest + ' gün' })])]));
-    });
+        h('span', { sinif: 'rk-metin' }, [h('b', { metin: b.metin }), h('small', { metin: x.d.gun + '/' + x.d.serbest + ' gün' })])]);
+    }, { n: Math.max(5, riskTonlu), sinif: 'eld-risk' }));
     if (!bilgili.length) kap.appendChild(h('p', { sinif: 'veri-yok', metin: 'Serbest süresi bilinen limanda konteyner yok.' }));
     if (bilgisiz.length) kap.appendChild(h('p', { sinif: 'kucuk soluk eld-bilgisiz', metin: 'Serbest süre bilgisi kayıtta olmayan ' + bilgisiz.length + ' konteyner risk listesine alınmadı: ' + bilgisiz.map(function (x) { return x.c.id; }).join(', ') + '.' }));
     kap.appendChild(G.lejant([['Süre aşıldı', 'var(--kritik)'], ['Son 3 gün', 'var(--ciddi)'], ['4–7 gün', 'var(--uyari)'], ['8+ gün', 'var(--iyi)']]));
@@ -829,7 +831,9 @@
       function liste(grup, bos, ek, eleme) {
         var k = h('div'); if (ek) k.appendChild(ek);
         var l = hz.liste.filter(function (x) { return x.d.grup === grup && (!eleme || eleme(x)); }).sort(sira[grup]);
-        if (!l.length) k.appendChild(G.bos({ baslik: bos })); else k.appendChild(listeIzgara(v, l, hz.now));
+         
+        var ln = grup === 'liman' ? Math.max(8, l.filter(function (x) { return riskSinif(x.d) !== ''; }).length) : 20;
+        if (!l.length) k.appendChild(G.bos({ baslik: bos })); else k.appendChild(listeIzgara(v, l, hz.now, ln));
         return k;
       }
       if (q) {

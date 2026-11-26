@@ -755,12 +755,16 @@
       tum.forEach(function (i) { var p = yilAy(i); if (p[0]) { yillar[p[0]] = 1; aylar[p[1]] = 1; } });
       var firmaSay = function (x) { return tum.filter(function (i) { return !x || i.firma === x; }).length; };
       var yl = Object.keys(yillar).sort().reverse(), al = Object.keys(aylar).sort();
-      govde.appendChild(aracKur([
+       
+      var urunVar = {}; tum.forEach(function (i) { var o = iknBul(i.firma, i.ikn); if (o && o.urun) o.urun.split(' / ').forEach(function (u) { urunVar[u] = 1; }); });
+      var urunSec = Object.keys(urunVar).sort(), urunGrup = urunSec.length ? [{ ad: 'Ürün grubu', anahtar: 'urun', secenekler: [['', 'Tüm ürünler']].concat(urunSec.map(function (u) { return [u, u]; })) }] : [];
+      govde.appendChild(aracKur(urunGrup.concat([
         { ad: 'Firma', anahtar: 'firma', secenekler: [['', 'Tüm firmalar', firmaSay('')], ['MY', 'MY', firmaSay('MY')], ['DAY', 'DAY', firmaSay('DAY')]] },
         { ad: 'Yıl', anahtar: 'yil', secenekler: [['', 'Tüm yıllar']].concat(yl.map(function (y) { return [y, y]; })) },
-        { ad: 'Ay', anahtar: 'ay', secenekler: [['', 'Tüm aylar']].concat(al.map(function (a) { return [a, AY[Number(a) - 1]]; })) }]));
-      var liste = tum.filter(function (i) { var p = yilAy(i); return (!f.firma || i.firma === f.firma) && (!f.yil || p[0] === f.yil) && (!f.ay || p[1] === f.ay); });
-      govde.appendChild(sayiSatiri(liste.length + ' ihale · çubuk: koyu = hastane kabulü, açık = teslim, çizgi = temlik eşiği', 'DMO ihaleler', firmaFiltre() + (f.yil ? ' · ' + f.yil : '') + (f.ay ? ' · ' + AY[Number(f.ay) - 1] : ''),
+        { ad: 'Ay', anahtar: 'ay', secenekler: [['', 'Tüm aylar']].concat(al.map(function (a) { return [a, AY[Number(a) - 1]]; })) }])));
+      var urunUyar = function (i) { if (!f.urun) return true; var o = iknBul(i.firma, i.ikn); return !!(o && o.urun && o.urun.split(' / ').indexOf(f.urun) >= 0); };
+      var liste = tum.filter(function (i) { var p = yilAy(i); return urunUyar(i) && (!f.firma || i.firma === f.firma) && (!f.yil || p[0] === f.yil) && (!f.ay || p[1] === f.ay); });
+      govde.appendChild(sayiSatiri(liste.length + ' ihale · çubuk: koyu = hastane kabulü, açık = teslim, çizgi = temlik eşiği', 'DMO ihaleler', firmaFiltre() + (f.urun ? ' · ' + f.urun : '') + (f.yil ? ' · ' + f.yil : '') + (f.ay ? ' · ' + AY[Number(f.ay) - 1] : ''),
         [sutun('Firma', function (i) { return i.firma; }), sutun('Sipariş no', function (i) { return sipNo(i); }), sutun('Ad', function (i) { return i.ad; }), sutun('Sipariş tarihi', function (i) { return i.baslangic; }),
           sutun('Teslim (ciro) %', function (i) { return i.teslim_ciro_yuzde; }), sutun('Kabul (ciro) %', function (i) { return i.kabul_ciro_yuzde; }), sutun('Açık sipariş', function (i) { return i.acik_siparis; }),
           sutun('Riskli sipariş', function (i) { return i.riskli_toplam_siparis; }), sutun('Cezalı sürede', function (i) { return i.cezali_surede_siparis; })], liste));
@@ -897,7 +901,8 @@
             : (s.siparis_durum === 'iptal' ? h('span', { sinif: 'soluk', metin: (s.iptal_kaynagi && s.iptal_kaynagi.indexOf('süre doldu') === 0) ? 'İptale düştü (süre doldu)' : 'Sipariş iptal' })
               : (s.siparis_durum !== 'acik' ? h('span', { sinif: 'soluk', metin: 'Sipariş kapalı' }
               ) : h('span', { sinif: kalan != null && kalan <= 3 ? 'kritik' : '' }, ['Cezalı süre: ' + kalanMetin(kalan)]))),
-          h('span', {}, ['Teslim ', h('strong', { metin: say(s.teslim_edilen_miktar) + ' / ' + say(s.miktar) })])])];
+          h('span', {}, ['Teslim ', h('strong', { metin: say(s.teslim_edilen_miktar) + ' / ' + say(s.miktar) })]),
+          s.irs_eslesme === 'siparis' ? h('span', { sinif: 'dm-irs-es', title: 'İrsaliye bu kaleme barkodla değil, sipariş numarası üzerinden eşlendi.', metin: 'sipariş no eşlemesi' }) : null])];   
        
       var oranEl = s.siparis_teslim_tamam_oran_yuzde;
       satir.push(h('div', { sinif: 'dm-sp-alt' }, [

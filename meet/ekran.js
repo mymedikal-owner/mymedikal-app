@@ -175,6 +175,20 @@
     var r = Math.ceil(n / c);
     return 'izgara c' + c + (r > 6 ? ' cok' : ' r' + r) + (n === 1 ? ' tek' : '');
   }
+   
+  function izgaraBoyutla(n) {
+    var iz = $('izgara'), kp = $('izgara-kap'); if (!iz || !kp) return;
+    var W = kp.clientWidth, H = kp.clientHeight, dik = H > W * 1.15;
+    if (mobil() || dik || W < 200 || H < 120 || n < 1) { iz.classList.remove('dengeli', 'kay'); iz.style.removeProperty('--kw'); iz.style.removeProperty('--kh'); return; }
+    var g = 10, en = 0, enW = 0;
+    for (var c = 1; c <= n; c++) {
+      var r = Math.ceil(n / c), w = Math.min((W - (c - 1) * g) / c, ((H - (r - 1) * g) / r) * 16 / 9);
+      if (w > enW) { enW = w; en = c; }
+    }
+    var kay = enW < 160; if (kay) enW = Math.min(160, W);
+    iz.style.setProperty('--kw', Math.floor(enW) + 'px'); iz.style.setProperty('--kh', Math.floor(enW * 9 / 16) + 'px');
+    iz.classList.add('dengeli'); iz.classList.toggle('kay', kay);
+  }
   function videoSiniri() {
     var ust = (mqDar && mqDar.matches) ? 4 : 16;
     return Math.max(1, ovc > 0 ? Math.min(ovc, ust) : ust);
@@ -214,6 +228,7 @@
       var liste = uzaklar.length ? uzaklar : (kartlar.has('ben') ? ['ben'] : []);
       yerlestir($('izgara'), liste);
       $('izgara').className = izgaraSinif(liste.length || 1);
+      izgaraBoyutla(liste.length || 1);
       if (uzaklar.length && kartlar.has('ben')) yerlestir(kendi, ['ben']);
     } else {
       $('izgara').hidden = true; $('ana-mod').hidden = false;
@@ -282,6 +297,7 @@
     var b = $('b-ekran'); b.setAttribute('aria-pressed', ekranAcik ? 'true' : 'false'); b.classList.toggle('aktif', ekranAcik);
     var t = ekranAcik ? 'Paylaşımı durdur' : 'Ekranı paylaş'; b.setAttribute('aria-label', t); b.setAttribute('title', t + ' (Alt+S)'); etYaz(b, ekranAcik ? 'Durdur' : 'Paylaş');
     $('m-ekran').lastChild.textContent = t;
+    var pb = $('paylas-bant'); if (pb) pb.hidden = !ekranAcik;   
   }
   function gorunumUi() {
     [['m-otomatik', 'otomatik'], ['m-izgara', 'izgara'], ['m-spotlight', 'spotlight'], ['m-konusmaci', 'konusmaci']].forEach(function (p) {
@@ -482,7 +498,7 @@
     ul.textContent = '';
     var ben = benOid();
     sohbetMsg.forEach(function (m) {
-      var li = document.createElement('li');
+      var li = document.createElement('li'); if (m.gonderen === ben) li.className = 'ben';
       var u = document.createElement('div'); u.className = 'msg-ust';
       var kim = m.gonderen === ben ? 'Siz' : (adlar[m.gonderen] || 'Kişi');
       var z = zaman(m); var saat = z ? new Date(z).toLocaleTimeString((window.MeetDil && window.MeetDil.dil === 'en') ? 'en-GB' : 'tr-TR', { hour: '2-digit', minute: '2-digit' }) : '';
@@ -1212,6 +1228,7 @@
     $('b-altyazi').addEventListener('click', altyazi); $('m-altyazi').addEventListener('click', altyazi);
     $('m-arka').addEventListener('click', arka);
     if (!(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function')) { $('b-ekran').hidden = true; $('m-ekran').hidden = true; }   
+    if ($('paylas-durdur')) $('paylas-durdur').addEventListener('click', ekranPaylas);
     $('b-ekran').addEventListener('click', ekranPaylas); $('m-ekran').addEventListener('click', ekranPaylas);
     $('b-el').addEventListener('click', elDegis); $('m-el').addEventListener('click', elDegis);
     $('b-tepki').addEventListener('click', function (e) { e.stopPropagation(); acilirDegistir('b-tepki', 'tepki-panel'); });
@@ -1278,6 +1295,7 @@
       if (yanAcik) yanKapat();
     });
     if (mq && mq.addEventListener) mq.addEventListener('change', duzenle);
+    if (window.ResizeObserver && $('izgara-kap')) { var roZ = 0; new ResizeObserver(function () { cancelAnimationFrame(roZ); roZ = requestAnimationFrame(function () { if (!$('izgara').hidden) izgaraBoyutla($('izgara').children.length || 1); }); }).observe($('izgara-kap')); }   
     var yenidenZ = null; window.addEventListener('resize', function () { clearTimeout(yenidenZ); yenidenZ = setTimeout(function () { if ($('sahne') && !$('sahne').hidden) duzenle(); }, 150); });   
     if (mqDar && mqDar.addEventListener) mqDar.addEventListener('change', secimGuncelle);
     window.addEventListener('beforeunload', function () { try { if (sag) sag.ayril(); } catch (e) {   } });

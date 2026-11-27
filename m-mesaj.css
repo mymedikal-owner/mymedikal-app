@@ -495,3 +495,27 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
  
 .ms-satir-alt { align-items: center; }
 @media (max-width: 599px) { .ms-asagi { right: 2px; } }
+
+ 
+ 
+.ms-m-emoji { background: transparent; box-shadow: none; padding: 2px 4px 0; }
+.ms-m-emoji::before { display: none; }
+.ms-m-emoji > .ms-metin { font-size: 44px; line-height: 1.15; }
+.ms-m-emoji > .ms-metin:has(+ .ms-meta)::after { display: none; }
+.ms-m-emoji > .ms-metin + .ms-meta { float: none; margin: 0; }
+ 
+.ms-alt-yazi.ms-yaziyor { color: var(--ms-yesil); font-weight: 500; }
+ 
+.ms-ozet-yeni { color: inherit; font-weight: 500; }
+ 
+.ms-yanit-kutu { border-radius: 8px; overflow: hidden; }
+.ms-yanit-metin { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; text-overflow: ellipsis; overflow-wrap: anywhere; line-height: 1.3; }
+.ms-ben .ms-yanit-kutu { background: rgba(0, 0, 0, .09); }
+.ms-karsi .ms-yanit-kutu { background: rgba(127, 127, 127, .12); }
+ 
+.ms-serit { margin: 0 8px; padding: 8px 10px; border-radius: 10px 10px 0 0; border-left: 4px solid var(--ms-yesil); background: var(--ms-arama-zemin); }
+.ms-serit-yazi span { max-width: 100%; }
+ 
+.ms-gun:not(.ms-arama-satir) { position: sticky; top: 4px; z-index: 2; }
+ 
+@media (max-width: 420px) { .ms-m, .ms-bolme .ms-m { max-width: 80%; } .ms-m-emoji > .ms-metin { font-size: 40px; } .ms-kart-dosya { min-width: 0; } }

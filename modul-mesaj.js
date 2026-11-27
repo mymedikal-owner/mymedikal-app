@@ -152,6 +152,15 @@
     });
   }
   function harfBaslik(ad) { var k = Array.from(String(ad || '').trim())[0] || '#'; k = k.toLocaleUpperCase('tr'); return /\p{L}/u.test(k) ? k : '#'; }
+  function emojiMi(m) {   
+    try {
+      if (!m || m.silindi || m.asistan || m.yanit || m.iletildi || (m.tur && m.tur !== 'metin') || typeof m.metin !== 'string') return false;
+      var t = m.metin.trim(); if (!t || t.length > 24) return false;
+      if (!/^(?:\p{Extended_Pictographic}|\p{Emoji_Modifier}|‍|️|⃣|\s)+$/u.test(t)) return false;
+      var n = (t.match(/\p{Extended_Pictographic}/gu) || []).length;
+      return n >= 1 && n <= 3;
+    } catch (e) { return false; }
+  }
   function gunEtiket(ts, simdi) {   
     var p = trParca(ts); if (!p) return '';
     var ms = epoch(simdi == null ? Date.now() : simdi);
@@ -892,7 +901,7 @@
       var okunmamis = s.okunmamis > 0;
       var ust = h('span', { sinif: 'ms-satir-ust' }, [h('span', { sinif: 'ms-sad' + (okunmamis ? ' ms-kalin' : ''), metin: ad }), h('span', { sinif: 'ms-saat' + (okunmamis ? ' ms-saat-yeni' : ''), metin: s.son ? T(saatBicim(s.son.ts)) : '' })]);
       var benimSon = !!(s.son && benOid && s.son.gonderen === benOid && s.son.id), tikO = benimSon ? tikEl(sohbetTik(s, s.son.id, benOid)) : null;   
-      var altEl = [h('span', { sinif: 'ms-ozet' + (tikO ? ' ms-ozet-tikli' : '') }, [tikO, document.createTextNode(s.son ? onizOnek(s) + onizMetni(s.son, T) : '')])];
+      var altEl = [h('span', { sinif: 'ms-ozet' + (tikO ? ' ms-ozet-tikli' : '') + (okunmamis ? ' ms-ozet-yeni' : '') },[tikO, document.createTextNode(s.son ? onizOnek(s) + onizMetni(s.son, T) : '')])];
       var rozetler = h('span', { sinif: 'ms-simge-sira' });
       if (s.tercih && s.tercih.sessiz) rozetler.appendChild(h('span', { sinif: 'ms-simge', 'aria-label': T('Sessize alındı') }, [ikon('hoparlorKapali', 16)]));
       if (s.tercih && s.tercih.sabit) rozetler.appendChild(h('span', { sinif: 'ms-simge', 'aria-label': T('Sabit') }, [ikon('sabit', 16)]));
@@ -1763,7 +1772,8 @@
             yd.addEventListener('click', function () { gonderBekleyen(m); });
             ic.push(yd);
           }
-          var balon = h('div', { sinif: 'ms-m' + (benim ? ' ms-ben' : ' ms-karsi') + (m.yerel ? ' ms-yerel ms-yerel-' + m.durum : '') + (tpk ? ' ms-m-tepkili' : '') + (m.asistan && !m.yerel ? ' ms-m-asistan' : ''), 'data-mid': m.id || null }, ic);
+          var yalnizEmoji = emojiMi(m);   
+          var balon = h('div', { sinif: 'ms-m' + (benim ? ' ms-ben' : ' ms-karsi') + (yalnizEmoji ? ' ms-m-emoji' : '') +(m.yerel ? ' ms-yerel ms-yerel-' + m.durum : '') + (tpk ? ' ms-m-tepkili' : '') + (m.asistan && !m.yerel ? ' ms-m-asistan' : ''), 'data-mid': m.id || null }, ic);
           if (!m.yerel && !m.silindi && m.id) balon.appendChild(menuBagla(balon, m));
           msj.appendChild(balon);
         });
@@ -1849,8 +1859,8 @@
       cozucu.push(i.on('silindi', function (ev) { if (ev.sohbet !== s.id) return; silinmisYap(ev.mid, ev.silen); if (yanitHedef && yanitHedef.id === ev.mid) { yanitHedef = null; seritGuncelle(); } if (duzenleHedef && duzenleHedef.id === ev.mid) seritIptal(); ciz(); }));
       cozucu.push(i.on('yaziyor', function (ev) {
         if (ev.sohbet !== s.id || ev.oid === benOid) return;
-        altYazi.textContent = (grup ? (uyeAd(ev.oid) || T('Biri')) + ' ' : '') + T('yazıyor…');
-        clearTimeout(yaziyorZmn); yaziyorZmn = setTimeout(function () { if (canli) altYazi.textContent = altBaslangic(); }, 4000);
+        altYazi.textContent = (grup ? (uyeAd(ev.oid) || T('Biri')) + ' ' : '') + T('yazıyor…'); altYazi.classList.add('ms-yaziyor');   
+        clearTimeout(yaziyorZmn); yaziyorZmn = setTimeout(function () { if (canli) { altYazi.textContent = altBaslangic(); altYazi.classList.remove('ms-yaziyor'); } }, 4000);
       }));
       cozucu.push(function () { clearTimeout(yaziyorZmn); });
       kutu.addEventListener('input', function () {

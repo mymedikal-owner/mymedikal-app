@@ -161,6 +161,7 @@
             <div id="ana" class="ana"></div>
             <div id="serit" class="serit"></div>
           </div>
+          <div id="paylas-bant" class="paylas-bant" role="status" hidden><span class="paylas-nokta" aria-hidden="true"></span><span>Ekranınızı paylaşıyorsunuz</span><button id="paylas-durdur" type="button">Durdur</button></div>
           <div id="kendi" class="kendi"></div>
           <div id="caliyor" class="caliyor" role="status" aria-live="polite" hidden>
             <div id="cal-av" class="cal-av" aria-hidden="true">?</div>
@@ -220,7 +221,7 @@
           <button id="b-cevir" class="yuvarlak" type="button" aria-label="Kamerayı çevir (ön/arka)" title="Kamerayı çevir (ön/arka)" hidden><span class="ikon" data-ikon="cevir"></span></button>
           <button id="b-altyazi" class="yuvarlak ikincil" type="button" aria-label="Altyazı (yakında)" title="Altyazı (yakında)"><span class="ikon" data-ikon="altyazi"></span></button>
           <div class="acilir-kap">
-            <button id="b-tepki" class="yuvarlak" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Tepki gönder" title="Tepki gönder"><span class="ikon" data-ikon="emoji"></span></button>
+            <button id="b-tepki" class="yuvarlak" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Tepki gönder" title="Tepki gönder"><span class="ikon" data-ikon="emoji"></span><span class="et" aria-hidden="true">Tepki</span></button>
             <div id="tepki-panel" class="acilir tepki-panel" role="menu" hidden>
               <button type="button" class="emoji-dugme" role="menuitem" data-tepki="like" data-emoji="👍" aria-label="Beğen">👍</button>
               <button type="button" class="emoji-dugme" role="menuitem" data-tepki="love" data-emoji="❤️" aria-label="Kalp">❤️</button>
@@ -237,9 +238,9 @@
             <div id="menu" class="acilir menu" role="menu" hidden>
               <p class="menu-baslik">Düzeni değiştir</p>
               <button id="m-otomatik" type="button" class="menu-oge" role="menuitemradio" aria-checked="true"><span class="ikon" data-ikon="otomatik"></span>Otomatik</button>
-              <button id="m-izgara" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="izgara"></span>Döşeme</button>
+              <button id="m-izgara" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="izgara"></span>Galeri görünümü</button>
               <button id="m-spotlight" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="spotlight"></span>Spotlight</button>
-              <button id="m-konusmaci" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="konusmaci"></span>Kenar çubuğu</button>
+              <button id="m-konusmaci" type="button" class="menu-oge" role="menuitemradio" aria-checked="false"><span class="ikon" data-ikon="konusmaci"></span>Konuşan görünümü</button>
               <hr class="menu-cizgi">
               <button id="m-tamekran" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="tamekran"></span>Tam ekran</button>
               <button id="m-arka" type="button" class="menu-oge" role="menuitem"><span class="ikon" data-ikon="arka"></span>Arka plan ve efektler</button>

@@ -163,5 +163,22 @@
   #icerik[data-modul="kalite-yukle"] .ny-etiket { margin-top: 4px; }
   #icerik[data-modul="kalite-yukle"] .ny-ipucu { margin-top: 6px; }
   #icerik[data-modul="kalite-yukle"] .ny-kart .ny-buyuk, #icerik[data-modul="kalite-yukle"] .ny-kart .ny-gonder { min-height: 48px; }
+   
+  #icerik[data-modul="yonetim"] .kart2 { padding: 10px 12px; }
+  #icerik[data-modul="yonetim"] .kart2-ust { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: center; }
+  #icerik[data-modul="yonetim"] .kart2-ust > div:first-child { flex: 1 1 100%; }
+  #icerik[data-modul="yonetim"] .kart2-eylem { display: flex; gap: 6px; }
+  #icerik[data-modul="yonetim"] .kart2-eylem .mini-dugme { min-height: 36px; }
+  #icerik[data-modul="yonetim"] .dikkat-ust .baglanti-dugme { min-height: 36px; }
+  #icerik[data-modul="yonetim"] .dikkat .dikkat-sira .dikkat-kart { min-height: 36px; padding-block: 4px; }
+  #icerik[data-modul="yonetim"] .dikkat.dikkat { padding-block: 8px; }
+  #icerik[data-modul="yonetim"] .segment-dugme { min-height: 36px; }
+  #icerik[data-modul="yonetim"] .iki-kolon { gap: 8px; }
+  #icerik[data-modul="yonetim"] .ust-bosluk { margin-top: 6px; }
+  #icerik[data-modul="yonetim"] .ozet-serit { margin-bottom: 8px; }
+  #icerik[data-modul="yonetim"] .segment { margin-bottom: 6px; }
+  #icerik[data-modul="yonetim"] .ozet-serit .ozet-serit-ana .kpi-ana { padding-block: 5px; padding-inline: 8px; }
+  #icerik[data-modul="yonetim"] .ozet-serit .ozet-serit-ana .kpi-deger { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
+  #icerik[data-modul="yonetim"] .ozet-serit .ozet-serit-ana .kpi-sayi { font-size: 22px; }
   #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
 }

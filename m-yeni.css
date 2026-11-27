@@ -47,8 +47,8 @@
 .as-ek-panel[hidden] { display: none; }
 .as-ek-uyari { margin: 0; font-size: 13px; line-height: 1.35; color: var(--yazi, #222); }
 .as-ek-cip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; font-size: 13px; }
-.as-ek-ad { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.as-ek-sil { flex: none; min-height: 32px; padding: 0 10px; border: 1px solid var(--cizgi, #ccc); border-radius: 16px; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.as-ek-ad { min-width: 0; overflow-wrap: anywhere; }
+.as-ek-sil { flex: none; min-height: 44px; min-width: 44px; padding: 0 12px; border: 1px solid var(--cizgi, #ccc); border-radius: 16px; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
 .as-ek-satir { margin-top: 6px; }
 .as-ek-silindi .as-ek-ad { opacity: .6; }
 

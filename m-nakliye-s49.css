@@ -75,3 +75,15 @@
 #icerik[data-modul="nakliye"] .nk-katla-say { font-weight: 400; font-size: var(--t-xs); color: var(--soluk); }
 .nk-xl-yer { flex: 0 0 auto; }
 .nk-xl-yer .excel-dugme { font-size: 0; gap: 0; padding: 0 10px; margin-left: 0; }
+ 
+.gs-gunler { min-width: 0; max-width: 100%; }
+#icerik .gs-gunler .segment-dugme { min-height: 44px; }
+.gs-gir { align-items: center; }
+.gs-gezin { min-height: 44px; min-width: 44px; justify-content: center; }
+.gs-gezin[disabled] { opacity: .45; cursor: default; }
+.gs-gir input[type="date"], .gs-gir input[type="month"] { min-height: 44px; }
+.gs-kurum { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+.gs-kurum-ad { overflow-wrap: anywhere; font-weight: 600; }
+.gs-rozetler { display: flex; flex-wrap: wrap; gap: 4px; }
+.gs-rozet { font-size: var(--t-xs); }
+@media (max-width: 599px) { .gs-gir { gap: var(--b2); } .gs-gir label { flex: 1 1 100%; } }

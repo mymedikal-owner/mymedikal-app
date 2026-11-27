@@ -530,6 +530,18 @@
    [/(\S+) itibarıyla, milyon/g, 'As of $1, million'], [/(\S+ – \S+) arasında oluşturulan belgeler; tutar yok/g, 'Documents created between $1; no amounts'], [/(\d\d:\d\d)’den bugün şimdiye/g, 'from $1 today until now'], [/Nakliye firması ve teslim kanıtı SAP.de tutulmuyor; /g, 'The carrier and proof of delivery are not kept in SAP; '],
    [/Şirket içi \(MY→DAY\)/g, 'Internal (MY→DAY)'], [/(\d+) kaynağın/g, '$1 sources’']]));
    
+  [['Malı Teslim Alan', 'Receiving party'], ['Malzeme Kodu', 'Material code'], ['Malzeme Adı', 'Material name'], ['Miktar', 'Quantity'], ['Koli İçi Miktar', 'Quantity per box'],
+    ['Ölçü Birimi', 'Unit'], ['Koli Miktarı', 'Boxes'], ['Sevk Tarih', 'Dispatch date'], ['Lokasyon', 'Location'], ['Açıklama', 'Note'], ['İrsaliye No', 'Waybill no.'],
+    ['Günlük sevk', 'Daily dispatch'], ['Günlük sevk · kuruma göre', 'Daily dispatch · by institution'], ['Günlük sevk · ürüne göre', 'Daily dispatch · by product'],
+    ['Günlük sevk yok', 'No daily dispatch'], ['Günlük sevkiyat listesi henüz gelmedi.', 'The daily dispatch list has not arrived yet.'],
+    ['Önceki gün', 'Previous day'], ['Sonraki gün', 'Next day'], ['Gün', 'Day'], ['Sevk günü', 'Dispatch day'], ['Gruplama', 'Grouping'], ['Liste', 'List'],
+    ['Kuruma göre', 'By institution'], ['Ürüne göre', 'By product'], ['İrsaliyeli', 'With waybill'], ['İrsaliyesiz', 'No waybill'], ['Koli girilmemiş', 'Boxes not entered'],
+    ['koli girilmemiş', 'boxes not entered'], ['Not var', 'Has note'], ['Var', 'Yes'], ['Satır', 'Lines'], ['sevk satırı', 'dispatch lines'], ['toplam miktar', 'total quantity'],
+    ['Koli', 'Boxes'], ['farklı kurum', 'distinct institutions'], ['Teslim noktası', 'Delivery points'], ['İrsaliye', 'Waybills'], ['farklı irsaliye', 'distinct waybills'],
+    ['Bu günde sevkiyat kaydı yok; önceki ya da sonraki güne geçin.', 'No dispatches on this day; go to the previous or next day.']
+  ].forEach(function (p) { if (!Object.prototype.hasOwnProperty.call(TAM, p[0])) TAM[p[0]] = p[1]; });
+  REGEX.unshift([/^koli girilen (\d+) satır$/, '$1 lines with boxes entered'], [/^Günlük liste (.+) güncellendi\.$/, 'Daily list updated $1.']);
+   
   var TAM_MESAJ = {
     'Asistan': 'Assistant', 'Yeni sohbet': 'New chat', 'Yenile': 'Refresh', 'Geri': 'Back', 'Başlat': 'Start', 'Anladım': 'Got it', 'Kişi ara': 'Search people', 'Grup adı': 'Group name',
     'Kişi seçin': 'Select people', 'Sohbet yok': 'No chats', 'Mesaj yok': 'No messages', 'Mesaj': 'Message', 'Gönder': 'Send', 'Kartı gönder': 'Send card', 'Siz': 'You', 'Okundu': 'Read',

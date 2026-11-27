@@ -278,17 +278,16 @@
       var etiketler = h('div', { sinif: 'eld-g-etiket' }, [h('div', { sinif: 'eld-g-bos', style: 'height:' + TOP + 'px' })]);
       gor.forEach(function (x) { etiketler.appendChild(h('a', { href: hrefK(x.c.id), sinif: 'eld-g-ad', style: 'height:' + RH + 'px' }, [h('b', { metin: x.c.id }), h('small', { metin: musteriMetni(v, x.c) })])); });
       var pane = h('div', { sinif: 'eld-g-pane', tabindex: '0', 'aria-label': 'Zaman çizelgesi (yatay kaydırılır)' }, [svg]);
-      kok.appendChild(G.kart({ baslik: 'Sevkiyat zaman çizelgesi', alt: 'Çubuk: kalkış → varış (ETD → ETA). Çubuğun sağındaki ince bant: serbest süre. Satıra dokununca ayrıntı açılır.',
-        govde: h('div', { sinif: 'eld-gantt' }, [etiketler, pane]),
+      kok.appendChild(G.kart({ baslik: 'Sevkiyat zaman çizelgesi',         govde: h('div', { sinif: 'eld-gantt' }, [etiketler, pane]),
         tablo: { kolonlar: ['Konteyner', 'Durum', 'Kalkış', 'Varış', 'Serbest süre'], satirlar: gor.map(function (x) { return [x.c.id, DURUM_AD[x.d.ds] || x.d.ds, tarihMetin(x.d.dep), tarihMetin(x.d.arr), x.c.free != null ? x.c.free + ' gün' : '—']; }) },
-        dip: 'Tarihler liste/forwarder kaynaklıdır' + (v.takip && v.takip.takipli_n ? '' : '') }));
+      }));
       var lj = G.lejant([['Yolda (dolu kısım: bugüne kadar)', 'var(--s1)'], ['Kalkış öncesi', 'var(--eksen)'], ['Varış tarihi geçti', 'var(--sk5)'], ['Serbest süre — kalan yeterli', 'var(--iyi)'], ['Serbest süre — az/aşıldı', 'var(--kritik)'], ['Planlanan serbest süre (henüz varmadı)', 'var(--vurgu-zemin)', 'tx']]);
       kok.appendChild(lj);
       kok._sonra = function () { pane.scrollLeft = Math.max(0, X(now) - pane.clientWidth * 0.8); };
     }
     if (tarihsiz.length) {
       var cs = h('div', { sinif: 'eld-cip-sira' }); tarihsiz.forEach(function (x) { cs.appendChild(h('a', { href: hrefK(x.c.id), sinif: 'eld-cip-link' }, [h('b', { metin: x.c.id }), ' ', h('span', { sinif: 'soluk', metin: DURUM_AD[x.d.ds] || x.d.ds })])); });
-      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Tarihi yok (' + tarihsiz.length + ')', alt: 'Kalkış/varış tarihi kayıtta olmayan konteynerler çizelgeye konmaz.', govde: cs })]));
+      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Tarihi yok (' + tarihsiz.length + ')', govde: cs })]));
     }
     return kok;
   }
@@ -595,7 +594,7 @@
     function toplam(g) { return [g.adet ? sayi(g.adet) + ' adet' : null, g.cift ? sayi(g.cift) + ' çift' : null].filter(Boolean).join(' + ') || '—'; }
     function yoldaN(g) { return g.k.filter(function (e) { return e.x.d.grup === 'yolda'; }).length; }
     var bar = G.yatay(liste.map(function (g) { return { e: musteriAd(v, g.kod), alt: g.k.length + ' lot · ' + yoldaN(g) + ' yolda', d: g.adet + g.cift, etiketDeger: toplam(g), renk: 'var(--s1)' }; }));
-    kok.appendChild(G.kart({ baslik: 'Müşteri bazında dağılım', alt: 'Konteyner lotlarında kayıtlı miktarların toplamı (tüm durumlar, teslim edilenler dahil)', govde: bar,
+    kok.appendChild(G.kart({ baslik: 'Müşteri bazında dağılım', govde: bar,
       tablo: { kolonlar: ['Müşteri', 'Miktar', 'Lot', 'Yolda'], satirlar: liste.map(function (g) { return [musteriAd(v, g.kod), toplam(g), g.k.length, yoldaN(g)]; }) } }));
     var tb = G.tablo({ kolonlar: [
       { ad: 'Müşteri', k: 'm', deger: function (r) { return r.m; }, ciz: function (r) { return r.m; } },
@@ -605,7 +604,7 @@
       { ad: 'Durum', k: 'd', deger: function (r) { return DURUM_AD[r.x.d.ds] || r.x.d.ds; }, ciz: function (r) { return DURUM_AD[r.x.d.ds] || r.x.d.ds; } },
       { ad: 'ETA / Konum', k: 'e', deger: function (r) { return r.x.d.grup === 'yolda' ? r.x.d.arr : 1e9; }, ciz: function (r) { return r.x.d.grup === 'yolda' ? 'ETA ' + tarihMetin(r.x.d.arr) : limanAd(r.x.c.at); } }],
       satirlar: satirlar, sira: { k: 'm', yon: 'yukari' }, satirTikla: function (r) { location.hash = hrefK(r.x.c.id); }, satirSinif: function (r) { return riskSinif(r.x.d); } });
-    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Lot dökümü', alt: 'Sütun başlığına dokunarak sıralayın; satıra dokununca konteyner ayrıntısı açılır.', govde: tb })]));
+    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Lot dökümü', govde: tb })]));
     return kok;
   }
 
@@ -652,7 +651,7 @@
     var od = h('div', { sinif: 'eld-odeme-liste' });
     odemeli.forEach(function (x) { var p = x.c.fin.pay; od.appendChild(h('a', { href: hrefK(x.c.id), sinif: 'eld-odeme-satir' }, [h('span', { sinif: 'od-ad' }, [h('b', { metin: x.c.id }), h('small', { metin: x.c.sup || '—' })]), odemeCubugu(p), h('span', { sinif: 'od-bakiye' + (p.bal > 0.5 ? ' bakiye' : ''), metin: p.bal > 0.5 ? usd(p.bal) + ' kalan' : 'kalan yok' })])); });
     od.appendChild(G.lejant(ODEME_LEJ));
-    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Ödeme durumu', alt: 'Konteyner başına; uzunluk PI toplamına göre. Kalan bakiye yüksekten düşüğe.', govde: od,
+    kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Ödeme durumu', govde: od,
       tablo: { kolonlar: ['Konteyner', 'Avans', 'Ara ödeme', 'Credit note', 'Kalan'], satirlar: odemeli.map(function (x) { var p = x.c.fin.pay; return [x.c.id, usd(p.adv), usd(p.p2), usd(p.cn), usd(p.bal)]; }) } })]));
     var mal = fl.filter(function (x) { return x.c.fin.total != null; }).sort(function (a, b) { return b.c.fin.total - a.c.fin.total; });
     kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'İthalat maliyeti (kayıtlı)', alt: 'Konteyner bazında; "tahmin" etiketli tutarlar kesinleşmemiştir',

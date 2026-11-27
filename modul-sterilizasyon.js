@@ -35,7 +35,7 @@
       }));
       var ust = eskiKaynak ? h('p', { sinif: 'ny-ipucu', metin: 'Veri eski: liste güncel olmayabilir' }) : null;
       var kt = v.kalite_bekleyen_kaynak_tarihi ? h('p', { sinif: 'ny-ipucu', metin: 'Veri tarihi: ' + tarihTR(v.kalite_bekleyen_kaynak_tarihi) }) : null;
-      return h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Kalite kararı bekleyen miktar (ürün bazında)', alt: 'kararı henüz verilmemiş mamul partileri · tarih sınırı yok', govde: h('div', null, [ust, govde2, kt]) })]);
+      return h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Kalite kararı bekleyen miktar (ürün bazında)', govde: h('div', null, [ust, govde2, kt]) })]);
     }
 
     function bugun(v) {

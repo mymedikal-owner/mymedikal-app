@@ -158,7 +158,7 @@
         }))])]));
     }
     var kAlt = donemMetni(c.donem0) + ' → ' + donemMetni(c.donem1) + ' · GL net satış (MY)', kapanmiyor = c.kapanis_farki != null && Math.abs(c.kapanis_farki) > 1;
-    return katla(st, 'kopru', G.kart({ baslik: 'Ciro köprüsü', alt: kAlt, govde: h('div', null, f), dip: 'Köprü GL net satıştan başlar ve GL net satışta kapanır; son satır, faturalandırma dışı kayıtların GL farkındaki değişimini taşır.' }), 'Ciro köprüsü', kAlt, kapanmiyor);   
+    return katla(st, 'kopru', G.kart({ baslik: 'Ciro köprüsü', alt: kAlt, govde: h('div', null, f) }), 'Ciro köprüsü', kAlt, kapanmiyor);   
   }
 
   function nakitKarti(an, st) {
@@ -181,7 +181,7 @@
      
     return katla(st, 'nakit', G.kart({ baslik: 'Nakit akışı', alt: nAlt, govde: h('div', null, [bar(oge, { ad: 'Aylık nakit akışı', yukseklik: 200 }),
       G.lejant([['Faaliyet', 'var(--s1)'], ['Yatırım (yaklaşık)', 'var(--s2)'], ['Finansman (yaklaşık)', 'var(--turuncu)']]), h('div', { style: 'margin-top:8px' }, [tab])]),
-      dip: 'Yatırım ve finansman rakamları hesap grubu değişiminden türetildiği için yaklaşıktır (alım/satış, kredi/vergi ayrılamaz).' + (geciciAy.length ? ' Soluk çubuk ve tablo, maliyet dağıtımı tamamlanmamış geçici aylar içerir: ' + geciciAy.join(', ') + '.' : '') }), 'Nakit akışı', nAlt, geciciAy.length > 0);
+      dip: geciciAy.length ? 'Soluk çubuk ve tablo, maliyet dağıtımı tamamlanmamış geçici aylar içerir: ' + geciciAy.join(', ') + '.' : null }), 'Nakit akışı', nAlt, geciciAy.length > 0);
   }
 
    

@@ -108,7 +108,7 @@
           sk('Geç teslim oranı', gec),
           sk('Şikâyet / 100 teslimat', x.sikayet_100_teslimat != null ? String(x.sikayet_100_teslimat).replace('.', ',') : (x.sikayet_12ay != null ? x.sikayet_12ay + ' şikâyet (teslimat az)' : '—')),
           sk('İade teslimatı (12 ay)', adet(x.iade_adedi_12ay))])]);
-      kap.appendChild(G.kart({ baslik: 'Müşteri sağlığı', alt: 'Puan 100 = sorun işareti yok · puan hesabı geçmiş verilerden', govde: govde2 }));
+      kap.appendChild(G.kart({ baslik: 'Müşteri sağlığı', govde: govde2 }));
       return kap;
     }
     function sagBos(baslik) {
@@ -184,7 +184,7 @@
         var seri = dz.map(function (x, i) { var k = aylar[i] === ci.kismi_ay; return { e: S.ayKisa(aylar[i], i === 0 || aylar[i].slice(5) === '01'), d: x, soluk: k, ipucu: [S.ayAd(aylar[i], true) + (k ? (EN ? ' (month in progress)' : ' (ay devam ediyor)') : ''), (EN ? 'Customer invoices: ' : 'Müşteri faturası: ') + S.para(x)] }; });
         var svg = S.bar(seri, { ad: 'Ay ay müşteri faturası', yukseklik: 190 });
         if (ci.son_3_ay_ortalamasi != null) ortCizgisi(svg, dz, ci.son_3_ay_ortalamasi, 190);
-        f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Ay ay müşteri faturası (son 12 ay)', alt: 'Çizgi: son 3 tam ayın ortalaması, geçmiş eğilimdir; tahmin ya da öneri değildir · açık renkli çubuk: ay devam ediyor', govde: svg })]));
+        f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Ay ay müşteri faturası (son 12 ay)', alt: 'Çizgi: son 3 tam ayın ortalaması · açık renkli çubuk: ay devam ediyor', govde: svg })]));
       }
       return f;
     }

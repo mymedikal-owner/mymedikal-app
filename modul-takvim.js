@@ -357,7 +357,6 @@
       kap.appendChild(h('section', { sinif: 'tq-bilinmiyor ust-bosluk', 'aria-label': 'Tarihi bilinmeyen kayıtlar' }, [
         h('h3', { sinif: 'bolum' }, [G.ikon('bilgi', 18), ' Tarihi bilinmiyor (' + bil.length + ')']), bk]));
     }
-    kap.appendChild(h('p', { sinif: 'kucuk soluk tq-not', metin: 'Kalite, İSG, resmi belge ve sigorta takvimlerinin birleşimidir; renkler bugünden hesaplanır, tarihi olmayan kayıt yeşil sayılmaz.' }));
     return kap;
   }
 

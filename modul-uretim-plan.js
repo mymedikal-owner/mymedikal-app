@@ -160,7 +160,7 @@
           h('div', { sinif: 'up-dongu-alt', metin: 'Bitiş ' + tarihSaat(d.bitis_tahmini) + ' · Sevke hazır ' + tarihSaat(d.sevke_hazir) }),
           dy.length ? h('ul', { sinif: 'up-dayanak' }, dy) : null]));
       });
-      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Döngü önerileri', alt: 'tam paletli, döngü başına en çok 168 koli', govde: on })]));
+      kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Döngü önerileri', govde: on })]));
       return kap;
     }
 

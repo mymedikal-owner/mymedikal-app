@@ -110,12 +110,11 @@
       var d = onc.yuk.veri, L = d.olaylar, z = d.ozet || {};
       if (st.osec) { var x = L.filter(function (k) { return okey(k) === st.osec; })[0]; if (x) { f.appendChild(oncelikDetay(x)); return f; } st.osec = null; }
       f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.ozetSerit([kutu('Acil', G.say(z.acil), null), kutu('Yüksek', G.say(z.yuksek), null), kutu('Normal', G.say(z.normal), null), kutu('Hedefi aşan', G.say(z.hedef_asan), z.eskalasyon ? z.eskalasyon + ' olay için üst bildirim' : null)], { en: 4 })]));
-      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Öncelik sırası', alt: 'Açık olaylar; önce bakılacak olan üstte. Sıralama karar değildir, yöntem alttadır', eylem: L.length ? xlSatir('Şikâyet öncelik sırası', 'Açık olaylar', ONC_KOL, L) : null, govde: L.length ? G.ilkN(L, oncelikSatir, { n: 10 }) : G.bos({ baslik: 'Açık olay yok', metin: 'Sıralanacak açık şikâyet bulunmuyor.' }) })]));
+      f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Öncelik sırası', eylem: L.length ? xlSatir('Şikâyet öncelik sırası', 'Açık olaylar', ONC_KOL, L) : null, govde: L.length ? G.ilkN(L, oncelikSatir, { n: 10 }) : G.bos({ baslik: 'Açık olay yok', metin: 'Sıralanacak açık şikâyet bulunmuyor.' }) })]));
       var bn = d.bilgi_notu_onerileri || [];
       if (bn.length) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Bilgi notu önerileri', alt: 'Son 12 ayda tekrarlayan türler', govde: G.ilkN(bn, function (n) {
         return h('div', { sinif: 's41-satir' }, [h('div', { sinif: 'ad', metin: n.onerilen_baslik }), h('div', { sinif: 'sag', metin: n.olay_sayisi + ' olay' }), h('div', { sinif: 'alt', metin: n.tur + ' · ' + n.hastane_sayisi + ' hastane' })]);
       }, { n: 3 }) })]));
-      if (d.yontem && d.yontem.puan) f.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Puan nasıl hesaplanır', govde: h('div', null, [h('p', { metin: d.yontem.puan }), h('p', { sinif: 'soluk', metin: (d.yontem.seviye || '') + ' ' + (d.yontem.hedef_sure || '') })]) })]));
       return f;
     }
     function genel(v) {

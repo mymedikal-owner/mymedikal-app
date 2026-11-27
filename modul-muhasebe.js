@@ -53,7 +53,7 @@
         G.kpi({ baslik: 'Bu hafta', deger: hf.net == null ? '—' : para(hf.net), ikon: 'para', durum: hf.net == null ? 'yok' : null, alt: hf.net == null ? 'veri yok' : tarihTR(hf.bas) + ' – ' + tarihTR(hf.bit) + ' · ' + degisim(hf) + ' · ' + bosMetin(hf) }),
         G.kpi({ baslik: 'Bu ay', deger: ay.net == null ? '—' : para(ay.net), ikon: 'para', durum: ay.net == null ? 'yok' : null, alt: ay.net == null ? 'veri yok' : tarihTR(ay.bas) + ' – ' + tarihTR(ay.bit) + ' · ' + degisim(ay) + ' · ' + bosMetin(ay) }), yilKpi]));
       var dsat = [['Bugün', bg], ['Bu hafta', hf], ['Bu ay', ay]].concat(yl ? [['Bu yıl', yl]] : [['Bu yıl', { net: null, gecen_yil: null, degisim_yuzde: null }]]).map(function (x) { var b = x[1], gy = b.gecen_yil; return [x[0], b.net == null ? 'veri yok' : para(b.net), gy && gy.net != null ? para(gy.net) : 'veri yok', b.degisim_yuzde == null ? '—' : (b.degisim_yuzde > 0 ? '+' : '−') + '%' + G.say(Math.abs(b.degisim_yuzde), 1), b.net == null ? '—' : para(b.net_bos_haric)]; });
-      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Dönem karşılaştırması', alt: 'Geçen yılın aynı tarih aralığıyla · boş ciro hariç ayrıca', govde: G.duzTablo(['Dönem', 'Net satış', 'Geçen yıl', 'Değişim', 'Boş ciro hariç'], dsat) })]));
+      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Dönem karşılaştırması', govde: G.duzTablo(['Dönem', 'Net satış', 'Geçen yıl', 'Değişim', 'Boş ciro hariç'], dsat) })]));
       var ogeler = v.gunluk.map(function (g) { return { e: String(+g.t.slice(8)), d: g.net, ipucu: [tarihTR(g.t), g.net == null ? 'kayıt yok (hafta sonu / henüz işlenmedi)' : 'Net satış: ' + para(g.net), g.bos_ciro ? 'Boş ciro dahil: ' + para(g.bos_ciro) : ''] }; });
       var satirlar = v.gunluk.map(function (g) { return [tarihTR(g.t), g.net == null ? 'veri yok' : para(g.net), g.bos_ciro == null ? '—' : para(g.bos_ciro)]; }).reverse();
        
@@ -146,8 +146,8 @@
     var bosluk = (k.veri_bosluklari || []).map(function (x) { return h('li', { metin: x }); });
     return h('div', { sinif: 'yigin' }, [
       h('div', { sinif: 'kpi-izgara tq-kpi' }, kpiler),
-      G.kart({ baslik: 'Ay sonu kapanış kokpiti', alt: k.donem, govde: tablo, dip: k.kapanis_suresi_not || null }),
-      bosluk.length ? G.kart({ baslik: 'Veri boşlukları', alt: 'Muhasebe kayıt izinde görünmeyen adımlar (boş, sıfır değil)', govde: h('ul', { sinif: 'soluk' }, bosluk) }) : null]);
+      G.kart({ baslik: 'Ay sonu kapanış kokpiti', alt: k.donem, govde: tablo }),
+      bosluk.length ? G.kart({ baslik: 'Veri boşlukları', govde: h('ul', { sinif: 'soluk' }, bosluk) }) : null]);
   }
 
   var M_DURUM = { mutabik: ['Mutabık', 'yesil', 'tik'], gonderildi: ['Gönderildi', 'sari', 'saat'], fark: ['Fark var', 'kirmizi', 'uyari'], gonderilmedi: ['Gönderilmedi', 'gri', 'bilgi'], veri_yok: ['Veri yok', 'gri', 'bilgi'] };
@@ -169,10 +169,10 @@
     var tablo = G.tablo({ kolonlar: kolonlar(), satirlar: m.kayitlar });
     var kartlar = [
       h('div', { sinif: 'kpi-izgara tq-kpi' }, [['Mutabık', 'mutabik', null, 'tik'], ['Gönderildi', 'gonderildi', null, 'saat'], ['Fark var', 'fark', 'kritik', 'uyari'], ['Gönderilmedi', 'gonderilmedi', null, 'bilgi']].concat(say.veri_yok ? [['Veri yok', 'veri_yok', null, 'bilgi']] : []).map(function (c) { return G.kpi({ baslik: c[0], deger: String(say[c[1]]), durum: say[c[1]] && c[2] ? c[2] : null, ikon: c[3] }); })),
-      G.kart({ baslik: 'Cari mutabakat', alt: (m.tarih_itibariyle ? tarihTR(m.tarih_itibariyle) + ' itibarıyla · ' : '') + 'MY · müşteri / tedarikçi / grup içi', govde: tablo, dip: m.yontem || null })];
+      G.kart({ baslik: 'Cari mutabakat', alt: (m.tarih_itibariyle ? tarihTR(m.tarih_itibariyle) + ' itibarıyla · ' : '') + 'MY · müşteri / tedarikçi / grup içi', govde: tablo })];
     if (m.kayitlar_day && m.kayitlar_day.length) kartlar.push(G.kart({ baslik: 'DAY alt defter (ayrı, MY ile toplanmaz)', alt: 'Yalnız muhasebe rolü', govde: G.tablo({ kolonlar: kolonlar(), satirlar: m.kayitlar_day }) }));
     var bosluk = (m.veri_bosluklari || []).map(function (x) { return h('li', { metin: typeof x === 'string' ? x : (x.metin || x.ad || '') }); });
-    if (bosluk.length) kartlar.push(G.kart({ baslik: 'Veri boşlukları', alt: 'Hesaplanamayan ya da eksik kaynaklar (boş, sıfır değil)', govde: h('ul', { sinif: 'soluk' }, bosluk) }));
+    if (bosluk.length) kartlar.push(G.kart({ baslik: 'Veri boşlukları', govde: h('ul', { sinif: 'soluk' }, bosluk) }));
     return h('div', { sinif: 'yigin' }, kartlar);
   }
 

@@ -166,8 +166,7 @@
       kap.appendChild(h('p', { sinif: 'sp-huni-bas', metin: 'Kalem düzeyi — ' + sayi(kt) + ' kalem' })); kap.appendChild(yigin(segK, kt, 'Kalem durumu'));
       kap.appendChild(G.lejant(segK.map(function (x) { return [x[0] + ' ' + sayi(x[1]), x[2]]; })));
       return G.kart({ baslik: 'Sipariş hunisi', alt: 'Açık → teslim → fatura: yalnız kayıtlı kanıt sayılır', govde: kap,
-        tablo: { kolonlar: ['Ölçü', 'Adet'], satirlar: [['Sipariş', n], ['İrsaliye kaydı olan', ir], ['Fatura kaydı olan', fa], ['Geciken', sn.gecikmis], ['Açık (zamanında)', sn.acik], ['Tamamlandı', sn.tamam], ['Durum bilinmiyor', sn.bilinmiyor], ['Kalem: teslim edildi', kal.tam], ['Kalem: kısmi', kal.kismi], ['Kalem: teslim yok', kal.yok], ['Kalem: bilinmiyor', kal.bilinmiyor]] },
-        dip: 'Durumu bilinmeyen siparişler ayrı dilimdir ("Durum bilinmiyor"); "teslim edildi" ya da 0 sayılmaz.' });
+        tablo: { kolonlar: ['Ölçü', 'Adet'], satirlar: [['Sipariş', n], ['İrsaliye kaydı olan', ir], ['Fatura kaydı olan', fa], ['Geciken', sn.gecikmis], ['Açık (zamanında)', sn.acik], ['Tamamlandı', sn.tamam], ['Durum bilinmiyor', sn.bilinmiyor], ['Kalem: teslim edildi', kal.tam], ['Kalem: kısmi', kal.kismi], ['Kalem: teslim yok', kal.yok], ['Kalem: bilinmiyor', kal.bilinmiyor]] } });
     }
 
      
@@ -179,7 +178,7 @@
       });
       var gov = g.length ? G.yatay(og, { maks: Math.max.apply(null, og.map(function (x) { return x.d; }).concat([1])) }) : h('p', { sinif: 'veri-yok', metin: 'Geciken sipariş yok.' });
       return G.kart({ baslik: 'Gecikme yaşlandırma', alt: g.length + ' geciken sipariş · bir çubuğa dokununca liste filtrelenir', govde: gov,
-        tablo: { kolonlar: ['Gecikme', 'Sipariş'], satirlar: og.map(function (x) { return [x.e, x.d]; }) }, dip: 'Gün sayısı kaynaktaki gecikme_gun alanıdır (istenen teslimden bugüne).' });
+        tablo: { kolonlar: ['Gecikme', 'Sipariş'], satirlar: og.map(function (x) { return [x.e, x.d]; }) } });
     }
 
      

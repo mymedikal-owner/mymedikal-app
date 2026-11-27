@@ -117,3 +117,15 @@
 .sp-iade-bekle { position: absolute; top: var(--b2); right: var(--b3); margin: 0; padding: 0; line-height: 1.3; }
 .sp-iade .sp-deg-ust { padding-right: 120px; }
 @media (min-width: 900px) { .sp-iade .sp-deg-liste { grid-template-columns: 1fr 1fr; align-items: start; } .sp-iade .sp-deg-daha, .sp-iade .sp-deg-bos { grid-column: 1 / -1; } }
+ 
+@media (max-width: 599px) {
+  #icerik[data-modul="siparis"] .ozet-serit-ana { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ikon { display: none; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ana { padding: 6px 4px 6px 6px; gap: 2px; min-width: 0; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-baslik { white-space: nowrap; line-height: 1.15; font-size: 10px; letter-spacing: 0; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-sayi { font-size: 18px; line-height: 1.1; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ust { padding-right: 0; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-deger small { display: none; }
+  #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-i { width: 24px; height: 24px; top: auto; bottom: 0; right: 0; }
+  #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
+}

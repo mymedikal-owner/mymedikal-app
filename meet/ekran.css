@@ -399,7 +399,7 @@ body.koyu .bant { top:50%; transform:translate(-50%,-50%); }
  
 #b-altyazi, #m-altyazi, #o-efekt, #m-arka, #m-spotlight { display:none !important; }
 .ust { min-height:52px; padding:6px 16px; }
-.ust-don { min-height:36px; }
+.ust-don { min-height:40px; }
 
  
 .lobi { display:flex; flex-direction:column; align-items:center; padding:20px 16px calc(16px + env(safe-area-inset-bottom)); overflow-y:auto; }

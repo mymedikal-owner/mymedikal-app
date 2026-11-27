@@ -519,3 +519,10 @@ body.ms-klavye .ms-alt { padding-bottom: 6px; }
 .ms-gun:not(.ms-arama-satir) { position: sticky; top: 4px; z-index: 2; }
  
 @media (max-width: 420px) { .ms-m, .ms-bolme .ms-m { max-width: 80%; } .ms-m-emoji > .ms-metin { font-size: 40px; } .ms-kart-dosya { min-width: 0; } }
+ 
+@media (min-width: 768px) and (pointer: fine) {
+  .ms-arama-kap { height: auto; min-height: 40px; }
+  .ms-arama { height: auto; min-height: 40px; line-height: 40px; }
+  .ms-ara-girdi { height: auto; min-height: 40px; }
+  .ms-cip { min-height: 40px; }
+}

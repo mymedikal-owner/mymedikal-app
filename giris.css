@@ -1,5 +1,6 @@
  
 .giris-dugme { font: inherit; font-size: 12px; line-height: 1; padding: 8px 10px; min-height: 36px; max-width: 150px; border-radius: 999px; border: 1px solid var(--cizgi, rgba(128,128,128,.35)); background: transparent; color: inherit; cursor: pointer; }
+@media (min-width: 600px) { .giris-dugme { min-height: 40px; } }    
 .giris-dugme .giris-metin { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .giris-dugme.giris-yok { opacity: .7; }
 .giris-dugme:disabled { cursor: default; }

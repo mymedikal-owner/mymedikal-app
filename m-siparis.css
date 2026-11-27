@@ -180,5 +180,22 @@
   #icerik[data-modul="yonetim"] .ozet-serit .ozet-serit-ana .kpi-ana { padding-block: 5px; padding-inline: 8px; }
   #icerik[data-modul="yonetim"] .ozet-serit .ozet-serit-ana .kpi-deger { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
   #icerik[data-modul="yonetim"] .ozet-serit .ozet-serit-ana .kpi-sayi { font-size: 22px; }
+   
+  #icerik[data-modul="ik"] .yeni-onizleme .kart2 { padding: 10px 12px; }
+  #icerik[data-modul="ik"] .yeni-onizleme .ik-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; }
+  #icerik[data-modul="ik"] .yeni-onizleme .ik-form > .alan:first-child, #icerik[data-modul="ik"] .yeni-onizleme .ik-form > .tam, #icerik[data-modul="ik"] .yeni-onizleme .ik-form > .dugme { grid-column: 1 / -1; }
+  #icerik[data-modul="ik"] .yeni-onizleme .pusula { padding-block: 2px; min-height: 0; }
+  #icerik[data-modul="ik"] .yeni-onizleme .pusula > div { display: flex; flex-wrap: wrap; column-gap: 6px; align-items: baseline; }
+  #icerik[data-modul="ik"] .yeni-onizleme .pusula-liste, #icerik[data-modul="ik"] .yeni-onizleme .yigin, #icerik[data-modul="ik"] .yeni-onizleme .iki-kolon { gap: 8px; }
+  #icerik[data-modul="ik"] .yeni-onizleme .ik-bakiye svg { width: 100px; height: 100px; }
+   
+  #icerik[data-modul="uretim-plan"] .kart2 { padding: 10px 12px; }
+  #icerik[data-modul="uretim-plan"] .kart2 .tablo tbody tr { padding-block: 2px; column-gap: 6px; }
+  #icerik[data-modul="uretim-plan"] .kart2 .tablo tbody tr > td:first-child { flex: 1 1 auto; width: auto; padding: 0; }
+  #icerik[data-modul="uretim-plan"] .kart2 .tablo tbody tr > td { padding-block: 0; gap: 4px; }
+  #icerik[data-modul="uretim-plan"] .kart2-ust > div:first-child { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+  #icerik[data-modul="uretim-plan"] .ust-bosluk { margin-top: 6px; }
+  #icerik[data-modul="uretim-plan"] .ozet-serit .ozet-serit-ana .kpi-ana { padding-block: 5px; gap: 2px; }
+  #icerik[data-modul="uretim-plan"] .ozet-serit { margin-bottom: 6px; }
   #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
 }

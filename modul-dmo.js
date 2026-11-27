@@ -43,7 +43,7 @@
   var GEREK = {
     '*': ['dmo-ihaleler', 'dmo-siparisler', 'dmo-muayene', 'dmo-ceza', 'fy', 'tb', 'as', 's49'],
     ozet: ['dmo-ihaleler', 'as', 's49'], acik: ['as'], hastaneler: ['dmo-ihaleler', 'as'], ihaleler: ['dmo-ihaleler', 'fy'],
-    ihale: ['dmo-ihaleler', 'dmo-siparisler', 'fy', 'tb', 'as'], siparis: ['dmo-ihaleler', 'dmo-siparisler', 'fy', 'tb', 'as'], muayene: ['dmo-ihaleler', 'dmo-muayene'],
+    ihale: ['dmo-ihaleler', 'dmo-siparisler', 'fy', 'tb', 'as'], siparis: ['dmo-ihaleler', 'dmo-siparisler', 'fy', 'tb', 'as'], muayene: ['dmo-ihaleler', 'dmo-siparisler', 'dmo-muayene', 'as'],
     ceza: ['dmo-ihaleler', 'dmo-ceza', 'fy'], belge: ['dmo-ihaleler', 'tb'], anlik: [], mektup: ['dmo-ihaleler']
   };
   async function fyOku() {
@@ -750,6 +750,13 @@
      
     function siparisAdet(s) { return s && s.miktar != null && s.miktar !== '' ? say(s.miktar) + ' adet' : ''; }
     function urunAdAdet(s) { return [urunTamAd(s), siparisAdet(s)].filter(Boolean).join(' · '); }
+     
+    var BARKOD_KOD = null, BARKOD_KAYNAK = null;
+    function muayeneUrunAd(m) {
+      var sl = yuk && yuk.v && yuk.v['dmo-siparisler'] && yuk.v['dmo-siparisler'].siparisler; if (!sl || !m || !m.barkod) return '';
+      if (BARKOD_KAYNAK !== sl) { BARKOD_KOD = {}; sl.forEach(function (s) { if (s.urun_barkod && s.dmo_urun_kodu) { if (BARKOD_KOD[s.urun_barkod] === undefined) BARKOD_KOD[s.urun_barkod] = s.dmo_urun_kodu; else if (BARKOD_KOD[s.urun_barkod] !== s.dmo_urun_kodu) BARKOD_KOD[s.urun_barkod] = null; } }); BARKOD_KAYNAK = sl; }
+      return BARKOD_KOD[m.barkod] ? urunTamAd({ dmo_urun_kodu: BARKOD_KOD[m.barkod] }) : '';
+    }
     function hsDurum(s) {
       var son = (TESLIM_AD[s.teslim_durum] || 'Teslim durumu yok') + ' · son teslim ' + tarihTR(s.son_teslim) + ' · teslim ' + say(s.teslim_edilen_miktar) + ' / ' + say(s.miktar);
       var ad = urunAdAdet(s);
@@ -1024,7 +1031,8 @@
       function sayiCiz(ls) {
         sk.textContent = '';
         sk.appendChild(sayiSatiri(ls.length + ' sipariş kalemi (özet kartları tekil sipariş sayar; bir sipariş birden çok kalem olabilir)', 'DMO siparişler', firmaFiltre() + ' · ' + (f.risk ? (RISK_AD[f.risk] || f.risk) : 'Tüm etiketliler'),
-          [sutun('Firma', function (s) { return s.firma; }), sutun('Hastane', function (s) { return s.hastane; }), sutun('İl', function (s) { return s.il; }), sutun('Sipariş no', function (s) { return sipNo(s); }),
+          [sutun('Firma', function (s) { return s.firma; }), sutun('Hastane', function (s) { return s.hastane; }), sutun('İl', function (s) { return s.il; }), sutun('YK no', function (s) { return s.siparis_no; }), sutun('Sipariş no', function (s) { return sipNo(s); }),
+            sutun('Ürün', function (s) { return urunTamAd(s); }), sutun('Sipariş adedi', function (s) { return s.miktar; }),
             sutun('Risk', function (s) { return s.risk ? (RISK_AD[s.risk] || s.risk) : ''; }), sutun('Teslim durumu', function (s) { return TESLIM_AD[s.teslim_durum] || ''; }), sutun('Son teslim', function (s) { return s.son_teslim; }),
             sutun('Cezalı süre sonu', function (s) { return s.cezali_sure_sonu; }), sutun('Miktar', function (s) { return s.miktar; }), sutun('Teslim edilen', function (s) { return s.teslim_edilen_miktar; })], ls));
       }
@@ -1055,11 +1063,12 @@
       govde.appendChild(h('div', { sinif: 'dm-oge-izgara dm-muay-say' }, [ikiSatir('İşlem bekleniyor', say(topla('islem_bekleniyor')), topla('islem_bekleniyor') ? 'kritik' : ''), ikiSatir('Ürün değişimi yapıldı', say(topla('urun_degisimi_yapildi'))), ikiSatir('İtiraz edildi', say(topla('itiraz_edildi'))), ikiSatir('Süre doldu, işlem yok', say(topla('islem_yapilmadi_sure_doldu')))]));
       govde.appendChild(sayiSatiri(l.length + ' kayıt · 15 günlük değişim süresi "işlem son tarihi"nden izlenir · ret gerekçesi metni kaynakta yok', 'Olumsuz muayeneler', firmaFiltre(),
         [sutun('Firma', function (m) { return m.firma; }), sutun('Hastane', function (m) { return m.hastane; }), sutun('Sipariş no', function (m) { return sipNo(m); }), sutun('Durum', function (m) { return MUAYENE_AD[m.durum] || m.durum_portal || ''; }),
+          sutun('YK no', function (m) { return m.siparis_no; }), sutun('Ürün', function (m) { return muayeneUrunAd(m); }), sutun('Teslimat adedi', function (m) { return m.teslimat_miktari; }),
           sutun('İşlem son tarihi', function (m) { return m.islem_son_tarihi; }), sutun('Kalan gün', function (m) { return m.islem_kalan_gun; }), sutun('Teslimat', function (m) { return m.teslimat_miktari; })], l));
       govde.appendChild(G.ilkN(l, function (m) {
         return h('article', { sinif: 'dm-sp' + (m.aksiyon_gerekli ? ' riskli' : '') }, [
           h('div', { sinif: 'dm-sp-ust' }, [firmaRozet(m.firma), h('strong', { metin: m.hastane || 'Hastane yok' }), m.aksiyon_gerekli ? h('span', { sinif: 'dm-risk riskli', metin: 'İşlem gerekli' }) : null]),
-          h('div', { sinif: 'dm-sp-orta' }, [h('span', {}, ['Sipariş no ', h('strong', { metin: sipNo(m) })]), h('span', { sinif: 'soluk kucuk', metin: 'Satın alma sip. ' + (m.siparis_no || 'görünüm bekleniyor') + ' · ' + (m.ikn ? iknUrun(m.firma, m.ikn) : 'IKN eşleşmedi') }), h('span', { metin: MUAYENE_AD[m.durum] || m.durum_portal || 'Durum yok' })]),
+          h('div', { sinif: 'dm-sp-orta' }, [h('span', {}, ['Sipariş no ', h('strong', { metin: sipNo(m) })]), h('span', { sinif: 'soluk kucuk', metin: 'Satın alma sip. ' + (m.siparis_no || 'görünüm bekleniyor') + ' · ' + (m.ikn ? iknUrun(m.firma, m.ikn) : 'IKN eşleşmedi') }), muayeneUrunAd(m) ? h('span', { sinif: 'kucuk', metin: muayeneUrunAd(m) + (m.teslimat_miktari != null ? ' · ' + say(m.teslimat_miktari) + ' adet' : '') }) : null, h('span', { metin: MUAYENE_AD[m.durum] || m.durum_portal || 'Durum yok' })]),
           h('div', { sinif: 'dm-sp-alt' }, [h('span', {}, ['İşlem son tarihi ', h('strong', { metin: tarihTR(m.islem_son_tarihi) })]), h('span', { metin: kalanMetin(m.islem_kalan_gun) }), h('span', {}, ['Teslimat ', h('strong', { metin: say(m.teslimat_miktari) })])])]);
       }, { n: 10, sinif: 'dm-liste' }));
     }

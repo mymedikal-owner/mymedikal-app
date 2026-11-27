@@ -293,7 +293,7 @@
     return G.kart({ baslik: 'Açık düzeltme ricaları', govde: govde });
   }
 
-  var YAS_KOVA = [['Vadesi gelmemiş', 'var(--eksen)'], ['0–30 gün gecikmiş', 'var(--s1)'], ['31–60 gün', 'var(--s1)'], ['61–90 gün', 'var(--uyari)'], ['91–180 gün', 'var(--uyari)'], ['180+ gün', 'var(--kritik)']];
+  var YAS_KOVA = [['Vadesi gelmemiş', 'var(--eksen)'], ['1–30 gün gecikmiş', 'var(--s1)'], ['31–60 gün', 'var(--s1)'], ['61–90 gün', 'var(--uyari)'], ['91–180 gün', 'var(--uyari)'], ['180+ gün', 'var(--kritik)']];
   function yaslandirmaKutusu(v) {
     var y = v.cari_yaslandirma;
     if (!y || !y.sirketler || !y.sirketler.length) return null;

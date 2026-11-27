@@ -45,13 +45,14 @@
       if (eski) kok.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Veri eski' }), ' — son güncelleme ' + MM.yasMetin(dk) + '. Rakamlar güncel olmayabilir.']));
       kok.appendChild(h('div', { sinif: 'tazelik' }, [h('span', { sinif: 'nokta ' + (eski ? 'sari' : 'yesil'), 'aria-hidden': 'true' }),
         h('span', { metin: 'Son güncelleme ' + saatTR(v.asof) + ' · Kayıt saati ' + (v.sap_veri_zamani ? String(v.sap_veri_zamani).slice(11, 16) : '—') })]));
-      var bg = v.bugun, hf = v.hafta, ay = v.ay;
+      var bg = v.bugun, hf = v.hafta, ay = v.ay, yl = v.yil;
       var bosMetin = function (b) { return b.net == null ? 'veri yok' : 'boş ciro hariç ' + para(b.net_bos_haric); };
-      kok.appendChild(h('div', { sinif: 'kpi-izgara tq-kpi' }, [
+      var yilKpi = yl ? G.kpi({ baslik: 'Bu yıl', deger: yl.net == null ? '—' : para(yl.net), ikon: 'para', durum: yl.net == null ? 'yok' : null, alt: yl.net == null ? 'veri yok' : tarihTR(yl.bas) + ' – ' + tarihTR(yl.bit) + ' · ' + degisim(yl) + ' · ' + bosMetin(yl) }) : null;
+      kok.appendChild(h('div', { sinif: 'kpi-izgara tq-kpi ms-anlik-kpi' }, [
         G.kpi({ baslik: 'Bugün', deger: bg.net == null ? '—' : para(bg.net), ikon: 'para', durum: bg.net == null ? 'yok' : null, alt: bg.net == null ? 'Henüz kayıt yok (son kayıt ' + tarihTR(v.sap_son_kayit_tarihi) + ')' : degisim(bg) + ' · ' + bosMetin(bg) }),
         G.kpi({ baslik: 'Bu hafta', deger: hf.net == null ? '—' : para(hf.net), ikon: 'para', durum: hf.net == null ? 'yok' : null, alt: hf.net == null ? 'veri yok' : tarihTR(hf.bas) + ' – ' + tarihTR(hf.bit) + ' · ' + degisim(hf) + ' · ' + bosMetin(hf) }),
-        G.kpi({ baslik: 'Bu ay', deger: ay.net == null ? '—' : para(ay.net), ikon: 'para', durum: ay.net == null ? 'yok' : null, alt: ay.net == null ? 'veri yok' : tarihTR(ay.bas) + ' – ' + tarihTR(ay.bit) + ' · ' + degisim(ay) + ' · ' + bosMetin(ay) })]));
-      var dsat = [['Bugün', bg], ['Bu hafta', hf], ['Bu ay', ay]].map(function (x) { var b = x[1], gy = b.gecen_yil; return [x[0], b.net == null ? 'veri yok' : para(b.net), gy && gy.net != null ? para(gy.net) : 'veri yok', b.degisim_yuzde == null ? '—' : (b.degisim_yuzde > 0 ? '+' : '−') + '%' + G.say(Math.abs(b.degisim_yuzde), 1), b.net == null ? '—' : para(b.net_bos_haric)]; });
+        G.kpi({ baslik: 'Bu ay', deger: ay.net == null ? '—' : para(ay.net), ikon: 'para', durum: ay.net == null ? 'yok' : null, alt: ay.net == null ? 'veri yok' : tarihTR(ay.bas) + ' – ' + tarihTR(ay.bit) + ' · ' + degisim(ay) + ' · ' + bosMetin(ay) }), yilKpi]));
+      var dsat = [['Bugün', bg], ['Bu hafta', hf], ['Bu ay', ay]].concat(yl ? [['Bu yıl', yl]] : [['Bu yıl', { net: null, gecen_yil: null, degisim_yuzde: null }]]).map(function (x) { var b = x[1], gy = b.gecen_yil; return [x[0], b.net == null ? 'veri yok' : para(b.net), gy && gy.net != null ? para(gy.net) : 'veri yok', b.degisim_yuzde == null ? '—' : (b.degisim_yuzde > 0 ? '+' : '−') + '%' + G.say(Math.abs(b.degisim_yuzde), 1), b.net == null ? '—' : para(b.net_bos_haric)]; });
       kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Dönem karşılaştırması', alt: 'Geçen yılın aynı tarih aralığıyla · boş ciro hariç ayrıca', govde: G.duzTablo(['Dönem', 'Net satış', 'Geçen yıl', 'Değişim', 'Boş ciro hariç'], dsat) })]));
       var ogeler = v.gunluk.map(function (g) { return { e: String(+g.t.slice(8)), d: g.net, ipucu: [tarihTR(g.t), g.net == null ? 'kayıt yok (hafta sonu / henüz işlenmedi)' : 'Net satış: ' + para(g.net), g.bos_ciro ? 'Boş ciro dahil: ' + para(g.bos_ciro) : ''] }; });
       var satirlar = v.gunluk.map(function (g) { return [tarihTR(g.t), g.net == null ? 'veri yok' : para(g.net), g.bos_ciro == null ? '—' : para(g.bos_ciro)]; }).reverse();
@@ -392,7 +393,7 @@
       ust.textContent = ''; govde.textContent = '';
       if (durum.sekme === 'mali' || durum.sekme === 'anlik' || durum.sekme === 'tfrs') {
         var vv = yuk && yuk.veri;
-        govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return vv ? ((s[0] !== 'kapanis' || vv.kapanis) && (s[0] !== 'mutabakat' || vv.mutabakat)) : (s[0] !== 'kapanis' && s[0] !== 'mutabakat'); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: 4 })]));
+        govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return vv ? ((s[0] !== 'kapanis' || vv.kapanis) && (s[0] !== 'mutabakat' || vv.mutabakat)) : (s[0] !== 'kapanis' && s[0] !== 'mutabakat'); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: 0 })]));
         if (durum.sekme === 'anlik') {
           if (!anlikTemiz) anlikTemiz = anlikTab(anlikKok);
           govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [anlikKok]));
@@ -431,7 +432,7 @@
         G.kpi({ baslik: 'Aktarılmayan', deger: bek == null ? '—' : String(bek), birim: bek == null ? 'veri yok' : 'fatura', ikon: 'belge', durum: kontrol ? 'kritik' : (bek == null ? 'yok' : null), alt: bek == null ? 'veri yok' : (kontrol ? kontrol + ' tanesi kontrol gerektirir' : 'tamamı kural gereği bekliyor'), tikla: git('aktarim') }),
         G.kpi({ baslik: 'GİB engeli', deger: gib ? String(gib.gonderilemez) : '—', birim: gib ? 'belge' : 'veri yok', ikon: 'uyari', durum: gib ? (gib.gonderilemez ? 'kritik' : null) : 'yok', alt: gib ? tarihTR(gib.tarih) + ' kontrolü · ' + gib.gonderilebilir + ' gönderilebilir' : 'veri yok', tikla: git('ebelge') }),
         ucuncu]));
-      var sek =h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return (s[0] !== 'kapanis' || v.kapanis) && (s[0] !== 'mutabakat' || v.mutabakat); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: window.matchMedia && window.matchMedia('(max-width: 599px)').matches ? 2 : 4 })]);
+      var sek =h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return (s[0] !== 'kapanis' || v.kapanis) && (s[0] !== 'mutabakat' || v.mutabakat); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: 0 })]);
       govde.appendChild(sek);
       if ((durum.sekme === 'kapanis' && !v.kapanis) || (durum.sekme === 'mutabakat' && !v.mutabakat)) durum.sekme = 'ebelge';
       if (ozetMi) {

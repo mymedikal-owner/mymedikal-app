@@ -156,5 +156,12 @@
   #icerik[data-modul="sikayet"] .s41-satir .ad { font-size: 14px; line-height: 1.3; }
   #icerik[data-modul="sikayet"] .ml-kpi { padding-block: 3px; }
   #icerik[data-modul="sikayet"] .ust-bosluk { margin-top: 6px; }
+   
+  #icerik[data-modul="kalite-yukle"] .ny-kart { padding: 12px; gap: 4px; margin-bottom: 8px; }
+  #icerik[data-modul="kalite-yukle"] .ny-kart .ny-girdi { min-height: 44px; padding-block: 8px; }
+  #icerik[data-modul="kalite-yukle"] .ny-kart .ny-girdi.ny-not { min-height: 64px; }
+  #icerik[data-modul="kalite-yukle"] .ny-etiket { margin-top: 4px; }
+  #icerik[data-modul="kalite-yukle"] .ny-ipucu { margin-top: 6px; }
+  #icerik[data-modul="kalite-yukle"] .ny-kart .ny-buyuk, #icerik[data-modul="kalite-yukle"] .ny-kart .ny-gonder { min-height: 48px; }
   #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
 }

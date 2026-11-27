@@ -226,11 +226,23 @@
 #icerik[data-modul="stok"] .stk-ozet .ozet-serit-ana { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 #icerik[data-modul="stok"] .stk-ozet .ozet-serit-ana .s41-sayi { padding: 4px 6px; }
 #icerik[data-modul="stok"] .stk-ozet.ozet-serit { gap: 4px; }
-#icerik[data-modul="stok"] .stk-ozet .ozet-serit-tumu { min-height: 40px; height: 40px; }
+#icerik[data-modul="stok"] .stk-ozet .ozet-serit-tumu { min-height: 40px; }
 #icerik[data-modul="stok"] .s41-satir.stk { padding-top: 2px; padding-bottom: 2px; }
 #icerik[data-modul="stok"] .sayfa-basi { margin-bottom: 6px; }
 #icerik[data-modul="stok"] .bant.ornek { margin-bottom: 4px; }
 #icerik[data-modul="stok"] .stk-sek { margin-bottom: 4px; }
 #icerik[data-modul="stok"] .ara-kutu { margin-bottom: 6px; }
+ 
+#icerik[data-modul="muhasebe"] .yigin { gap: 6px; }
+#icerik[data-modul="muhasebe"] .yigin .kart2 { padding: 8px 12px; }
+#icerik[data-modul="muhasebe"] .yigin .kart2 .kart2-ust { margin-bottom: 4px; }
+#icerik[data-modul="muhasebe"] .yigin .kart2 .mh-liste { gap: 4px; margin-top: 4px; }
+#icerik[data-modul="muhasebe"] .yigin .mh-satir { padding-top: 3px; padding-bottom: 3px; min-height: 40px; }
+#icerik[data-modul="muhasebe"] .sayfa-basi { margin-bottom: 6px; }
+#icerik[data-modul="muhasebe"] .mhs-arama { margin-bottom: 6px; }
+#icerik[data-modul="muhasebe"] .bant.ornek { margin-bottom: 4px; }
+#icerik[data-modul="muhasebe"] .tazelik.taze-birlesik { margin-bottom: 4px; }
+#icerik[data-modul="muhasebe"] .ara-kutu { margin-bottom: 6px; }
+#icerik[data-modul="muhasebe"] .tq-kpi .kpi .kpi-ana { padding: 6px 8px; }
 #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
 }

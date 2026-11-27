@@ -214,7 +214,7 @@
     function arac(v, vg) {
       var o = ozet(vg || v), tum = (vg || v).siparisler;
       var say0 = function (fn, yoksay) { return v.siparisler.filter(function (x) { return uygun(x, yoksay) && fn(x); }).length; };
-      var sec = [['acik', 'Açık', o.acik], ['blokeli', 'Blokeli', o.blokeli], ['gecikmis', 'Geciken', o.gecikmis], ['tamam', 'Tamamlanan', o.tamam], ['iade', 'İade', iadeVar(vg || v) ? (vg || v).iade_siparisler.filter(function (d) { return d.tamamlandi !== true; }).length : 'veri yok'], ['bilinmiyor', 'Durum bilinmiyor', o.bilinmiyor], ['tumu', 'Tümü', tum.length]];
+      var sec = [['acik', 'Açık', o.acik], ['blokeli', 'Blokeli', o.blokeli], ['gecikmis', 'Geciken', o.gecikmis], ['tamam', 'Tamamlanan', o.tamam], ['iade', 'İade', iadeVar(vg || v) ? (vg || v).iade_siparisler.filter(function (d) { return d.tamamlandi !== true; }).length : 'görünüm bekleniyor'], ['bilinmiyor', 'Durum bilinmiyor', o.bilinmiyor], ['tumu', 'Tümü', tum.length]];
       var urunSay = function (u) { return say0(function (x) { return urunGrubu(x) === u; }, 'urun'); };
       var gruplar = [
         { ad: 'Görünümler', secenekler: [['liste', 'Sipariş listesi'], ['musteri', 'Müşteri bazında'], ['hastane', 'Hastane / teslim yeri bazında']], secili: gor, varsayilan: 'liste', sec: function (d) { gor = d || 'liste'; ciz(); } },
@@ -501,7 +501,7 @@
         govde.appendChild(G.bos({ baslik: 'İade verisi henüz yok', metin: 'İadeler için kaynak veri gelince burada listelenir.' }));
         var iadeAdim = ['İade başlatıldı', 'Lojistik yönlendirildi', 'Hastaneden alındı', 'Depoya ulaştı', 'Mal girişi', 'Kalite kontrol', 'Satışa hazır'];
         var zin = h('ol', { sinif: 'sp-zincir', 'aria-label': 'İade adımları' });
-        iadeAdim.forEach(function (a) { zin.appendChild(adim('yok', 'bilgi', a, 'görünüm bekleniyor')); });
+        iadeAdim.forEach(function (a) { zin.appendChild(adim('yok', 'bilgi', a, 'kaynak bağlı değil')); });
         govde.appendChild(G.kart({ baslik: 'İade adımları', alt: 'adım adım takip · adım verisi henüz yok', govde: zin }));
         return;
       }

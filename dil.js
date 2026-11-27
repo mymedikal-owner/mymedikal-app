@@ -493,6 +493,14 @@
     ['Kendiliğinden işlem yapılmaz.', 'No action is taken automatically.'], ['Ödemeye kalan gün', 'Days to payment'], ['Hesap kesim günü', 'Statement day'], ['Son ödeme günü', 'Payment due day'], ['indir', 'download']].forEach(function (p) {
     if (!PARCA_L.some(function (x) { return x[0] === p[0]; })) PARCA_L.push(p);
   });
+   
+  [['karar bekleniyor', 'decision pending'], ['Kalite kararı bekleyen miktar (ürün bazında)', 'Quantity awaiting quality decision (by product)'], ['kararı henüz verilmemiş partiler', 'batches with no decision yet'],
+    ['Kalite kararı bekleyen ürün yok.', 'No products awaiting a quality decision.'], ['Ürün bazında bekleyen miktar', 'Pending quantity by product'], ['Sterilizasyon kapasitesi', 'Sterilization capacity'],
+    [' · en eski parti ', ' · oldest batch '], ['Açık sipariş bilgisi henüz yayımlanmadı ya da okunamadı.', 'Open order information has not been published yet or could not be read.'],
+    ['Bu firma için görünüm bekleniyor.', 'View pending for this company.'], ['Bu ihaleye bağlanan kesinti', 'Deductions linked to this tender'], ['Bugün ihale yok', 'No tender today'],
+    ['Satın alma sip. ', 'Purchase order '], ['Dönem (fatura tarihi): ', 'Period (invoice date): '], ['Ay bilgisi olan ihale yok', 'No tender with month information']].forEach(function (p) {
+    if (!PARCA_L.some(function (x) { return x[0] === p[0]; })) PARCA_L.push(p);
+  });
   var PARCA = PARCA_L.slice().sort(function (a, b) { return b[0].length - a[0].length; });
   var REGEX = [
     [/(^|\D)1 days ago/g, '$11 day ago'], [/(^|\D)1 days left/g, '$11 day left'], [/(^|\D)1 days/g, '$11 day'], [/(\d+) sa (\d+) dk önce/g, '$1 h $2 min ago'], [/(\d+) sa önce/g, '$1 h ago'], [/(\d+) dk önce/g, '$1 min ago'], [/(\d+) gün önce/g, '$1 days ago']

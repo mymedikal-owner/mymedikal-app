@@ -10,6 +10,7 @@
 }
 .s41-liste { display: grid; gap: var(--b2); }
 .st-satir { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--b3); width: 100%; text-align: left; font: inherit; color: var(--yazi); background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m); padding: var(--b3); min-height: 44px; cursor: pointer; }
+.st-salt { cursor: default; }
 .st-ad { font-weight: 600; overflow-wrap: anywhere; }
 .st-sag { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
 .st-alt { grid-column: 1 / -1; color: var(--soluk); font-size: var(--t-xs); }

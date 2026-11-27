@@ -23,11 +23,27 @@
         { baslik: 'Kalite kararı bekleyen', deger: sayiYaz(o.kalite_bekleyen_parti), birim: o.kalite_bekleyen_parti == null ? '' : 'parti', ikon: 'saat', alt: 'son 30 günde açılan' }], { en: 3 });
     }
 
+     
+    function kaliteBekleyen(v) {
+      var l = v.kalite_bekleyen_urunler, govde2, eskiKaynak = v.kalite_bekleyen_kaynak_eski === true;
+      if (!Array.isArray(l)) govde2 = h('p', { sinif: 'ny-ipucu', metin: 'Ürün bazında bekleyen miktar: görünüm bekleniyor' });
+      else if (!l.length) govde2 = h('p', { sinif: 'ny-ipucu', metin: eskiKaynak ? 'Veri eski: bekleyen ürün bilgisi güncel değil.' : 'Kalite kararı bekleyen ürün yok.' });
+      else govde2 = h('div', { sinif: 's41-liste' }, l.map(function (r) {
+        var alt = (r.parti == null ? '' : G.say(r.parti) + ' parti') + (r.en_eski_parti_tarihi ? ' · en eski parti ' + tarihTR(r.en_eski_parti_tarihi) : '');
+        return h('div', { sinif: 'st-satir st-salt' }, [h('span', { sinif: 'st-ad', metin: r.urun || '—' }),
+          h('span', { sinif: 'st-sag', metin: r.miktar == null ? '—' : G.say(r.miktar) + (r.birim ? ' ' + r.birim : '') }), alt ? h('small', { sinif: 'st-alt', metin: alt }) : null]);
+      }));
+      var ust = eskiKaynak ? h('p', { sinif: 'ny-ipucu', metin: 'Veri eski: liste güncel olmayabilir' }) : null;
+      var kt = v.kalite_bekleyen_kaynak_tarihi ? h('p', { sinif: 'ny-ipucu', metin: 'Veri tarihi: ' + tarihTR(v.kalite_bekleyen_kaynak_tarihi) }) : null;
+      return h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Kalite kararı bekleyen miktar (ürün bazında)', alt: 'kararı henüz verilmemiş mamul partileri · tarih sınırı yok', govde: h('div', null, [ust, govde2, kt]) })]);
+    }
+
     function bugun(v) {
       var gn = v.gunluk || [], ciftler = gn.map(function (x) { return { e: gunKisa(x.gun), giren: x.giren, cikan: x.cikan }; });
       var ham = ciftler.filter(function (x) { return x.giren != null || x.cikan != null; }), toplam = 0;
       ham.forEach(function (x) { toplam += (x.giren || 0) + (x.cikan || 0); });
       var kok2 = h('div');
+      kok2.appendChild(kaliteBekleyen(v));
       if (!ham.length) kok2.appendChild(h('p', { sinif: 'ny-ipucu', metin: 'Hareket bilgisi şu an alınamıyor.' }));
       else if (!toplam) kok2.appendChild(h('p', { sinif: 'ny-ipucu', metin: 'Son 7 günde sevk geçiş deposunda hareket olmadı.' }));
       else {

@@ -359,18 +359,18 @@
     var ozAlan = h('div', { sinif: 'ust-bosluk' }), alan = h('div', { sinif: 'ust-bosluk' });
     kap.appendChild(ozAlan); kap.appendChild(alan);
     var kol = [
-      { ad: 'Teslim alan kurum', k: 'teslim_alan_kurum', ciz: function (r) { return dolu(r.teslim_alan_kurum); } },
-      { ad: 'Sevk tarihi', k: 'sevk_tarihi', ciz: function (r) { return td(r.sevk_tarihi); } },
-      { ad: 'Tür', k: 'tur', ciz: turAd },
-      { ad: 'Ürün', k: 'malzeme', ciz: function (r) { return dolu(r.malzeme); } },
-      { ad: 'Miktar', k: 'miktar', sag: true, ciz: miktarKol, deger: function (r) { return r.miktar; } },
-      { ad: 'Koli', k: 'koli', sag: true, ciz: function (r) { return r.koli == null ? '—' : say(r.koli); } },
-      { ad: 'Sipariş no', k: 'siparis_no', ciz: function (r) { return dolu(r.siparis_no); } },
-      { ad: 'Teslimat no', k: 'teslimat_no', ciz: function (r) { return dolu(tesNo(r)); }, deger: tesNo },
-      { ad: 'İrsaliye no', k: 'irsaliye_no', ciz: function (r) { return dolu(r.teslimat_no ? r.irsaliye_no : null); } },
-      { ad: 'Lojistik', k: 'lojistik', ciz: function (r) { return dolu(r.lojistik); } },
+      { ad: 'Malı Teslim Alan', k: 'teslim_alan_kurum', ciz: function (r) { return dolu(r.teslim_alan_kurum); } },
+      { ad: 'Malzeme Kodu', k: 'urun_kodu', ciz: function (r) { return dolu(r.urun_kodu); } },
+      { ad: 'Malzeme Adı', k: 'malzeme', ciz: function (r) { return dolu(r.malzeme); } },
+      { ad: 'Miktar', k: 'miktar', sag: true, ciz: function (r) { return r.miktar == null ? '—' : say(r.miktar); }, deger: function (r) { return r.miktar; } },
+      { ad: 'Koli İçi Miktar', k: 'koli_ici', sag: true, ciz: function () { return '—'; } },
+      { ad: 'Ölçü Birimi', k: 'birim', ciz: function (r) { return dolu(r.birim); } },
+      { ad: 'Koli Miktarı', k: 'koli', sag: true, ciz: function (r) { return r.koli == null ? '—' : say(r.koli); } },
+      { ad: 'Sevk Tarih', k: 'sevk_tarihi', ciz: function (r) { return td(r.sevk_tarihi); } },
       { ad: 'Lokasyon', k: 'lokasyon', ciz: function (r) { return dolu(r.lokasyon); } },
-      { ad: 'Açıklama', k: 'aciklama', ciz: function (r) { return dolu(r.aciklama); } }];
+      { ad: 'Açıklama', k: 'aciklama', ciz: function (r) { return dolu(r.aciklama); } },
+      { ad: 'İrsaliye No', k: 'irsaliye_no', ciz: function (r) { return dolu(r.teslimat_no ? r.irsaliye_no : null); } },
+      { ad: 'Lojistik', k: 'lojistik', ciz: function (r) { return dolu(r.lojistik); } }];
     function ciz() {
       alan.textContent = ''; ozAlan.textContent = '';
       var q = MM.aramaNorm ? MM.aramaNorm(st.ara || '') : (st.ara || '').toLowerCase(), bas = st.bas, bit = st.mod === 'gun' ? st.bas : st.bit;

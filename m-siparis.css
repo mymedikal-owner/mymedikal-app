@@ -127,5 +127,17 @@
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-ust { padding-right: 0; }
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-deger small { display: none; }
   #icerik[data-modul="siparis"] .ozet-serit-ana .kpi-i { width: 24px; height: 24px; top: auto; bottom: 0; right: 0; }
+  #icerik[data-modul="dmo"] .kirinti:not(:has(a ~ a)) { display: none; }
+  #icerik[data-modul="dmo"] .ozet-serit .kpi-ust { padding-right: 0; min-height: 0; }
+  #icerik[data-modul="dmo"] .ozet-serit .kpi-ana { padding-block: 6px; }
+  #icerik[data-modul="dmo"] .dm-ayr-tek { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; }    
+  #icerik[data-modul="dmo"] .dm-mk-ozet-oge .dm-mk-ozet-satir { padding-block: 2px; gap: 0; }
+  #icerik[data-modul="dmo"] .ara-kutu { margin-bottom: 6px; }
+  #icerik[data-modul="dmo"] .dm-mk-olcu { padding-bottom: 0; }
+  #icerik[data-modul="dmo"] .dm-mk-ozet-liste { margin-bottom: 2px; gap: 2px; }
+  #icerik[data-modul="dmo"] .dm-ayr-liste, #icerik[data-modul="dmo"] .dm-bg-liste { gap: 2px; }
+  #icerik[data-modul="dmo"] .ozet-serit { margin-bottom: 6px; }
+  #icerik[data-modul="dmo"] .dm-bos-kisa { padding-block: 8px; }
+  #icerik[data-modul="dmo"] .dm-bos-kisa p { display: none; }
   #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
 }

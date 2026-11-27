@@ -928,6 +928,30 @@
     'Olumlu değil': 'Not accepted'
   };
   Object.keys(TAM_8036).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_8036[k]; });
+   
+  var TAM_2711 = {
+    'Dikkat gerektirenleri göster': 'Show items needing attention',
+    'Son teslimi geçen': 'Past delivery deadline',
+    'Riskli': 'At-risk',
+    'Ek süre başvurusu': 'Extension request',
+    'Ek süre hastane onayında': 'Extension pending hospital approval',
+    'Ek süre durumu bilinmeyen': 'Extension status unknown',
+    'Geçmişi ölçülemeyen': 'History not measurable',
+    'Teslim girişi bekleyen (irsaliyeden ≥5 gün)': 'Awaiting delivery entry (≥5 days since delivery note)',
+    'Gecikmiş': 'Overdue',
+    'Ek süre gerekli': 'Extension needed'
+  };
+  Object.keys(TAM_2711).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_2711[k]; });
+  REGEX.unshift([/^irsaliyeden girişe ort\. (.+) gün \((hastane ortalaması|il ortalaması|il ortalaması \(kargo\))\)$/, function (m, g, k) { return 'avg. ' + g + ' days from delivery note to entry (' + cevir(k) + ')'; }],
+    [/^irsaliyeden girişe ort\. (.+) gün$/, 'avg. $1 days from delivery note to entry'],
+    [/^Son teslim (\d{2}\.\d{2}\.\d{4})$/, 'Delivery deadline $1'],
+    [/^Son teslimi geçen: (.+) hastane$/, 'Past delivery deadline: $1 hospitals'],
+    [/^Ek süre gerekli: (.+) hastane$/, 'Extension needed: $1 hospitals'],
+    [/^Riskli: (.+) hastane$/, 'At-risk: $1 hospitals'],
+    [/^Ek süre hastane onayında: (.+)$/, 'Extension pending hospital approval: $1'],
+    [/^Ek süre durumu bilinmeyen: (.+)$/, 'Extension status unknown: $1'],
+    [/^Geçmişi ölçülemeyen: (.+)$/, 'History not measurable: $1'],
+    [/^Gecikmiş (\d+) · Riskli (\d+) · Ek süre (\d+)$/, 'Overdue $1 · At-risk $2 · Extension $3']);
   PARCA.push.apply(PARCA, [
     ['Portal bilgisi eski olabilir. Değerler güncel olmayabilir. ', 'Portal data may be out of date. Values may not be current. '],
     ['kota grubunda aşım görünüyor — kesinleşmedi', 'quota groups with an apparent overrun, not confirmed'],

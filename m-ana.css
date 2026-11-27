@@ -58,6 +58,10 @@
 .kom-hero .kh-k { grid-column: 1; font-size: 12px; } .kom-hero .kh-b { grid-column: 1; font-size: var(--t-xl); margin: 0; }
 .kom-hero .kh-t { grid-column: 2; grid-row: 1 / span 2; gap: 6px; } .kom-hero .kh-t div { padding: 4px 8px; border-radius: 10px; font-size: 11px; text-align: center; } .kom-hero .kh-t b { font-size: 18px; }
 .komuta { margin-bottom: var(--b3); } .kom-izgara { gap: 8px; }
+ 
+.kom-hero-dugme { width: 100%; min-height: 44px; border: 0; font: inherit; text-align: left; cursor: pointer; -webkit-appearance: none; appearance: none; }
+.kom-hero-dugme .kh-git { grid-column: 3; grid-row: 1 / span 2; display: inline-flex; align-items: center; color: #fff; opacity: .85; }
+.kom-hero-dugme:focus-visible { outline: 3px solid #fff; outline-offset: -4px; box-shadow: 0 0 0 3px var(--vurgu); }
 .kom-kutu { border-radius: var(--r-m); padding: 8px 4px 6px; gap: 0; }
 .kk-ik { width: 30px; height: 30px; border-radius: 9px; margin-bottom: 2px; } .kk-sayi { font-size: 20px; } .kk-alt { font-size: 10px; line-height: 1.2; }
 .komuta.az .kom-kutu { padding: 12px 10px; } .komuta.az .kk-sayi { font-size: var(--t-2xl); }

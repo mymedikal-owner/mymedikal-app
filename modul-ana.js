@@ -148,8 +148,13 @@
     if (gor.length >= 3 && kutular.some(function (x) { return x.k; })) {
       var ac = bildirimSay.kritik, iz = bildirimSay.uyari, yol = kutular.filter(function (x) { return x.k && !x.k.ton; }).length;
       var baslik = ac ? 'Dikkat gerekiyor' : (iz ? 'Takip gerekiyor' : (kutular.some(function (x) { return x.k; }) ? 'Her şey yolunda' : 'Veri bekleniyor'));
-      kap.appendChild(h('div', { sinif: 'kom-hero ' + (ac ? 'k' : (iz ? 'u' : 'i')) }, [h('div', { sinif: 'kh-k', metin: 'Şirket bugün' }), h('div', { sinif: 'kh-b', metin: baslik }),
-        h('div', { sinif: 'kh-t' }, [h('div', null, [h('b', { metin: String(ac) }), 'acil']), h('div', null, [h('b', { metin: String(iz) }), 'izlenen']), h('div', null, [h('b', { metin: String(yol) }), 'yolunda'])])]));
+      var tikla = ac > 0 || iz > 0, ceviriH = MM.t || function (x) { return x; };
+      var heroIc = [h('div', { sinif: 'kh-k', metin: 'Şirket bugün' }), h('div', { sinif: 'kh-b', metin: baslik }),
+        h('div', { sinif: 'kh-t' }, [h('div', null, [h('b', { metin: String(ac) }), 'acil']), h('div', null, [h('b', { metin: String(iz) }), 'izlenen']), h('div', null, [h('b', { metin: String(yol) }), 'yolunda'])])];
+      if (tikla) {
+        heroIc.push(h('span', { sinif: 'kh-git', 'aria-hidden': 'true' }, [gr.ikon('sag', 16)]));
+        kap.appendChild(h('button', { type: 'button', sinif: 'kom-hero kom-hero-dugme ' + (ac ? 'k' : 'u'), 'aria-label': ceviriH('Dikkat gerektirenleri göster'), onclick: function () { var z = document.getElementById('zil'); if (z) z.click(); } }, heroIc));
+      } else kap.appendChild(h('div', { sinif: 'kom-hero i' }, heroIc));
     }
     var izg = h('div', { sinif: 'kom-izgara' });
     kutular.forEach(function (x) {

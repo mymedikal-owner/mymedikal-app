@@ -197,5 +197,40 @@
   #icerik[data-modul="uretim-plan"] .ust-bosluk { margin-top: 6px; }
   #icerik[data-modul="uretim-plan"] .ozet-serit .ozet-serit-ana .kpi-ana { padding-block: 5px; gap: 2px; }
   #icerik[data-modul="uretim-plan"] .ozet-serit { margin-bottom: 6px; }
-  #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
+   
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px 10px; padding: 5px 12px; align-items: start; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale > * { grid-column: 1 / -1; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale > .dn-bar { grid-column: auto; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 6px; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale > .dn-bar .dn-bar-ad { grid-column: 1 / -1; grid-row: 1; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale > .dn-bar .dn-bar-iz { grid-column: 1; grid-row: 2; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale > .dn-bar .dn-bar-say { grid-column: 2; grid-row: 2; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale .dm-ih-ust { row-gap: 2px; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ihale-kap .dn-ihale .dn-kargo-yok { padding-top: 0; padding-bottom: 0; min-height: 0; }
+#icerik[data-modul="dmo-nakliyat"] .dn-durum { margin-bottom: 4px; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ozet .dn-gri { margin-bottom: 4px; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ozet .dn-oz3 { margin-bottom: 2px; }
+#icerik[data-modul="dmo-nakliyat"] .dn-ozet .dn-oz3 .dn-oz3-k { padding: 4px 2px; }
+#icerik[data-modul="dmo-nakliyat"] .sayfa-basi { margin-bottom: 4px; }
+#icerik[data-modul="dmo-nakliyat"] .arac-cubugu { margin-bottom: 6px; }
+#icerik[data-modul="dmo-nakliyat"] .dn-liste { gap: 6px; }
+#icerik[data-modul="dmo-nakliyat"] .dn-liste .daha-fazla { margin-top: 4px; }
+ 
+#icerik[data-modul="sterilizasyon"] .s41-liste .st-satir { padding: 6px 12px; row-gap: 0; }
+#icerik[data-modul="sterilizasyon"] .s41-liste { gap: 6px; }
+#icerik[data-modul="sterilizasyon"] .sayfa-basi { margin-bottom: 6px; }
+#icerik[data-modul="sterilizasyon"] .ozet-serit { margin-bottom: 8px; }
+#icerik[data-modul="sterilizasyon"] .segment.sekme-sira { margin-bottom: 8px; }
+#icerik[data-modul="sterilizasyon"] .arac-cubugu { margin-bottom: 8px; }
+#icerik[data-modul="sterilizasyon"] .bant.ornek { margin-bottom: 6px; }
+ 
+#icerik[data-modul="stok"] .stk-ozet .ozet-serit-ana { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+#icerik[data-modul="stok"] .stk-ozet .ozet-serit-ana .s41-sayi { padding: 4px 6px; }
+#icerik[data-modul="stok"] .stk-ozet.ozet-serit { gap: 4px; }
+#icerik[data-modul="stok"] .stk-ozet .ozet-serit-tumu { min-height: 40px; height: 40px; }
+#icerik[data-modul="stok"] .s41-satir.stk { padding-top: 2px; padding-bottom: 2px; }
+#icerik[data-modul="stok"] .sayfa-basi { margin-bottom: 6px; }
+#icerik[data-modul="stok"] .bant.ornek { margin-bottom: 4px; }
+#icerik[data-modul="stok"] .stk-sek { margin-bottom: 4px; }
+#icerik[data-modul="stok"] .ara-kutu { margin-bottom: 6px; }
+#icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
 }

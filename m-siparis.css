@@ -262,3 +262,59 @@
 #icerik[data-modul="muhasebe"] .tq-kpi .kpi .kpi-ana { padding: 6px 8px; }
 #icerik[data-modul="siparis"] .kirinti:not(:has(a ~ a)) { display: none; }    
 }
+
+ 
+#icerik[data-modul="dmo"] .dm-ozet-firma { display: flex; gap: 4px; padding: 3px; margin-bottom: var(--b3, 12px); background: var(--yuzey2); border-radius: var(--r-m, 12px); }
+#icerik[data-modul="dmo"] .dm-ozet-fdugme { flex: 1 1 0; min-height: 44px; font: inherit; font-weight: 700; color: var(--yazi2); background: transparent; border: 0; border-radius: var(--r-s, 10px); cursor: pointer; }
+#icerik[data-modul="dmo"] .dm-ozet-fdugme.secili { background: var(--vurgu); color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+#icerik[data-modul="dmo"] .dm-ok-h { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; text-align: center; }
+#icerik[data-modul="dmo"] .dm-ok-ad { font-size: var(--t-xs); color: var(--soluk); overflow-wrap: break-word; }
+#icerik[data-modul="dmo"] .dm-ok-ad.uyari { color: var(--kritik); font-weight: 700; }
+#icerik[data-modul="dmo"] .dm-halka.kucuk .dm-hk-merkez strong { font-size: 10px; max-width: 74%; letter-spacing: -.2px; }
+#icerik[data-modul="dmo"] .dm-halka.orta .dm-hk-merkez strong { font-size: 17px; max-width: 72%; }
+#icerik[data-modul="dmo"] .dm-halka.uyari .dm-hk-merkez strong { color: var(--kritik); }
+#icerik[data-modul="dmo"] .dm-halka .dm-hk-esik { stroke-width: 5; }
+#icerik[data-modul="dmo"] .dm-ok-buyuk { display: flex; justify-content: space-around; gap: 8px; margin-bottom: var(--b3, 12px); padding: var(--b3, 12px) var(--b1, 6px); background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m, 12px); }
+
+ 
+#icerik[data-modul="dmo"] .dm-pn-kpiler { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--b2, 8px); margin-bottom: var(--b3, 12px); }
+#icerik[data-modul="dmo"] .dm-pn-kpi { display: flex; align-items: center; gap: var(--b2, 8px); min-width: 0; min-height: 44px; padding: var(--b3, 12px); background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: var(--r-m, 12px); }
+#icerik[data-modul="dmo"] .dm-pn-kpi.uyari { background: var(--turuncu-zemin); border-color: var(--turuncu); }
+#icerik[data-modul="dmo"] .dm-pn-kpi-g { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+#icerik[data-modul="dmo"] .dm-pn-kpi-ad { font-size: var(--t-xs); font-weight: 650; color: var(--yazi2); overflow-wrap: break-word; }
+#icerik[data-modul="dmo"] .dm-pn-kpi-de { font-size: var(--t-xl, 20px); line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#icerik[data-modul="dmo"] .dm-pn-kpi-alt { font-size: var(--t-xs); overflow-wrap: break-word; }
+#icerik[data-modul="dmo"] .dm-pn-kpi-ik { flex: none; font-size: 22px; line-height: 1; color: var(--turuncu); }
+#icerik[data-modul="dmo"] .dm-pn-grup { margin: var(--b3, 12px) 0 var(--b1, 4px); font-size: var(--t-s); color: var(--yazi2); }
+#icerik[data-modul="dmo"] .dm-pn-liste { display: flex; flex-direction: column; gap: var(--b2, 8px); margin-bottom: var(--b2, 8px); }
+#icerik[data-modul="dmo"] .dm-pn-kart { display: flex; flex-direction: column; gap: var(--b2, 8px); min-width: 0; padding: var(--b3, 12px); color: var(--yazi); text-decoration: none; background: var(--yuzey); border: 1px solid var(--cizgi); border-left: 5px solid var(--vurgu); border-radius: var(--r-m, 12px); }
+#icerik[data-modul="dmo"] .dm-pn-kart:hover, #icerik[data-modul="dmo"] .dm-pn-kart:focus-visible { border-color: var(--vurgu); }
+#icerik[data-modul="dmo"] .dm-pn-kart.uyari { background: var(--turuncu-zemin); border-left-color: var(--turuncu); }
+#icerik[data-modul="dmo"] .dm-pn-kart.sari { background: var(--sari-zemin); border-left-color: var(--sari-yazi); }
+#icerik[data-modul="dmo"] .dm-pn-ust { display: flex; align-items: center; gap: var(--b2, 8px); min-height: 44px; }
+#icerik[data-modul="dmo"] .dm-pn-baslik { display: flex; flex-direction: column; gap: 2px; flex: 1 1 0; min-width: 0; }
+#icerik[data-modul="dmo"] .dm-pn-no { font-size: var(--t-l, 17px); font-variant-numeric: tabular-nums; }
+#icerik[data-modul="dmo"] .dm-pn-urun { font-size: var(--t-s); overflow-wrap: anywhere; }
+#icerik[data-modul="dmo"] .dm-pn-ok { flex: none; min-width: 28px; font-size: 28px; line-height: 1; text-align: center; color: var(--vurgu); }
+#icerik[data-modul="dmo"] .dm-pn-etler { display: flex; flex-wrap: wrap; gap: var(--b1, 4px) var(--b2, 8px); }
+#icerik[data-modul="dmo"] .dm-pn-et { padding: 2px 8px; font-size: var(--t-xs); font-weight: 650; color: var(--yazi); background: var(--yuzey2); border: 1px solid var(--eksen); border-radius: var(--r-t, 999px); overflow-wrap: break-word; }
+#icerik[data-modul="dmo"] .dm-pn-et.alt { color: var(--kirmizi); border-color: var(--kirmizi); }
+#icerik[data-modul="dmo"] .dm-pn-cubuklar { display: flex; flex-direction: column; gap: var(--b2, 8px); }
+#icerik[data-modul="dmo"] .dm-pn-eksen, #icerik[data-modul="dmo"] .dm-pn-sat { display: grid; grid-template-columns: 5.6em minmax(0, 1fr) 4.8em; gap: var(--b2, 8px); align-items: center; }
+#icerik[data-modul="dmo"] .dm-pn-eksen { margin-bottom: -4px; }
+#icerik[data-modul="dmo"] .dm-pn-eksen::before { content: ''; }
+#icerik[data-modul="dmo"] .dm-pn-eksen-et { position: relative; left: 25%; grid-column: 2; display: block; width: 6em; margin-left: -3em; text-align: center; font-size: var(--t-xs); font-weight: 700; color: var(--yazi2); }
+#icerik[data-modul="dmo"] .dm-pn-ad { font-size: var(--t-xs); color: var(--yazi2); overflow-wrap: break-word; }
+#icerik[data-modul="dmo"] .dm-pn-iz { position: relative; min-height: 14px; background: var(--yuzey3); border-radius: 4px; }
+#icerik[data-modul="dmo"] .dm-pn-dolgu { position: absolute; inset: 0 auto 0 0; background: var(--vurgu); border-radius: 4px; }
+#icerik[data-modul="dmo"] .dm-pn-dolgu.alt { background: var(--kritik); }
+#icerik[data-modul="dmo"] .dm-pn-dolgu.bek { background: repeating-linear-gradient(135deg, var(--vurgu) 0 3px, transparent 3px 6px); box-shadow: inset 0 0 0 1.5px var(--vurgu); }
+#icerik[data-modul="dmo"] .dm-pn-esik { position: absolute; left: 25%; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--yazi); border-radius: 1px; box-shadow: 0 0 0 1px var(--yuzey); }
+#icerik[data-modul="dmo"] .dm-pn-de { font-size: var(--t-s); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: break-word; }
+#icerik[data-modul="dmo"] .dm-pn-sat.alt .dm-pn-de { color: var(--kirmizi); }
+#icerik[data-modul="dmo"] .dm-pn-eksik { padding: var(--b2, 8px) var(--b3, 12px); font-size: var(--t-s); color: var(--yazi); background: var(--yuzey2); border: 1px dashed var(--eksen); border-radius: var(--r-s, 8px); }
+#icerik[data-modul="dmo"] .dm-pn-alt { display: flex; flex-wrap: wrap; gap: var(--b1, 4px) var(--b3, 12px); color: var(--yazi2); font-variant-numeric: tabular-nums; }
+@media (min-width: 720px) {
+  #icerik[data-modul="dmo"] .dm-pn-kpiler { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #icerik[data-modul="dmo"] .dm-pn-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); align-items: start; }
+}

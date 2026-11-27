@@ -108,8 +108,14 @@
       svg.appendChild(sv('line', { x1: 50 + r1 * Math.cos(a), y1: 50 + r1 * Math.sin(a), x2: 50 + r2 * Math.cos(a), y2: 50 + r2 * Math.sin(a), class: 'dm-hk-esik' }));
     }
     var kap = h('div', { sinif: 'dm-halka' + (o.sinif ? ' ' + o.sinif : ''), style: '--hk:' + boy + 'px;width:' + boy + 'px;height:' + boy + 'px', role: 'img', 'aria-label': o.ad || '' }, [svg,
-      h('div', { sinif: 'dm-hk-merkez' }, [h('strong', { metin: vd == null ? 'veri yok' : o.merkez }), o.alt ? h('small', { metin: o.alt }) : null])]);
+      h('div', { sinif: 'dm-hk-merkez' }, [h('strong', { metin: vd == null ? (o.yok || 'veri yok') : o.merkez }), o.alt ? h('small', { metin: o.alt }) : null])]);
     return kap;
+  }
+   
+  var OZET_ESIK = 25;
+  function sipHalka(ad, v, boy) {
+    var d = sayi(v, 1), n = d == null ? null : Number(v), uy = n != null && n < OZET_ESIK, kucuk = boy < 60;
+    return halka({ boy: boy, deger: n, esik: OZET_ESIK, renk: uy ? 'kirmizi' : 'yesil', merkez: d == null ? '—' : '%' + d, yok: '—', sinif: (kucuk ? 'kucuk' : 'orta') + (uy ? ' uyari' : ''), ad: ad + ' ' + (n == null ? 'veri yok' : '%' + d) + ', eşik %' + OZET_ESIK });
   }
   function halkaKutu(ad, hk, alt) { return h('div', { sinif: 'dm-hk-kutu' }, [hk, h('span', { sinif: 'dm-hk-ad', metin: ad }), alt ? h('span', { sinif: 'dm-hk-alt', metin: alt }) : null]); }
 
@@ -430,22 +436,30 @@
       });
       return G.kart({ baslik: 'Aylara göre ihale', alt: 'sipariş ayına göre ihale sayısı · mavi MY, mor DAY', govde: h('div', { sinif: 'dm-ay-grafik', role: 'group', 'aria-label': 'Aylara göre ihale sayısı' }, sutunlar) });
     }
+    function ozetFirma() { var v = null; try { v = sessionStorage.getItem('mm-dmo-ozet-firma'); } catch (e) { } return v === 'DAY' ? 'DAY' : 'MY'; }
+    function firmaSegmenti(sf) {   
+      return h('div', { sinif: 'dm-ozet-firma', role: 'group', 'aria-label': 'Şirket' }, ['MY', 'DAY'].map(function (fa) {
+        return h('button', { type: 'button', sinif: 'dm-ozet-fdugme' + (fa === sf ? ' secili' : ''), 'aria-pressed': fa === sf ? 'true' : 'false', metin: fa, onclick: function () {
+          if (fa === sf) return; try { sessionStorage.setItem('mm-dmo-ozet-firma', fa); } catch (e) { } MK_ACIK = null; ciz(); } });
+      }));
+    }
     function ozetGoster() {
-      var d = yuk.v['dmo-ozet'], fk = d.firmalar || {};
+      var d = yuk.v['dmo-ozet'], fk = d.firmalar || {}, sf = ozetFirma();
+      govde.appendChild(firmaSegmenti(sf));
        
-      var top = function (k) { var a = (fk.MY || {})[k], b = (fk.DAY || {})[k]; return a == null && b == null ? null : (a || 0) + (b || 0); };
+      var top = function (k) { var a = (fk[sf] || {})[k]; return a == null ? null : a; };   
        
       var kutular = [['Açık sipariş', 'acik_siparis', '#dmo/siparis?risk=acik', false], ['Riskli sipariş', 'riskli_toplam_siparis', '#dmo/siparis?risk=riskli_toplam', true], ['Cezalı sürede', 'cezali_surede_siparis', '#dmo/siparis?risk=cezali_surede', true],
         ['Olumsuz muayene', 'olumsuz_muayene', '#dmo/muayene', false], ['Siparişli ihale', 'siparisli_ihale_sayisi', '#dmo/ihaleler', false]].map(function (r) {
         var v = top(r[1]);
-        return { baslik: r[0], deger: say(v), durum: v == null ? 'yok' : (r[3] && v ? 'kritik' : null), tikla: function () { git(r[2]); } };
+        return { baslik: r[0], deger: say(v), durum: v == null ? 'yok' : (r[3] && v ? 'kritik' : null), tikla: function () { git(r[2] + (r[2].indexOf('?') < 0 ? '?' : '&') + 'firma=' + sf); } };
       });
-      if (yuk.as) kutular.push({ baslik: 'Gönderilecek adet (açık sipariş takibi)', deger: say((yuk.as.toplam || {}).kalan), tikla: function () { git('#dmo/acik'); } });
+      if (yuk.as) kutular.push({ baslik: 'Gönderilecek adet (açık sipariş takibi)', deger: say((yuk.as.toplam || {})['kalan_' + sf]), tikla: function () { git('#dmo/acik'); } });
       govde.appendChild(G.ozetSerit(kutular, { en: 4 }));
-      govde.appendChild(acikSiparisBolumu());   
+      govde.appendChild(acikSiparisBolumu(sf));   
        
-      var mkListe = mektupListesi();
-      govde.appendChild(h('button', { type: 'button', sinif: 'dm-ayr dm-ayr-tek dm-mk-gecis', onclick: function () { git('#dmo/mektup'); } }, [h('strong', { metin: 'Siparişler (sipariş bazlı görünüm)' }), h('span', { sinif: 'soluk kucuk', metin: mkListe.length + ' sipariş · ' + mkListe.filter(function (o) { return o.uyari; }).length + ' uyarılı' })]));
+      var mkListe = mektupListesi().filter(function (o) { return o.x.firma === sf; });
+      govde.appendChild(h('button', { type: 'button', sinif: 'dm-ayr dm-ayr-tek dm-mk-gecis', onclick: function () { git('#dmo/mektup?firma=' + sf); } }, [h('strong', { metin: 'Siparişler (sipariş bazlı görünüm)' }), h('span', { sinif: 'soluk kucuk', metin: mkListe.length + ' sipariş · ' + mkListe.filter(function (o) { return o.uyari; }).length + ' uyarılı' })]));
       var bugun = bugunKarti();
       if (bugun) govde.appendChild(bugun);
        
@@ -534,36 +548,75 @@
         h('span', null, ['Ek süre ', h('strong', { metin: ve(r.ek_sure_basvurusu_gereken_hastane) })]),
         p.asim_teyitsiz === true ? h('span', { sinif: 'dm-mk-ozet-rozet', metin: 'kesinleşmedi' }) : null]);
     }
-    function mkOzetSatiri(m) {
-      var urun = mkUrun(m.firma, m.dosya_no), anahtar = m.firma + '|' + m.dosya_no, detay = null;
-      var oge = h('div', { sinif: 'dm-mk-ozet-oge' });
-      var dugme = h('button', { type: 'button', sinif: 'dm-mk-ozet-satir' + mkTonlu(m), 'aria-expanded': 'false', onclick: function () {
-        if (detay) { kapat(); MK_ACIK = null; return; }
-        if (MK_ACIK && MK_ACIK.oge && MK_ACIK.oge.kapat) MK_ACIK.oge.kapat();   
-        ac(); MK_ACIK = { anahtar: anahtar, oge: oge };
-      } }, [
-        h('div', { sinif: 'dm-mk-olcu' }, [h('strong', { sinif: 'dm-mk-ozet-no-d', metin: sipNo(m) })].concat(mkOlcuHucreleri(m))),
-        mkOzetAlt(m, urun)]);
-      function ac() { detay = mkOlcuDetayi(m); oge.appendChild(detay); dugme.setAttribute('aria-expanded', 'true'); oge.classList.add('acik'); }
-      function kapat() { if (detay) { detay.remove(); detay = null; } dugme.setAttribute('aria-expanded', 'false'); oge.classList.remove('acik'); }
-      oge.kapat = kapat; oge.appendChild(dugme);
-      if (MK_ACIK && MK_ACIK.anahtar === anahtar) { ac(); MK_ACIK.oge = oge; }   
-      return oge;
+    
+
+
+    function pnCubuk(ad, v, tur, yokMetin) {
+      var n = v == null || isNaN(Number(v)) ? null : Math.max(0, Math.min(100, Number(v))), alt = tur !== 'b' && n != null && n < OZET_ESIK;
+      var iz = h('div', { sinif: 'dm-pn-iz', 'aria-hidden': 'true' }, [n ? h('div', { sinif: 'dm-pn-dolgu' + (alt ? ' alt' : tur === 'b' ? ' bek' : ''), style: 'width:' + n + '%' }) : null, h('i', { sinif: 'dm-pn-esik' })]);
+      return h('div', { sinif: 'dm-pn-sat' + (alt ? ' alt' : '') }, [h('span', { sinif: 'dm-pn-ad', metin: ad }), iz,
+        h('span', { sinif: 'dm-pn-de', metin: (alt ? '▼ ' : '') + (n == null ? (yokMetin || 'veri yok') : yz(v)) })]);
     }
-    function acikSiparisBolumu() {   
-      var kap = h('div', { sinif: 'dm-mk-acik' }), l = mkListe();
-      kap.appendChild(h('h3', { sinif: 'bolum', metin: 'Açık siparişler' }));
+    function pnEtiket(m) {   
+      var p = m.iptal || {}, r = m.teslimat_riski || {}, e = [];
+      if (p.asim_teyitsiz === true) e.push('Kesinleşmedi · iptal hakkı aşımı');
+      if (Number(r.ek_sure_basvurusu_gereken_hastane) > 0) e.push('Ek süre gerekli: ' + r.ek_sure_basvurusu_gereken_hastane + ' hastane');
+      if (Number(r.gecmise_gore_riskli_hastane) > 0) e.push('Riskli: ' + r.gecmise_gore_riskli_hastane + ' hastane');
+      return e;
+    }
+    function mkOzetSatiri(m) {
+      var urun = mkUrun(m.firma, m.dosya_no), k = m.kapsam || {}, o = m.oran || {}, p = m.iptal || {}, r = m.teslimat_riski || {}, tam = k.tam === true, ton = mkTonlu(m).replace(' ', '');
+      var govdeK, altinda = [];
+      if (tam) {
+        var s = [['İrsaliye', o.irsaliye_eksik === true ? null : o.irsaliye_yuzde, 'a', o.irsaliye_eksik === true ? 'kayıt eksik' : null], ['Teslim', o.teslim_yuzde, 'a'], ['Kabul', o.kabul_yuzde, 'a'], ['Kabul bekleyen', o.teslim_muayenesiz_yuzde, 'b']];
+        s.forEach(function (x) { if (x[2] === 'a' && x[1] != null && Number(x[1]) < OZET_ESIK) altinda.push(x[0]); });
+        govdeK = h('div', { sinif: 'dm-pn-cubuklar' }, [h('div', { sinif: 'dm-pn-eksen', 'aria-hidden': 'true' }, [h('span', { sinif: 'dm-pn-eksen-et', metin: '%25 eşik' })])].concat(s.map(function (x) { return pnCubuk(x[0], x[1], x[2], x[3]); })));
+      } else govdeK = h('div', { sinif: 'dm-pn-eksik' }, [h('strong', { metin: '⚠ veri eksik' }), h('span', { metin: k.portal_zamani ? ' · ' + zamanTR(k.portal_zamani) + ' itibarıyla siparişin bir bölümü portal listesinin dışında' : ' · siparişin bir bölümü portal listesinin dışında' })]);
+      var et = pnEtiket(m).map(function (t) { return h('span', { sinif: 'dm-pn-et', metin: t }); });
+      if (altinda.length) et.push(h('span', { sinif: 'dm-pn-et alt', metin: '▼ %25 altı: ' + altinda.join(' · ') }));
+      return h('a', { href: '#dmo/mektup/' + encodeURIComponent(m.firma) + '/' + encodeURIComponent(m.dosya_no), sinif: 'dm-pn-kart' + (ton ? ' ' + ton : ''), 'aria-label': 'Sipariş ' + sipNo(m) + ' ayrıntısını aç' }, [
+        h('div', { sinif: 'dm-pn-ust' }, [h('div', { sinif: 'dm-pn-baslik' }, [h('strong', { sinif: 'dm-pn-no', metin: sipNo(m) }), h('span', { sinif: 'dm-pn-urun soluk', metin: urun || 'ürün bilgisi yok' })]), h('span', { sinif: 'dm-pn-ok', 'aria-hidden': 'true', metin: '›' })]),
+        et.length ? h('div', { sinif: 'dm-pn-etler' }, et) : null,
+        govdeK,
+        h('div', { sinif: 'dm-pn-alt kucuk' }, [
+          m.acik_kalem == null ? h('span', null, ['Açık kalem ', h('strong', { metin: 'veri eksik' })]) : h('span', null, ['Açık kalem ', h('strong', { metin: ve(m.acik_kalem) })]),
+          h('span', null, ['İptal ', h('strong', { metin: ve(p.kullanilan_toplam) }), ' / ', h('strong', { metin: ve(p.hak_toplam) })]),
+          h('span', null, ['Riskli ', h('strong', { metin: ve(r.gecmise_gore_riskli_hastane) })]),
+          h('span', null, ['Ek süre ', h('strong', { metin: ve(r.ek_sure_basvurusu_gereken_hastane) })])])]);
+    }
+    function pnKpi(ad, deger, alt, ton, ek) {
+      return h('div', { sinif: 'dm-pn-kpi' + (ton ? ' ' + ton : '') }, [ek || null, h('div', { sinif: 'dm-pn-kpi-g' }, [h('span', { sinif: 'dm-pn-kpi-ad', metin: ad }), h('strong', { sinif: 'dm-pn-kpi-de', metin: deger }), alt ? h('small', { sinif: 'dm-pn-kpi-alt soluk', metin: alt }) : null])]);
+    }
+    function pnKpiSerit(sat, sf) {
+      var uy = sat.filter(function (m) { return mkTonlu(m); }).length;
+      var kb = sat.filter(function (m) { return m.kapsam && m.kapsam.tam === true && m.oran && m.oran.kabul_yuzde != null; });
+      var ort = kb.length ? kb.reduce(function (a, m) { return a + Number(m.oran.kabul_yuzde); }, 0) / kb.length : null;
+      var tutar = null, tutarAlt = 'fiyat yetkisi yok';
+      if (fiyatGor()) {
+        if (!yuk.fy) tutarAlt = 'yükleniyor';
+        else {
+          var tl = sat.map(function (m) { var r = (yuk.fy.mektup || {})[m.firma + '|' + m.dosya_no]; return r && sayi(r.tutar_kdv_haric_tl) != null ? Number(r.tutar_kdv_haric_tl) : null; }), var_ = tl.filter(function (x) { return x != null; });
+          tutar = var_.length ? var_.reduce(function (a, b) { return a + b; }, 0) : null;
+          tutarAlt = tutar == null ? 'veri yok' : 'KDV hariç' + (var_.length < sat.length ? ' · ' + (sat.length - var_.length) + ' siparişte tutar yok' : '');
+        }
+      }
+      return h('div', { sinif: 'dm-pn-kpiler', role: 'group', 'aria-label': sf + ' açık sipariş özeti' }, [
+        pnKpi('Açık sipariş', String(sat.length), sf + ' firması'),
+        pnKpi('Toplam tutar', tutar == null ? '—' : tlKisa(tutar) + ' TL', tutarAlt),
+        pnKpi('Ortalama kabul', ort == null ? 'veri yok' : '%' + sayi(ort, 1), ort == null ? 'tam veri yok' : kb.length + ' siparişin ortalaması · eşik %' + OZET_ESIK, ort != null && ort < OZET_ESIK ? 'uyari' : '', ort == null ? null : sipHalka('Ortalama kabul', ort, 64)),
+        pnKpi('Uyarılı sipariş', String(uy), uy ? 'ek süre / riskli / kesinleşmedi' : 'uyarı yok', uy ? 'uyari' : '', uy ? h('span', { sinif: 'dm-pn-kpi-ik', 'aria-hidden': 'true', metin: '⚠' }) : null)]);
+    }
+    function acikSiparisBolumu(sf) {   
+      var kap = h('div', { sinif: 'dm-mk-acik dm-pn' }), l = mkListe();
+      kap.appendChild(h('h3', { sinif: 'bolum', metin: 'Açık siparişler · ' + sf }));
       if (!l) { kap.appendChild(G.bos({ baslik: 'Açık siparişler: veri eksik' })); return kap; }
       var acik = l.filter(function (m) { return m.acik_kalem == null || Number(m.acik_kalem) > 0; });   
-      if (!acik.length) { kap.appendChild(G.bos({ baslik: 'Açık sipariş yok' })); return kap; }
-      ['MY', 'DAY'].forEach(function (fa) {
-        var sat = acik.filter(function (m) { return m.firma === fa; });
-        if (!sat.length) return;
-        var uy = sat.filter(function (m) { return mkTonlu(m); }), dg = sat.filter(function (m) { return !mkTonlu(m); });
-        kap.appendChild(mkOlcuBasligi(fa));
-        if (uy.length) kap.appendChild(h('div', { sinif: 'dm-liste dm-mk-ozet-liste' }, uy.map(mkOzetSatiri)));
-        if (dg.length) kap.appendChild(G.ilkN(dg, mkOzetSatiri, { n: 2, sinif: 'dm-liste dm-mk-ozet-liste' }));
-      });
+      var sat = acik.filter(function (m) { return m.firma === sf; });
+      if (!sat.length) { kap.appendChild(G.bos({ baslik: sf + ' için açık sipariş yok' })); return kap; }
+      kap.appendChild(pnKpiSerit(sat, sf));
+      var uy = sat.filter(function (m) { return mkTonlu(m); }), dg = sat.filter(function (m) { return !mkTonlu(m); });
+      if (uy.length) { kap.appendChild(h('h4', { sinif: 'dm-pn-grup', metin: 'Dikkat gerektirenler (' + uy.length + ')' })); kap.appendChild(h('div', { sinif: 'dm-liste dm-pn-liste' }, uy.map(mkOzetSatiri))); }
+      if (dg.length) { if (uy.length) kap.appendChild(h('h4', { sinif: 'dm-pn-grup', metin: 'Diğer siparişler (' + dg.length + ')' })); kap.appendChild(G.ilkN(dg, mkOzetSatiri, { n: 4, sinif: 'dm-liste dm-pn-liste' })); }
       return kap;
     }
 
@@ -1220,6 +1273,7 @@
       else if (!mk) govde.appendChild(G.kart({ baslik: orBas, govde: h('p', { sinif: 'dm-mk-yok kucuk soluk', metin: 'İrsaliye / kargo teslim / muayene kabul oranları: veri yok' }) }));
       else {
         tlKap = h('div');
+        if (mk.kapsam && mk.kapsam.tam === true) { var mo = mk.oran || {}; govde.appendChild(h('div', { sinif: 'dm-ok-buyuk' }, [['İrsaliye', mo.irsaliye_eksik === true ? null : mo.irsaliye_yuzde], ['Teslim', mo.teslim_yuzde], ['Kabul', mo.kabul_yuzde]].map(function (x) { return h('div', { sinif: 'dm-ok-h' }, [sipHalka(x[0], x[1], 84), h('span', { sinif: 'dm-ok-ad', metin: x[0] })]); }))); }
         govde.appendChild(G.kart({ baslik: orBas, govde: h('div', null, [mkOranOgeleri(mk), tlKap]) }));
         govde.appendChild(mkRiskKarti(x.firma, x.dosya_no, mk));
         mkTlCiz(x, tlKap);

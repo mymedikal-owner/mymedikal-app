@@ -859,6 +859,8 @@
     'Kabul': 'Acceptance',
     'irsaliye kaydı eksik': 'delivery note record missing',
     'veri eksik': 'data missing',
+    'Uyarılı sipariş': 'Orders with warnings', 'ek süre / riskli / kesinleşmedi': 'extra time / at risk / not finalised', 'uyarı yok': 'no warnings',
+    'tam veri yok': 'no complete data', 'Ortalama kabul': 'Average acceptance', 'Toplam tutar': 'Total amount', 'kayıt eksik': 'record missing',
     'İptal: kullanılan': 'Cancellations: used',
     '/ hak': '/ allowance',
     'grup · en dar grupta kalan': 'groups · remaining in tightest group',

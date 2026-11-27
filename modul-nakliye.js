@@ -199,7 +199,21 @@
     sek.forEach(function (x) { if (x[0] === secId) kap.appendChild(x[2]); });
     return kap;
   }
+  function kartTelefon(x) {
+     
+    var k = x.k, st = STIL[x.kova];
+    var planMetin = k.cikis ? 'Çıkış ' + tarihTR(k.cikis) : 'Plan ' + tarihTR(k.plan) + (x.gec ? ' · ' + x.gec + ' gün geçti' : '');
+    var altMetin = 'Teslimat ' + k.no + (k.tur === 'Z004' ? ' · DMO' : '') + (k.ic ? ' · Şirket içi (DAY)' : (k.sirket === 'MY' || k.sirket === 'DAY' ? ' · ' + k.sirket : '')) + ' · ' + planMetin;
+    var rg = rozet(x.kova); rg.classList.add('tq-rg');
+    var kr = k.kargo_durum ? kdRozet(k) : null; if (kr) kr.classList.add('tq-rk');
+    return h('div', { sinif: 'tq-kart tq-kart-tel', style: '--isaret:' + st.isaret }, [
+      h('span', { sinif: 'tq-kart-ikon', style: 'color:' + st.yazi + ';background:' + st.zemin }, [G.ikon(st.ikon, 20)]),
+      h('span', { sinif: 'tq-kart-metin' }, [h('span', { sinif: 'tq-kart-ad', metin: k.musteri || 'Müşteri bilinmiyor' }), h('span', { sinif: 'tq-kart-alt', metin: altMetin }), cizgi(x), k.kargo_durum ? kdSatir(k) : null]),
+      h('span', { sinif: 'tq-kart-sag' }, [rg, kr])
+    ]);
+  }
   function kart(x) {
+    if (window.matchMedia && window.matchMedia('(max-width: 599px)').matches) return kartTelefon(x);
     var k = x.k, st = STIL[x.kova];
     return h('div', { sinif: 'tq-kart', style: '--isaret:' + st.isaret }, [
       h('span', { sinif: 'tq-kart-ikon', style: 'color:' + st.yazi + ';background:' + st.zemin }, [G.ikon(st.ikon, 20)]),

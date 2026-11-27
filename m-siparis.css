@@ -140,6 +140,15 @@
   #icerik[data-modul="dmo"] .dm-bos-kisa { padding-block: 8px; }
   #icerik[data-modul="dmo"] .dm-bos-kisa p { display: none; }
    
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "ad rg" "alt alt" "cz rk" "nt nt"; gap: 1px 8px; padding: 5px 12px; align-items: center; min-height: 0; }
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .tq-kart-metin, #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .tq-kart-sag { display: contents; }
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .tq-kart-ad { grid-area: ad; }
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .tq-kart-alt { grid-area: alt; font-size: 11px; }
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .ns-cizgi { grid-area: cz; }
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .kt-not { grid-area: nt; }
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .tq-rg { grid-area: rg; justify-self: end; }
+  #icerik[data-modul="nakliye"] .tq-liste .tq-kart-tel .tq-rk { grid-area: rk; justify-self: end; }
+   
   #icerik[data-modul="sikayet"] .kirinti:not(:has(a ~ a)) { display: none; }
   #icerik[data-modul="sikayet"] .kart2 { padding: 10px 12px; }
   #icerik[data-modul="sikayet"] .kart2-ust > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }

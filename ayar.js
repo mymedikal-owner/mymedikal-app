@@ -81,8 +81,8 @@ window.MM_AYAR = {
   
   kaliteYukleGrup: ['35375050-912e-4079-b6f4-89a2b4903810', '45c58d2c-cdd9-4ddb-a08d-5a0c6d71982f'],   
   
-  finansYukleDriveId: '',
-  finansYukleGrup: [],
+  finansYukleDriveId: 'b!0D_3zKy4IU6LYiO2_AamUPvjLVCeq2JOpGAXaDNZv6tOt68F0pk_SI2qXFYIQ_GH',
+  finansYukleGrup: ['e92423d4-7574-4a4e-b9a6-cb35f19f68d1'],
   sirketAlanlari: ['mymedikal.com.tr', 'daymedikal.com.tr'],   
   girisGruplar: [],    
   girisUpn: '',          
@@ -97,7 +97,7 @@ window.MM_AYAR = {
   rolAdlari: { calisan: 'Çalışan', yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' },
   mesaj: { url: 'https://mymesaj-api-p4nhi4.azurewebsites.net/api', apiKapsam: 'api://3f6676f2-d721-4c84-b98e-750eded44dad/mesaj.kullan' },   
   demo: false,         
-  surum: '80.84',  
+  surum: '80.85',  
   
   
   acikModuller: ['ana', 'makineler', 'eldiven', 'siparis', 'kalite', 'nakliye', 'muhasebe', 'finans', 'dmo', 'dmo-nakliyat', 'stok', 'sikayet', 'sterilizasyon', 'uretim-plan', 'ihale', 'kalite-yukle', 'asistan', 'toplanti', 'mesaj'],

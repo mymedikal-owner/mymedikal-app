@@ -939,10 +939,14 @@
     'Geçmişi ölçülemeyen': 'History not measurable',
     'Teslim girişi bekleyen (irsaliyeden ≥5 gün)': 'Awaiting delivery entry (≥5 days since delivery note)',
     'Gecikmiş': 'Overdue',
-    'Ek süre gerekli': 'Extension needed'
+    'Ek süre gerekli': 'Extension needed',
+    'Ek süre gerekli (son teslime ≤7 gün, irsaliye çıkmadı)': 'Extension needed (≤7 days to deadline, no delivery note)',
+    'Ek süre için son teslime ≤3 gün': 'Extension: ≤3 days to delivery deadline',
+    'Son teslim': 'Delivery deadline'
   };
   Object.keys(TAM_2711).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(TAM, k)) TAM[k] = TAM_2711[k]; });
-  REGEX.unshift([/^irsaliyeden girişe ort\. (.+) gün \((hastane ortalaması|il ortalaması|il ortalaması \(kargo\))\)$/, function (m, g, k) { return 'avg. ' + g + ' days from delivery note to entry (' + cevir(k) + ')'; }],
+  REGEX.unshift([/^Son teslime ≤7 gün, irsaliye çıkmadı: son teslim (.+) \((.+)\)\.$/, function (m, t, k) { return 'Delivery deadline in ≤7 days, no delivery note: deadline ' + t + ' (' + cevir(k) + ').'; }],
+    [/^irsaliyeden girişe ort\. (.+) gün \((hastane ortalaması|il ortalaması|il ortalaması \(kargo\))\)$/, function (m, g, k) { return 'avg. ' + g + ' days from delivery note to entry (' + cevir(k) + ')'; }],
     [/^irsaliyeden girişe ort\. (.+) gün$/, 'avg. $1 days from delivery note to entry'],
     [/^Son teslim (\d{2}\.\d{2}\.\d{4})$/, 'Delivery deadline $1'],
     [/^Son teslimi geçen: (.+) hastane$/, 'Past delivery deadline: $1 hospitals'],

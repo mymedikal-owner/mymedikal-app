@@ -97,7 +97,7 @@ window.MM_AYAR = {
   rolAdlari: { calisan: 'Çalışan', yonetim: 'Yönetim', fabrika: 'Fabrika', satis: 'Satış', finans: 'Finans', muhasebe: 'Muhasebe', kalite: 'Kalite', 'eldiven-finans': 'Eldiven finans' },
   mesaj: { url: 'https://mymesaj-api-p4nhi4.azurewebsites.net/api', apiKapsam: 'api://3f6676f2-d721-4c84-b98e-750eded44dad/mesaj.kullan' },   
   demo: false,         
-  surum: '80.88',  
+  surum: '80.89',  
   
   
   acikModuller: ['ana', 'makineler', 'eldiven', 'siparis', 'kalite', 'nakliye', 'muhasebe', 'finans', 'dmo', 'dmo-nakliyat', 'stok', 'sikayet', 'sterilizasyon', 'uretim-plan', 'ihale', 'kalite-yukle', 'asistan', 'toplanti', 'mesaj'],

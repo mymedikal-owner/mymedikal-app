@@ -7,12 +7,12 @@
   'use strict';
   var MM = window.MM, h = MM.h, sayi = MM.sayi, G = MM.gr;
   var ESKI_DK = 12 * 60;
-  var RISK_AD = { riskli: 'Riskli', sure_gecti: 'Cezalı süre geçti', cezali_surede: 'Cezalı sürede', riskli_toplam: 'Riskli (hepsi)', teslim_alinmadi: 'Teslim girişi bekleyen (irsaliyeden ≥5 gün)', son_teslim_yakin: 'Son teslim yakın', ek_sure_iste: 'Ek süre iste', ek_sure_3gun: 'Ek süre başvurusuna ≤3 gün', itiraz: 'İtiraz', iptal_sure_doldu: 'İptale düştü (süre doldu)' };
+  var RISK_AD = { riskli: 'Riskli', sure_gecti: 'Cezalı süre geçti', cezali_surede: 'Cezalı sürede', riskli_toplam: 'Riskli (hepsi)', teslim_alinmadi: 'Teslim girişi bekleyen (irsaliyeden ≥5 gün)', son_teslim_yakin: 'Son teslim yakın', ek_sure_iste: 'Ek süre gerekli (son teslime ≤7 gün, irsaliye çıkmadı)', ek_sure_3gun: 'Ek süre için son teslime ≤3 gün', itiraz: 'İtiraz', iptal_sure_doldu: 'İptale düştü (süre doldu)' };
   var RISK_SIRA = ['riskli', 'sure_gecti', 'cezali_surede', 'teslim_alinmadi', 'son_teslim_yakin', 'ek_sure_iste', 'itiraz', 'iptal_sure_doldu'];
   var RISKLI_GRUP = ['riskli', 'sure_gecti', 'cezali_surede', 'son_teslim_yakin'];   
    
-  function ekSure3(s) { var k = s.ek_sure_basvuru_kalan_gun; return s.siparis_durum === 'acik' && s.teslim_durum !== 'tamamlandi' && k != null && k >= 0 && k <= 3; }
-  function etiketVar(s, r) { if (r === 'ek_sure_3gun') return ekSure3(s); var e = s.risk_etiketleri || (s.risk ? [s.risk] : []); return r === 'riskli_toplam' ? RISKLI_GRUP.some(function (g) { return e.indexOf(g) >= 0; }) : e.indexOf(r) >= 0; }
+  function ekSure3(s) { var k = s.ek_sure_basvuru_kalan_gun, e = s.risk_etiketleri || (s.risk ? [s.risk] : []); return s.siparis_durum === 'acik' && s.teslim_durum !== 'tamamlandi' && e.indexOf('ek_sure_iste') >= 0 && k != null && k >= 0 && k <= 3; }
+  function etiketVar(s, r) { if (r === 'ek_sure_3gun') return ekSure3(s); var e =s.risk_etiketleri || (s.risk ? [s.risk] : []); return r === 'riskli_toplam' ? RISKLI_GRUP.some(function (g) { return e.indexOf(g) >= 0; }) : e.indexOf(r) >= 0; }
   var TESLIM_AD = { tamamlandi: 'Teslim tamam', kismi: 'Kısmi teslim', yok: 'Portalda giriş yok', iptal: 'İptal' };
   var AY = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
   var DOSYALAR = ['dmo-ozet', 'dmo-ihaleler', 'dmo-siparisler', 'dmo-muayene', 'dmo-ceza'];
@@ -645,7 +645,7 @@
         h('div', { sinif: 'dm-mk-iknk-ust' }, [h('strong', { metin: x.hastane || 'Hastane yok' }), x.il ? h('span', { sinif: 'soluk kucuk', metin: x.il }) : null, x.ek_sure_basvurusu_gerekli === true ? h('span', { sinif: 'dm-mk-et', metin: 'Ek süre başvurusu' }) : null]),
         h('div', { sinif: 'kucuk soluk', metin: gecmis }),
         x.en_erken_son_teslim ? h('div', { sinif: 'kucuk soluk', metin: 'Son teslim ' + tarihTR(x.en_erken_son_teslim) }) : null,
-        x.ek_sure_basvuru_son_gun ? h('div', { sinif: 'kucuk soluk', metin: 'Başvuru son günü ' + tarihTR(x.ek_sure_basvuru_son_gun) }) : null]);
+        x.ek_sure_basvuru_son_gun ? h('div', { sinif: 'kucuk soluk', metin: 'Son teslim ' + tarihTR(x.ek_sure_basvuru_son_gun) }) : null]);
     }
     function mkRiskKarti(firma, no, m) {   
       var r = m.teslimat_riski || {};
@@ -655,7 +655,6 @@
       }
       var govdeK = h('div', null, [
         h('div', { sinif: 'dm-mk-say-satir' }, [dugme('Son teslimi geçen', r.son_teslimi_gecen_hastane, 'gecen'), dugme('Riskli', r.gecmise_gore_riskli_hastane, 'riskli'), dugme('Ek süre başvurusu', r.ek_sure_basvurusu_gereken_hastane, 'ek')]),
-        h('p', { sinif: 'kucuk dm-mk-say' + (Number(r.basvuru_suresi_gecen_hastane) > 0 ? ' uyari' : ''), metin: 'Başvuru süresi geçen: ' + ve(r.basvuru_suresi_gecen_hastane) }),
         Number(r.ek_sure_onay_bekleyen_hastane) > 0 ? h('p', { sinif: 'kucuk soluk', metin: 'Ek süre hastane onayında: ' + ve(r.ek_sure_onay_bekleyen_hastane) }) : null,
         Number(r.ek_sure_durumu_bilinmeyen_hastane) > 0 ? h('p', { sinif: 'kucuk soluk', metin: 'Ek süre durumu bilinmeyen: ' + ve(r.ek_sure_durumu_bilinmeyen_hastane) }) : null,
         h('p', { sinif: 'kucuk soluk', metin: 'Geçmişi ölçülemeyen: ' + ve(r.gecmisi_olculemeyen_hastane) })]);
@@ -993,7 +992,7 @@
         s.lojistik_firma ? h('span', {}, ['Lojistik ', h('strong', { metin: s.lojistik_firma + (s.lojistik_no ? ' · ' + s.lojistik_no : '') }), s.lojistik_kaynak === 'kargo_portal' ? h('span', { sinif: 'soluk kucuk', metin: ' (kargo portalı)' }) : null]) : h('span', { sinif: 'soluk', metin: 'Lojistik firması henüz eşleşmedi' }),
         fiyatGor() ? h('span', {}, ['Birim fiyat ', h('strong', { metin: tl(fSip(s).birim_fiyat_kdv_haric_tl) }), ' · tutar (KDV hariç) ', h('strong', { metin: tl(fSip(s).tutar_kdv_haric_tl) })]) : null]));
       if (s.uyari_metni) satir.push(h('p', { sinif: 'dm-sp-not uyari', metin: s.uyari_metni + (s.irsaliye_tarihi ? ' (irsaliye ' + tarihTR(s.irsaliye_tarihi) + ')' : '') }));
-      if (r === 'ek_sure_iste' || ekSure3(s)) satir.push(h('p', { sinif: 'dm-sp-not', metin: 'Ek süre başvurusu son gün ' + tarihTR(s.ek_sure_basvuru_son_gun) + ' (' + kalanMetin(s.ek_sure_basvuru_kalan_gun) + ').' }));
+      if (etiketVar(s, 'ek_sure_iste')) satir.push(h('p', { sinif: 'dm-sp-not', metin: 'Son teslime ≤7 gün, irsaliye çıkmadı: son teslim ' + tarihTR(s.ek_sure_basvuru_son_gun) + ' (' + kalanMetin(s.ek_sure_basvuru_kalan_gun) + ').' }));
       if (r === 'itiraz') satir.push(h('p', { sinif: 'dm-sp-not', metin: 'Teslim tarihi (portal): ' + tarihTR(s.teslim_tarihi) + '.' }));
        
       var bid = belgeIdleri('siparis_belge', s.firma + '|' + s.siparis_no);
@@ -1007,7 +1006,7 @@
     }
     function siparisEkrani() {
       var tum = yuk.v['dmo-siparisler'].siparisler;
-      var ops = [['', 'Tüm etiketliler'], ['riskli_toplam', RISK_AD.riskli_toplam]].concat(RISK_SIRA.map(function (r) { return [r, RISK_AD[r]]; })).concat([['ek_sure_3gun', 'Ek süre başvurusuna ≤3 gün'], ['acik', 'Tüm açık siparişler']]);   
+      var ops = [['', 'Tüm etiketliler'], ['riskli_toplam', RISK_AD.riskli_toplam]].concat(RISK_SIRA.map(function (r) { return [r, RISK_AD[r]]; })).concat([['ek_sure_3gun', 'Ek süre için son teslime ≤3 gün'], ['acik', 'Tüm açık siparişler']]);   
       var lk = h('div', { sinif: 'dm-sp-lk' });   
       govde.appendChild(aracKur([{ ad: 'Risk etiketi', anahtar: 'risk', secenekler: ops }, FIRMA_GRUP], { deger: f.dno || '', yerTutucu: 'Dosya no', degisti: function (q) { f.dno = String(q || '').trim(); listeCiz(); } }));
       var liste = tum.filter(function (s) { return (!f.firma || s.firma === f.firma) && (f.risk === 'acik' ? s.siparis_durum === 'acik' : (f.risk ? etiketVar(s, f.risk) : !!s.risk)); });   

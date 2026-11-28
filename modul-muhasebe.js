@@ -23,7 +23,7 @@
   function turAd(t) { return TUR_AD[t] || 'Diğer'; }   
   function bekleyen(l) { return h('div', { sinif: 'bekle-liste' }, l.map(function (x) { return h('div', { sinif: 'bekle-oge' }, [h('span', { sinif: 'bekle-ik' }, [G.ikon(x.ikon || 'bilgi', 18)]), h('div', null, [h('b', { metin: x.baslik }), h('small', { metin: x.metin })]), h('span', { sinif: 'etiket kismi', metin: 'bekliyor' })]); })); }
 
-  var SEKMELER = [['ozet', 'Özet'], ['mali', 'Mali tablolar'], ['tfrs', 'TFRS tabloları'], ['anlik', 'Anlık ciro'], ['ebelge', 'e-Belge'], ['aktarim', 'Aktarım'], ['kapanis', 'Kapanış'], ['mutabakat', 'Mutabakat'], ['duzeltme', 'Düzeltmeler']];
+  var SEKMELER = [['ozet', 'Özet'], ['mali', 'Mali tablolar'], ['tfrs', 'TFRS tabloları'], ['vuktfrs', 'VUK – TFRS'], ['anlik', 'Anlık ciro'], ['ebelge', 'e-Belge'], ['aktarim', 'Aktarım'], ['kapanis', 'Kapanış'], ['mutabakat', 'Mutabakat'], ['duzeltme', 'Düzeltmeler']];
 
   
 
@@ -381,22 +381,107 @@
     return kok;
   }
 
+  
+
+
+  function vukTfrsTab(kok) {
+    var EN = window.MM_LOC === 'en-GB', yuk = null, hata = null, canli = true;
+    function tl(n) { return n == null || !isFinite(n) ? '—' : (n < 0 ? '−' : '') + '₺ ' + G.say(Math.abs(n)); }
+    function fk(n) { return n == null || !isFinite(n) ? '—' : (n > 0 ? '+' : '') + tl(n); }
+    function ayAd(iso) {
+      if (!iso) return '—'; var p = String(iso).split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 1, 1));
+      return new Intl.DateTimeFormat(window.MM_LOC || 'tr-TR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d);
+    }
+    function hesapMetin(s) {   
+      var t = String(s || '').replace(/\s*\([^)]*\)/g, '').replace(/[A-Za-zÇĞİÖŞÜçğıöşü].*$/, '').trim();
+      return t ? (EN ? 'Accounts: ' : 'Hesap: ') + t : null;
+    }
+    function sinifTur(t) { return t === 'toplam' ? 'vurgu' : (t === 'ara' || t === 'favok' ? 'ara' : (t === 'alt' || t === 'favok-alt' || t === 'uyum' ? 'alt' : '')); }
+    function ilkHucre(r, ek) { return h('td', { style: 'min-width:150px' }, [r.ad, hesapMetin(r.kaynak_hesap) ? h('small', { metin: hesapMetin(r.kaynak_hesap) }) : null, r.not ? h('small', { metin: r.not }) : null].concat(ek || [])); }
+    function tablo(baslik, alt, kolonAd, satirlar) {
+      var t = h('table', { sinif: 'ml-tablo' }, [h('thead', null, [h('tr', null, [h('th', { scope: 'col', metin: 'Kalem' })].concat(kolonAd.map(function (a) { return h('th', { scope: 'col', metin: a }); })))]), h('tbody', null, satirlar)]);
+      return G.kart({ baslik: baslik, alt: alt, govde: h('div', { sinif: 'tablo-kaydir' }, [t]) });
+    }
+    function gelirSatirlari(sat) {
+      return sat.map(function (r) { return h('tr', { sinif: sinifTur(r.tur) }, [ilkHucre(r), h('td', { metin: tl(r.deger) })]); });
+    }
+    function bilancoSatirlari(sat) {
+      return sat.map(function (r) {
+        if (r.tur === 'baslik') return h('tr', { sinif: 'ara' }, [h('td', { colspan: '4', metin: r.ad })]);
+        var ek = r.tfrs_ad && r.tfrs_ad.trim() !== r.ad.trim() ? [h('small', null, [EN ? 'IFRS: ' : 'TFRS: ', r.tfrs_ad.trim()])] : [];
+        return h('tr', { sinif: sinifTur(r.tur) }, [ilkHucre(r, ek), h('td', { metin: tl(r.vuk) }), h('td', { metin: tl(r.tfrs) }), h('td', { metin: fk(r.fark) })]);
+      });
+    }
+    function kopruSatirlari(v) {
+      var e = v.esas_faaliyet_kari, k = v.kopru, s = [];
+      s.push(h('tr', { sinif: 'ara' }, [h('td', { metin: 'VUK esas faaliyet kârı' }), h('td', { metin: '' }), h('td', { metin: tl(e.vuk) })]));
+      k.kalemler.forEach(function (x) {
+        s.push(h('tr', null, [h('td', { style: 'min-width:150px' }, [x.ad, h('small', { metin: (EN ? 'Accounts: ' : 'Hesap: ') + x.hesap }),
+          h('small', null, [EN ? 'In VUK: ' : "VUK'ta: ", x.vuk_yeri]), h('small', null, [EN ? 'In IFRS: ' : "TFRS'te: ", x.tfrs_yeri])]),
+          h('td', { metin: tl(x.tutar) }), h('td', { metin: fk(x.fark) })]));
+      });
+      s.push(h('tr', { sinif: 'vurgu' }, [h('td', { metin: 'TFRS esas faaliyet kârı' }), h('td', { metin: '' }), h('td', { metin: tl(e.tfrs) })]));
+      return s;
+    }
+    function duzeltmeSatirlari(l) {
+      return l.map(function (d) {
+        return h('tr', null, [h('td', { style: 'min-width:150px' }, [d.ad, h('small', { metin: d.standart })]), h('td', { metin: d.etkilenen }), h('td', { metin: d.tutar == null ? 'Bağlı veri yok' : tl(d.tutar) })]);
+      });
+    }
+    function ciz() {
+      kok.textContent = '';
+      if (hata) { kok.appendChild(G.bos({ tur: 'hata', baslik: 'VUK – TFRS tabloları alınamadı', metin: 'Veri okunamadı ya da henüz hazırlanmadı.', eylem: { ad: 'Yeniden dene', fn: yenile } })); return; }
+      if (!yuk) { kok.appendChild(G.iskelet('kart', 3)); return; }
+      var v = yuk.veri;
+      if (!v || v.uygun === false || !v.gelir_tablosu) { kok.appendChild(G.bos({ tur: 'bekle', baslik: 'VUK – TFRS tabloları hazırlanamadı', metin: 'Tablolar şu anda hazırlanamadı; bir sonraki güncellemede yeniden denenir.' })); return; }
+      if (v.ornek === true) kok.appendChild(h('div', { sinif: 'bant ornek', role: 'alert', metin: 'ÖRNEK VERİ — gerçek değil' }));
+      var dk = MM.yasDk(v.asof);
+      if (dk == null || dk > ESKI_DK) kok.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Veri eski' }), ' — son güncelleme ' + MM.yasMetin(dk) + '. Değerler güncel olmayabilir.']));
+      kok.appendChild(h('div', { sinif: 'bant sari', role: 'note' }, [h('strong', { metin: 'Yalnız sunum farkı. ' }),
+        'VUK ve TFRS aynı dönemin aynı muhasebe kayıtlarından hazırlanır; gösterilen fark yalnız sınıflama (sunum biçimi) farkıdır. TFRS düzeltme kayıtları bağlı olmadığı için uygulanmadı; aşağıda ayrıca listelenir.']));
+      kok.appendChild(h('p', { sinif: 'soluk kucuk', metin: ayAd(v.baslangic) + ' – ' + ayAd(v.bitis) + ' · MY · ₺' }));
+      var e = v.esas_faaliyet_kari, nk = v.net_kar;
+      kok.appendChild(h('div', { sinif: 'kpi-izgara tq-kpi' }, [
+        G.kpi({ baslik: 'VUK esas faaliyet kârı', deger: tl(e.vuk), ikon: 'para', alt: null }),
+        G.kpi({ baslik: 'TFRS esas faaliyet kârı', deger: tl(e.tfrs), ikon: 'para', alt: null }),
+        G.kpi({ baslik: 'Fark', deger: fk(e.fark), ikon: 'liste', alt: (EN ? 'Net profit difference: ' : 'Dönem net kârı farkı: ') + fk(nk.fark) })]));
+      var gt = v.gelir_tablosu;
+      kok.appendChild(h('div', { sinif: 'ust-bosluk', style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;align-items:start' }, [
+        tablo('VUK gelir tablosu', 'Tek düzen hesap planı sunumu', ['Tutar'], gelirSatirlari(gt.vuk)),
+        tablo('TFRS gelir tablosu', 'TMS 1 sunum biçimi (fonksiyon esaslı)', ['Tutar'], gelirSatirlari(gt.tfrs))]));
+      var b = v.bilanco;
+      if (b && b.uygun) kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [tablo('Bilanço: VUK ve TFRS', ayAd(b.tarih) + (EN ? ' end' : ' sonu'), ['VUK', 'TFRS', 'Fark'], bilancoSatirlari(b.satirlar))]));
+      else kok.appendChild(h('div', { sinif: 'bant gri', role: 'status', metin: 'Bilanço üretilemedi.' }));
+      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [tablo('Fark köprüsü', 'VUK esas faaliyet kârından TFRS esas faaliyet kârına; mutlak farka göre büyükten küçüğe', ['Kalem tutarı', 'Esas faaliyet kârı etkisi'], kopruSatirlari(v))]));
+      kok.appendChild(h('div', { sinif: 'ust-bosluk' }, [tablo('TFRS düzeltmeleri', 'Sistemde kayıtlı olmayan düzeltmeler', ['Etkilenen kalemler', 'Durum'], duzeltmeSatirlari(v.duzeltmeler || []))]));
+      kok.appendChild(h('p', { sinif: 'soluk kucuk', metin: 'Bu düzeltmelerin tutarı sistemde kayıtlı olmadığından hesaplanmadı; 0 yazılmadı ve tahmini rakam üretilmedi.' }));
+    }
+    function yenile() { hata = null; yuk = null; ciz(); window.MMVeri.oku('muhasebe', 'vuk_tfrs').then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
+    yenile();
+    return function () { canli = false; };
+  }
+
    
   MM.moduller.muhasebe = function (kok) {
     var yuk = null, hata = null, canli = true;
     var q = new URLSearchParams(location.search).get('msekme'), durum = { sekme: SEKMELER.some(function (s) { return s[0] === q; }) ? q : 'ozet' };
-    var maliKok = h('div'), maliTemiz = null, anlikKok = h('div'), anlikTemiz = null, tfrsKok = h('div'), tfrsTemiz = null, perf = null;
+    var maliKok = h('div'), maliTemiz = null, anlikKok = h('div'), anlikTemiz = null, tfrsKok = h('div'), tfrsTemiz = null, vukKok = h('div'), vukTemiz = null, perf = null;
     kok.appendChild(G.sayfaBasi({ baslik: 'Muhasebe', alt: 'Mali tablolar, e-Belge, aktarım, kapanış', kirinti: [['Muhasebe']] }));
     var ust = h('div'), govde = h('div', { 'aria-live': 'polite' });
     kok.appendChild(ust); kok.appendChild(govde);
     function ciz() {
       ust.textContent = ''; govde.textContent = '';
-      if (durum.sekme === 'mali' || durum.sekme === 'anlik' || durum.sekme === 'tfrs') {
+      if (durum.sekme === 'mali' || durum.sekme === 'anlik' || durum.sekme === 'tfrs' || durum.sekme === 'vuktfrs') {
         var vv = yuk && yuk.veri;
         govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.sekmeler(SEKMELER.filter(function (s) { return vv ? ((s[0] !== 'kapanis' || vv.kapanis) && (s[0] !== 'mutabakat' || vv.mutabakat)) : (s[0] !== 'kapanis' && s[0] !== 'mutabakat'); }).map(function (s) { return [s[0], s[1], null]; }), durum.sekme, function (id) { durum.sekme = id; ciz(); }, { sinif: 'cip', ad: 'Muhasebe bölümleri', goster: 0 })]));
         if (durum.sekme === 'anlik') {
           if (!anlikTemiz) anlikTemiz = anlikTab(anlikKok);
           govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [anlikKok]));
+          return;
+        }
+        if (durum.sekme === 'vuktfrs') {
+          if (!vukTemiz) vukTemiz = vukTfrsTab(vukKok);
+          govde.appendChild(h('div', { sinif: 'ust-bosluk' }, [vukKok]));
           return;
         }
         if (durum.sekme === 'tfrs') {
@@ -446,6 +531,6 @@
     }
     function yenile() { hata = null; yuk = null; ciz(); window.MMVeri.oku('muhasebe', 'muhasebe').then(function (r) { yuk = r; hata = null; }).catch(function (e) { hata = e; }).then(function () { if (canli) ciz(); }); }
     yenile();
-    return function () { canli = false; if (maliTemiz) maliTemiz(); if (anlikTemiz) anlikTemiz(); if (tfrsTemiz) tfrsTemiz(); if (perf) perf.temizle(); };
+    return function () { canli = false; if (maliTemiz) maliTemiz(); if (anlikTemiz) anlikTemiz(); if (tfrsTemiz) tfrsTemiz(); if (vukTemiz) vukTemiz(); if (perf) perf.temizle(); };
   };
 })();

@@ -556,7 +556,7 @@
     'Mesajlar': 'Messages', 'Sohbetler': 'Chats', 'Ara': 'Search', 'Tümü': 'All', 'Okunmamış': 'Unread', 'okunmamış': 'unread', 'Favoriler': 'Favorites', 'Gruplar': 'Groups', 'Arşivlenmiş': 'Archived',
     'Asistan şu an yanıt vermiyor. Sorunuzu mail ile iletin; cevap kendi yetkinize göre verilir.': 'The assistant is not responding right now. Send your question by email; the answer follows your own access rights.',
     'Asistan hazırlanıyor…': 'The assistant is getting ready…', 'Soru iletilemedi': 'The question could not be sent', 'hata': 'error', 'Sorunuz': 'Your question', 'Gönder': 'Send',
-    'Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.': 'The answer is taking long. You can ask again or send it as a request.', 'Erişebildiğin bölümler:': 'Sections you can access:',
+    'Gecikmeli — cevap gelince burada görünecek.': 'Delayed — the answer will appear here when ready.', 'Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.': 'The answer is taking long. You can ask again or send it as a request.', 'Erişebildiğin bölümler:': 'Sections you can access:',
     'Şirket içi yapay zekâ asistanı': 'In-company AI assistant', 'Henüz sohbet yok. Başlatmak için + düğmesine dokunun.': 'No chats yet. Tap + to start one.', 'Arşivde sohbet yok': 'No archived chats', 'Sonuç yok': 'No results',
     'Sohbetler şirket hesabında saklanır.': 'Chats are stored in the company account.', 'Gizle': 'Hide', 'Ayrıntı': 'Details', 'Açılıyor': 'Opening', 'Kişi listesi yenileniyor…': 'Refreshing the people list…',
     'Kişi listesi alınamadı': 'Could not load the people list', 'Yeni grup': 'New group', 'Henüz kimse yok — app\'i açan iş arkadaşların burada görünecek': 'No one yet — colleagues who open the app will appear here',

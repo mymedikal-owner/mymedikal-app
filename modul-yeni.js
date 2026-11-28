@@ -105,7 +105,9 @@
         return h('span', { sinif: 'as-ek-cip' }, [h('span', { sinif: 'as-ek-ad', metin: e.ad + ' · ' + Math.max(1, Math.round(e.boyut / 1024)) + ' KB' }), sil]);
       }));
     }
-    var m = h('div', { sinif: 'mesaj ' + o.k }, [h('div', { sinif: 'balon' }, [h('p', { metin: o.metin }), ekSatir, kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: Tt('Dayandığı bilgiler:') })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), AS_KLASOR_AD[k] || k]); }))) : null])]);
+    var m = h('div', { sinif: 'mesaj ' + o.k }, [h('div', { sinif: 'balon' }, [o.alinti ? h('p', { sinif: 'soluk kucuk', metin: o.alinti }) : null, h('p', { metin: o.metin }), ekSatir, kaynaklar && kaynaklar.length ? h('div', { sinif: 'kaynak-satir' }, [h('span', { sinif: 'soluk kucuk', metin: Tt('Dayandığı bilgiler:') })].concat(kaynaklar.map(function (k) { return h('span', { sinif: 'kaynak-rozet' }, [gr.ikon('belge', 14), AS_KLASOR_AD[k] || k]); }))) : null])]);
+    if (o.k === 'kullanici' && o.gecikmis) m.firstChild.appendChild(h('p', { sinif: 'soluk kucuk as-gecikmeli', role: 'status', metin: Tt('Gecikmeli — cevap gelince burada görünecek.') }));
+    if (o.k === 'kullanici') o.dom = m;
     return m;
   }
   function asMailHref(govde) { var p = window.MM.talimatPosta || ''; if (!p) return ''; return 'mailto:' + p + '?subject=' + encodeURIComponent('[Talimat] App asistan sorusu') + (govde ? '&body=' + encodeURIComponent(govde) : ''); }
@@ -122,22 +124,66 @@
     if (u.dugme) u.dugme.disabled = AS.bekleyen;
     u.akis.scrollTop = u.akis.scrollHeight;
   }
-  function asEkle(o) {
-    o.ts = Date.now(); AS.gecmis.push(o); if (AS.gecmis.length > 40) AS.gecmis.shift();
+  function asEkle(o, sonra) {   
+    o.ts = Date.now();
+    var ix = sonra ? AS.gecmis.indexOf(sonra) : -1;
+    if (ix >= 0) AS.gecmis.splice(ix + 1, 0, o); else AS.gecmis.push(o);
+    if (AS.gecmis.length > 40) AS.gecmis.shift();
     var u = AS.ui;
-    if (u && u.akis.isConnected) { var bosEl = u.akis.querySelector('.asistan-bos'); if (bosEl) bosEl.remove(); u.akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') u.akis.appendChild(asEylemSatiri(o)); }
+    if (u && u.akis.isConnected) {
+      var bosEl = u.akis.querySelector('.asistan-bos'); if (bosEl) bosEl.remove();
+      var balon = asBalon(o), eylem = (o.soru && o.k === 'asistan') ? asEylemSatiri(o) : null;
+      var ref = (ix >= 0 && sonra.dom && sonra.dom.parentNode === u.akis) ? sonra.dom : null;
+      if (ref) { u.akis.insertBefore(balon, ref.nextSibling); if (eylem) u.akis.insertBefore(eylem, balon.nextSibling); }
+      else { u.akis.appendChild(balon); if (eylem) u.akis.appendChild(eylem); }
+    }
     asUiGuncelle();
   }
-  function asBitir(o) { AS.bekleyen = false; asEkle(o); if (typeof MM.asistanDegisti === 'function') { try { MM.asistanDegisti(); } catch (e) {   } } }
-  function asYokla(id, soru, gecen, bekle) {
+  function asBitir(o, sonra) { AS.bekleyen = false; AS.bekleyenId = null; asEkle(o, sonra); if (typeof MM.asistanDegisti === 'function') { try { MM.asistanDegisti(); } catch (e) {   } } }
+  var AS_BEKLE_ANAHTAR = 'mm_as_bekleyen';
+  function asBekleListe() { try { var l = JSON.parse(sessionStorage.getItem(AS_BEKLE_ANAHTAR) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
+  function asBekleEkle(v) { try { var l = asBekleListe().filter(function (x) { return x && x.id !== v.id; }); l.push(v); sessionStorage.setItem(AS_BEKLE_ANAHTAR, JSON.stringify(l.slice(-5))); } catch (e) {   } }
+  function asBekleSil(id) { try { var l = asBekleListe().filter(function (x) { return x && x.id !== id; }); if (l.length) sessionStorage.setItem(AS_BEKLE_ANAHTAR, JSON.stringify(l)); else sessionStorage.removeItem(AS_BEKLE_ANAHTAR); } catch (e) {   } }
+  function asGecBasla(km) { km.gecikmis = true; if (km.dom && !km.dom.querySelector('.as-gecikmeli') && km.dom.firstChild) km.dom.firstChild.appendChild(h('p', { sinif: 'soluk kucuk as-gecikmeli', role: 'status', metin: Tt('Gecikmeli — cevap gelince burada görünecek.') })); }
+  function asGecKaldir(km) { if (!km) return; km.gecikmis = false; var g = km.dom && km.dom.querySelector('.as-gecikmeli'); if (g) g.remove(); }
+  function asBeklemeBirak(id) { if (AS.bekleyenId === id) { AS.bekleyen = false; AS.bekleyenId = null; asUiGuncelle(); } }   
+  function asSonuc(id, o, km, soru) {   
+    o.alinti = '↳ ' + String(soru || '').slice(0, 60);
+    if (AS.bekleyenId === id) { delete o.alinti; asBitir(o, km); return; }
+    asEkle(o, km);
+    if (typeof MM.asistanDegisti === 'function') { try { MM.asistanDegisti(); } catch (e) {   } }
+  }
+  AS.goruldu = AS.goruldu || {}; AS.yoklayan = AS.yoklayan || {};
+  function asYokla(id, soru, gecen, bekle, km) {
+    AS.yoklayan[id] = true;
     setTimeout(async function () {
+      if (AS.goruldu[id]) { delete AS.yoklayan[id]; return; }
       var c = null;
       try { c = await window.MMVeri.sohbetCevap(id); } catch (e) { c = null; }
-      if (c) { MM.asistanSon = { metin: String(c.cevap || ''), ts: Date.now() }; asBitir({ k: 'asistan', metin: String(c.cevap || ''), klasorler: c.klasorler, soru: soru }); return; }
+      if (AS.goruldu[id]) { delete AS.yoklayan[id]; return; }   
+      if (c) {
+        AS.goruldu[id] = true; delete AS.yoklayan[id]; asBekleSil(id); asGecKaldir(km);
+        MM.asistanSon = { metin: String(c.cevap || ''), ts: Date.now() };
+        asSonuc(id, { k: 'asistan', metin: String(c.cevap || ''), klasorler: c.klasorler, soru: soru }, km, soru); return;
+      }
       gecen += bekle;
-      if (gecen >= 300000) { asBitir({ k: 'asistan', metin: Tt('Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.'), soru: soru, hata: true }); return; }
-      asYokla(id, soru, gecen, Math.min(15000, bekle + 2500));
+      if (gecen >= 1800000) { delete AS.yoklayan[id]; asBekleSil(id); asGecKaldir(km); asSonuc(id, { k: 'asistan', metin: Tt('Cevap gecikti. Yeniden sorabilir ya da iş olarak iletebilirsiniz.'), soru: soru, hata: true }, km, soru); return; }
+      if (gecen >= 300000 && km && !km.gecikmis) {   
+        asGecBasla(km); asBeklemeBirak(id);
+      }
+      asYokla(id, soru, gecen, gecen >= 300000 ? 30000 : Math.min(15000, bekle + 2500), km);
     }, bekle);
+  }
+  function asDevam() {   
+    asBekleListe().forEach(function (v) {
+      if (!v || !v.id || AS.goruldu[v.id] || AS.yoklayan[v.id]) return;
+      var gecen = Math.max(0, Date.now() - (v.ts || 0));   
+      if (gecen >= 1800000) { asBekleSil(v.id); return; }
+      var soru = String(v.soru || ''), km = { k: 'kullanici', metin: soru, soruId: v.id };
+      asEkle(km);
+      if (gecen < 300000) { if (!AS.bekleyen) { AS.bekleyen = true; AS.bekleyenId = v.id; asUiGuncelle(); } asYokla(v.id, soru, gecen, 5000, km); }
+      else { asGecBasla(km); asYokla(v.id, soru, gecen, 1000, km); }
+    });
   }
   async function asGonder(soru, tekrar, ekler, eskiKm) {
     soru = String(soru || '').trim().slice(0, 1000);
@@ -147,7 +193,7 @@
     var km = { k: 'kullanici', metin: soru, ekBilgi: ekler.map(function (e, i) { return { n: i + 1, tur: e.tur, boyut: e.boyut, ad: e.ad || (e.tur === 'pdf' ? 'belge.pdf' : 'fotoğraf.jpg') }; }) };
     if (tekrar && eskiKm) km = eskiKm;   
     if (!tekrar) asEkle(km); else asUiGuncelle();
-    try { var s = await window.MMVeri.sohbetSor(soru, null, ekler); km.soruId = s.id; asYokla(s.id, soru, 0, 5000); }
+    try { var s = await window.MMVeri.sohbetSor(soru, null, ekler); km.soruId = s.id; AS.bekleyenId = s.id; asBekleEkle({ id: s.id, soru: soru, ts: Date.now() }); asYokla(s.id, soru, 0, 5000, km); }
     catch (err) { asBitir({ k: 'asistan', metin: Tt('Soru iletilemedi') + ' (' + (err && err.message ? err.message : Tt('hata')) + ').', soru: soru, hata: true, ekler: ekler, km: km }); }
     return true;
   }
@@ -209,6 +255,7 @@
       } }, [ekDugme, ekGirdi, giriKutu, gonderDugme]);
       [akis, ekPanel, giris, h('p', { sinif: 'soluk kucuk', metin: Tt('Sorular ve cevaplar denetim için kayda alınır, 90 gün saklanır.') })].forEach(function (x) { sohbetGovde.appendChild(x); });
       AS.gecmis.forEach(function (o) { akis.appendChild(asBalon(o)); if (o.soru && o.k === 'asistan') akis.appendChild(asEylemSatiri(o)); });   
+      if (!AS.gecmis.length) { asDevam(); }
       if (!AS.gecmis.length) {   
         var ORNEK = { siparis: 'Açık siparişlerin durumu nedir?', makineler: 'Bugün hangi makinelerde duruş var?', stok: 'Kritik stok seviyesindeki ürünler hangileri?', eldiven: 'Eldiven konteynerlerinin durumu nedir?' };
         var chipler = erisilen.filter(function (k) { return ORNEK[k[0]]; }).slice(0, 4).map(function (k) {

@@ -34,6 +34,7 @@
   }
    
   var DK_ILK = 20;
+  var UD = null;   
   function mSayi(v) { return typeof v === 'number' && isFinite(v); }
   function m2Yaz(n) { return n.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
   function dokumaGecerli(d) {    
@@ -61,7 +62,7 @@
   MM.makineEkSinama = { adimSonuc: adimSonuc, ESKI_MS: ESKI_MS, dokumaGecerli: dokumaGecerli, dokumaSalonlar: dokumaSalonlar, dokumaSirala: dokumaSirala, dokumaToplam: dokumaToplam, m2Yaz: m2Yaz };
    
    
-  var acikDurum = { canli: false, tahmin: false };
+  var acikDurum = { canli: false, tahmin: !(window.matchMedia && window.matchMedia('(max-width: 599px)').matches) };   
   function acilir(anahtar, ozet, icerik) {
     var ac = h('details', { sinif: 'acilir-bolum me-ac' }, [ozet, icerik]);
     if (acikDurum[anahtar]) ac.setAttribute('open', '');
@@ -71,13 +72,13 @@
   function canliCiz(kutu, liste, veriMs, durum) {
     kutu.textContent = '';
     var ogeler = [], simdi = Date.now(), uyarili = [], calisan = [];
-    var dar = !!(window.matchMedia && window.matchMedia('(max-width: 599px)').matches);
+    var dar = false;   
     liste.forEach(function (c) {
       var eski = (simdi - veriMs + (c.veri_yas_sn || 0) * 1000) > ESKI_MS;
       var sayi = h('div', { sinif: 'me-canli-sayi', metin: say(c.adet) });
       var alt = h('div', { sinif: 'me-canli-alt', metin: eski ? 'veri gecikmeli · artmıyor' : (c.calisiyor ? say(c.hiz_dk) + ' adet/dk' : (c.adet == null ? 'veri yok' : 'duruyor · artmıyor')) });
       var artar = c.calisiyor && !eski;
-      var k = h('div', { sinif: 'me-canli-kutu' + (artar ? '' : ' dur') }, [h('div', { sinif: 'me-canli-hat', metin: 'Hat ' + c.hat }), sayi, alt,
+      var k = h('div', { sinif: 'me-canli-kutu' + (artar ? ' ok' : (eski || c.adet == null ? ' dur yok' : ' dur dus')) }, [h('div', { sinif: 'me-canli-hat', metin: 'Hat ' + c.hat }), sayi, alt,
         h('div', { sinif: 'me-canli-vard', 'data-hat': c.hat }),
         eski ? h('span', { sinif: 'me-etiket', metin: 'veri gecikmeli' }) : (c.calisiyor ? h('span', { sinif: 'me-etiket', metin: c.adet_tahmin ? 'canlı tahmini · adet tahmin' : 'canlı tahmini' }) : null)]);
       (artar && dar ? calisan : uyarili).push(k);   
@@ -147,7 +148,9 @@
     var v = h('div', { sinif: 'me-vardiya' }, a.vardiyalar.map(function (x) {
       return h('div', null, [h('span', { metin: x.ad + ' · ' + x.saat }), h('b', { metin: say(x.adet) + ' alarm' }), h('span', { metin: say(x.dk) + ' dk toplam' }), h('span', { sinif: 'me-soluk', metin: x.neden_girildi + ' / ' + x.adet + ' kayıtta neden girilmiş' })]);
     }));
-    var l = G.ilkN(a.son || [], function (x) { return h('div', { sinif: 'me-alarm-satir' }, [h('span', { metin: x.bas + ' · ' + x.hat }), h('span', { metin: x.alarm + ' · ' + say(x.dk) + ' dk · ' + x.vardiya })]); }, { n: 10, sinif: 'me-alarm-liste' });
+    var ALARM_AD = { 'hat-durus': 'Hat durdu', 'dusuk-uretim': 'Düşük üretim' };   
+    var alarmAd = function (k) { return ALARM_AD[k] || (k ? String(k).replace(/-/g, ' ').replace(/^./, function (c) { return c.toLocaleUpperCase('tr-TR'); }) : 'Alarm'); };
+    var l = G.ilkN(a.son || [], function (x) { return h('div', { sinif: 'me-alarm-satir' }, [h('span', { metin: x.bas + ' · ' + x.hat }), h('span', { metin: alarmAd(x.alarm) + ' · ' + say(x.dk) + ' dk · ' + x.vardiya })]); }, { n: 10, sinif: 'me-alarm-liste' });
     return h('div', null, [v, l, h('p', { sinif: 'me-soluk', metin: 'Son 24 saat, ' + say(a.toplam) + ' alarm; kişi adı yok.' })]);
   }
 
@@ -163,12 +166,15 @@
   function dokumaKart(v, durum, yeniden) {
     var tr = window.MM.t || function (x) { return x };
     var sal = dokumaSalonlar(v.liste), toplam = dokumaToplam(v.liste), tanim = v.liste.filter(function (x) { return !mSayi(x.m2); }).length;
+    var udSay = UD ? v.liste.filter(function (x) { return UD[String(x.no)]; }).length : 0;
+    var sifirHepsi = !v.liste.some(function (x) { return mSayi(x.m2) && x.m2 > 0; });   
     var saat = saatYaz(v.zaman), alt = [v.ad, saat ? tr('veri saati') + ' ' + saat : ''].filter(Boolean).join(' · ');
-    var ozet = h('div', { sinif: 'me-dk-ozet' }, [h('div', { sinif: 'me-dk-kutu me-dk-toplam' }, [h('span', { sinif: 'me-soluk', metin: tr('Toplam') }), h('b', { metin: m2Yaz(toplam) + ' m²' })])]);
+    var ozet = h('div', { sinif: 'me-dk-ozet' }, [h('div', { sinif: 'me-dk-kutu me-dk-toplam' }, [h('span', { sinif: 'me-soluk', metin: tr('Toplam') }), h('b', { metin: sifirHepsi ? '—' : m2Yaz(toplam) + ' m²' })])]);
     var salonlar = h('div', { sinif: 'me-dk-salonlar', style: 'grid-template-columns:repeat(' + Math.max(sal.length, 1) + ',minmax(0,1fr))' }, sal.map(function (s) {
-      return h('div', { sinif: 'me-dk-kutu' }, [h('span', { sinif: 'me-soluk', metin: tr('Salon') + ' ' + s.salon }), h('b', { metin: s.sayi ? m2Yaz(s.toplam) : '—' })]);
+      return h('div', { sinif: 'me-dk-kutu' }, [h('span', { sinif: 'me-soluk', metin: tr('Salon') + ' ' + s.salon }), h('b', { metin: s.sayi && !sifirHepsi ? m2Yaz(s.toplam) : '—' })]);
     }));
     var govde = h('div', null, [ozet, salonlar]);
+    if (sifirHepsi) govde.appendChild(h('p', { sinif: 'me-soluk me-uyari', metin: udSay >= v.liste.length - tanim ? tr('Planlı üretim dışı') + ' · ' + say(udSay) : tr('Tüm tezgâhlar 0 bildiriyor; ölçüm gelmedi sayıldı, toplam yazılmadı') }));
     if (tanim) govde.appendChild(h('p', { sinif: 'me-soluk', metin: tr('{n} tezgahta m² bilgisi tanımsız (toplama katılmadı)').replace('{n}', say(tanim)) }));
     var ac = h('details', { sinif: 'acilir-bolum me-dk-ac' }, [h('summary', { metin: tr('Tezgah bazında') })]);
     if (durum.acik) ac.setAttribute('open', '');
@@ -179,8 +185,8 @@
       var tum = dokumaSirala(v.liste, durum.salon), gor = tum.slice(0, durum.n);
       liste.appendChild(G.cipler([['t', tr('Tümü')]].concat(sal.map(function (s) { return [s.salon, tr('Salon') + ' ' + s.salon]; })), durum.salon, function (id) { durum.salon = id; durum.n = DK_ILK; listeCiz(); }, tr('Salon süzgeci')));
       liste.appendChild(h('div', { sinif: 'me-dk-izgara' }, gor.map(function (x) {
-        var sayi = mSayi(x.m2);
-        return h('div', { sinif: 'me-dk-hucre' + (sayi && x.m2 === 0 ? ' sifir' : '') + (sayi ? '' : ' tanimsiz') }, [h('span', { metin: String(x.no) }), h('b', { metin: sayi ? m2Yaz(x.m2) : tr('tanımsız') })]);
+        var sayi = mSayi(x.m2), disi = !!(UD && UD[String(x.no)]);
+        return h('div', { sinif: 'me-dk-hucre' + (disi ? ' tanimsiz' : (sayi && x.m2 === 0 ? ' sifir' : '') + (sayi ? '' : ' tanimsiz')) }, [h('span', { metin: String(x.no) }), h('b', { metin: disi ? tr('üretim dışı') : (sayi ? m2Yaz(x.m2) : tr('tanımsız')) })]);
       })));
       if (tum.length > gor.length) liste.appendChild(h('button', { type: 'button', sinif: 'mini-dugme', metin: tr('Daha fazla göster'), onclick: function () { durum.n += DK_ILK; listeCiz(); } }));
     }
@@ -264,12 +270,12 @@
     }
     function ciz(d) {   
       digerKok.textContent = ''; durusKok.textContent = '';
-      digerKok.appendChild(kart('Gün sonu tahmini', 'tahmin', tahminBolum(d.tahmin)));
+      digerKok.appendChild(kart('Gün sonu tahmini', 'tahmin · bugünkü hıza göre, ölçüm değil', tahminBolum(d.tahmin)));
       dokumaKok.textContent = '';
       try { var dv = dokumaGecerli(d); if (dv) dokumaKok.appendChild(dokumaKart(dv, dokumaDurum)); } catch (e) { dokumaKok.textContent = ''; }    
       gecmisUst.textContent = '';
       gecmisUst.appendChild(kart('OEE kırılımı', null, oeeBolum(d.oee)));
-      gecmisUst.appendChild(kart('Makine bazında fire', 'makinenin bildirdiği oran · adet', fireBolum(d.fire)));
+      gecmisUst.appendChild(kart('Makine bazında fire', 'makinenin bildirdiği oran', fireBolum(d.fire)));
       durusKok.appendChild(kart('Duruş nedenleri', 'Vardiya bazlı Pareto', paretoBolum(d.pareto)));
       durusKok.appendChild(kart('Vardiya zaman şeridi', null, seritBolum(d.serit)));
       durusKok.appendChild(kart('Alarm geçmişi', 'Son 24 saat · vardiya', alarmBolum(d.alarm_24s)));
@@ -281,7 +287,7 @@
       durum.canli.forEach(function (o) {
         var s = adimSonuc(o, simdi);
         if (s.eskidi) {   
-          o.artar = false; o.k.className = 'me-canli-kutu dur'; o.alt.textContent = 'veri gecikmeli · artmıyor';
+          o.artar = false; o.k.className = 'me-canli-kutu dur yok'; o.alt.textContent = 'veri gecikmeli · artmıyor';
           var et = o.k.querySelector('.me-etiket'); if (et) et.textContent = 'veri gecikmeli'; else o.k.appendChild(h('span', { sinif: 'me-etiket', metin: 'veri gecikmeli' }));
           var ic = o.k.parentNode;   
           if (ic && ic.classList && ic.classList.contains('me-canli-ic')) {
@@ -314,6 +320,11 @@
           try {
             var r = await window.MMVeri.oku('fabrika', 'makine-ek'), d = r.veri || {};
             if (!canli_) return;
+            try {   
+              var rd = await window.MMVeri.oku('fabrika', 'dokuma-veri'), tz = (rd.veri || {}).tezgahlar || [], ks = {};
+              tz.forEach(function (x) { if (x && x.uretim_disi === true) ks[String(x.no)] = true; });
+              UD = Object.keys(ks).length ? ks : null;
+            } catch (e2) { UD = null; }
             ciz(d); ekYuklendi = true; sonEk = simdi; donemYukle();
             vardMap = d.vardiya_hat || {};
             await operatorYukle();

@@ -77,7 +77,7 @@
       kap.appendChild(G.ozetSerit(kutular, { en: 4 }));
       var dar = window.innerWidth < 600;
       var grafikGovde = !ciftler.length ? h('p', { sinif: 'ny-ipucu', metin: 'Hesaplanabilen hat ailesi yok.' })
-        : (dar ? G.yatay(ciftler.map(function (c) { return { e: c.e, d: c.d, etiketDeger: ondalik(c.d) }; }), {}) : G.cubuk(ciftler, { ad: 'Kaç günlük iş', yukseklik: 200 }));
+        : G.yatay(ciftler.map(function (c) { return { e: c.e, d: c.d, etiketDeger: ondalik(c.d) + ' gün' }; }), {});   
       var grafikKart = h('div', { sinif: 'ust-bosluk' }, [G.kart({ sinif: 'up-grafik', baslik: 'Hat ailesi yükü', alt: 'açık işin kaç günlük olduğu', govde: grafikGovde })]);
       kap.appendChild(h('div', { sinif: 'ust-bosluk' }, [G.kart({ baslik: 'Hat aileleri', alt: 'son 10 iş günü ortalaması', govde: G.tablo({ sayfa: 10, bos: 'Hat ailesi yok.', satirlar: aileler, kolonlar: [
         { k: 'etiket', ad: 'Hat ailesi', ciz: function (r) { return r.etiket || AILE_AD[r.aile] || r.aile; } },

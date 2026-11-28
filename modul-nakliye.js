@@ -347,11 +347,15 @@
   }
   function gsSirket(r, harita) { if (r.sirket) return r.sirket; var o = GS_ON[String(r.irsaliye_no || '').slice(0, 2)]; return o || (r.teslimat_no && harita[r.teslimat_no]) || ''; }
   function gsRozet(ad, yazi, zemin, ikon) { return h('span', { sinif: 'tq-rozet gs-rozet', style: 'color:' + yazi + ';background:' + zemin }, [G.ikon(ikon, 13), ad]); }
-  function gsKurum(r) {
-    var rz = [r.irsaliye_no ? gsRozet('İrsaliyeli', 'var(--yesil)', 'var(--yesil-zemin)', 'tik') : gsRozet('İrsaliyesiz', 'var(--soluk)', 'var(--yuzey3)', 'bilgi')];
-    if (r.koli == null) rz.push(gsRozet('Koli girilmemiş', 'var(--sari)', 'var(--sari-zemin)', 'bilgi'));
-    if (r.aciklama_var) rz.push(gsRozet('Not var', 'var(--vurgu-sert)', 'var(--vurgu-zemin)', 'bilgi'));
-    return h('span', { sinif: 'gs-kurum' }, [h('span', { sinif: 'gs-kurum-ad', metin: dolu(r.teslim_alan_kurum) }), h('span', { sinif: 'gs-rozetler' }, rz)]);
+   
+  function gsKurumCiz(sapGorunum) {
+    return function (r) {
+      var rz = [];
+      rz.push(r.irsaliye_no ? gsRozet('İrsaliyeli', 'var(--yesil)', 'var(--yesil-zemin)', 'tik') : gsRozet('İrsaliyesiz', 'var(--soluk)', 'var(--yuzey3)', 'bilgi'));
+      if (!sapGorunum && r.koli == null) rz.push(gsRozet('Koli girilmemiş', 'var(--sari)', 'var(--sari-zemin)', 'bilgi'));
+      if (r.aciklama_var) rz.push(gsRozet('Not var', 'var(--vurgu-sert)', 'var(--vurgu-zemin)', 'bilgi'));
+      return h('span', { sinif: 'gs-kurum' }, [h('span', { sinif: 'gs-kurum-ad', metin: dolu(r.teslim_alan_kurum) }), rz.length ? h('span', { sinif: 'gs-rozetler' }, rz) : null]);
+    };
   }
   function gsMiktarMetin(mk) { return birimler(mk).map(function (u) { return say(mk[u]) + (u === '—' ? '' : ' ' + u); }).join(' · ') || '—'; }
   function gunlukGorunum(v, st, yeniden, turGr, turTem) {
@@ -359,7 +363,11 @@
     if (!gs || !Array.isArray(gs.satirlar)) { kap.appendChild(G.bos({ baslik: 'Günlük sevk yok', metin: 'Günlük sevkiyat listesi henüz gelmedi.' })); return kap; }
     var okn = gs.okn && Array.isArray(gs.okn.satirlar) && gs.okn.satirlar.length ? gs.okn : null;
     var tum = (okn ? okn.satirlar : gs.satirlar).filter(function (r) { return r.miktar !== 0; }).map(gsNorm);
-    if (!okn) { var pn = planNotu(v); if (pn) kap.appendChild(pn); }
+    if (!okn) {
+      var pn = planNotu(v); if (pn) kap.appendChild(pn);
+      kap.appendChild(veriSatiri(v.asof || v.uretim));
+      kap.appendChild(h('p', { sinif: 'kucuk soluk', metin: 'Koli ve irsaliye bilgisi son günlerde eksik olabilir; koli durumu Kargo sekmesinde.' }));
+    }
     else {
       var odk = okn.dosya_zamani ? MM.yasDk(okn.dosya_zamani) : null;
       if (odk != null && odk > 36 * 60) kap.appendChild(h('div', { sinif: 'bant sari kucuk-bant', role: 'status', metin: 'Günlük liste ' + MM.yasMetin(odk) + ' güncellendi.' }));
@@ -398,7 +406,7 @@
     kap.appendChild(ozAlan); kap.appendChild(grupAlan); kap.appendChild(alan);
     function cv(k) { return function (r) { return r[k] == null ? '' : r[k]; }; }
     var kol = [
-      { ad: 'Malı Teslim Alan', k: 'teslim_alan_kurum', ciz: gsKurum, csv: cv('teslim_alan_kurum') },
+      { ad: 'Malı Teslim Alan', k: 'teslim_alan_kurum', ciz: gsKurumCiz(!okn), csv: cv('teslim_alan_kurum') },
       { ad: 'Malzeme Kodu', k: 'urun_kodu', ciz: function (r) { return dolu(r.urun_kodu); }, csv: cv('urun_kodu') },
       { ad: 'Malzeme Adı', k: 'malzeme', ciz: function (r) { return dolu(r.malzeme); }, csv: cv('malzeme') },
       { ad: 'Miktar', k: 'miktar', sag: true, ciz: function (r) { return r.miktar == null ? '—' : say(r.miktar); }, deger: function (r) { return r.miktar; }, csv: cv('miktar') },

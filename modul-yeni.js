@@ -780,7 +780,7 @@
         return k;
       }
        
-      function limitTab() {
+      function findeksLimitler() {
         var k = h('div'), bl = v.banka_limit, L = bl && Array.isArray(bl.liste) ? bl.liste : [];
         if (!L.length) { k.appendChild(gr.bos({ tur: 'bekle', baslik: 'Limit verisi bekleniyor', metin: 'Banka limitleri finans ekibinden alındığında banka banka burada görünecek.' })); return k; }
         var kay = Array.isArray(bl.kaynak) ? bl.kaynak.join(', ') : (bl.kaynak || 'Banka limit listesi');
@@ -819,6 +819,80 @@
               h('p', { sinif: 'hz-limit kucuk soluk', metin: [x.limit_kaynak ? 'Limit kaynağı: ' + x.limit_kaynak : '', x.revize_vadesi ? 'Revize vadesi ' + trT(x.revize_vadesi) : '', x.not || ''].filter(Boolean).join(' · ') || 'Limit kaynağı belirtilmemiş' })])]);
         }, { sinif: 'hz-banka-izgara', n: telL ? 3 : 10 });
         k.appendChild(h('div', { sinif: 'ust-bosluk' }, [kartlar]));
+        return k;
+      }
+       
+      function limitTab() {
+        var k = h('div', { sinif: 'hz-gor' }), bl = v.banka_limit, L = bl && Array.isArray(bl.liste) ? bl.liste : [];
+        if (!L.length) { k.appendChild(gr.bos({ tur: 'bekle', baslik: 'Limit verisi bekleniyor', metin: 'Banka limitleri finans ekibinden alındığında banka banka burada görünecek.' })); return k; }
+        var T0 = bl.toplam || {}, ANA = 'mm.finans.limitGorunum', sec = 'borc';
+        try { var sk = sessionStorage.getItem(ANA); if (sk === 'borc' || sk === 'limit') sec = sk; } catch (e) {   }
+        var gov = h('div', { 'aria-live': 'polite' });
+        function ik(n) { return n == null ? '—' : mn(n); }
+        function fmtD(iso) { return iso ? trT(String(iso).slice(0, 10)) : ''; }
+        function kontrolMetin(c) {
+          var M = { limit_toplam: 'Limit toplamı kalemlerin toplamıyla tutmuyor; kontrol edilmeli.', risk_toplam: 'Toplam risk kalemlerin toplamıyla tutmuyor; kontrol edilmeli.', kullanilabilir: 'Kullanılabilir tutar, limit ve risk farkıyla tutmuyor; kontrol edilmeli.', eksik_hucre: 'Bir tutar boş geldi, hesaplanamadı; kontrol edilmeli.', guncelleme_yok: 'Güncelleme tarihi yok; kontrol edilmeli.', revize_gecmis: 'Limit revize tarihi geçmiş.' };
+          if (c.kod === 'bayat') return 'Güncelleme ' + (c.gun != null ? c.gun + ' gün önce' : 'eski') + ' yapılmış.';
+          return M[c.kod] || 'Kontrol edilmeli.';
+        }
+         
+        function borcGor() {
+          var d = h('div'), B = L.filter(function (x) { return x.borc && x.borc.tl_karsiligi != null; }).sort(function (a, b) { return b.borc.tl_karsiligi - a.borc.tl_karsiligi; });
+          if (!B.length) { d.appendChild(gr.bos({ tur: 'bekle', baslik: 'Bağlı veri yok', metin: 'Kredi bilgisi bağlanınca bankaya borcumuz burada görünecek.' })); return d; }
+          var tpl = T0.borc_tl_karsiligi != null ? T0.borc_tl_karsiligi : B.reduce(function (a, x) { return a + x.borc.tl_karsiligi; }, 0);
+          d.appendChild(kaynakSatir('', v.kaynak && v.kaynak.tarih_itibariyle));
+          d.appendChild(h('div', { sinif: 'kpi-izgara hz-lim-kpi' }, [gr.kpi({ baslik: 'Bankaya toplam borcumuz', deger: mn(tpl), birim: B.length + ' banka · ' + (T0.borc_adet != null ? T0.borc_adet : B.reduce(function (a, x) { return a + (x.borc.adet || 0); }, 0)) + ' kredi', ikon: 'liste' })]));
+          d.appendChild(xDugme('Bankaya borcumuz', ['Banka', 'Borç TL karşılığı', 'TL borç', 'USD borç', 'Kredi adedi'], B.map(function (x) { return [x.gorunen_ad || x.banka, x.borc.tl_karsiligi, x.borc.tl, x.borc.usd, x.borc.adet]; })) || document.createComment(''));
+          d.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.sayfali(B, function (x) {
+            var b = x.borc;
+            return h('article', { sinif: 'hz-banka hz-lim' }, [
+              h('div', { sinif: 'hz-lim-ust' }, [bankaLogo(x.banka, x.logo), h('h4', { metin: x.gorunen_ad || x.banka })]),
+              h('div', { sinif: 'hz-lim-bos' }, [h('small', { metin: 'Borcumuz (TL karşılığı)' }), h('b', { metin: mn(b.tl_karsiligi) })]),
+              ls2('TL borç', b.tl ? mn(b.tl) : '—'), ls2('USD borç', b.usd ? dvz(b.usd, 'USD') : '—'), ls2('Kredi', b.adet != null ? b.adet + ' adet' : '—')]);
+          }, { sinif: 'hz-banka-izgara', n: hzn() })]));
+          d.appendChild(h('p', { sinif: 'hz-kaynak kucuk soluk ust-bosluk', metin: 'Taksitli kredide kalan anapara + faiz, diğerlerinde kalan anapara.' }));
+          return d;
+        }
+        function ls2(a, b) { return h('div', { sinif: 'hz-b-satir' }, [h('span', { metin: a }), h('b', { metin: b })]); }
+         
+        function limitGor() {
+          var d = h('div'), U = L.filter(function (x) { return x.kullanim; }), Y = L.filter(function (x) { return !x.kullanim && x.limit_tl != null; });
+          if (!U.length) { d.appendChild(gr.bos({ tur: 'bekle', baslik: 'Bağlı veri yok', metin: 'Limit ve risk tablosu bağlanınca kullanılabilir limit burada görünecek.' })); return d; }
+          if (bl.kullanim_bayat) { d.appendChild(h('div', { sinif: 'bant sari', role: 'status', metin: 'Güncel limit tablosu okunamadı (dosya şu an açık). Son okunabilen tablo ' + fmtD(bl.kullanim_tarih) + ' tarihli olduğu için rakamlar gösterilmiyor.' })); return d; }    
+          d.appendChild(kaynakSatir('', bl.kullanim_tarih));
+          (Array.isArray(bl.kullanim_uyari) ? bl.kullanim_uyari : []).forEach(function (u) { d.appendChild(h('div', { sinif: 'bant sari', role: 'status', metin: u.metin || '' })); });
+          var bay = U.filter(function (x) { return (x.kullanim.kontrol || []).some(function (c) { return c.kod === 'bayat'; }); }).length;
+          if (bay) d.appendChild(h('div', { sinif: 'bant sari', role: 'status' }, [h('strong', { metin: 'Güncel olmayan limit var' }), ' — ' + bay + ' bankanın tablosu 7 günden eski; kullanılabilir tutar eski olabilir.']));
+          var kul = T0.kullanim_kullanilabilir_tl;
+          d.appendChild(h('div', { sinif: 'kpi-izgara hz-lim-kpi' }, [
+            gr.kpi({ baslik: 'Toplam kullanılabilir limit', deger: ik(kul), birim: T0.kullanim_kullanilabilir_usd != null ? dvz(T0.kullanim_kullanilabilir_usd, 'USD') : '', ikon: 'tik', durum: kul == null ? 'yok' : (kul < 0 ? 'kritik' : 'iyi') }),
+            gr.kpi({ baslik: 'Toplam limit', deger: ik(T0.kullanim_limit_toplam_tl), birim: U.length + ' banka', ikon: 'liste' }),
+            gr.kpi({ baslik: 'Toplam risk', deger: ik(T0.kullanim_risk_toplam_tl), birim: T0.kullanim_asim_banka_adet ? T0.kullanim_asim_banka_adet + ' bankada limit aşımı' : '', ikon: 'cubuk' })]));
+          var S = U.slice().sort(function (a, b) { return (a.kullanim.kullanilabilir_tl == null ? Infinity : a.kullanim.kullanilabilir_tl) - (b.kullanim.kullanilabilir_tl == null ? Infinity : b.kullanim.kullanilabilir_tl); });
+          d.appendChild(xDugme('Kullanılabilir limit', ['Banka', 'Limit (TL)', 'Teminat (TL)', 'Risk (TL)', 'Kullanılabilir (TL)', 'Kullanılabilir (USD)', 'Güncelleme', 'Revize'], S.map(function (x) { var u = x.kullanim; return [x.gorunen_ad || x.banka, u.limit_toplam_tl, u.teminat_toplam_tl, u.risk_toplam_tl, u.kullanilabilir_tl, u.kullanilabilir_usd, fmtD(u.guncelleme), fmtD(u.revize)]; })) || document.createComment(''));
+          function hucre(a, b, c, kr_) { return h('div', { sinif: 'hz-lim-h' + (kr_ ? ' neg' : '') }, [h('small', { metin: a }), h('b', { metin: b }), c ? h('small', { metin: c }) : null]); }
+          d.appendChild(h('div', { sinif: 'ust-bosluk' }, [gr.sayfali(S, function (x) {
+            var u = x.kullanim, neg = u.kullanilabilir_tl != null && u.kullanilabilir_tl < 0, ks = (u.kontrol || []).filter(function (c) { return c.ekran === false ? false : true; }), bayat = ks.some(function (c) { return c.kod === 'bayat'; }), ac = false;
+            var det = h('div', { sinif: 'hz-lim-detay', hidden: true });
+            function liste(bs, kal, f) { return kal && kal.length ? h('div', { sinif: 'hz-lim-liste' }, [h('strong', { metin: bs })].concat(kal.map(function (z) { return ls2(z.ad, f(z)); }))) : null; }
+            [liste('Limit kalemleri', u.limit_kalemleri, function (z) { return z.pb && z.pb !== 'TL' ? dvz(z.tutar, z.pb) : mn(z.tutar); }), liste('Teminat kalemleri', u.teminat_kalemleri, function (z) { return mn(z.tl); }), liste('Risk kalemleri', u.risk_kalemleri, function (z) { return mn(z.tl) + (z.usd ? ' · ' + dvz(z.usd, 'USD') : ''); })].forEach(function (e) { if (e) det.appendChild(e); });
+            det.appendChild(h('p', { sinif: 'hz-limit kucuk soluk', metin: 'Revize ' + (u.revize ? fmtD(u.revize) : '—') + ' · Güncelleme ' + (u.guncelleme ? fmtD(u.guncelleme) : '—') }));
+            if (x.fark_tl != null) det.appendChild(h('p', { sinif: 'hz-limit', metin: 'Bankanın saydığı risk, borcumuzdan ' + mn(Math.abs(x.fark_tl)) + (x.fark_tl >= 0 ? ' fazla (faiz/marj ya da tarih farkı olabilir).' : ' az (faiz/marj ya da tarih farkı olabilir).') }));
+            if (bayat) det.appendChild(h('div', { sinif: 'bant sari', role: 'status', metin: 'Bu bankanın tablosu güncel değil; kullanılabilir tutar eski olabilir.' }));
+            ks.filter(function (c) { return c.kod !== 'bayat'; }).forEach(function (c) { det.appendChild(h('p', { sinif: 'hz-limit kucuk soluk hz-kontrol', metin: kontrolMetin(c) })); });
+            if (x.limit_tl != null) det.appendChild(h('p', { sinif: 'hz-limit kucuk soluk', metin: 'Findeks gözüyle: limit ' + mn(x.limit_tl) + ' / risk ' + mn(x.risk_tl) }));
+            var dug = h('button', { type: 'button', sinif: 'hz-lim-satir', 'aria-expanded': 'false', onclick: function () { ac = !ac; det.hidden = !ac; dug.setAttribute('aria-expanded', ac ? 'true' : 'false'); dug.classList.toggle('acik', ac); } }, [
+              h('span', { sinif: 'hz-lim-ust' }, [bankaLogo(x.banka, x.logo), h('span', { sinif: 'hz-lim-ad', metin: x.gorunen_ad || x.banka }), neg ? h('span', { sinif: 'hz-asim', metin: 'Limit aşımı' }) : null, bayat ? h('span', { sinif: 'hz-bayat', metin: 'Güncel değil' }) : null]),
+              h('span', { sinif: 'hz-lim-izgara' }, [hucre('Limit', ik(u.limit_toplam_tl)), hucre('Teminat', ik(u.teminat_toplam_tl)), hucre('Risk', ik(u.risk_toplam_tl)), hucre('Kullanılabilir', u.kullanilabilir_tl == null ? 'Bağlı veri yok' : ik(u.kullanilabilir_tl), u.kullanilabilir_usd != null ? dvz(u.kullanilabilir_usd, 'USD') : '', neg)])]);
+            return h('article', { sinif: 'hz-banka hz-lim' + (neg ? ' asim' : '') }, [dug, det]);
+          }, { sinif: 'hz-banka-izgara hz-lim-liste-kap', n: hzn() })]));
+          if (Y.length) d.appendChild(h('p', { sinif: 'hz-kaynak kucuk soluk ust-bosluk', metin: 'Bağlı veri yok: ' + Y.map(function (x) { return x.gorunen_ad || x.banka; }).join(', ') }));
+          return d;
+        }
+        function goster() { gov.textContent = ''; gov.appendChild(sec === 'limit' ? limitGor() : borcGor()); }
+        k.appendChild(gr.segment([['borc', 'Bankaya borcumuz'], ['limit', 'Kullanılabilir limit']], sec, function (id) { sec = id; try { sessionStorage.setItem(ANA, id); } catch (e) {   } goster(); }, { ad: 'Banka limitleri görünümü' }));
+        k.appendChild(h('div', { sinif: 'ust-bosluk' }, [gov])); goster();
+        k.appendChild(h('section', { sinif: 'ust-bosluk hz-findeks' }, [h('h3', { metin: 'Findeks (KKB) gözüyle limitler' }), findeksLimitler()]));
         return k;
       }
        

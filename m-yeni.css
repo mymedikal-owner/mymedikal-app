@@ -100,6 +100,16 @@ td:not(.sag) .hz-dvz { align-items: flex-start; }
 .hz-lim-bos { display: flex; align-items: baseline; justify-content: space-between; gap: var(--b3); flex-wrap: wrap; } .hz-lim-bos small { color: var(--soluk); font-size: var(--t-s); font-weight: 600; } .hz-lim-bos b { font-size: var(--t-2xl, 26px); font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; } .hz-lim-bos.neg b, .hz-lim-bos.neg small { color: var(--kirmizi); }
 .hz-lim-bar { height: 10px; background: var(--yuzey2); border-radius: 6px; overflow: hidden; } .hz-lim-bar i { display: block; height: 100%; border-radius: 0 6px 6px 0; }
 .hz-lim-yuzde { margin: 0; }
+ 
+.hz-gor .segment-dugme { min-height: 44px; }
+.hz-lim-satir { display: grid; gap: 8px; width: 100%; min-height: 44px; padding: 0; margin: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.hz-lim-izgara { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px var(--b3); }
+.hz-lim-h { display: grid; gap: 2px; min-width: 0; } .hz-lim-h small { color: var(--soluk); font-size: var(--t-xs); overflow-wrap: anywhere; } .hz-lim-h b { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; } .hz-lim-h.neg b { color: var(--kirmizi); }
+.hz-lim-ad { flex: 1 1 auto; min-width: 0; font-weight: 650; overflow-wrap: anywhere; }
+.hz-asim { font-size: var(--t-xs); font-weight: 650; padding: 2px 8px; border-radius: var(--r-t); background: color-mix(in srgb, var(--kritik) 12%, var(--yuzey)); color: var(--kirmizi); border: 1px solid var(--kritik); }
+.hz-lim-detay { display: grid; gap: 8px; padding-top: 8px; border-top: 1px dashed var(--cizgi); min-width: 0; } .hz-lim-detay[hidden] { display: none; }
+.hz-lim-liste { display: grid; gap: 4px; }
+@media (min-width: 900px) { .hz-lim-izgara { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 599px) { .hz-lim-bos b { font-size: 24px; } }
  
 .hz-acilir { margin: 2px calc(-1 * var(--b2)) var(--b3); padding: var(--b2); background: var(--yuzey2); border-radius: var(--r-s); min-width: 0; }
